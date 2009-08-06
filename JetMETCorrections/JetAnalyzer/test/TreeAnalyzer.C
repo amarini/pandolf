@@ -37,7 +37,7 @@ void TreeAnalyzer::Loop()
 
    Long64_t nentries;
 
-   if( DEBUG_ ) nentries = 10000;
+   if( DEBUG_ ) nentries = 100000;
    else nentries = fChain->GetEntries();
 
    BookStuff();
@@ -639,6 +639,16 @@ if(DEBUG_VERBOSE_  ) std::cout << "Finito calo kt 4" << std::endl;
          Float_t theta_nh = acos( nhPz/p_nh );
          Float_t pt_nh = p_nh*sin(theta_nh);
  
+         Float_t pxJetReco_noNH = pxJetReco - nhPx;
+         Float_t pyJetReco_noNH = pyJetReco - nhPy;
+         Float_t pzJetReco_noNH = pzJetReco - nhPz;
+         Float_t pJetReco_noNH = sqrt( pxJetReco_noNH*pxJetReco_noNH + pyJetReco_noNH*pyJetReco_noNH + pzJetReco_noNH*pzJetReco_noNH); 
+         Float_t thetaJetReco_noNH = acos( pzJetReco_noNH / pJetReco_noNH );
+
+         etaJetReco_noNH_PFItCone5_[nJetReco_PFItCone5_] = -log( tan( thetaJetReco_noNH/2. ) );
+         phiJetReco_noNH_PFItCone5_[nJetReco_PFItCone5_] = atan( pyJetReco_noNH / pxJetReco_noNH );
+         ptJetReco_noNH_PFItCone5_[nJetReco_PFItCone5_] = pJetReco_noNH*sin(thetaJetReco_noNH);
+
          nTracksReco_PFItCone5_[nJetReco_PFItCone5_] = nTracks;
          eTracksReco_PFItCone5_[nJetReco_PFItCone5_] = trackEnergy;
          etTracksReco_PFItCone5_[nJetReco_PFItCone5_] = trackEt;
@@ -752,6 +762,10 @@ void TreeAnalyzer::BookStuff() {
   jetTree_->Branch(   "ptPart_PFItCone5",    ptPart_PFItCone5_,    "ptPart_PFItCone5_[nJetReco_PFItCone5_]/F");
   jetTree_->Branch(  "etaPart_PFItCone5",   etaPart_PFItCone5_,   "etaPart_PFItCone5_[nJetReco_PFItCone5_]/F");
   jetTree_->Branch(  "phiPart_PFItCone5",   phiPart_PFItCone5_,   "phiPart_PFItCone5_[nJetReco_PFItCone5_]/F");
+
+  jetTree_->Branch("etaJetReco_noNH_PFItCone5", etaJetReco_noNH_PFItCone5_, "etaJetReco_noNH_PFItCone5_[nJetReco_PFItCone5_]/F");
+  jetTree_->Branch("phiJetReco_noNH_PFItCone5", phiJetReco_noNH_PFItCone5_, "phiJetReco_noNH_PFItCone5_[nJetReco_PFItCone5_]/F");
+  jetTree_->Branch("ptJetReco_noNH_PFItCone5", ptJetReco_noNH_PFItCone5_, "ptJetReco_noNH_PFItCone5_[nJetReco_PFItCone5_]/F");
 
   jetTree_->Branch("nTracksReco_PFItCone5", nTracksReco_PFItCone5_, "nTracksReco_PFItCone5_[nJetReco_PFItCone5_]/I");
   jetTree_->Branch("eTracksReco_PFItCone5", eTracksReco_PFItCone5_, "eTracksReco_PFItCone5_[nJetReco_PFItCone5_]/F");
