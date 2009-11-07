@@ -5,6 +5,7 @@
 \usepackage{multirow}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{afterpage}
 %\usepackage{here}
 \usepackage{shortvrb,rotating}
 \usepackage{subfigure}
@@ -200,6 +201,13 @@ Francesco Pandolfi, Daniele del Re
 %$^f${\it Instituto de Fisica Teorica-Universidade Estadual Paulista, Sao Paulo, Brazil} \\
 %$^g$ {\it Ghent University, Ghent, Belgium} \\
 \end{small}
+\vspace{1cm}
+Mikko Voutilainen
+\begin{small}
+\begin{center}
+{\it CERN, European Organization for Nuclear Research, Geneva, Switzerland}
+\end{center}
+\end{small}
 \end{center}
 \end{Authlist}
 % Authorlist:
@@ -226,7 +234,7 @@ Francesco Pandolfi, Daniele del Re
 %% authorlist ordering is for motivation and reward within the
 %% working team.
 \begin{abstract}
-sblearch.
+A study of the Particle Flow jet energy composition is presented. It proves to be a crucial aspect to be monitored on first LHC data, because Particle Flow jet reconstruction performance heavily depends on its particle composition. The charged hadron component, furthermore, proves to be a valid meter of the quality with which the jet has been measured.
 \end{abstract} 
 \end{titlepage}
 \tableofcontents
@@ -237,17 +245,12 @@ sblearch.
 
 The Particle Flow event reconstruction \cite{pflow} aims at giving a complete description of the event by reconstructing all final state stable particles. In order to do this, all CMS sub-detectors are exploited in unison in an optimal way. Reconstructed particle candidates are then grouped together to form Particle Flow jets.
 
-The Particle Flow substantially improves jet reconstruction in CMS, delivering jets that are measured more accurately than the ones provided by calorimeter-based reconstruction algorithms. This phenomenon is amplified at low $p_{\mathrm{T}}$, and is due to three main reasons:
+The Particle Flow approach substantially improves jet reconstruction in CMS, delivering jets that are measured more accurately than the ones provided by calorimeter-based reconstruction algorithms. This phenomenon is amplified at low $p_{\mathrm{T}}$, and is due to three main reasons:
 \begin{itemize}
 \item the Particle Flow algorithm is constructed in such a way that at low $p_{\mathrm{T}}$ it makes more extensive relying on the very precise track information; calorimeter jets, conversely, are very inaccurate at low energies, with their resolution dominated by the fluctuations induced by the noise and stochastic HCAL terms;
 \item soft charged jet particles are bent away by the 3.8 T magnetic field, and therefore create deposits far away in the calorimeter with respect to the jet axis; these particles can be recovered by making use of the tracker information, whereas in a calorimeter stand-alone approach they are invariably lost;
 \item the superior tracker granularity allows a correct inter-particle momentum subdivision even for collimated bunches of particles, resulting in a more accurate evaluation of the jet 4-vector.
 \end{itemize}
-
-Compared to traditional jet reconstruction, though, a Particle Flow jet is a more complex object. Therefore, more detailed analyses can and must be done in order to monitor and improve their performance.
-
-This note describes one of such methods, based on the study of a Particle Flow jet's particle composition. Different jet sub-populations can be defined, depending on what fraction of its energy is carried by a certain type of particles. Studying the jet qualities as a function of the variations of these energy fractions gives powerful insight on the nature of the jet itself. One of these variables, the fraction of jet energy carried by charged hadron candidates, proves to be a valid meter of the quality with which the jet has been reconstructed. It can therefore be exploited at analysis level, to select Particle Flow jets that have been measured more accurately, or as a calibration variable, to optimally take into account different classes of jet sub-populations.
-
 
 \begin{table}[b]
 \belowcaptionskip 0cm
@@ -285,13 +288,10 @@ This note describes one of such methods, based on the study of a Particle Flow j
 \end{tabular}
 \end{center}
 \end{table}
-\section{Data Samples}
 
-This analysis makes use of two different sets of data samples from the `Summer 09' production. These events have all been generated and reconstructed with the {\tt CMSSW\_3\_1\_X} software release series, at a centre of mass energy $\sqrt{s} = 10$ TeV. The analysis has been made entirely in {\tt CMSSW\_3\_1\_2}.
+Compared to traditional jet reconstruction, though, a Particle Flow jet is a more complex object. Therefore, more detailed analyses can and must be done in order to monitor and improve their performance.
 
-The results presented in Sections \ref{sec:composition} and \ref{sec:MCtest} have been obtained by analyzing the  QCD di-jet samples, which have been generated in 21 parton transverse momentum ($\hat{p}_{\mathrm{T}}$) bins. The DBS instances of these datasets, as well as the corresponding cross sections and number of events, are shown in Table \ref{tab:dbs_dijet}. On the other hand, the data-driven method for computing and applying such corrections, described in Section \ref{sec:photJet}, makes use of the Photon+Jet samples, listed in Table \ref{tab:dbs_photJet}. These events have instead been generated by simulating different HLT paths, so that each dataset doesn't correspond to a closed interval in $\hat{p}_{\mathrm{T}}$, but an open one (comprising all events with $\hat{p}_{\mathrm{T}}$ greater that a certain threshold).
-
-All events have been correctly weighted on the relative cross sections. In order to do so, a cut on $\hat{p}_{\mathrm{T}}$ has been applied to the Photon+Jet events, to eliminate overlapping values of $\hat{p}_{\mathrm{T}}$ between different datasets.
+This note describes one of such methods, based on the study of a Particle Flow jet's particle composition. Different jet sub-populations can be defined, depending on what fraction of its energy is carried by a certain type of particles. Studying the jet qualities as a function of the variations of these energy fractions gives powerful insight on the nature of the jet itself. One of these variables, the fraction of jet energy carried by charged hadron candidates, proves to be a valid meter of the quality with which the jet has been reconstructed. It can therefore be exploited at analysis level, to select Particle Flow jets that have been measured more accurately, or as a calibration variable, to optimally take into account different classes of jet sub-populations.
 
 
 \begin{table}[tb]
@@ -318,35 +318,37 @@ All events have been correctly weighted on the relative cross sections. In order
 \end{center}
 \end{table}
 
+\section{Data Samples}
+
+This analysis makes use of two different sets of data samples from the `Summer 09' production. These events have all been generated and reconstructed with the {\tt CMSSW\_3\_1\_X} software release series, at a centre of mass energy $\sqrt{s} = 10$ TeV. The analysis has been made entirely in {\tt CMSSW\_3\_1\_2}.
+
+The results presented in Sections \ref{sec:composition} and \ref{sec:MCtest} have been obtained by analyzing the  QCD di-jet samples, which have been generated in 21 parton transverse momentum ($\hat{p}_{\mathrm{T}}$) bins. The DBS instances of these datasets, as well as the corresponding cross sections and number of events, are shown in Table \ref{tab:dbs_dijet}. On the other hand, the data-driven method for computing and applying such corrections, described in Section \ref{sec:photJet}, makes use of the Photon+Jet samples, listed in Table \ref{tab:dbs_photJet}. These events have instead been generated in open $\hat{p}_{\mathrm{T}}$ intervals, comprising of events with $\hat{p}_{\mathrm{T}}$ greater than a certain threshold.
+
+All events have been correctly weighted on the relative cross sections. In order to do so, a cut on $\hat{p}_{\mathrm{T}}$ has been applied to the Photon+Jet events, to eliminate overlapping values of $\hat{p}_{\mathrm{T}}$ between different datasets.
+
+
 \section{Definitions}
 
-Particle jets are defined by choosing a proper jet clustering algorithm. The analysis presented in this note consideres only jets clustered with the anti-$k_{T}$ algorithm \cite{antikt}, with size parameter $R = 0.5$. The same algorithm is applied to generated MC truth particles, obtaining generated jets, and to PFCandidates, obtaining reconstructed Particle Flow jets (see Section \ref{sec:composition} for details).
-
-The two main variables used in the study of jet reconstruction performance are the energy response and energy resolution. The energy response, in a given $p_{\mathrm{T}}$ bin, is usually defined as the arithmetic mean of the 
-$$
-p_{\mathrm{T}}^{\mathrm{\small{RECO}}}/p_{\mathrm{T}}^{\mathrm{\small{GEN}}}
-$$
- distribution, where $p_{\mathrm{T}}^{\mathrm{\small{RECO}}}$ is the reconstructed jet's transverse momentum, and $p_{\mathrm{T}}^{\mathrm{\small{GEN}}}$ is the generated jet's one. The energy resolution is then defined as the standard deviation of such distribution, divided by the response.
- 
-For the purpose of this note, however, we will obtain these two quantities from a gaussian fit to the distributions (unless if specifically noted). The fit function will be initialized with mean and width equal respectively to the mean and RMS of the distribution, and the fit will be extended in an interval of $\pm 2$ standard deviations about the mean, in a 3-step iterative procedure. The response will then be obtained as the resulting function's mean parameter, while the energy resolution as the width divided by the response.
-
-
-\section{Methodology}
-
-This study is divided in two parts: an MC truth based feasibility test, presented in Section \ref{sec:MCtest}, and a data-driven calibration procedure, described in Section \ref{sec:photJet}. In the feasibility test, only the two leading reconstructed jets are considered, if they have $p_{\mathrm{T}}^{\mathrm{\small{RECO}}} > 5$ GeV/$c$. Furthermore a successful matching to generated jets is required:
+Particle jets are defined by choosing a proper jet clustering algorithm. The analysis presented in this note consideres only jets clustered with the anti-$k_{T}$ algorithm \cite{antikt}, with size parameter $R = 0.5$. The same algorithm is applied to generated MC truth particles, obtaining generated jets, and to PFCandidates, obtaining reconstructed Particle Flow jets (see Section \ref{sec:composition} for details). To access the Monte Carlo truth information, reconstructed jets are subsequently matched to generated jets by requiring
 $$
 \Delta R \equiv \sqrt{ \Delta \eta^2 + \Delta \phi^2} < 0.1
 $$
-where $\Delta \eta$ and $\Delta \phi$ are respectively the differences in pseudorapidity and azimuth between the reconstructed and the generated jets. In the case of multiple generated jets satisfying this condition, the closest jet is selected.
+where $\Delta \eta$ and $\Delta \phi$ are respectively the differences in pseudorapidity and azimuth between the reconstructed and the generated jets. In the case of multiple generated jets satisfying this condition, the closest one is selected.
 
-@@@ Qui le condizioni per Photon+Jets?
+The two main variables used in the study of jet reconstruction performance are the energy response and energy resolution. The energy response, in a given $p_{\mathrm{T}}$ bin, is usually defined as the mean of the 
+$$
+p_{\mathrm{T}}^{\mathrm{\small{RECO}}}/p_{\mathrm{T}}^{\mathrm{\small{GEN}}}
+$$
+distribution, where $p_{\mathrm{T}}^{\mathrm{\small{RECO}}}$ is the reconstructed jet's transverse momentum, and $p_{\mathrm{T}}^{\mathrm{\small{GEN}}}$ is the generated jet's one. The energy resolution is then defined as the standard deviation of such distribution, divided by the response. From now on we will refer to response and resolution computed in this way as ``arithmetic''.
+ 
+For the purpose of this note, however, we will also obtain these two quantities from a gaussian fit to the distributions. The fit function will be initialized with mean and width equal respectively to the mean and RMS of the distribution, and the fit will be extended in an interval of $\pm 2$ standard deviations about the mean, in a 3-step iterative procedure. The response will then be obtained as the resulting function's mean parameter, while the energy resolution as the width divided by the response. The method used for the extraction of the jet energy response and resolution, be it arithmetic or from a fit, will nevertheless always be specified.
 
 
 
 \section{Jet Particle Composition}
 \label{sec:composition}
 
-The aim of the Particle Flow reconstruction strategy is to provide a complete description of an event by identifying all stable particles. The algorithm therefore analyzes all of the reconstructed ``elements'' in an event (i.e. tracks, ECAL clusters, HCAL deposits, etc.) in order to create particle candidates. The algorithmic procedure through which Particle Flow particle candidates (in short PFCandidates) are created, is rather complex, for it makes use of ingenious strategies in order to avoid multiple counting of reconstructed energy. It is thoroughly described in \cite{pflow}.
+The aim of the Particle Flow reconstruction strategy is to provide a complete description of an event by identifying all stable particles. The algorithm therefore analyzes all of the reconstructed ``elements'' in an event (i.e. tracks, ECAL clusters, HCAL deposits, etc.) to create particle candidates. The algorithmic procedure through which Particle Flow particle candidates (in short PFCandidates) are created is rather complex, for it makes use of ingenious strategies in order to avoid multiple counting of reconstructed energy. It is thoroughly described in \cite{pflow}.
 
 For what concernes the scope of this note, it is sufficient to say that PFCandidates can be of seven different types, depending on the subdetectors that were used in their reconstruction:
 
@@ -364,7 +366,7 @@ For what concernes the scope of this note, it is sufficient to say that PFCandid
 \centering
 \subfigure[]{\includegraphics[width=7.5cm]{stack_R_vs_eta.pdf}}
 \subfigure[]{\includegraphics[width=7.5cm]{genstack_R_vs_eta.pdf}}
-\caption{Average jet energy compisition as a function of generated pseudorapidity $\eta^{\mathrm{\small{GEN}}}$ for PFJets (a) and generated jets (b). From bottom to top: charged hadrons (red), photons (blue) and neutral hadrons (green), electrons (cyan). Furthermore, in the reconstructed spectrum, particles in the $3 < |\eta| < 5$ region are detected by HF and identified as hadrons (magenta) or electromagnetic particles (grey). See text for details.\label{fig:stack}}
+\caption{Average jet energy compisition as a function of generated pseudorapidity $\eta^{\mathrm{\small{GEN}}}$ for PFJets (a) and generated jets (b). From bottom to top: charged hadrons (red), photons (blue) and neutral hadrons (green), electrons (cyan). Furthermore, in the reconstructed spectrum, particles in the $3 < |\eta| < 5$ region are detected by HF and identified as hadrons (magenta) or electromagnetic particles (grey, on top). See text for details.\label{fig:stack}}
 \end{figure}
 
 We must point out, though, that while the creation of PFCandidates is quite straightforward in the case of isolated particles (a Particle Flow photon is created from an ECAL cluster that is not ``linked'' to tracks or HCAL deposits, a Particle Flow muon when compatible hits are found in the inner tracking system and the muon chambers, and so forth), some complexities arise with bunched particles, such as the case of jets. This is because, while the CMS tracker is able to distinguish charged particles with high efficiency and excellent granularity, neutral particle detection is based on the energy deposits seen in the calorimeters, and is therefore heavily dependant on their resolutions and granularities. While this is not much of a concern for CMS's superb electromagnetic calorimeter, HCAL's inferior performance may limit the reconstruction discrimination power. 
@@ -379,13 +381,6 @@ When a reconstructed track is found to point to a calorimeter energy deposit, th
 \caption{(a): Generated jet neutral hadron energy composition, as a function of the jet pseudorapidity. From bottom to top, neutral hadron energy contributions from neutrons, $K^0_L$'s, $K^0_S$'s, $\Lambda$'s, and, on top (but not labeled on the figure), $\Xi^0$'s. (b): Distribution of the MC truth radial distance of the decay vertices for $K^0_S$ (blue squares) and $\Lambda$ (red circles) mesons produced in the barrel. The shaded band on the left shows the position of ECAL. \label{fig:stackNH}}
 \end{figure}
 
-With seven different PFCandidate types, we can introduce seven corresponding variables, that we will call respectively R$_{\mathrm{ch}}$, R$_{\mathrm{e}}$, R$_{\mu}$, R$_{\gamma}$, R$_{\mathrm{nh}}$, R$_{\mathrm{HFhad}}$ and R$_{\mathrm{HFem}}$, defined as
-$$
-\mathrm{R_{X}} = \frac{\sum E_{\mathrm{X}}}{E_{\mathrm{jet}}}
-$$
-where the sum is extended over all PFCandidates of type `X' composing the considered jet, and $E_{\mathrm{jet}}$ is the total jet energy. These variables therefore represent the fraction of jet energy that is carried by `X-type' PFCandidates.
-
-The study of the average value of these variables as a function of pseudorapidity gives insight on the expected PFJet composition in the CMS detector. This is shown in Figure \ref{fig:stack}a, for PFJets correctly matched to generated jets, as a function of the matched generated jet's pseudorapidity ($\eta_{\mathrm{\small{GEN}}}$). Furthermore, a cut on the generated transverse momentum has been applied ($p_{\mathrm{T}}^{\small{\mathrm{GEN}}} > 80$ GeV/$c$). As expected, the charged energy fraction R$_{\mathrm{ch}}$ starts dropping in correspondance of $|\eta_{\mathrm{\small{GEN}}}|=2.5$, where the silicon tracker ends. Similarly, central calorimetry reaches up to $\eta=3$, which is where the photon and neutral hadron components start giving way to the HF components.
 
 \begin{table} [b]
 \caption{Principal decay modes and branching ratios (BR) for short-lived neutral hadrons. Values are taken from~\cite{PDG}.}
@@ -405,11 +400,20 @@ The study of the average value of these variables as a function of pseudorapidit
        \end{tabular}
 \end{center}
 \end{table}
+\subsection{Energy Fraction Variables}
+
+With seven different PFCandidate types, we can introduce seven corresponding variables, that we will call respectively R$_{\mathrm{ch}}$, R$_{\mathrm{e}}$, R$_{\mu}$, R$_{\gamma}$, R$_{\mathrm{nh}}$, R$_{\mathrm{HFhad}}$ and R$_{\mathrm{HFem}}$, defined as
+$$
+\mathrm{R_{X}} = \frac{\sum E_{\mathrm{X}}}{E_{\mathrm{jet}}}
+$$
+where the sum is extended over all PFCandidates of type `X' composing the considered jet, and $E_{\mathrm{jet}}$ is the total jet energy. These variables therefore represent the fraction of jet energy that is carried by `X-type' PFCandidates.
+
+The study of the average value of these variables as a function of pseudorapidity gives insight on the expected PFJet composition in the CMS detector. This is shown in Figure \ref{fig:stack}a, for PFJets correctly matched to generated jets, as a function of the matched generated jet's pseudorapidity ($\eta_{\mathrm{\small{GEN}}}$). Furthermore, a cut on the generated transverse momentum has been applied ($p_{\mathrm{T}}^{\small{\mathrm{GEN}}} > 80$ GeV/$c$). As expected, the charged energy fraction R$_{\mathrm{ch}}$ starts dropping in correspondance of $|\eta_{\mathrm{\small{GEN}}}|=2.5$, where the silicon tracker ends. Similarly, central calorimetry reaches up to $\eta=3$, which is where the photon and neutral hadron components start giving way to the HF components.
+
 
 An equivalent jet composition spectrum can be constructed for generated jets (Figure \ref{fig:stack}b), by discriminating on the generated particles that compose these jets. In this case, though, a little delicacy is required. In fact, while classification of particles such as prompt photons and charged hadrons is quite straightforward, some complications arise in the case of neutral hadrons, for these should be classified on the basis of the actual detector reconstruction capabilities.
 
 The average generated jet neutral hadron composition, as a function of jet pseudorapidity, is shown in Figure \ref{fig:stackNH}a. About~60\% of these particles are neutrons and $K^0_L$, which have long enough lifetimes to ensure that they reach the calorimeters without decaying. On the other hand, the remaining 40\% is composed of relatively short lived particles, which decay before reaching the calorimeters. The dominant decay channels for these particles are shown in Table \ref{tab:nhDecays}, while Figure \ref{fig:stackNH}b shows the distribution of the radial distance of the MC truth decay vertices for particles produced in the barrel ($|\eta_{\mathrm{\small{GEN}}}|<1.4$).
-
 
 Neutral hadrons that decay in the CMS tracker must be classified on the basis of their decay product. Neutral pions, in particular, will rapidly decay to photons and therefore be detected in the electromagnetic calorimeter. For this reason it is correct, in the ECAL-covered pseudorapidity region, to add their energy to the photon spectrum: this explains the rise in the photon component in Figure \ref{fig:stack}b, in correspondence of the $|\eta_{\small{\mathrm{GEN}}}|<3$ region.
 
@@ -417,43 +421,71 @@ As for the decay to charged hadrons, the discimination is based on whether the d
 
 The same method has been applied to photons in jets. If a photon converts to an electron-positron pair in a track seeded region of the detector, its energy will be accounted for in the electron energy fraction. Otherwise, in the photon one.
 
-\begin{figure}[tb]
+
+\begin{figure}[b]
 \centering
-\subfigure[]{\includegraphics[width=6.5cm]{Ech_resolution_50_80_PFItCone5.pdf}}
-\subfigure[]{\includegraphics[width=6.5cm]{Egamma_resolution_50_80_PFItCone5.pdf}}
-\subfigure[]{\includegraphics[width=6.5cm]{Enh_resolution_50_80_PFItCone5.pdf}}
-\subfigure[]{\includegraphics[width=6.5cm]{Egammanh_resolution_50_80_PFItCone5.pdf}}
-\caption{Single component energy resolutions: (a) charged hadrons; (b) photons; (c) neutral hadrons; (d) photon + neutral hadron combined resolution. Distributions are normalized to unity.\label{fig:Ex_resolutions}}
+\includegraphics[width=15cm]{compreso_87_104.pdf}
+\caption{Single component energy resolutions for PFJets matched to generated jets with $87<p_{\mathrm{T}} < 104$ GeV/$c$: charged hadron resolution (top left), photon resolution (center top), neutral hadron resolution (top right), electron resolution (bottom left), muon resolution (center bottom), photon+neutral hadron resolution (bottom right). \label{fig:Ex_resolutions_lowPt}}
+\end{figure}
+\clearpage
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=15cm]{compreso_523_627.pdf}
+\caption{Single component energy resolutions for PFJets matched to generated jets with $523<p_{\mathrm{T}} < 627$ GeV/$c$: charged hadron resolution (top left), photon resolution (center top), neutral hadron resolution (top right), electron resolution (bottom left), muon resolution (center bottom), photon+neutral hadron resolution (bottom right). \label{fig:Ex_resolutions_highPt}}
 \end{figure}
 
-@@@ qui bisogna aggiornare con le figure di mikko
 
-Figures \ref{fig:Ex_resolutions}a,b,c show, respectively, single component energy resolutions for charged hadrons, photons and neutral hadrons, for PFJets matched to generated jets that satisfy $50 < p_{\mathrm{T}}^{\small{\mathrm{GEN}}} < 80$ GeV/$c$ and $|\eta_{\mathrm{\small{GEN}}}|<2.5$. As expected, the excellent performance of the CMS tracker translates in very sharp peak in the charged energy resolution. A somewhat broader and biased distribution is obtained for the photon resolution, while for neutral hadrons an excessively large fraction of reconstructed jets (note the logarithmic scale of the $y$-axis) seem to report no neutral hadron presence, whereas the corresponding generated jets did (note the over-population of the `-1' bin).
-
-Both the asymmetry in the photon spectrum and the anomalies in the neutral hadron one are consequence of the Particle Flow reconstruction strategy. In the case of jets, both photons and neutral hadrons, as previously described, are constructed only if a calorimetric energy excess is observed, with respect to the measured momenta of the tracks pointing to these energy deposit. For this reason it is more sound to study the {\em combined} photon and neutral hadron resolution, which is shown in Figure \ref{fig:Ex_resolutions}d. The obtained distribution is strikingly more symmetric, but has an evident bias. The amount of the bias should be directly connected to the HCAL energy resolution, on which is based the comparison that eventually gives rise to photons and neutral hadrons in jets.
-
-
-
-\begin{figure}[tb]
+\begin{figure}[p]
 \centering
-\subfigure[]{\includegraphics[width=7.5cm]{gr_Rch_response_vs_pt_MEAN_barrel.pdf}}
-\subfigure[]{\includegraphics[width=7.5cm]{gr_Rch_resolution_vs_pt_RMS_barrel.pdf}}
-\caption{Jet energy response (a) and resolution (b) as a function of the generated jet transverse momentum. The graphs compare results for PFJets and corrected calorimeter jets. \label{fig:PF_vs_calo}}
+\includegraphics[width=15cm]{fracresponse.pdf}
+\caption{Single component energy response as a function of jet transverse momentum: charged hadron response (top left), photon response (center top), neutral hadron response (top right), electron response (bottom left), muon response (center bottom), photon+neutral hadron response (bottom right). \label{fig:fracresponse}}
 \end{figure}
+\clearpage
+
+
+
+\subsection{Single Component Resolutions}
+\label{sec:singleComp}
+
+A component-based study of PFJets is both useful to obtain an in-depth understanding of the Particle Flow jet reconstruction, and an invaluable tool to monitor their behaviour on first data and test the accuracy of the CMS Monte Carlo simulation. As we will se more thoroughly in the next section, Particle Flow jet reconstruction performance depends dramatically on the considered jet's composition, so that a crucial step in Particle Flow validation on data will be to assure that a correct energy sharing between components is assigned during jet creation.
+
+Figures \ref{fig:Ex_resolutions_lowPt} and \ref{fig:Ex_resolutions_highPt} show, for two different $p_{\mathrm{T}}$ bins, single component energy resolutions for PFJets reconstructed in the CMS barrel. For a given component `X', the resolution is defined as:
+$$
+\frac{E_{\mathrm{X}}^{\mathrm{reco}} - E_{\mathrm{X}}^{\mathrm{gen}}}{E_{\mathrm{X}}^{\mathrm{gen}}}
+$$
+with obvious meaning of the simbols. Figure \ref{fig:fracresponse}, instead, shows the energy response for each component, computed as the mean of such resolution distributions, as a function of the jet transverse momentum.
+
+As expected, the excellent performance of the CMS tracker translates in very sharp peak in the charged energy resolution. A somewhat broader  distribution is obtained for the photon resolution, while for neutral hadrons an excessively large fraction of reconstructed jets (note the logarithmic scale of the $y$-axis) seem to report no neutral hadron presence, whereas the corresponding generated jets did (note the over-population of the `-1' bin).
+
+Both the asymmetry in the photon spectrum and the anomalies in the neutral hadron one are consequence of the Particle Flow reconstruction strategy. In the case of jets, both photons and neutral hadrons, as previously described, are constructed only if a calorimetric energy excess is observed, with respect to the measured momenta of the tracks pointing to these energy deposit. Furthermore, when an excess is actually observed, precedence in always given to photon candidate creation. For these reasons it is more sound to study the {\em combined} photon and neutral hadron resolution, which is shown in the bottom right plots. The obtained distribution is strikingly more symmetric, but has an evident bias. The amount of the bias should be directly connected to the HCAL energy resolution, on which is based the comparison that eventually gives rise to photons and neutral hadrons in jets.
+
+At jet transverse momenta greater than $\approx 500$ GeV/$c$ tracking charged collimated particles becomes a more and more difficult task, with a growing probability of `loosing' particle tracks due to rec-hit sharing or similar effects. The charged energy component therefore increasingly underestimates the correct value, and this traslates into the formation of a visible tail on the left of the resolution distribution (see Figure \ref{fig:Ex_resolutions_highPt}). The Particle Flow algorithm, though, compensates this effect because the energy is measured in the calorimeter, and is therefore not lost. So even if this leads to a gradual underestimation of the charged component and a gradual overestimation of the combined neutral one, on the whole the jet measurement is more precise as its transverse momentum increases.
 
 
 
 \section{Response and Resolution Variation with Jet Charged Energy Fraction}
 \label{sec:MCtest}
+If the advantage of PFJets over calorimeter jets relies in the access to the central tracker information, it is quite straightforward to parametrize it through the variable R$_{\mathrm{ch}}$. We expect to have jets of ``higher quality'' (i.e. higher reponse and better resolution) with increasing R$_{\mathrm{ch}}$, because of a more intense use of the tracker. Figures \ref{fig:Rch_binning_ARIT}a,b show jet arithmetic response and resolution variations as a function of the generated jet's transverse momentum, in three R$_{\mathrm{ch}}$ intervals, for PFJets generated in the CMS barrel ($|\eta|<1.4$). Figures \ref{fig:Rch_binning_ARIT}a,b show the same variations for response and resolution obtained by gaussian fits to the distributions.
 
-Particle Flow Jets have higher response and better resolution than calorimeter-based jets, as can be seen in Figures \ref{fig:PF_vs_calo}a,b.
+For transverse momenta up to a few hundred GeV$/c$, jet quality increases with R$_{\mathrm{ch}}$. The effect is particularly visible in the resolution graph, where at low-$p_{\mathrm{T}}$ the spread can be as large as 60\%. At high-$p_{\mathrm{T}}$, instead, the hierarchy is completely inversed: at large values of R$_{\mathrm{ch}}$, jet reconstruction quality drops visibly. This effect is caused by the increasing unreliability of tracking in the case of collimated, high-$p_{\mathrm{T}}$ particles, and has been already discussed in Section \ref{sec:singleComp}.
+
+@@@ What is actually happening must be understood. feedback from the PF group is needed. 
 
 \begin{figure}[tb]
 \centering
 \subfigure[]{\includegraphics[width=7.5cm]{gr_Rch_response_vs_pt_MEAN_barrel.pdf}}
 \subfigure[]{\includegraphics[width=7.5cm]{gr_Rch_resolution_vs_pt_RMS_barrel.pdf}}
-\caption{PFJet energy response (a) and resolution (b) for different R$_{\mathrm{ch}}$ intervals. \label{fig:Rch_binning}}
+\caption{PFJet energy arithmetic response (a) and resolution (b) for different R$_{\mathrm{ch}}$ intervals.\label{fig:Rch_binning_ARIT}}
 \end{figure}
+
+\begin{figure}[tb]
+\centering
+\subfigure[]{\includegraphics[width=7.5cm]{gr_Rch_response_vs_pt_FIT_barrel.pdf}}
+\subfigure[]{\includegraphics[width=7.5cm]{gr_Rch_resolution_vs_pt_FIT_barrel.pdf}}
+\caption{PFJet energy response (a) and resolution (b) for different R$_{\mathrm{ch}}$ intervals. Response and resolution have been obtained through gaussian fits to the response distributions.\label{fig:Rch_binning_FIT}}
+\end{figure}
+
 
 \begin{figure}[tb]
 \centering
@@ -461,107 +493,61 @@ Particle Flow Jets have higher response and better resolution than calorimeter-b
 \subfigure[]{\includegraphics[width=7.5cm]{Rch_barrel_projection_3.pdf}}
 \caption{(a): R$_{\mathrm{ch}}$ distributions for PFJets and generated jets in the CMS barrel, with $p_{\mathrm{T}}^{\mathrm{GEN}}>80$ GeV$/c$; (b): jet response distributions for barrel PFJets with $20 < p_{\mathrm{T}}^{\mathrm{GEN}} < 25$ GeV$/c$. \label{fig:Rch_distrib}}
 \end{figure}
-
-Therefore, if the improvement is mainly given by the use of the central tracker, it is quite straightforward to parametrize it through the variable R$_{\mathrm{ch}}$. We expect to have jets of ``higher quality'' (i.e. higher reponse and better resolution) with increasing R$_{\mathrm{ch}}$, because of a more intense use of the tracker. Figures \ref{fig:Rch_binning}a,b show jet response and resolution variations as a function of the generated jet's transverse momentum, in three R$_{\mathrm{ch}}$ intervals, for PFJets generated in the CMS barrel ($|\eta|<1.4$). For transverse momenta up to a few hundred GeV$/c$, jet quality increases with R$_{\mathrm{ch}}$, as we expected. The effect is particularly visible in the resolution graph, where at low-$p_{\mathrm{T}}$ the spread can be as large as 60\%. 
-
-The high-$p_{\mathrm{T}}$ trend, instead, is completely inversed: at large values of R$_{\mathrm{ch}}$, jet reconstruction quality drops visibly. This behaviour is explained by two complementary reasons:
-\begin{itemize}
-\item track reconstruction performance worsenes proportionally to the transverse momentum of the charged particles; this effect is even more severe in the case of collinear particles;
-\item the true charged fraction of a jet tends to zero as the parton momentum tends to infinity.
-\end{itemize}
-@@@ Qui bisogna capire cosa diavolo sta succedendo. magari presentando al PFlow e chiedendo feedback. 
+\clearpage
 
 
 Figure \ref{fig:Rch_distrib}a shows the reconstructed and generated R$_{\mathrm{ch}}$ distributions for barrel PFJets. A tranverse momentum cut of $p_{\mathrm{T}}$ has been applied on the generated jets. Figure \ref{fig:Rch_distrib}b, instead, shows jet response distributions for jets with $20<p_{\mathrm{T}}<25$ GeV/$c$, in the three studied R$_{\mathrm{ch}}$ intervals.
 
-@@@ SMETTI DI LEGGERE QUI
 
-Jets with increasing R$_{\mathrm{ch}}$ prove to have higher response and improved resolution, crowning this variable as a meter of the quality with which the considered jet has been measured. For the simple reason that a jet that is measured more accurately requires less (or none) energy corrections with respect to a jet that is measured poorly, we will use R$_{\mathrm{ch}}$ as a calibration variable, in such a way that these these different jet sub-populations are optimally exploited.
+\subsection{R$_{\mathrm{ch}}$-Based Calibration}
 
-In order to do so, the variation of the response as a function of R$_{\mathrm{ch}}$ will be studied for each $p_{\mathrm{T}}^{\mathrm{GEN}}$ bin. The data points in each such bin are fitted with a fifth-order polinomial, and the correction is obtained as the inverse of the fitted response. Figure \ref{fig:fits}a and \ref{fig:fits}b show, respectively for barrel and endcaps, the obtained MC-truth variation for some $p_{\mathrm{T}}$ bins. The fit function is superimposed, and an overall good agreement is observed. The data points show two general trends: the first is that the response variation as a function of R$_{\mathrm{ch}}$ is more pronounced at low $p_{\mathrm{T}}$, becomes almost negligible  intermediate $p_{\mathrm{T}}$ and finally tends to invert monotony at high $p_{\mathrm{T}}$;
-the second is that variations are more dramatic in the endcaps with respect to the barrel.
+From what has been shown it is clear that the jet charged energy fraction R$_{\mathrm{ch}}$ is a valid meter of the quality with which the considered jet has been measured. For the simple reason that a jet that is measured more accurately requires less (or none) energy corrections with respect to a jet that is measured poorly, we will here make a Monte Carlo feasibility test to see if it possible to use R$_{\mathrm{ch}}$ as a calibration variable, to optimally exploit these different jet sub-populations.
 
-%The steep rise in response that is observed when R$_{\mathrm{ch}}$ approaches unity is due to a fake track infiltration, which causes an artificial rise in R$_{\mathrm{ch}}$ and, at the same time, in energy response (which may, in fact, exceed 1). It must be noted that the fake track problem has been effectively addressed in the latest release of the Particle Flow algorithm. 
+In order to do so, the variation of the response as a function of R$_{\mathrm{ch}}$ will be studied for each $p_{\mathrm{T}}^{\mathrm{GEN}}$ bin. The data points in each such bin are fitted with a fifth-order polinomial, and the correction is obtained as the inverse of the fitted response. Figures \ref{fig:Rchfits}a and \ref{fig:Rchfits}b show, respectively for barrel and endcaps, the obtained MC-truth variation for some $p_{\mathrm{T}}$ bins. The fit function is superimposed, and an overall good agreement is observed. The data points show that the response variation as a function of R$_{\mathrm{ch}}$ is more pronounced at low $p_{\mathrm{T}}$, becomes almost negligible  intermediate $p_{\mathrm{T}}$ and finally tends to invert monotony at high $p_{\mathrm{T}}$. Furthermore, the observed variation in the endcaps is very little.
 
-
-
-As a comparison, Figures \ref{fig:genfits}a,b show the variations in MC-truth response as a function of the {\em generated} charged jet energy fraction (R$_{\mathrm{ch}}^{\small{\mathrm{GEN}}}$), in the same $p_{\mathrm{T}}$ bins. What can be observed is that while the low-R$_{\mathrm{ch}}$ behaviour seems to be compatible with the one observed in Figures \ref{fig:fits}, as R$_{\mathrm{ch}}$ grows the two sets of graphs diverge: in the barrel a very swift rise in response leads to values greater than one for jets with $p_{\mathrm{T}}  \lesssim 400$ GeV/$c$. In the endcaps, instead, all $p_{\mathrm{T}}$ bins seem to converge nicely to quasi-unitary response as R$_{\mathrm{ch}}^{\small{\mathrm{GEN}}} \rightarrow 1$, while showing opposite concavity (with respect to the reconstructed trend) at small values of R$_{\mathrm{ch}}$.
+%As a comparison, Figures \ref{fig:genfits}a,b show the variations in MC-truth response as a function of the {\em generated} charged jet energy fraction (R$_{\mathrm{ch}}^{\small{\mathrm{GEN}}}$), in the same $p_{\mathrm{T}}$ bins. What can be observed is that while the low-R$_{\mathrm{ch}}$ behaviour seems to be compatible with the one observed in Figures \ref{fig:fits}, as R$_{\mathrm{ch}}$ grows the two sets of graphs diverge: in the barrel a very swift rise in response leads to values greater than one for jets with $p_{\mathrm{T}}  \lesssim 400$ GeV/$c$. In the endcaps, instead, all $p_{\mathrm{T}}$ bins seem to converge nicely to quasi-unitary response as R$_{\mathrm{ch}}^{\small{\mathrm{GEN}}} \rightarrow 1$, while showing opposite concavity (with respect to the reconstructed trend) at small values of R$_{\mathrm{ch}}$.
 
 
+%\begin{figure}[tb]
+%\centering
+%\subfigure[]{\includegraphics[width=7.5cm]{gr_Rch_response_vs_pt_MEAN_eta0_3.pdf}}
+%\subfigure[]{\includegraphics[width=7.5cm]{response_vs_eta.pdf}}
+%\caption{MC truth jet energy response as a function of generated jet transverse momentum (a) and pseudorapidity (b), before (black squares) and after (red circles) the application of the R$_{\mathrm{ch}}$-based correction. \label{fig:response}}
+%\end{figure}
 
-\begin{figure}[tb]
-\centering
-\subfigure[]{\includegraphics[width=7.5cm]{fits_barrel.pdf}}
-\subfigure[]{\includegraphics[width=7.5cm]{fits_endcap.pdf}}
-\caption{MC truth jet energy response as a function of charged jet energy fraction R$_{\mathrm{ch}}$, for different $p_{\mathrm{T}}$ bins, in the barrel (a) and in the endcaps (b). Data points are fitted with a fifth-order polinomial. \label{fig:fits}}
-\end{figure}
+%After the corrections are obtained with the described procedure, they are applied to the same events, in order to check the method's overall consistency. Figure \ref{fig:response}a proves an effective closure test in the whole $|\eta|<3$ region by showing the obtained response as a function of $p_{\mathrm{T}}$. Figure \ref{fig:response}b, on the other hand, shows the induced variations in the pseudorapidity spectrum of the response. No artificial plateaus seem to be introduced by this correction in the $\eta$ spectrum, proving that this correction is mostly not correlated to pseudorapidity. The only exception is represented by the trackerless endcap region ($2.6 < |\eta| < 3 $), where a saturation-to-one effect seems to be introduced. This is not a concern, for the scope of this note is to quantify the maximum effect obtainable with this strategy. Furthermore, in standard jet reconstruction, PFJets will undergo the usual energy calibrations, which do include a correction as a function of pseudorapidity. This will both reduce the effect of an {\em a posteriori} R$_{\mathrm{ch}}$-based calibration, and nullify this problem.
 
-\begin{figure}[tb]
-\centering
-\subfigure[]{\includegraphics[width=7.5cm]{fits_genbarrel.pdf}}
-\subfigure[]{\includegraphics[width=7.5cm]{fits_genendcap.pdf}}
-\caption{MC truth jet energy response as a function of the generated charged jet energy fraction R$_{\mathrm{ch}}^{\small{\mathrm{GEN}}}$, for different $p_{\mathrm{T}}$ bins, in the barrel (a) and in the endcaps (b). Data points are fitted with a fifth-order polinomial. \label{fig:genfits}}
-\end{figure}
 
 
 
 \begin{figure}[tb]
 \centering
-\subfigure[]{\includegraphics[width=7.5cm]{gr_Rch_response_vs_pt_MEAN_eta0_3.pdf}}
-\subfigure[]{\includegraphics[width=7.5cm]{response_vs_eta.pdf}}
-\caption{MC truth jet energy response as a function of generated jet transverse momentum (a) and pseudorapidity (b), before (black squares) and after (red circles) the application of the R$_{\mathrm{ch}}$-based correction. \label{fig:response}}
-\end{figure}
-
-After the corrections are obtained with the described procedure, they are applied to the same events, in order to check the method's overall consistency. Figure \ref{fig:response}a proves an effective closure test in the whole $|\eta|<3$ region by showing the obtained response as a function of $p_{\mathrm{T}}$. Figure \ref{fig:response}b, on the other hand, shows the induced variations in the pseudorapidity spectrum of the response. No artificial plateaus seem to be introduced by this correction in the $\eta$ spectrum, proving that this correction is mostly not correlated to pseudorapidity. The only exception is represented by the trackerless endcap region ($2.6 < |\eta| < 3 $), where a saturation-to-one effect seems to be introduced. This is not a concern, for the scope of this note is to quantify the maximum effect obtainable with this strategy. Furthermore, in standard jet reconstruction, PFJets will undergo the usual energy calibrations, which do include a correction as a function of pseudorapidity. This will both reduce the effect of an {\em a posteriori} R$_{\mathrm{ch}}$-based calibration, and nullify this problem.
-
-\begin{figure}[tb]
-\centering
-\subfigure[]{\includegraphics[width=7.5cm]{gr_Rch_resolution_vs_pt_FIT_barrel.pdf}}
-\subfigure[]{\includegraphics[width=7.5cm]{gr_Rch_resolution_vs_pt_FIT_endcap.pdf}}
-\caption{MC truth jet energy resolution as a function of generated jet transverse momentum in the barrel (a) and in the endcaps (b), before (black squares) and after (red circles) the application of the R$_{\mathrm{ch}}$-based correction. \label{fig:resolution}}
+\subfigure[]{\includegraphics[width=7.5cm]{fits_barrelGEN.pdf}}
+\subfigure[]{\includegraphics[width=7.5cm]{fits_endcapGEN.pdf}}
+\caption{MC truth jet energy response as a function of charged jet energy fraction R$_{\mathrm{ch}}$, for different $p_{\mathrm{T}}$ bins, in the barrel (a) and in the endcaps (b). Data points are fitted with a fifth-order polinomial. \label{fig:Rchfits}}
 \end{figure}
 
 \begin{figure}[tb]
 \centering
-\subfigure[]{\includegraphics[width=7.5cm]{gr_Rch_resolution_vs_pt_RMS_barrel.pdf}}
-\subfigure[]{\includegraphics[width=7.5cm]{gr_Rch_resolution_vs_pt_RMS_endcap.pdf}}
-\caption{MC truth jet energy resolution, computed by taking the distribution RMS, as a function of generated jet transverse momentum in the barrel (a) and in the endcaps (b), before (black squares) and after (red circles) the application of the R$_{\mathrm{ch}}$-based correction. \label{fig:resolution_RMS}}
+\subfigure[]{\includegraphics[width=6.8cm]{gr_RchCalib_responseRes_vs_pt_RMS_barrel.pdf}} \hspace{0.6cm}
+\subfigure[]{\includegraphics[width=6.8cm]{gr_RchCalib_responseRes_vs_pt_RMS_endcap.pdf}}
+\caption{MC truth jet arithmetic energy resolution as a function of generated jet transverse momentum in the barrel (a) and in the endcaps (b), before (black squares) and after (red circles) the application of the R$_{\mathrm{ch}}$-based correction. \label{fig:resolution}}
 \end{figure}
 
-Finally, Figures \ref{fig:resolution}a and \ref{fig:resolution}b show the obtained MC-truth variation in PFJet resolution, for barrel and endcaps, when applying the R$_{\mathrm{ch}}$-based correction. Figures \ref{fig:resolution_RMS}a and \ref{fig:resolution_RMS}b, instead, show the effect induced on the resolution computed not with a gaussian fit, but by taking the distribution RMS. An overall small effect is introduced in the barrel: the improvement is of the order of 0.5\%, is localized at low $p_{\mathrm{T}}$ if considering the resolution obtained with the gaussian fit, at high $p_{\mathrm{T}}$ if considering the RMS. In the endcaps, on the other hand, a more tangible improvement is observed: it is of the order of 2\%, and localized at low $p_{\mathrm{T}}$, if considering the fit, and of the order of 1\% in the case of the RMS, but extended over the whole $p_{\mathrm{T}}$ range.
+
+Figures \ref{fig:resolution}a and \ref{fig:resolution}b show the obtained MC-truth variation in PFJet arithmetic resolution, for barrel and endcaps, when applying the R$_{\mathrm{ch}}$-based correction. The gain is mainly concentrated in the low-$p_{\mathrm{T}}$ end of the spectrum, and never greater than 0.5\%. The variation is even smaller in the fit resolutions. Considering that the introduction of this method would imply a certain degree of uncertainty connected to the systematic effects intrinsic to the method, we conclude that it is simply not worth it.
  
-The following Section will focus on the construction of a data-driven method to obtain the described calibration by using photon + jet events, and comment the obtained results.
-
-
-
-
-
-
-
-\section{Calibration with Photon+Jet Events}
-\label{sec:photJet}
-
-qui subentrate te e mikko
-
-
-\subsection{Photon Identification}
-
-
-\subsection{Event Selection}
-
-
-
-\subsection{Estraction of the Correction}
-
-e io ritorno qua: via con i plot di response vs Rch sui dati, si estraggono le correzioni, si corregge, closure test e via per la celebrita'
-
-
-
-
-\section{Results}
+ 
 
 
 \section{Conclusions}
+
+The study of the energy composition of Particle Flow jets proves to be an invaluable tool for the understanding and monitoring of both the Particle Flow algorithm as a whole and, more specifically, the Particle Flow jet reconstruction. Because particles are measured with very different precision depending on which subdetectors are used and what energy regime is considered, Particle Flow jet reconstruction performance heavily depends on the jet's composition. It will therefore be crucial to verify on the first LHC collision data that the Particle Flow algorithm is correctly describing particle jets in terms of energy components. This type of analysis will furthermore play an important role in tuning the Monte Carlo simulation of the experiment to match the observed data.
+
+
+
+
+
 
 \begin{thebibliography}{99}
 
