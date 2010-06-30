@@ -777,7 +777,8 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
      Float_t oldWeight=eventWeight_;
      //jetTree_->SetBranchStatus( "eventWeight", 0 );
      Float_t ptPhot_tmp;
-     jetTree_->SetBranchAddress( "ptPhotReco", &ptPhot_tmp );
+     //jetTree_->SetBranchAddress( "ptPhotReco", &ptPhot_tmp );
+     jetTree_->SetBranchAddress( "ptPhotGen", &ptPhot_tmp );
 
      TTree* newTree = jetTree_->CloneTree(0);
      Float_t newWeight_loose;
