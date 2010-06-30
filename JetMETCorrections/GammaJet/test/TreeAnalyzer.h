@@ -25,6 +25,13 @@
 #include <iostream>
 
 
+struct GenEventParameters{
+
+  Float_t crossSection;
+  Float_t ptHatMin;
+  Float_t ptHatMax;
+
+};
 
 
 class TreeAnalyzer {
@@ -43,7 +50,6 @@ public :
    Int_t           event;
    Int_t           nMC;
    Int_t           pdgIdMC[150];   //[nMC]
-   Int_t           motherIDMC[150];   //[nMC]
    Int_t           statusMC[150];   //[nMC]
    Float_t         ptMC [150];   //[nMC]
    Float_t         eMC  [150];   //[nMC]
@@ -272,7 +278,6 @@ public :
    Int_t oldrun_;
    Int_t currentLS_;
    Int_t event_;
-   Int_t lbn_;
    Float_t ptHat_;
    Float_t ptHatMin_;
    Float_t ptHatMax_;
@@ -292,7 +297,6 @@ public :
    TBranch        *b_event;   //!
    TBranch        *b_nMC;   //!
    TBranch        *b_pdgIdMC;   //!
-   TBranch        *b_motherIDMC;   //!
    TBranch        *b_statusMC;   //!
    TBranch        *b_ptMC ;   //!
    TBranch        *b_eMC  ;   //!
@@ -498,6 +502,8 @@ public :
    virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
    virtual Long64_t LoadTree(Long64_t entry);
+   virtual void     LoadInput();
+   virtual void     LoadInputFromFile( const std::string& fileName );
    virtual void     Init(TTree *tree);
    virtual void     Loop()=0;
    virtual Bool_t   Notify();
@@ -506,6 +512,7 @@ public :
    virtual void     ReadCSVFile(const std::string& csv);
    virtual void     UpdateCache();
    virtual bool     isGoodLS ();
+   virtual GenEventParameters     getGenEventParameters ();
 
    //virtual void BookStuff()=0;
 

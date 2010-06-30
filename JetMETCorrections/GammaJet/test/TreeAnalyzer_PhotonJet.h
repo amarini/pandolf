@@ -19,6 +19,7 @@ class TreeAnalyzer_PhotonJet : public TreeAnalyzer {
  public:
 
    TreeAnalyzer_PhotonJet( std::string dataset, std::string recoType, std::string jetAlgo, bool useGenJets=false, TTree* tree=0);
+   virtual ~TreeAnalyzer_PhotonJet();
 
    virtual void Loop();
 
@@ -144,9 +145,10 @@ class TreeAnalyzer_PhotonJet : public TreeAnalyzer {
    bool DEBUG_VERBOSE_;
    bool useGenJets_;
 
-   TH1F* h1_ptPhot;;
-   TH1F* h1_eff_num_vs_pt;
+   TH1F* h1_ptPhot;
    TH1F* h1_eff_denom_vs_pt;
+   TH1F* h1_eff_num_medium_vs_pt;
+   TH1F* h1_eff_num_loose_vs_pt;
   
 };
 

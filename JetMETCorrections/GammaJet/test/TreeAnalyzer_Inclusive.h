@@ -21,7 +21,7 @@
 class TreeAnalyzer_Inclusive : public TreeAnalyzer {
 public :
 
-   TreeAnalyzer_Inclusive( const std::string& dataset, const std::string& recoType, const std::string& jetAlgo, TTree* tree=0);
+   TreeAnalyzer_Inclusive( const std::string& dataset, const std::string& recoType, const std::string& jetAlgo, const std::string& flags="", TTree* tree=0);
 
    virtual void Loop();
 
@@ -34,8 +34,8 @@ private :
    Float_t   eCorrJetReco_[40];
    Float_t phiJetReco_[40];
    Float_t etaJetReco_[40];
-
    Float_t   ptJetGen_[40];
+
    Float_t    eJetGen_[40];
    Float_t  phiJetGen_[40];
    Float_t  etaJetGen_[40];

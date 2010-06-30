@@ -12,9 +12,6 @@ do2ndLevel_DiJet: AnalysisJet.o TreeAnalyzer.o TreeAnalyzer_DiJet.o
 do2ndLevel_PhotonJet: AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJet.o
 	$(CC) -Wall -o do2ndLevel_PhotonJet do2ndLevel_PhotonJet.cpp AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJet.o $(ROOTFLAG)
 
-do2ndLevel_HZZlljj: AnalysisJet.o TreeAnalyzer.o TreeAnalyzer_HZZlljj.o
-	$(CC) -Wall -o do2ndLevel_HZZlljj do2ndLevel_HZZlljj.cpp AnalysisJet.o TreeAnalyzer.o TreeAnalyzer_HZZlljj.o $(ROOTFLAG)
-
 prova: AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJet.o
 	$(CC) -Wall -o prova prova_TreeAnalyzer_Photon.cpp AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJet.o $(ROOTFLAG)
 
@@ -29,9 +26,6 @@ TreeAnalyzer.o: TreeAnalyzer.C
 
 TreeAnalyzer_PhotonJet.o: TreeAnalyzer_PhotonJet.C
 	$(CC) $(CFLAGS) TreeAnalyzer_PhotonJet.C $(ROOTFLAG)
-
-TreeAnalyzer_HZZlljj.o: TreeAnalyzer_HZZlljj.C
-	$(CC) $(CFLAGS) TreeAnalyzer_HZZlljj.C $(ROOTFLAG)
 
 TreeAnalyzer_DiJet.o: TreeAnalyzer_DiJet.C
 	$(CC) $(CFLAGS) TreeAnalyzer_DiJet.C $(ROOTFLAG)

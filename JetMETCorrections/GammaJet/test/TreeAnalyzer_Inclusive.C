@@ -7,8 +7,8 @@
 
 
 
-TreeAnalyzer_Inclusive::TreeAnalyzer_Inclusive(const std::string& dataset, const std::string& recoType, const std::string& jetAlgo, TTree* tree) :
-     TreeAnalyzer( "Inclusive", dataset, recoType, jetAlgo, (std::string)"", tree ) {
+TreeAnalyzer_Inclusive::TreeAnalyzer_Inclusive(const std::string& dataset, const std::string& recoType, const std::string& jetAlgo, const std::string& flags, TTree* tree) :
+     TreeAnalyzer( "Inclusive", dataset, recoType, jetAlgo, flags, tree ) {
 
 
   DEBUG_VERBOSE_ = false;
