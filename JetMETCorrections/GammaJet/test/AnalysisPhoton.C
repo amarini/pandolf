@@ -141,7 +141,7 @@ bool AnalysisPhoton::clusterMajOK( const std::string& tightness ) const {
 
   bool pass=true;
 
-  if( this->clusterMaj >= clusterMaj_thresh || this->clusterMaj <= 0.1 ) pass=false;
+  if( this->clusterMaj >= clusterMaj_thresh || this->clusterMaj <= 0.15 ) pass=false;
 
   return pass;
 
@@ -164,7 +164,7 @@ bool AnalysisPhoton::clusterMinOK( const std::string& tightness ) const {
 
   bool pass=true;
 
-  if( this->clusterMin >= clusterMin_thresh || this->clusterMin <= 0.001 ) pass=false;
+  if( this->clusterMin >= clusterMin_thresh || this->clusterMin <= 0.15 ) pass=false;
 
   return pass;
 
