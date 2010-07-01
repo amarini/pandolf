@@ -3,9 +3,6 @@ CFLAGS = -Wall -c
 ROOTFLAG = `${ROOTSYS}/bin/root-config --cflags --libs`
 
 
-do2ndLevel_Inclusive: AnalysisJet.o TreeAnalyzer.o TreeAnalyzer_Inclusive.o
-	$(CC) -Wall -o do2ndLevel_Inclusive do2ndLevel_Inclusive.cpp AnalysisJet.o TreeAnalyzer.o TreeAnalyzer_Inclusive.o $(ROOTFLAG)
-
 do2ndLevel_DiJet: AnalysisJet.o TreeAnalyzer.o TreeAnalyzer_DiJet.o
 	$(CC) -Wall -o do2ndLevel_DiJet do2ndLevel_DiJet.cpp AnalysisJet.o TreeAnalyzer.o TreeAnalyzer_DiJet.o $(ROOTFLAG)
 
@@ -30,12 +27,21 @@ TreeAnalyzer_PhotonJet.o: TreeAnalyzer_PhotonJet.C
 TreeAnalyzer_DiJet.o: TreeAnalyzer_DiJet.C
 	$(CC) $(CFLAGS) TreeAnalyzer_DiJet.C $(ROOTFLAG)
 
-TreeAnalyzer_Inclusive.o: TreeAnalyzer_Inclusive.C
-	$(CC) $(CFLAGS) TreeAnalyzer_Inclusive.C $(ROOTFLAG)
+drawPhotonJet: fitTools.o DrawBase.o
+	$(CC) -Wall -o drawPhotonJet drawPhotonJet.C fitTools.o DrawBase.o $(ROOTFLAG)
+
+drawPhotonJet_2bkg: fitTools.o DrawBase.o
+	$(CC) -Wall -o drawPhotonJet_2bkg drawPhotonJet_2bkg.C fitTools.o DrawBase.o $(ROOTFLAG)
+
+drawMinBias: fitTools.o DrawBase.o
+	$(CC) -Wall -o drawMinBias drawMinBias.cpp fitTools.o DrawBase.o $(ROOTFLAG)
+
+DrawBase.o: DrawBase.C
+	$(CC) $(CFLAGS) DrawBase.C $(ROOTFLAG)
+
+fitTools.o: fitTools.C
+	$(CC) $(CFLAGS) fitTools.C $(ROOTFLAG)
 
 
 clean:
-	rm TreeAnalyzer.o
-	rm AnalysisPhoton.o
-	rm AnalysisJet.o
-	rm TreeAnalyzer_PhotonJet.o
+	rm *.o
