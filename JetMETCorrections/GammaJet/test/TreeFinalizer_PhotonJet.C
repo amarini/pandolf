@@ -23,7 +23,7 @@ std::string RECOTYPE_;
 
 std::vector<TH1F*> getResponseHistos(const std::string& name);
 
-void photonJet(const std::string& dataset, std::string recoType, std::string jetAlgo, bool useGenJets=false, bool MCassoc=false) {
+void finalize(const std::string& dataset, std::string recoType, std::string jetAlgo, bool useGenJets=false, bool MCassoc=false) {
 
   RECOTYPE_ = recoType;
 
