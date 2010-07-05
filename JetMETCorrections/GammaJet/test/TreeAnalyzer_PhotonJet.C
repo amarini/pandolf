@@ -9,11 +9,20 @@
 #include "fitTools.C"
 
 
-TreeAnalyzer_PhotonJet::TreeAnalyzer_PhotonJet( std::string dataset, std::string recoType, std::string jetAlgo, bool useGenJets, TTree* tree ) :
+TreeAnalyzer_PhotonJet::TreeAnalyzer_PhotonJet( const std::string& dataset, const std::string& recoType, const std::string& jetAlgo, const std::string& flags, bool useGenJets, TTree* tree ) :
      TreeAnalyzer( "PhotonJet", dataset, recoType, jetAlgo, (std::string)"", tree ) {
 
 
   useGenJets_=useGenJets;
+
+
+} //constructor
+
+
+
+void TreeAnalyzer_PhotonJet::CreateOutputFile() {
+
+  TreeAnalyzer::CreateOutputFile();
 
 //  int nBins_pt = 16;
 // Double_t Lower[nBins_pt];
@@ -29,9 +38,9 @@ TreeAnalyzer_PhotonJet::TreeAnalyzer_PhotonJet( std::string dataset, std::string
 
   h1_eff_denom_vs_pt = new TH1F("eff_denom_vs_pt", "", ptPhot_binning.size()-1, ptPhotBinning_array);
   h1_eff_denom_vs_pt->Sumw2();
-  h1_eff_num_medium_vs_pt = new TH1F("eff_medium_vs_pt", "", ptPhot_binning.size()-1, ptPhotBinning_array);
+  h1_eff_num_medium_vs_pt = new TH1F("eff_num_medium_vs_pt", "", ptPhot_binning.size()-1, ptPhotBinning_array);
   h1_eff_num_medium_vs_pt->Sumw2();
-  h1_eff_num_loose_vs_pt = new TH1F("eff_loose_vs_pt", "", ptPhot_binning.size()-1, ptPhotBinning_array);
+  h1_eff_num_loose_vs_pt = new TH1F("eff_num_loose_vs_pt", "", ptPhot_binning.size()-1, ptPhotBinning_array);
   h1_eff_num_loose_vs_pt->Sumw2();
   
 
@@ -45,7 +54,9 @@ TreeAnalyzer_PhotonJet::TreeAnalyzer_PhotonJet( std::string dataset, std::string
   jetTree_->Branch("ptHat",&ptHat_,"ptHat_/F");
 
   jetTree_->Branch("eventWeight",&eventWeight_,"eventWeight_/F");
-  jetTree_->Branch("isIsolated_loose",&isIsolated_loose_, "isIsolated_loose_/O");
+  jetTree_->Branch("eventWeight_medium",&eventWeight_medium_,"eventWeight_medium_/F");
+  jetTree_->Branch("eventWeight_loose",&eventWeight_loose_,"eventWeight_loose_/F");
+  jetTree_->Branch("isIsolated_veryloose",&isIsolated_veryloose_, "isIsolated_veryloose_/O");
 
   jetTree_->Branch("isIsolated_hcal_loose",&isIsolated_hcal_loose_, "isIsolated_hcal_loose_/O");
   jetTree_->Branch("isIsolated_hcal_medium",&isIsolated_hcal_medium_, "isIsolated_hcal_medium_/O");
@@ -170,7 +181,7 @@ TreeAnalyzer_PhotonJet::TreeAnalyzer_PhotonJet( std::string dataset, std::string
   jetTree_->Branch("epfMet",&epfMet_,"epfMet_/F");
   jetTree_->Branch("phipfMet",&phipfMet_,"phipfMet_/F");
 
-} //constructor
+} 
 
 
 
@@ -220,8 +231,8 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      if( !isGoodLS() ) continue; //this takes care also of integrated luminosity
 
      //trigger:
-     if( !useGenJets_ &&
-         !HLTResults[0] &&  //this is HLT_Photon10_L1R
+     //if( !useGenJets_ && maybe this gives bias?
+     if( !HLTResults[0] &&  //this is HLT_Photon10_L1R
          !HLTResults[2] )   //this is HLT_Photon15_L1R
         continue; 
 
@@ -231,6 +242,10 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
      epfMet_ = epfMet;
      phipfMet_ = phipfMet;
+
+     //default values. if usegenjets, they will be updated afterwards:
+     eventWeight_medium_ = 1.;
+     eventWeight_loose_ = 1.;
 
 
      //foundPhot will be either a reco photon (signal) or a genjet (if usegenjets):
@@ -347,13 +362,13 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
 
      //if( foundPhot.pt < 10. ) continue;
-     if( foundPhot.pt < 1. ) continue;
+     if( foundRecoPhot.pt < 1. ) continue;
 
 
      
-     isIsolated_loose_ = true;
-     if( foundPhot.hcalIso > foundPhot.e ) isIsolated_loose_ = false;
-     if( foundPhot.ptTrkIso > foundPhot.pt ) isIsolated_loose_ = false;
+     isIsolated_veryloose_ = true;
+     if( foundPhot.hcalIso > foundPhot.e ) isIsolated_veryloose_ = false;
+     if( foundPhot.ptTrkIso > foundPhot.pt ) isIsolated_veryloose_ = false;
 
      isIsolated_hcal_loose_ =  foundPhot.isIsolated_hcal("loose");
      isIsolated_hcal_medium_ = foundPhot.isIsolated_hcal("medium");
@@ -740,19 +755,20 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
 
 
 
-     bool eventOK = (matchedToMC_ || isIsolated_loose_);
+     bool eventOK = (matchedToMC_ || isIsolated_veryloose_);
 
      if( eventOK && (ptPhotReco_>5.) )
        jetTree_->Fill(); 
 
      h1_ptPhot->Fill( ptPhotReco_, eventWeight_ );
 
+     Float_t ptPhotMin = h1_eff_denom_vs_pt->GetBinLowEdge(1);
      // to compute efficiencies:
      h1_eff_denom_vs_pt->Fill(ptPhotGen_, eventWeight_);
-     if( foundRecoPhot.pt>10. && fabs(foundRecoPhot.eta)<1.3 && foundRecoPhot.passedPhotonID("medium") )
-       h1_eff_num_medium_vs_pt->Fill(ptPhotGen_, eventWeight_);
-     if( foundRecoPhot.pt>10. && fabs(foundRecoPhot.eta)<1.3 && foundRecoPhot.passedPhotonID("loose") )
-       h1_eff_num_loose_vs_pt->Fill(ptPhotGen_, eventWeight_);
+     if( foundRecoPhot.pt>ptPhotMin && fabs(foundRecoPhot.eta)<1.3 && foundRecoPhot.passedPhotonID("medium") )
+       h1_eff_num_medium_vs_pt->Fill(foundRecoPhot.ptGen, eventWeight_);
+     if( foundRecoPhot.pt>ptPhotMin && fabs(foundRecoPhot.eta)<1.3 && foundRecoPhot.passedPhotonID("loose") )
+       h1_eff_num_loose_vs_pt->Fill(foundRecoPhot.ptGen, eventWeight_);
      
 
    } //for entries
@@ -781,20 +797,7 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
      jetTree_->SetBranchAddress( "ptPhotGen", &ptPhot_tmp );
 
      TTree* newTree = jetTree_->CloneTree(0);
-     Float_t newWeight_loose;
-     newTree->Branch( "eventWeight_loose", &newWeight_loose, "newWeight_loose/F" );
-     Float_t newWeight_medium;
-     newTree->Branch( "eventWeight_medium", &newWeight_medium, "newWeight_medium/F" );
 
-  // int nBins_pt = 16;
-  // Double_t Lower[nBins_pt];
-  // fitTools::getPtBins( nBins_pt, Lower );
-
-     std::vector<float> ptPhot_binning = fitTools::getPtPhot_binning();
-
-     Double_t ptPhotBinning_array[200]; //ugly! no more than 200 pt bins supported
-     for( unsigned i=0; i<ptPhot_binning.size(); ++i )
-       ptPhotBinning_array[i] = ptPhot_binning[i];
 
      int nentries = jetTree_->GetEntries();
 
@@ -807,26 +810,28 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
 
        int thebin = h1_eff_denom_vs_pt->FindBin( ptPhot_tmp );
 
-     //int thebin = -1;
-     //for( unsigned ibin=0; ibin<(nBins_pt-1); ++ibin ) {
-     //  if( ptPhot>Lower[ibin] && ptPhot<Lower[ibin+1] ) {
-     //    thebin = ibin;
-     //    break;
-     //  }
-     //}
-       if( thebin<0 ) {
-         newWeight_medium= 0.; //scary
-         newWeight_loose= 0.; //scary
+       //std::cout << "ptPhot: " << ptPhot_tmp << "\tbin: " << thebin;
+
+       if( thebin<1 || thebin>h1_eff_denom_vs_pt->GetNbinsX() ) {
+         eventWeight_medium_= 0.; //scary
+         eventWeight_loose_= 0.; //scary
+       //std::cout << "\t-> continued." << std::endl;
+         continue;
+       }
+
+       if( h1_eff_denom_vs_pt->GetBinContent(thebin)==0. ) {
+         eventWeight_medium_= 0.; 
+         eventWeight_loose_= 0.; 
        } else {
-         newWeight_loose  = oldWeight*h1_effloose->GetBinContent( thebin );
-         newWeight_medium = oldWeight*h1_effmedium->GetBinContent( thebin );
+         //std::cout << "\th1_effloose(bin): " << h1_effloose->GetBinContent(thebin) << "\th1_effmedium(bin): " << h1_effmedium->GetBinContent( thebin ) << std::endl;
+         eventWeight_loose_  = oldWeight*h1_effloose->GetBinContent( thebin );
+         eventWeight_medium_ = oldWeight*h1_effmedium->GetBinContent( thebin );
        }
 
        newTree->Fill();
 
      } //for entries
 
-     //newTree->Write();
      jetTree_ = newTree;
 
 

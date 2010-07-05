@@ -18,16 +18,20 @@ class TreeAnalyzer_PhotonJet : public TreeAnalyzer {
 
  public:
 
-   TreeAnalyzer_PhotonJet( std::string dataset, std::string recoType, std::string jetAlgo, bool useGenJets=false, TTree* tree=0);
+   TreeAnalyzer_PhotonJet( const std::string& dataset, const std::string& recoType, const std::string& jetAlgo, const std::string& flags="", bool useGenJets=false, TTree* tree=0);
    virtual ~TreeAnalyzer_PhotonJet();
 
+   virtual void CreateOutputFile();
    virtual void Loop();
 
 
 
  private:
 
-   Bool_t isIsolated_loose_;
+   Float_t eventWeight_medium_;
+   Float_t eventWeight_loose_;
+
+   Bool_t isIsolated_veryloose_;
 
    Bool_t isIsolated_hcal_loose_;
    Bool_t isIsolated_hcal_medium_;
