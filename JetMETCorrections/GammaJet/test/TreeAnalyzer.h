@@ -499,11 +499,15 @@ public :
 
    TreeAnalyzer( const std::string& analyzerType, const std::string& dataset, const std::string& recoType, const std::string& jetAlgo, const std::string& flags="", TTree *tree=0);
    virtual ~TreeAnalyzer();
+
+   virtual void SetFlags( const std::string& flags ) { flags_ = flags; };
+
    virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
    virtual Long64_t LoadTree(Long64_t entry);
    virtual void     LoadInput();
    virtual void     LoadInputFromFile( const std::string& fileName );
+   virtual void     CreateOutputFile();
    virtual void     Init(TTree *tree);
    virtual void     Loop()=0;
    virtual Bool_t   Notify();

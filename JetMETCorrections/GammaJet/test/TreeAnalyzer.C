@@ -25,27 +25,8 @@ TreeAnalyzer::TreeAnalyzer(const std::string& analyzerType, const std::string& d
    }
    flags_ = flags;
 
-
-  
-   std::string outfileName;
-
-   if( DEBUG_ ) outfileName = "prova2ndLevel_"+dataset_;
-   else {
-    if(dataset_!="") outfileName = analyzerType_ + "_2ndLevelTree_"+dataset_;
-    else outfileName = analyzerType_ + "_2ndLevelTree";
-   }
-
-
-   outfileName = outfileName + "_" + algoType_ + flags_ + ".root";
-
-   outfile_ = new TFile(outfileName.c_str(), "RECREATE");
-   
-   outfile_->cd();
-
-   jetTree_ = new TTree("jetTree", "Reduced Tree for Jet Studies");
-   jetTree_->SetMaxTreeSize(100000000000ULL); //setting max tree size to 100 GB
-
 }
+
 
 
 // destructor
@@ -92,27 +73,42 @@ void TreeAnalyzer::LoadInput() {
    } else if( dataset_=="QCD_Spring10_Pt0to15" ) {
      sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/QCD_Spring10/QCDPt0to15/output_*.root/myanalysis/pippo");
      chain->Add(treePath);
+   } else if( dataset_=="QCD_Spring10_Pt5to15" ) {
+     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/QCD_Spring10/QCDPt0to15/output_*.root/myanalysis/pippo");
+     chain->Add(treePath);
+     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/QCD_Spring10/QCDPt5to15/output_*.root/myanalysis/pippo");
+     chain->Add(treePath);
    } else if( dataset_=="QCD_Spring10_Pt15" ) {
-     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/QCD_Spring10_3rdTry/QCDPt15/output_*.root/myanalysis/pippo");
+     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/QCD_Spring10/QCDPt15/output_*.root/myanalysis/pippo");
      chain->Add(treePath);
    } else if( dataset_=="QCD_Spring10_Pt15to20" ) {
-     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/QCD_Spring10_3rdTry/QCDPt15/output_*.root/myanalysis/pippo");
+     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/QCD_Spring10/QCDPt15/output_*.root/myanalysis/pippo");
      chain->Add(treePath);
-     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/QCD_Spring10_3rdTry/QCDPt15to20/output_*.root/myanalysis/pippo");
+     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/QCD_Spring10/QCDPt15to20/output_*.root/myanalysis/pippo");
      chain->Add(treePath);
    } else if( dataset_=="QCD_Spring10_Pt20to30" ) {
-     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/QCD_Spring10_3rdTry/QCDPt15/output_*.root/myanalysis/pippo");
+     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/QCD_Spring10/QCDPt15/output_*.root/myanalysis/pippo");
      chain->Add(treePath);
-     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/QCD_Spring10_3rdTry/QCDPt20to30/output_*.root/myanalysis/pippo");
+     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/QCD_Spring10/QCDPt20to30/output_*.root/myanalysis/pippo");
      chain->Add(treePath);
    } else if( dataset_=="QCD_Spring10_Pt30" ) {
-     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/QCD_Spring10_3rdTry/QCDPt30/output_*.root/myanalysis/pippo");
+     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/QCD_Spring10/QCDPt30/output_*.root/myanalysis/pippo");
+     chain->Add(treePath);
+   } else if( dataset_=="QCD_Spring10_Pt30to50" ) {
+     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/QCD_Spring10/QCDPt30/output_*.root/myanalysis/pippo");
+     chain->Add(treePath);
+     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/QCD_Spring10/QCDPt30to50/output_*.root/myanalysis/pippo");
+     chain->Add(treePath);
+   } else if( dataset_=="QCD_Spring10_Pt50to80" ) {
+     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/QCD_Spring10/QCDPt30/output_*.root/myanalysis/pippo");
+     chain->Add(treePath);
+     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/QCD_Spring10/QCDPt50to80/output_*.root/myanalysis/pippo");
      chain->Add(treePath);
    } else if( dataset_=="QCD_Spring10_Pt80" ) {
-     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/QCD_Spring10_3rdTry/QCDPt80/output_*.root/myanalysis/pippo");
+     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/QCD_Spring10/QCDPt80/output_*.root/myanalysis/pippo");
      chain->Add(treePath);
    } else if( dataset_=="QCD_Spring10_Pt170" ) {
-     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/QCD_Spring10_3rdTry/QCDPt170/output_*.root/myanalysis/pippo");
+     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/QCD_Spring10/QCDPt170/output_*.root/myanalysis/pippo");
      chain->Add(treePath);
    } else if( dataset_=="QCD_Pythia8" ) {
      sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/QCD_Pythia8/output_*.root/myanalysis/pippo");
@@ -136,6 +132,8 @@ void TreeAnalyzer::LoadInput() {
    //std::cout << "-> Added " << nFiles << " files. Tree has " << tree->GetEntries() << " entries." << std::endl;
 
    Init(tree);
+
+   this->CreateOutputFile();
 
 }
 
@@ -167,9 +165,32 @@ void TreeAnalyzer::LoadInputFromFile( const std::string& fileName ) {
    //std::cout << "-> Added " << nFiles << " files. Tree has " << tree->GetEntries() << " entries." << std::endl;
 
    Init(tree);
+  
+   this->CreateOutputFile();
 
 }
 
+void TreeAnalyzer::CreateOutputFile() {
+
+   std::string outfileName;
+
+   if( DEBUG_ ) outfileName = "prova2ndLevel_"+dataset_;
+   else {
+    if(dataset_!="") outfileName = analyzerType_ + "_2ndLevelTree_"+dataset_;
+    else outfileName = analyzerType_ + "_2ndLevelTree";
+   }
+
+
+   outfileName = outfileName + "_" + algoType_ + flags_ + ".root";
+
+   outfile_ = new TFile(outfileName.c_str(), "RECREATE");
+   
+   outfile_->cd();
+
+   jetTree_ = new TTree("jetTree", "Reduced Tree for Jet Studies");
+   jetTree_->SetMaxTreeSize(100000000000ULL); //setting max tree size to 100 GB
+
+}
 
 
 Int_t TreeAnalyzer::GetEntry(Long64_t entry)
@@ -747,6 +768,10 @@ GenEventParameters TreeAnalyzer::getGenEventParameters() {
    } else if( dataset_=="QCD_Spring10_Pt0to15" ) {
      returnGenPars.crossSection = 48445000000.;
      returnGenPars.ptHatMax = 15.;
+   } else if( dataset_=="QCD_Spring10_Pt5to15" ) {
+     returnGenPars.crossSection = 36640000000.;
+     returnGenPars.ptHatMin = 5.;
+     returnGenPars.ptHatMax = 15.;
    } else if( dataset_=="QCD_Spring10_Pt15" ) {
      returnGenPars.crossSection = 876215000.-60411000.;
      returnGenPars.ptHatMax = 30.;
@@ -760,6 +785,14 @@ GenEventParameters TreeAnalyzer::getGenEventParameters() {
      returnGenPars.ptHatMax = 30.;
    } else if( dataset_=="QCD_Spring10_Pt30" ) {
      returnGenPars.crossSection = 60411000.-923821.;
+     returnGenPars.ptHatMax = 80.;
+   } else if( dataset_=="QCD_Spring10_Pt30to50" ) {
+     returnGenPars.crossSection = 53114800.;
+     returnGenPars.ptHatMin = 30.;
+     returnGenPars.ptHatMax = 50.;
+   } else if( dataset_=="QCD_Spring10_Pt50to80" ) {
+     returnGenPars.crossSection = 6358210.;
+     returnGenPars.ptHatMin = 50.;
      returnGenPars.ptHatMax = 80.;
    } else if( dataset_=="QCD_Spring10_Pt80" ) {
      returnGenPars.crossSection = 923821.-25474.9;
@@ -784,6 +817,9 @@ GenEventParameters TreeAnalyzer::getGenEventParameters() {
      returnGenPars.crossSection = -1.;
      returnGenPars.ptHatMax = 10000.;
    }
+
+   if( returnGenPars.crossSection != -1 ) 
+     std::cout << "-> Dataset was in database. Cross-section correctly set." << std::endl;
 
    return returnGenPars;
 
