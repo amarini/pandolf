@@ -610,17 +610,50 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
   } else {
 
-    infileName = prefix + dataset + suffix + ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
+    infileName = "files_PhotonJet_2ndLevel_" + dataset+"_" + recoType +".txt";
+
+    //open from file.txt:
+    FILE* iff = fopen(infileName.c_str(),"r");
+    if(iff == 0) {
+      std::cout << "cannot open input file " << infileName << " ... adding single file." << std::endl;
+      infileName = "PhotonJet_2ndLevelTree_" + dataset + "_" + algoType + ".root/jetTree";
+      tree->Add(infileName.c_str());
+      std::cout << "-> Added " << infileName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
+
     } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
+
+      char singleLine[500];
+
+      while( fscanf(iff, "%s", singleLine) !=EOF ) {
+
+        std::string rootfilename(singleLine);
+        std::string treename = rootfilename + "/jetTree";
+        std::cout << "-> Adding " << treename;
+        tree->Add(treename.c_str());
+        TFile* infile = TFile::Open(rootfilename.c_str(), "READ");
+        h1_lumi = (TH1F*)infile->Get("lumi");
+        if( h1_lumi!=0 ) {
+          totalLumi += h1_lumi->GetBinContent(1);
+          std::cout << "\tTotal lumi: " << totalLumi << " ub-1" << std::endl;
+        } else {
+          std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
+        }
+
+      }
+      fclose(iff);
+
     }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
+  //infileName = prefix + dataset + suffix + ".root";
+  //infile = TFile::Open(infileName.c_str(), "READ");
+  //h1_lumi = (TH1F*)infile->Get("lumi");
+  //if( h1_lumi!=0 ) {
+  //  totalLumi += h1_lumi->GetBinContent(1);
+  //} else {
+  //  std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
+  //}
+  //treeName = infileName + "/jetTree";
+  //tree->Add(treeName.c_str());
+  //std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
 
   }
 
