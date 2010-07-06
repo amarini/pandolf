@@ -10,11 +10,10 @@ if len(sys.argv) != 6:
     sys.exit(1)
 dataset = sys.argv[1]
 recoType = sys.argv[2]
-#inputlist = "files_EG_Run2010A_Jun14thReReco_v1.txt"
 #inputlist = "files_EG_Run2010A_PromptReco_v4.txt"
-inputlist = "files_MinimumBias_Commissioning10_SD_EG_Jun14thSkim_v1.txt"
-#inputlist = "files_MinimumBias_Commissioning10-GOODCOLL-Jun9thSkim_v1_JSON.txt"
-#inputlist = "files_prova.txt"
+#inputlist = "files_EG_Run2010A_Jun14thReReco_v1.txt"
+inputlist = "files_QCD_Spring10_Pt5to15.txt"
+#inputlist = "files_MinimumBias_Commissioning10_SD_EG_Jun14thSkim_v1.txt"
 #settingfile = "config/RSZZsettings.txt"
 output = dataset
 # choose among cmt3 8nm 1nh 8nh 1nd 1nw 
@@ -31,19 +30,19 @@ application = sys.argv[4]
 #outputmain = castordir+output
 # to write on local disks
 ################################################
-#castordir = "/castor/cern.ch/user/p/pandolf/DATA/EG/Run2010A-Jun14thReReco_v1/"
-#diskoutputdir = "/cmsrm/pc21_2/pandolf/DATA/EG/Run2010A-Jun14thReReco_v1/"
-castordir = "/castor/cern.ch/user/p/pandolf/DATA/MinimumBias/Commissioning10_SD_EG_Jun14thSkim_v1/"
 #diskoutputdir = "/cmsrm/pc21_2/pandolf/DATA/EG/Run2010A-PromptReco-v4/"
-diskoutputdir = "/cmsrm/pc21_2/pandolf/DATA/MinimumBias/Commissioning10_SD_EG_Jun14thSkim_v1/"
+#diskoutputdir = "/cmsrm/pc21_2/pandolf/DATA/MinimumBias/Commissioning10_SD_EG_Jun14thSkim_v1/"
+diskoutputdir = "/cmsrm/pc21_2/pandolf/MC/QCD_Spring10/QCDPt5to15/"
+castordir = "/castor/cern.ch/user/p/pandolf/MC/QCD_Spring10/QCDPt5to15/"
+#castordir = "/castor/cern.ch/user/p/pandolf/DATA/MinimumBias/Commissioning10_SD_EG_Jun14thSkim_v1/"
 outputmain = castordir
 diskoutputmain = diskoutputdir
 # prepare job to write on the cmst3 cluster disks
 ################################################
-os.system("mkdir -p "+dataset)
-os.system("mkdir -p "+dataset+"/log/")
-os.system("mkdir -p "+dataset+"/input/")
-os.system("mkdir -p "+dataset+"/src/")
+os.system("mkdir -p "+dataset+"_"+recoType)
+os.system("mkdir -p "+dataset+"_"+recoType+"/log/")
+os.system("mkdir -p "+dataset+"_"+recoType+"/input/")
+os.system("mkdir -p "+dataset+"_"+recoType+"/src/")
 outputroot = outputmain+"/root/"
 if castordir != "none": 
     os.system("rfmkdir -p "+outputmain)
@@ -67,7 +66,7 @@ input = open(inputlist)
 
 for ijob in range(ijobmax):
     # prepare the list file
-    inputfilename = pwd+"/"+dataset+"/input/input_"+str(ijob)+".list"
+    inputfilename = pwd+"/"+dataset+"_"+recoType+"/input/input_"+str(ijob)+".list"
     inputfile = open(inputfilename,'w')
     # if it is a normal job get filesperjob lines
     if ijob != (ijobmax-1):
@@ -85,7 +84,7 @@ for ijob in range(ijobmax):
     inputfile.close()
 
     # prepare the script to run
-    outputname = dataset+"/src/submit_"+str(ijob)+".src"
+    outputname = dataset+"_"+recoType+"/src/submit_"+str(ijob)+".src"
     outputfile = open(outputname,'w')
     outputfile.write('#!/bin/bash\n')
     outputfile.write('export STAGE_HOST=castorcms\n')
@@ -97,7 +96,7 @@ for ijob in range(ijobmax):
     outputfile.write('ls *.root | xargs -i rfcp {} '+outputroot+'\n')
     outputfile.write('ls *.root | xargs -i scp -o BatchMode=yes -o StrictHostKeyChecking=no {} pccmsrm21:'+diskoutputmain+'/{}\n') 
     outputfile.close
-    os.system("echo bsub -q "+queue+" -o "+dataset+"/log/"+dataset+"_"+str(ijob)+".log source "+pwd+"/"+outputname)
-    os.system("bsub -q "+queue+" -o "+dataset+"/log/"+dataset+"_"+str(ijob)+".log source "+pwd+"/"+outputname+" -copyInput="+dataset+"_"+str(ijob))
+    os.system("echo bsub -q "+queue+" -o "+dataset+"_"+recoType+"/log/"+dataset+"_"+str(ijob)+".log source "+pwd+"/"+outputname)
+    os.system("bsub -q "+queue+" -o "+dataset+"_"+recoType+"/log/"+dataset+"_"+str(ijob)+".log source "+pwd+"/"+outputname+" -copyInput="+dataset+"_"+str(ijob))
     ijob = ijob+1
     continue
