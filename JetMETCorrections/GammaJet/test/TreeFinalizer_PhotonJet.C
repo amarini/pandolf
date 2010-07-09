@@ -19,643 +19,107 @@
 
 bool DEBUG_ = false;
 std::string RECOTYPE_;
+std::string algoType;
+std::string suffix;
+
+TChain* tree;
+Double_t totalLumi=0.;
 
 
+void addInput(const std::string& dataset);
 std::vector<TH1F*> getResponseHistos(const std::string& name);
 
-void finalize(const std::string& dataset, std::string recoType, std::string jetAlgo, bool useGenJets=false, bool MCassoc=false) {
+
+
+void finalize(const std::string& dataset, std::string recoType, std::string jetAlgo, bool noJetSelection=false, bool useGenJets=false, bool MCassoc=false) {
+
+
+  tree = new TChain("jetTree");
 
   RECOTYPE_ = recoType;
 
-  std::string algoType = (recoType=="calo") ? jetAlgo : recoType+jetAlgo;
+  algoType = (recoType=="calo") ? jetAlgo : recoType+jetAlgo;
   if( recoType=="jpt"&&jetAlgo=="akt5" ) algoType="jptak5"; 
 
-  TChain* tree = new TChain("jetTree");
-  
   std::string infileName, treeName;
-  TFile* infile=0;
-  TH1F* h1_lumi=0;
-  Double_t totalLumi=0.;
 
-  std::string prefix = "PhotonJet_2ndLevelTree_";
-  std::string suffix = "_"+algoType;
+  suffix = "_"+algoType;
   if( useGenJets ) suffix = suffix + "_GENJETS";
 
 
-  if( dataset=="DATA_7TeV_20100507") {
 
-    infileName = prefix + "DATA_MinimumBias_Commissioning10-GOODCOLL-v8" + suffix + ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-    infileName = prefix + "Commissioning10-GOODCOLL-v8_runs132605_606" + suffix + ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-    infileName = prefix + "MinimumBias_Commissioning10-GOODCOLL-v9" + suffix + ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
+  if( dataset=="PhotonJet_Summer09") {
 
+    addInput( "PhotonJet_Summer09_Pt15" );
+    addInput( "PhotonJet_Summer09_Pt30" );
+    addInput( "PhotonJet_Summer09_Pt80" );
+    addInput( "PhotonJet_Summer09_Pt170" );
+    addInput( "PhotonJet_Summer09_Pt300" );
+    addInput( "PhotonJet_Summer09_Pt470" );
+    addInput( "PhotonJet_Summer09_Pt800" );
+    addInput( "PhotonJet_Summer09_Pt1400" );
 
-  } else if( dataset=="PhotonJet_Summer09") {
+  } else if( dataset=="QCD_Summer09" ) {
 
-    infileName = prefix + "PhotonJet_Summer09_Pt15" + suffix + ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-    infileName = prefix + "PhotonJet_Summer09_Pt30" + suffix + ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-    infileName = prefix + "PhotonJet_Summer09_Pt80" + suffix + ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-    infileName = prefix + "PhotonJet_Summer09_Pt170" + suffix + ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-    infileName = prefix + "PhotonJet_Summer09_Pt300" + suffix + ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-    infileName = prefix + "PhotonJet_Summer09_Pt470" + suffix + ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-    infileName = prefix + "PhotonJet_Summer09_Pt800" + suffix + ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-    infileName = prefix + "PhotonJet_Summer09_Pt1400" + suffix + ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
+    addInput( "QCD_Summer09_Pt15" );
+    addInput( "QCD_Summer09_Pt30" );
+    addInput( "QCD_Summer09_Pt80" );
+    addInput( "QCD_Summer09_Pt170" );
+    addInput( "QCD_Summer09_Pt300" );
+    addInput( "QCD_Summer09_Pt470" );
+    addInput( "QCD_Summer09_Pt800" );
+    addInput( "QCD_Summer09_Pt1400" );
 
-  } else if( dataset=="QCD_Summer09") {
+  } else if( dataset=="PhotonJetQCD_Summer09" ) {
 
-    infileName = prefix + "QCD_Summer09_Pt15" + suffix +  ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-    infileName = prefix + "QCD_Summer09_Pt30" + suffix +  ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-    infileName = prefix + "QCD_Summer09_Pt80" + suffix +  ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-    infileName = prefix + "QCD_Summer09_Pt170" + suffix +  ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-    infileName = prefix + "QCD_Summer09_Pt300" + suffix +  ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-    infileName = prefix + "QCD_Summer09_Pt470" + suffix +  ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-    infileName = prefix + "QCD_Summer09_Pt800" + suffix +  ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
+    addInput( "PhotonJet_Summer09_Pt15" );
+    addInput( "PhotonJet_Summer09_Pt30" );
+    addInput( "PhotonJet_Summer09_Pt80" );
+    addInput( "PhotonJet_Summer09_Pt170" );
+    addInput( "PhotonJet_Summer09_Pt300" );
+    addInput( "PhotonJet_Summer09_Pt470" );
+    addInput( "PhotonJet_Summer09_Pt800" );
+    addInput( "PhotonJet_Summer09_Pt1400" );
+    addInput( "QCD_Summer09_Pt15" );
+    addInput( "QCD_Summer09_Pt30" );
+    addInput( "QCD_Summer09_Pt80" );
+    addInput( "QCD_Summer09_Pt170" );
+    addInput( "QCD_Summer09_Pt300" );
+    addInput( "QCD_Summer09_Pt470" );
+    addInput( "QCD_Summer09_Pt800" );
+    addInput( "QCD_Summer09_Pt1400" );
 
-  } else if( dataset=="PhotonJetQCD_Summer09") {
+  } else if( dataset=="PhotonJet_Spring10" ) {
 
-    infileName = prefix + "PhotonJet_Summer09_Pt15" + suffix + ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-    infileName = prefix + "PhotonJet_Summer09_Pt30" + suffix + ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-    infileName = prefix + "PhotonJet_Summer09_Pt80" + suffix + ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-    infileName = prefix + "PhotonJet_Summer09_Pt170" + suffix + ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-    infileName = prefix + "PhotonJet_Summer09_Pt300" + suffix + ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-    infileName = prefix + "PhotonJet_Summer09_Pt470" + suffix + ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-    infileName = prefix + "PhotonJet_Summer09_Pt800" + suffix + ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-    infileName = prefix + "PhotonJet_Summer09_Pt1400" + suffix + ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-    infileName = prefix + "QCD_Summer09_Pt15" + suffix +  ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-    infileName = prefix + "QCD_Summer09_Pt30" + suffix +  ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-    infileName = prefix + "QCD_Summer09_Pt80" + suffix +  ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-    infileName = prefix + "QCD_Summer09_Pt170" + suffix +  ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-    infileName = prefix + "QCD_Summer09_Pt300" + suffix +  ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-    infileName = prefix + "QCD_Summer09_Pt470" + suffix +  ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-    infileName = prefix + "QCD_Summer09_Pt800" + suffix +  ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
+    addInput( "PhotonJet_Spring10_Pt5to15" );
+    addInput( "PhotonJet_Spring10_Pt15" );
+    addInput( "PhotonJet_Spring10_Pt30" );
+    addInput( "PhotonJet_Spring10_Pt80" );
+    addInput( "PhotonJet_Spring10_Pt170" );
 
-  } else if( dataset=="PhotonJet_Spring10") {
+  } else if( dataset=="QCD_Spring10" ) {
 
-  //infileName = prefix + "PhotonJet_Spring10_Pt0to15" + suffix + ".root";
-  //infile = TFile::Open(infileName.c_str(), "READ");
-  //h1_lumi = (TH1F*)infile->Get("lumi");
-  //if( h1_lumi!=0 ) {
-  //  totalLumi += h1_lumi->GetBinContent(1);
-  //} else {
-  //  std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-  //}
-  //treeName = infileName + "/jetTree";
-  //tree->Add(treeName.c_str());
-  //std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
+    //addInput( "QCD_Spring10_Pt5to15" );
+    addInput( "QCD_Spring10_Pt15" );
+    addInput( "QCD_Spring10_Pt30" );
+    addInput( "QCD_Spring10_Pt80" );
+    addInput( "QCD_Spring10_Pt170" );
+    addInput( "QCD_Spring10_Pt300" );
 
-    infileName = prefix + "PhotonJet_Spring10_Pt5to15" + suffix + ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
+  } else if( dataset=="DATA_EG" ) {
 
-    infileName = prefix + "PhotonJet_Spring10_Pt15" + suffix + ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-    infileName = prefix + "PhotonJet_Spring10_Pt30" + suffix + ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-
-    infileName = prefix + "PhotonJet_Spring10_Pt80" + suffix + ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-
-  } else if( dataset=="QCD_Spring10") {
-
-//  infileName = prefix + "QCD_Spring10_Pt0to15" + suffix + ".root";
-//  treeName = infileName + "/jetTree";
-//  tree->Add(treeName.c_str());
-//  std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-
-    infileName = prefix + "MinBias_357ReReco_v3_Pt0to15" + suffix + ".root";
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-
-//  infileName = prefix + "QCD_Spring10_Pt15" + suffix + ".root";
-//  treeName = infileName + "/jetTree";
-//  tree->Add(treeName.c_str());
-//  std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-
-    infileName = prefix + "QCD_Spring10_Pt15to20" + suffix + ".root";
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-
-    infileName = prefix + "QCD_Spring10_Pt20to30" + suffix + ".root";
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-
-//  infileName = prefix + "QCD_Spring10_Pt30" + suffix + ".root";
-//  treeName = infileName + "/jetTree";
-//  tree->Add(treeName.c_str());
-//  std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-
-    infileName = prefix + "QCD_Spring10_Pt30to50" + suffix + ".root";
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-
-    infileName = prefix + "QCD_Spring10_Pt50to80" + suffix + ".root";
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-
-    infileName = prefix + "QCD_Spring10_Pt80" + suffix + ".root";
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-
-    infileName = prefix + "QCD_Spring10_Pt170" + suffix + "_NOPTHATCUT.root";
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-
-  } else if( dataset=="DATA_CMSWEEK_MAY10") {
-
-    infileName = prefix + "MinimumBias_Commissioning10-Apr20Skim_GOODCOLL-v1" + suffix + ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-
-    infileName = prefix + "MinimumBias_Commissioning10-GOODCOLL-v9" + suffix + ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-
-  } else if( dataset=="DATA_EG") {
-
-    infileName = prefix + "MinimumBias_Commissioning10_May6thPDSkim2_SD_EG" + suffix + ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-
-    infileName = prefix + "MinimumBias_Commissioning10_SD_EG-v9" + suffix + ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-
-    infileName = prefix + "EG_Run2010A-PromptReco-v1" + suffix + ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-
-    infileName = prefix + "EG_Run2010A-PromptReco-v2" + suffix + ".root";
-    infile = TFile::Open(infileName.c_str(), "READ");
-    h1_lumi = (TH1F*)infile->Get("lumi");
-    if( h1_lumi!=0 ) {
-      totalLumi += h1_lumi->GetBinContent(1);
-    } else {
-      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-    }
-    treeName = infileName + "/jetTree";
-    tree->Add(treeName.c_str());
-    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-
+    addInput( "MinimumBias_Commissioning10_SD_EG_Jun14thSkim_v1" );
+    addInput( "EG_Run2010A-Jun14thReReco_v1" );
+    addInput( "EG_Run2010A-PromptReco-v4" );
+    addInput( "EG_Run2010A_PromptReco_v4_139347_139375" );
 
   } else {
-
-    infileName = "files_PhotonJet_2ndLevel_" + dataset+"_" + recoType +".txt";
-
-    //open from file.txt:
-    FILE* iff = fopen(infileName.c_str(),"r");
-    if(iff == 0) {
-      std::cout << "cannot open input file " << infileName << " ... adding single file." << std::endl;
-      infileName = "PhotonJet_2ndLevelTree_" + dataset + "_" + algoType + ".root/jetTree";
-      tree->Add(infileName.c_str());
-      std::cout << "-> Added " << infileName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-
-    } else {
-
-      char singleLine[500];
-
-      while( fscanf(iff, "%s", singleLine) !=EOF ) {
-
-        std::string rootfilename(singleLine);
-        std::string treename = rootfilename + "/jetTree";
-        std::cout << "-> Adding " << treename;
-        tree->Add(treename.c_str());
-        TFile* infile = TFile::Open(rootfilename.c_str(), "READ");
-        h1_lumi = (TH1F*)infile->Get("lumi");
-        if( h1_lumi!=0 ) {
-          totalLumi += h1_lumi->GetBinContent(1);
-          std::cout << "\tTotal lumi: " << totalLumi << " ub-1" << std::endl;
-        } else {
-          std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-        }
-
-      }
-      fclose(iff);
-
-    }
-  //infileName = prefix + dataset + suffix + ".root";
-  //infile = TFile::Open(infileName.c_str(), "READ");
-  //h1_lumi = (TH1F*)infile->Get("lumi");
-  //if( h1_lumi!=0 ) {
-  //  totalLumi += h1_lumi->GetBinContent(1);
-  //} else {
-  //  std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
-  //}
-  //treeName = infileName + "/jetTree";
-  //tree->Add(treeName.c_str());
-  //std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
+  
+    addInput( dataset );
 
   }
+
+
 
   std::cout << "-> Total integrated luminosity: " << totalLumi << " ub-1." << std::endl;
   TH1F* h1_totalLumi = new TH1F("totalLumi", "", 1, 0., 1.);
@@ -687,6 +151,9 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   TH1D* h1_phiPhot_loose = new TH1D("phiPhot_loose", "", 15, -3.1416, 3.1416);
   h1_phiPhot_loose->Sumw2();
 
+  TH1D* h1_ptPhot_medium = new TH1D("ptPhot_medium", "", 10, ptPhot_binning[0], ptMax);
+  h1_ptPhot_medium->Sumw2();
+
   TH1D* h1_ptPhot_clusterOK = new TH1D("ptPhot_clusterOK", "", 10, ptPhot_binning[0], ptMax);
   h1_ptPhot_clusterOK->Sumw2();
   TH1D* h1_etaPhot_clusterOK = new TH1D("etaPhot_clusterOK", "", 15, -1.3, 1.3);
@@ -705,8 +172,12 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
   TH1D* h1_hcalIsoPhotReco_Nm1 = new TH1D("hcalIsoPhotReco_Nm1", "", 10, 0., 0.5);
   h1_hcalIsoPhotReco_Nm1->Sumw2();
+  TH1D* h1_hcalIsoEnergyPhotReco_Nm1 = new TH1D("hcalIsoEnergyPhotReco_Nm1", "", 10, 0., 15.);
+  h1_hcalIsoEnergyPhotReco_Nm1->Sumw2();
   TH1D* h1_ecalIsoPhotReco_Nm1 = new TH1D("ecalIsoPhotReco_Nm1", "", 20, 0., 1.);
   h1_ecalIsoPhotReco_Nm1->Sumw2();
+  TH1D* h1_ecalIsoEnergyPhotReco_Nm1 = new TH1D("ecalIsoEnergyPhotReco_Nm1", "", 20, 0., 30.);
+  h1_ecalIsoEnergyPhotReco_Nm1->Sumw2();
   TH1D* h1_ptTrkIsoPhotReco_Nm1 = new TH1D("ptTrkIsoPhotReco_Nm1", "", 20, 0., 1.);
   h1_ptTrkIsoPhotReco_Nm1->Sumw2();
   TH1D* h1_nTrkIsoPhotReco_Nm1 = new TH1D("nTrkIsoPhotReco_Nm1", "", 11, -0.5, 10.5);
@@ -718,8 +189,12 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
   TH1D* h1_hcalIsoPhotReco_clusterOK = new TH1D("hcalIsoPhotReco_clusterOK", "", 10, 0., 0.5);
   h1_hcalIsoPhotReco_clusterOK->Sumw2();
+  TH1D* h1_hcalIsoEnergyPhotReco_clusterOK = new TH1D("hcalIsoEnergyPhotReco_clusterOK", "", 10, 0., 15.);
+  h1_hcalIsoEnergyPhotReco_clusterOK->Sumw2();
   TH1D* h1_ecalIsoPhotReco_clusterOK = new TH1D("ecalIsoPhotReco_clusterOK", "", 20, 0., 1.);
   h1_ecalIsoPhotReco_clusterOK->Sumw2();
+  TH1D* h1_ecalIsoEnergyPhotReco_clusterOK = new TH1D("ecalIsoEnergyPhotReco_clusterOK", "", 20, 0., 30.);
+  h1_ecalIsoEnergyPhotReco_clusterOK->Sumw2();
   TH1D* h1_ptTrkIsoPhotReco_clusterOK = new TH1D("ptTrkIsoPhotReco_clusterOK", "", 20, 0., 1.);
   h1_ptTrkIsoPhotReco_clusterOK->Sumw2();
   TH1D* h1_nTrkIsoPhotReco_clusterOK = new TH1D("nTrkIsoPhotReco_clusterOK", "", 11, -0.5, 10.5);
@@ -769,6 +244,7 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
   std::vector<TH1F*> h1_response_loose        = getResponseHistos("response_loose");
   std::vector<TH1F*> h1_responseGEN_loose     = getResponseHistos("responseGEN_loose");
+  std::vector<TH1F*> h1_responseMPF_loose     = getResponseHistos("responseMPF_loose");
 
 
 
@@ -939,13 +415,19 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     if( fabs(deltaPhi_jet) < (pi - 1.) ) back2back = false; //loose back to back for now
 
     bool secondJetOK = ( pt2ndJetReco < 0.5*ptPhotReco );
-  //Float_t secondJetPt_thresh = (recoType=="calo") ? 5. : 8.;
-  //bool secondJetOK = ( pt2ndJetReco < 0.1*ptPhotReco || pt2ndJetReco<secondJetPt_thresh );
+    //bool secondJetOK = ( pt2ndJetReco < 0.3*ptPhotReco || pt2ndJetReco < 5. );
+
+
+    //temporary fix:
+    isIsolated_ecal_loose  = ( ecalIsoPhotReco<0.1  || ecalIsoPhotReco*ePhotReco<4.5 );
+    isIsolated_ecal_medium = ( ecalIsoPhotReco<0.05 || ecalIsoPhotReco*ePhotReco<3.  );
   
 
     //before selection fill N-1 isolation plots (no event topology for isolation variables):
     if(                           isIsolated_ecal_medium && isIsolated_ptTracks_medium && isIsolated_nTracks_medium && clusterMajOK_medium && clusterMinOK_medium  ) h1_hcalIsoPhotReco_Nm1->Fill( hcalIsoPhotReco, eventWeight);
+    if(                           isIsolated_ecal_medium && isIsolated_ptTracks_medium && isIsolated_nTracks_medium && clusterMajOK_medium && clusterMinOK_medium  ) h1_hcalIsoEnergyPhotReco_Nm1->Fill( hcalIsoPhotReco*ePhotReco, eventWeight);
     if( isIsolated_hcal_medium                           && isIsolated_ptTracks_medium && isIsolated_nTracks_medium && clusterMajOK_medium && clusterMinOK_medium  ) h1_ecalIsoPhotReco_Nm1->Fill( ecalIsoPhotReco, eventWeight);
+    if( isIsolated_hcal_medium                           && isIsolated_ptTracks_medium && isIsolated_nTracks_medium && clusterMajOK_medium && clusterMinOK_medium  ) h1_ecalIsoEnergyPhotReco_Nm1->Fill( ecalIsoPhotReco*ePhotReco, eventWeight);
     if( isIsolated_hcal_medium && isIsolated_ecal_medium                               && isIsolated_nTracks_medium && clusterMajOK_medium && clusterMinOK_medium  ) h1_ptTrkIsoPhotReco_Nm1->Fill( ptTrkIsoPhotReco, eventWeight);
     if( isIsolated_hcal_medium && isIsolated_ecal_medium && isIsolated_ptTracks_medium                              && clusterMajOK_medium && clusterMinOK_medium  ) h1_nTrkIsoPhotReco_Nm1->Fill( nTrkIsoPhotReco, eventWeight);
     //no cluster cuts on cluster N-1's:
@@ -961,10 +443,16 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     bool clusterShapeOK_medium = (clusterMajOK_medium && clusterMinOK_medium );
 
 
+    //////////////////////////////////////////////
+    /////      CLUSTER SHAPE ONLY SELECTION 
+    //////////////////////////////////////////////
+
 
     if( clusterShapeOK_medium ) {
       h1_hcalIsoPhotReco_clusterOK->Fill( hcalIsoPhotReco, eventWeight);
+      h1_hcalIsoEnergyPhotReco_clusterOK->Fill( hcalIsoPhotReco*ePhotReco, eventWeight);
       h1_ecalIsoPhotReco_clusterOK->Fill( ecalIsoPhotReco, eventWeight);
+      h1_ecalIsoEnergyPhotReco_clusterOK->Fill( ecalIsoPhotReco*ePhotReco, eventWeight);
       h1_ptTrkIsoPhotReco_clusterOK->Fill( ptTrkIsoPhotReco, eventWeight);
       h1_nTrkIsoPhotReco_clusterOK->Fill( nTrkIsoPhotReco, eventWeight);
       h1_deltaPhi_clusterOK->Fill( deltaPhi_jet, eventWeight);
@@ -977,7 +465,7 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
         h1_ptPhot_clusterOK_isolated->Fill( ptPhotReco, eventWeight );
       }
 
-      if( back2back && secondJetOK && jetInBarrel) {
+      if( (back2back && secondJetOK && jetInBarrel) || noJetSelection ) {
         h1_ptPhot_clusterOK->Fill( ptPhotReco, eventWeight );
         h1_phiPhot_clusterOK->Fill( phiPhotReco, eventWeight );
         h1_etaPhot_clusterOK->Fill( etaPhotReco, eventWeight );
@@ -998,15 +486,32 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     bool photonOK_medium = passedPhotonID_medium || MCassoc || useGenJets;
     bool photonOK_loose = (isIsolated_loose && clusterShapeOK_medium) || MCassoc || useGenJets;
 
-    //event selection (medium):
-    if( photonOK_medium && back2back && jetInBarrel) {
+    // compute mpf :
+    Float_t phi_Phot_Met = fitTools::delta_phi( phiPhotReco, phipfMet );
+    Float_t mpfResponse = 1. + epfMet*ptPhotReco*cos( phi_Phot_Met ) / (ptPhotReco*ptPhotReco);
+
+
+  
+    //////////////////////////////////////////////
+    /////      EVENT SELECTION: MEDIUM ID
+    //////////////////////////////////////////////
+
+    bool passedMedium_no2ndJet = photonOK_medium && ( (back2back && jetInBarrel) || noJetSelection );
+    bool passedMedium_FULL     = passedMedium_no2ndJet && (secondJetOK || noJetSelection);
+
+
+    if( passedMedium_no2ndJet ) {
 
       Float_t correctWeight = (useGenJets) ? eventWeight_medium : eventWeight;
 
     //// no cut in 2nd jet to produce gen response plot to have more stat
     //h1_responseGEN[theBin]->Fill( ptJetReco/ptJetGen, correctWeight );
       
-      if( secondJetOK ) {
+      if( passedMedium_FULL ) {
+
+        h1_ptPhot_medium->Fill( ptPhotReco, correctWeight );
+
+
         //fill responseGEN histos before any selection to avoid biases:
         int theBinGEN = hp_ptPhotMean->FindBin( ptJetGen );
         theBinGEN -= 1; //because arrays start from 0
@@ -1028,18 +533,23 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
         h1_response[theBin]->Fill( ptJetReco/ptPhotReco, correctWeight );
 
         if( recoType=="pf" ) {
-          // compute mpf :
-          Float_t phi_Phot_Met = fitTools::delta_phi( phiPhotReco, phipfMet );
-          Float_t mpfResponse = 1. + epfMet*ptPhotReco*cos( phi_Phot_Met ) / (ptPhotReco*ptPhotReco);
           h1_responseMPF[theBin]->Fill( mpfResponse, correctWeight );
         } //if pf
           
-      }
+      } //if second jet ok
 
     } 
 
-    //event selection (loose):
-    if( photonOK_loose && back2back && jetInBarrel) {
+
+    //////////////////////////////////////////////
+    /////      EVENT SELECTION: LOOSE ID
+    //////////////////////////////////////////////
+
+    bool passedLoose_no2ndJet = photonOK_loose && ( (back2back && jetInBarrel) || noJetSelection );
+    bool passedLoose_FULL     = passedLoose_no2ndJet && (secondJetOK || noJetSelection);
+
+
+    if( passedLoose_no2ndJet ) {
 
       Float_t correctWeight = (useGenJets) ? eventWeight_loose : eventWeight;
       
@@ -1047,7 +557,7 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
       h1_responseGEN_loose[theBin]->Fill( ptJetReco/ptJetGen, correctWeight );
       
     
-      if( secondJetOK ) {
+      if( passedLoose_FULL ) {
         //if( ptPhotReco>28. && ptJetReco/ptPhotReco<0.1 )
         //  std::cout << " ptPhot: " << ptPhotReco << "\tptJet: " << ptJetReco << "\tetaJet: " << etaJetReco << "\tphiJet: " << phiJetReco << "\tclustMin: " << clusterMinPhotReco << "\tclustMaj: " << clusterMajPhotReco << "\tdeltaPhi: " << deltaPhi_jet << "\tnTrkIso:" << nTrkIsoPhotReco << std::endl;
         h1_ptPhot_loose->Fill( ptPhotReco, correctWeight );
@@ -1055,7 +565,11 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
         h1_etaPhot_loose->Fill( etaPhotReco, correctWeight );
         hp_ptPhotMean_loose->Fill( ptPhotReco, ptPhotReco, correctWeight );
         h1_response_loose[theBin]->Fill( ptJetReco/ptPhotReco, correctWeight );
-      }
+
+        if( recoType=="pf" ) {
+          h1_responseMPF_loose[theBin]->Fill( mpfResponse, correctWeight );
+        } //if pf
+      } //if second jet ok
 
     } //if loose
 
@@ -1075,7 +589,9 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   }
 
   outfileName = outfileName + suffix;
+  if( noJetSelection ) outfileName = outfileName + "_NOJETSEL";
   if( MCassoc ) outfileName = outfileName + "_MCassoc";
+  if( useGenJets ) outfileName = outfileName + "_GENJETS";
   outfileName += ".root";
 
   TFile* outFile = new TFile(outfileName.c_str(), "RECREATE");
@@ -1094,6 +610,8 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   h1_phiPhot_loose->Write();
   h1_etaPhot_loose->Write();
 
+  h1_ptPhot_medium->Write();
+
   h1_ptPhot_clusterOK->Write();
   h1_phiPhot_clusterOK->Write();
   h1_etaPhot_clusterOK->Write();
@@ -1110,14 +628,18 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   h1_ptSecondJetRel_clusterOK_isolated->Write();
 
   h1_hcalIsoPhotReco_Nm1->Write();
+  h1_hcalIsoEnergyPhotReco_Nm1->Write();
   h1_ecalIsoPhotReco_Nm1->Write();
+  h1_ecalIsoEnergyPhotReco_Nm1->Write();
   h1_ptTrkIsoPhotReco_Nm1->Write();
   h1_nTrkIsoPhotReco_Nm1->Write();
   h1_clusterMajPhotReco_Nm1->Write();
   h1_clusterMinPhotReco_Nm1->Write();
 
   h1_hcalIsoPhotReco_clusterOK->Write();
+  h1_hcalIsoEnergyPhotReco_clusterOK->Write();
   h1_ecalIsoPhotReco_clusterOK->Write();
+  h1_ecalIsoEnergyPhotReco_clusterOK->Write();
   h1_ptTrkIsoPhotReco_clusterOK->Write();
   h1_nTrkIsoPhotReco_clusterOK->Write();
   h1_deltaPhi_clusterOK->Write();
@@ -1140,8 +662,10 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     h1_response_clusterOK[i]->Write();
     h1_responseGEN_clusterOK[i]->Write();
 
-    if( recoType=="pf" )
+    if( recoType=="pf" ) {
       h1_responseMPF[i]->Write();
+      h1_responseMPF_loose[i]->Write();
+    }
   }
 
 
@@ -1149,8 +673,12 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
   delete h1_hcalIsoPhotReco_Nm1;
   h1_hcalIsoPhotReco_Nm1 = 0;
+  delete h1_hcalIsoEnergyPhotReco_Nm1;
+  h1_hcalIsoEnergyPhotReco_Nm1 = 0;
   delete h1_ecalIsoPhotReco_Nm1;
   h1_ecalIsoPhotReco_Nm1 = 0;
+  delete h1_ecalIsoEnergyPhotReco_Nm1;
+  h1_ecalIsoEnergyPhotReco_Nm1 = 0;
   delete h1_ptTrkIsoPhotReco_Nm1;
   h1_ptTrkIsoPhotReco_Nm1 = 0;
   delete h1_nTrkIsoPhotReco_Nm1;
@@ -1166,8 +694,6 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   h1_pt2ndJetReco = 0;
   delete h1_ptPhot;
   h1_ptPhot = 0;
-  delete h1_ptPhot;
-  h1_ptPhot = 0;
   delete h1_etaPhot;
   h1_etaPhot = 0;
   delete h1_phiPhot;
@@ -1177,10 +703,24 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   delete h1_ptSecondJetRel_Nm1;
   h1_ptSecondJetRel_Nm1 = 0;
 
+  delete h1_ptPhot_loose;
+  h1_ptPhot_loose = 0;
+  delete h1_etaPhot_loose;
+  h1_etaPhot_loose = 0;
+  delete h1_phiPhot_loose;
+  h1_phiPhot_loose = 0;
+
+  delete h1_ptPhot_medium;
+  h1_ptPhot_medium = 0;
+
   delete h1_hcalIsoPhotReco_clusterOK;
   h1_hcalIsoPhotReco_clusterOK = 0;
+  delete h1_hcalIsoEnergyPhotReco_clusterOK;
+  h1_hcalIsoEnergyPhotReco_clusterOK = 0;
   delete h1_ecalIsoPhotReco_clusterOK;
   h1_ecalIsoPhotReco_clusterOK = 0;
+  delete h1_ecalIsoEnergyPhotReco_clusterOK;
+  h1_ecalIsoEnergyPhotReco_clusterOK = 0;
   delete h1_ptTrkIsoPhotReco_clusterOK;
   h1_ptTrkIsoPhotReco_clusterOK = 0;
   delete h1_nTrkIsoPhotReco_clusterOK;
@@ -1193,7 +733,57 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 //delete h1_response;
 //h1_response = 0;
 
+
+  delete tree;
+  tree = 0;
+
+  totalLumi = 0.;
+
 }
+
+
+void addInput( const std::string& dataset ) {
+
+  std::string infileName = "files_PhotonJet_2ndLevel_" + dataset+"_" + RECOTYPE_ +".txt";
+  TH1F* h1_lumi;
+
+
+  //open from file.txt:
+  FILE* iff = fopen(infileName.c_str(),"r");
+  if(iff == 0) {
+    std::cout << "cannot open input file '" << infileName << "' ... adding single file." << std::endl;
+    infileName = "PhotonJet_2ndLevelTree_" + dataset + suffix + ".root/jetTree";
+    tree->Add(infileName.c_str());
+    std::cout << "-> Added " << infileName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
+
+  } else {
+
+    char singleLine[500];
+
+    while( fscanf(iff, "%s", singleLine) !=EOF ) {
+
+      std::string rootfilename(singleLine);
+      std::string treename = rootfilename + "/jetTree";
+      std::cout << "-> Added " << treename;
+      tree->Add(treename.c_str());
+      TFile* infile = TFile::Open(rootfilename.c_str(), "READ");
+      h1_lumi = (TH1F*)infile->Get("lumi");
+      if( h1_lumi!=0 ) {
+        totalLumi += h1_lumi->GetBinContent(1);
+        std::cout << "\tTotal lumi: " << totalLumi << " ub-1" << std::endl;
+      } else {
+        std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
+      }
+      infile->Close();
+
+    }
+    fclose(iff);
+
+  }
+
+} //addinput
+
+
   
 std::vector<TH1F*> getResponseHistos(const std::string& name) {
 

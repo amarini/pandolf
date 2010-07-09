@@ -59,13 +59,19 @@ void TreeAnalyzer::LoadInput() {
      sprintf(treePath, "/cmsrm/pc21_2/pandolf/DATA/MinimumBias/Commissioning10-Apr20Skim_GOODCOLL-v1_3rdTry/output_*.root/myanalysis/pippo");
      chain->Add(treePath);
    } else if( dataset_=="PhotonJet_Spring10_Pt0to15" ) {
-     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/PhotonJet_Spring10_2ndTry/PhotonJetPt0to15_3rdTry/output_*.root/myanalysis/pippo");
+     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/PhotonJet_Spring10/PhotonJetPt0to15/output_*.root/myanalysis/pippo");
      chain->Add(treePath);
    } else if( dataset_=="PhotonJet_Spring10_Pt15" ) {
-     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/PhotonJet_Spring10_2ndTry/PhotonJetPt15_3rdTry/output_*.root/myanalysis/pippo");
+     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/PhotonJet_Spring10/PhotonJetPt15/output_*.root/myanalysis/pippo");
      chain->Add(treePath);
    } else if( dataset_=="PhotonJet_Spring10_Pt30" ) {
-     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/PhotonJet_Spring10_2ndTry/PhotonJetPt30_3rdTry/output_*.root/myanalysis/pippo");
+     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/PhotonJet_Spring10/PhotonJetPt30/output_*.root/myanalysis/pippo");
+     chain->Add(treePath);
+   } else if( dataset_=="PhotonJet_Spring10_Pt80" ) {
+     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/PhotonJet_Spring10/PhotonJetPt80/output_*.root/myanalysis/pippo");
+     chain->Add(treePath);
+   } else if( dataset_=="PhotonJet_Spring10_Pt170" ) {
+     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/PhotonJet_Spring10/PhotonJetPt170/output_*.root/myanalysis/pippo");
      chain->Add(treePath);
    } else if( dataset_=="MinBias_357ReReco_v3"||dataset_=="MinBias_357ReReco_v3_Pt0to15" ) {
      sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/MinBias_357ReReco_v3/output_*.root/myanalysis/pippo");
@@ -109,6 +115,15 @@ void TreeAnalyzer::LoadInput() {
      chain->Add(treePath);
    } else if( dataset_=="QCD_Spring10_Pt170" ) {
      sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/QCD_Spring10/QCDPt170/output_*.root/myanalysis/pippo");
+     chain->Add(treePath);
+   } else if( dataset_=="QCD_Spring10_Pt300" ) {
+     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/QCD_Spring10/QCDPt300/output_*.root/myanalysis/pippo");
+     chain->Add(treePath);
+   } else if( dataset_=="QCD_Spring10_Pt470" ) {
+     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/QCD_Spring10/QCDPt470/output_*.root/myanalysis/pippo");
+     chain->Add(treePath);
+   } else if( dataset_=="QCD_Spring10_Pt1400" ) {
+     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/QCD_Spring10/QCDPt1400/output_*.root/myanalysis/pippo");
      chain->Add(treePath);
    } else if( dataset_=="QCD_Pythia8" ) {
      sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/QCD_Pythia8/output_*.root/myanalysis/pippo");
@@ -231,8 +246,10 @@ void TreeAnalyzer::Init(TTree *tree)
    ptHatMin_ = genPars.ptHatMin;
    ptHatMax_ = genPars.ptHatMax;
 
-   if( dataset_ == "QCD_Spring10_Pt170" ) 
+   if( dataset_ == "PhotonJet_Spring10_Pt15" ) {
      ptHatMax_ = 10000.;
+     flags_ = "_NOPTHATCUT";
+   }
 
    //will cut on pt_hat, so have to divide only by correct number of events:
    char cutOnPtHat[70];

@@ -755,7 +755,7 @@ void DrawBase::drawHisto_onlyData( std::string name, std::string etaRegion, std:
     Float_t ptPhotMax = 70.;
 
     //TH2* h2_axes_lo_resp = new TH2D("axes_lo_resp", "", 10, 10., ptPhotMax, 10, (1.-3.*scale_uncert), (1.+3.*scale_uncert));
-    TH2* h2_axes_lo_resp = new TH2D("axes_lo_resp", "", 10, ptPhot_binning[0], ptPhotMax, 10, 0.65, 1.35);
+    TH2* h2_axes_lo_resp = new TH2D("axes_lo_resp", "", 10, ptPhot_binning[0], ptPhotMax, 10, 0.81, 1.19);
     h2_axes_lo_resp->SetXTitle("Photon p_{T} [GeV/c]");
     h2_axes_lo_resp->SetYTitle("Data / MC");
     h2_axes_lo_resp->GetXaxis()->SetTitleOffset(1.2);
@@ -992,7 +992,7 @@ void DrawBase::drawHisto_onlyData( std::string name, std::string etaRegion, std:
 
 
 
-void DrawBase::drawHisto_2bkg( std::string name, std::string name_bkg1, std::string name_bkg2, std::string etaRegion, std::string flags, int legendQuadrant, bool log_aussi) {
+void DrawBase::drawHisto_2bkg( std::string name, std::string etaRegion, std::string flags, int legendQuadrant, bool log_aussi) {
 
   if( mcFile2_==0 ) {
     std::cout << "Set mcFile2 first!" << std::endl;
@@ -1177,8 +1177,8 @@ void DrawBase::drawHisto_2bkg( std::string name, std::string name_bkg1, std::str
     legend->SetFillColor(kWhite);
     legend->SetTextSize(0.035);
     legend->AddEntry(dataHisto, "Data", "P");
-    legend->AddEntry(mcHisto, name_bkg1.c_str(), "F");
-    legend->AddEntry(mcHisto2, name_bkg2.c_str(), "F");
+    legend->AddEntry(mcHisto, mcName_.c_str(), "F");
+    legend->AddEntry(mcHisto2, mcName2_.c_str(), "F");
 
     TPaveText* label_cms = new TPaveText(0.25, 0.83, 0.42, 0.87, "brNDC");
     label_cms->SetFillColor(kWhite);
@@ -1394,9 +1394,8 @@ void DrawBase::drawHisto_2bkg( std::string name, std::string name_bkg1, std::str
       gr_resolutionGEN_vs_pt->SetPointError( iplot, ptMeanErrGEN, genResolutionErr );
 
 
-    } //if reponse
+    } //if response
 
-std::cout << "fin qui OK. " << std::endl;
     legend->Draw("same");
       
 
@@ -1481,10 +1480,10 @@ std::cout << "fin qui OK. " << std::endl;
 
     Float_t scale_uncert = (recoType_=="calo") ? 0.1 : 0.05;
 
-    Float_t ptPhotMax = 70.;
+    Float_t ptPhotMax = ptPhot_binning[ptPhot_binning.size()-2];
 
     //TH2* h2_axes_lo_resp = new TH2D("axes_lo_resp", "", 10, 10., ptPhotMax, 10, (1.-3.*scale_uncert), (1.+3.*scale_uncert));
-    TH2* h2_axes_lo_resp = new TH2D("axes_lo_resp", "", 10, ptPhot_binning[0], ptPhotMax, 10, 0.65, 1.35);
+    TH2* h2_axes_lo_resp = new TH2D("axes_lo_resp", "", 10, ptPhot_binning[0], ptPhotMax, 10, 0.81, 1.19);
     h2_axes_lo_resp->SetXTitle("Photon p_{T} [GeV/c]");
     h2_axes_lo_resp->SetYTitle("Data / MC");
     h2_axes_lo_resp->GetXaxis()->SetTitleOffset(1.2);
@@ -1670,8 +1669,8 @@ std::cout << "fin qui OK. " << std::endl;
       legend2->AddEntry( gr_resolution_vs_pt, "Data (#gamma+Jet)", "P");
       legend2->AddEntry( gr_resolutionMC_vs_pt, "Simulation (#gamma+Jet)", "P");
     } else if( name == "responseMPF" ) {
-      legend2->AddEntry( gr_resolution_vs_pt, "Data (#gamma+Jet, MPF)", "P");
-      legend2->AddEntry( gr_resolutionMC_vs_pt, "Simulation (#gamma+Jet, MPF)", "P");
+      legend2->AddEntry( gr_resolution_vs_pt, "Data (MPF)", "P");
+      legend2->AddEntry( gr_resolutionMC_vs_pt, "Simulation (MPF)", "P");
     }
     legend2->AddEntry( gr_resolutionGEN_vs_pt, "True Resolution", "P");
     legend2->Draw("same");

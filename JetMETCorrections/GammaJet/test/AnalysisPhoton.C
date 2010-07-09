@@ -45,13 +45,13 @@ bool AnalysisPhoton::isIsolated_ecal( const std::string& tightness ) const {
 
   if( tightness == "loose" ) {
     ecalIso_rel_thresh = 0.1;
-    ecalIso_abs_thresh = 3.;
+    ecalIso_abs_thresh = 4.5;
   } else if( tightness == "medium" ) {
     ecalIso_rel_thresh = 0.05;
-    ecalIso_abs_thresh = 1.7;
+    ecalIso_abs_thresh = 3.;
   } else if( tightness == "tight" ) {
     ecalIso_rel_thresh = 0.03;
-    ecalIso_abs_thresh = 1.7;
+    ecalIso_abs_thresh = 3.;
   } else {
     std::cout << "WARNING: no isolation \"" << tightness << "\" exists. Exiting." << std::endl;
     exit(1);

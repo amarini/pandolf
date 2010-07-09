@@ -37,10 +37,12 @@ class DrawBase {
   void set_crossSectionNormalization();
   void set_sameEventNormalization();
   void set_sameInstanceNormalization();
+  void set_mcName( const std::string& name ) { mcName_ = name; };
+  void set_mcName2( const std::string& name ) { mcName2_ = name; };
 
   void drawHisto( std::string name, std::string etaRegion, std::string flags, int legendQuadrant=1, bool log_aussi=false);
   void drawHisto_onlyData( std::string name, std::string etaRegion, std::string flags, int legendQuadrant=1, bool log_aussi=false);
-  void drawHisto_2bkg( std::string name, std::string name_bkg1, std::string name_bkg2, std::string etaRegion, std::string flags, int legendQuadrant=1, bool log_aussi=false); //da cambiare!
+  void drawHisto_2bkg( std::string name, std::string etaRegion, std::string flags, int legendQuadrant=1, bool log_aussi=false); //da cambiare!
   void drawProfile( std::string yVar, std::string xVar, int legendQuadrant=1);
   void drawStack(const std::string& varY, const std::string& varX, const std::string& RECO_GEN, bool isData) const { this->drawStack( varY, varX, "", RECO_GEN, isData); };
   void drawStack(const std::string& varY, const std::string& varX, const std::string& etaRegion, const std::string& RECO_GEN, bool isData) const;
@@ -80,6 +82,8 @@ class DrawBase {
   std::string recoType_;
   std::string jetAlgo_;
 
+  std::string mcName_;
+  std::string mcName2_;
 
   TFile* dataFile_;
   TFile* mcFile_;

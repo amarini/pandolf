@@ -9,7 +9,7 @@
 int main(int argc, char* argv[]) {
 
   if( argc != 7 && argc!=8 ) {
-    std::cout << "USAGE: ./drawPhotonJet [(string)data_dataset] [(string)mc_BG_dataset] [(string)mc_SIGNAL_dataset] [(string)recoType] [(string)jetAlgo] [(string)norm ('LUMI' or 'SHAPE')] [(bool)useGenJets=false]" << std::endl;
+    std::cout << "USAGE: ./drawPhotonJet [data_dataset] [mc_BG_dataset] [mc_SIGNAL_dataset] [recoType] [jetAlgo] [norm ('LUMI' or 'SHAPE')] [flags=""]" << std::endl;
     exit(23);
   }
 
@@ -36,10 +36,10 @@ int main(int argc, char* argv[]) {
 
   Float_t etamax = 3.;
 
-  bool useGenJets = false;
+  std::string flags = "";
   if( argc==8 ) {
-    std::string useGenJets_str(argv[7]);
-    if( useGenJets_str=="true") useGenJets=true;
+    std::string flags_str(argv[7]);
+    flags = flags_str;
   }
 
   bool sameEvents = false; //until njets histos have no overflows... or maybe use GetEntries instead of integral?
@@ -48,8 +48,8 @@ int main(int argc, char* argv[]) {
   db->set_pdf_aussi((bool)false);
 
   char outputdir_char[200];
-  if( useGenJets ) {
-    sprintf( outputdir_char, "PhotonJetPlots_%s_vs_%s_GENJETS_plus_%s_%s_%s", data_dataset.c_str(), mc_bg.c_str(), mc_photonjet.c_str(), algoType.c_str(), norm.c_str());
+  if( flags!="" ) {
+    sprintf( outputdir_char, "PhotonJetPlots_%s_vs_%s_plus_%s_%s_%s_%s", data_dataset.c_str(), mc_bg.c_str(), mc_photonjet.c_str(), algoType.c_str(), norm.c_str(), flags.c_str());
   } else {
     sprintf( outputdir_char, "PhotonJetPlots_%s_vs_%s_plus_%s_%s_%s", data_dataset.c_str(), mc_bg.c_str(), mc_photonjet.c_str(), algoType.c_str(), norm.c_str());
   }
@@ -61,29 +61,33 @@ int main(int argc, char* argv[]) {
   db->set_outputdir(outputdir_str);
 
   char dataFileName[150];
-  sprintf( dataFileName, "PhotonJet_%s_%s.root", data_dataset.c_str(), algoType.c_str());
+  if( flags != "" ) {
+    sprintf( dataFileName, "PhotonJet_%s_%s_%s.root", data_dataset.c_str(), algoType.c_str(), flags.c_str());
+  } else {
+    sprintf( dataFileName, "PhotonJet_%s_%s.root", data_dataset.c_str(), algoType.c_str());
+  }
   TFile* dataFile = TFile::Open(dataFileName);
   std::cout << "Opened data file '" << dataFileName << "'." << std::endl;
 
   db->set_dataFile( dataFile );
 
-  char mcMinBiasFileName[150];
-  if( useGenJets ) {
-    sprintf( mcMinBiasFileName, "PhotonJet_%s_%s_GENJETS.root", mc_bg.c_str(), algoType.c_str());
+  char mcBGFile[150];
+  if( flags!="" ) {
+    sprintf( mcBGFile, "PhotonJet_%s_%s_%s.root", mc_bg.c_str(), algoType.c_str(), flags.c_str());
   } else {
-    sprintf( mcMinBiasFileName, "PhotonJet_%s_%s.root", mc_bg.c_str(), algoType.c_str());
+    sprintf( mcBGFile, "PhotonJet_%s_%s.root", mc_bg.c_str(), algoType.c_str());
   }
-  TFile* mcMinBiasFile = TFile::Open(mcMinBiasFileName);
-  std::cout << "Opened mc file '" << mcMinBiasFileName << "'." << std::endl;
+  TFile* mcMinBiasFile = TFile::Open(mcBGFile);
+  std::cout << "Opened mc file '" << mcBGFile << "'." << std::endl;
 
   db->set_mcFile( mcMinBiasFile );
 
   char mcPhotonJetFileName[150];
-//if( MCassoc ) {
-//  sprintf( mcPhotonJetFileName, "PhotonJet_%s_%s_MCassoc.root", mc_photonjet.c_str(), algoType.c_str());
-//} else {
+  if( flags!="" && flags!="GENJETS" ) {
+    sprintf( mcPhotonJetFileName, "PhotonJet_%s_%s_%s.root", mc_photonjet.c_str(), algoType.c_str(), flags.c_str());
+  } else {
     sprintf( mcPhotonJetFileName, "PhotonJet_%s_%s.root", mc_photonjet.c_str(), algoType.c_str());
-//}
+  }
   TFile* mcPhotonJetFile = TFile::Open(mcPhotonJetFileName);
   std::cout << "Opened mc file '" << mcPhotonJetFileName << "'." << std::endl;
 
@@ -100,41 +104,52 @@ int main(int argc, char* argv[]) {
   std::string MCbgName = "QCD MC";
   std::string MCsignalName = "#gamma+jet MC";
 
-  db->drawHisto_2bkg( "ptPhot", MCbgName, MCsignalName, "", "clusterOK_isolated",1, log);
+  db->set_mcName( MCbgName );
+  db->set_mcName2( MCsignalName );
+
+  db->drawHisto_2bkg( "ptPhot", "", "clusterOK_isolated",1, log);
+  db->drawHisto_2bkg( "ptPhot", "", "loose",1, log);
+  db->drawHisto_2bkg( "ptPhot", "", "medium",1, log);
   db->drawHisto_onlyData( "ptPhot", "", "clusterOK_isolated",1, log);
-  db->drawHisto_2bkg( "phiPhot", MCbgName, MCsignalName, "", "clusterOK_isolated",1);
-  db->drawHisto_2bkg( "etaPhot", MCbgName, MCsignalName, "", "clusterOK_isolated",1);
-  db->drawHisto_2bkg( "deltaPhi", MCbgName, MCsignalName, "", "Nm1",1);
-  db->drawHisto_2bkg( "deltaPhi", MCbgName, MCsignalName, "", "clusterOK",1);
+  db->drawHisto_2bkg( "phiPhot", "", "clusterOK_isolated",1);
+  db->drawHisto_2bkg( "etaPhot", "", "clusterOK_isolated",1);
+  db->drawHisto_2bkg( "deltaPhi", "", "Nm1",1);
+  db->drawHisto_2bkg( "deltaPhi", "", "clusterOK",1);
 
-  db->drawHisto_2bkg( "ptSecondJetRel", MCbgName, MCsignalName, "", "Nm1",1, log);
-  db->drawHisto_2bkg( "hcalIsoPhotReco", MCbgName, MCsignalName, "", "Nm1",1, log);
-  db->drawHisto_2bkg( "ecalIsoPhotReco", MCbgName, MCsignalName, "", "Nm1",1, log);
-  db->drawHisto_2bkg( "nTrkIsoPhotReco", MCbgName, MCsignalName, "", "Nm1",1, log);
-  db->drawHisto_2bkg( "ptTrkIsoPhotReco", MCbgName, MCsignalName, "", "Nm1",1, log);
-  db->drawHisto_2bkg( "clusterMajPhotReco", MCbgName, MCsignalName, "", "Nm1",1, log);
-  db->drawHisto_2bkg( "clusterMinPhotReco", MCbgName, MCsignalName, "", "Nm1",1, log);
+  db->drawHisto_2bkg( "ptSecondJetRel", "", "Nm1",1, log);
+  db->drawHisto_2bkg( "hcalIsoPhotReco", "", "Nm1",1, log);
+  db->drawHisto_2bkg( "hcalIsoEnergyPhotReco", "", "Nm1",1, log);
+  db->drawHisto_2bkg( "ecalIsoPhotReco", "", "Nm1",1, log);
+  db->drawHisto_2bkg( "ecalIsoEnergyPhotReco", "", "Nm1",1, log);
+  db->drawHisto_2bkg( "nTrkIsoPhotReco", "", "Nm1",1, log);
+  db->drawHisto_2bkg( "ptTrkIsoPhotReco", "", "Nm1",1, log);
+  db->drawHisto_2bkg( "clusterMajPhotReco", "", "Nm1",1, log);
+  db->drawHisto_2bkg( "clusterMinPhotReco", "", "Nm1",1, log);
 
-  db->drawHisto_2bkg( "clusterMajPhotReco", MCbgName, MCsignalName, "", "",1, log);
-  db->drawHisto_2bkg( "clusterMinPhotReco", MCbgName, MCsignalName, "", "",1, log);
+  db->drawHisto_2bkg( "clusterMajPhotReco", "", "",1, log);
+  db->drawHisto_2bkg( "clusterMinPhotReco", "", "",1, log);
 
-  db->drawHisto_2bkg( "ptSecondJetRel", MCbgName, MCsignalName, "", "clusterOK",1);
-  db->drawHisto_2bkg( "hcalIsoPhotReco", MCbgName, MCsignalName, "", "clusterOK",1);
-  db->drawHisto_2bkg( "ecalIsoPhotReco", MCbgName, MCsignalName, "", "clusterOK",1);
-  db->drawHisto_2bkg( "nTrkIsoPhotReco", MCbgName, MCsignalName, "", "clusterOK",1);
-  db->drawHisto_2bkg( "ptTrkIsoPhotReco", MCbgName, MCsignalName, "", "clusterOK",1);
-  db->drawHisto_2bkg( "clusterMajPhotReco", MCbgName, MCsignalName, "", "isolated",1);
-  db->drawHisto_2bkg( "clusterMinPhotReco", MCbgName, MCsignalName, "", "isolated",1);
+  db->drawHisto_2bkg( "ptSecondJetRel", "", "clusterOK",1);
+  db->drawHisto_2bkg( "hcalIsoPhotReco", "", "clusterOK",1);
+  db->drawHisto_2bkg( "hcalIsoEnergyPhotReco", "", "clusterOK",1);
+  db->drawHisto_2bkg( "ecalIsoPhotReco", "", "clusterOK",1);
+  db->drawHisto_2bkg( "ecalIsoEnergyPhotReco", "", "clusterOK",1);
+  db->drawHisto_2bkg( "nTrkIsoPhotReco", "", "clusterOK",1);
+  db->drawHisto_2bkg( "ptTrkIsoPhotReco", "", "clusterOK",1);
+  db->drawHisto_2bkg( "clusterMajPhotReco", "", "isolated",1);
+  db->drawHisto_2bkg( "clusterMinPhotReco", "", "isolated",1);
 
-  db->drawHisto_2bkg( "ptSecondJetRel", MCbgName, MCsignalName, "", "clusterOK_isolated",1);
-  db->drawHisto_2bkg( "deltaPhi", MCbgName, MCsignalName, "", "clusterOK_isolated",1);
+  db->drawHisto_2bkg( "ptSecondJetRel", "", "clusterOK_isolated",1);
+  db->drawHisto_2bkg( "deltaPhi", "", "clusterOK_isolated",1);
   db->drawHisto_onlyData( "deltaPhi", "", "clusterOK_isolated",1);
 
-  db->drawHisto_2bkg( "response", MCbgName, MCsignalName, "", "loose",1);
-  db->drawHisto_2bkg( "response", MCbgName, MCsignalName, "", "",1);
-  db->drawHisto_2bkg( "response", MCbgName, MCsignalName, "", "clusterOK",1);
-  if( recoType=="pf" )
-    db->drawHisto_2bkg( "responseMPF", MCbgName, MCsignalName, "", "",1);
+  db->drawHisto_2bkg( "response", "", "loose",1);
+  db->drawHisto_2bkg( "response", "", "",1);
+  db->drawHisto_2bkg( "response", "", "clusterOK",1);
+  if( recoType=="pf" ) {
+    db->drawHisto_2bkg( "responseMPF", "", "",1);
+    db->drawHisto_2bkg( "responseMPF", "", "loose",1);
+  }
 
   delete db;
   db = 0;
