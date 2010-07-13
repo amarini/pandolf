@@ -18,6 +18,8 @@
 
 
 bool DEBUG_ = false;
+bool BINNINGFINO_ = false;
+bool ONEVTX_ = true;
 std::string RECOTYPE_;
 std::string algoType;
 std::string suffix;
@@ -31,8 +33,9 @@ std::vector<TH1F*> getResponseHistos(const std::string& name);
 
 
 
-void finalize(const std::string& dataset, std::string recoType, std::string jetAlgo, bool noJetSelection=false, bool useGenJets=false, bool MCassoc=false) {
+void finalize(const std::string& dataset, std::string recoType, std::string jetAlgo, float secondJetThreshold=0.5, bool useGenJets=false, bool MCassoc=false) {
 
+  bool noJetSelection = ( secondJetThreshold < 0. );
 
   tree = new TChain("jetTree");
 
@@ -97,14 +100,34 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     addInput( "PhotonJet_Spring10_Pt80" );
     addInput( "PhotonJet_Spring10_Pt170" );
 
+  } else if( dataset=="PhotonJet_Summer1036X" ) {
+
+    addInput( "PhotonJet_Summer1036X_Pt5to15" );
+    addInput( "PhotonJet_Summer1036X_Pt15to20" );
+    addInput( "PhotonJet_Summer1036X_Pt20to30" );
+    addInput( "PhotonJet_Summer1036X_Pt30to50" );
+    addInput( "PhotonJet_Summer1036X_Pt50to80" );
+    addInput( "PhotonJet_Summer1036X_Pt80to120" );
+    addInput( "PhotonJet_Summer1036X_Pt120to170" );
+    addInput( "PhotonJet_Summer1036X_Pt170to300" );
+
   } else if( dataset=="QCD_Spring10" ) {
 
     //addInput( "QCD_Spring10_Pt5to15" );
-    addInput( "QCD_Spring10_Pt15" );
-    addInput( "QCD_Spring10_Pt30" );
+    addInput( "QCD_Spring10_Pt15to20" );
+    addInput( "QCD_Spring10_Pt20to30" );
+    addInput( "QCD_Spring10_Pt30to50" );
+    addInput( "QCD_Spring10_Pt50to80" );
     addInput( "QCD_Spring10_Pt80" );
     addInput( "QCD_Spring10_Pt170" );
-    addInput( "QCD_Spring10_Pt300" );
+    //addInput( "QCD_Spring10_Pt300" );
+
+  } else if( dataset=="DATA_EG_35X" ) {
+
+    addInput( "MinimumBias_Commissioning10_May6thPDSkim2_SD_EG" );
+    addInput( "MinimumBias_Commissioning10_SD_EG-v9" );
+    addInput( "EG_Run2010A-PromptReco-v1" );
+    addInput( "EG_Run2010A-PromptReco-v2" );
 
   } else if( dataset=="DATA_EG" ) {
 
@@ -112,6 +135,24 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     addInput( "EG_Run2010A-Jun14thReReco_v1" );
     addInput( "EG_Run2010A-PromptReco-v4" );
     addInput( "EG_Run2010A_PromptReco_v4_139347_139375" );
+    addInput( "EG_Run2010A_PromptReco_v4_139376_139459" );
+
+  } else if( dataset=="DATA_EG_NEW" ) {
+
+    addInput( "MinimumBias_Commissioning10_SD_EG_Jun14thSkim_v1_80MeV_MET" );
+    addInput( "EG_Run2010A_Jun14thReReco_v1_80MeV_MET" );
+    addInput( "EG_Run2010A_PromptReco_v4_80MeV_MET" );
+
+  } else if( dataset=="DATA_EG_1" ) {
+
+    addInput( "MinimumBias_Commissioning10_SD_EG_Jun14thSkim_v1" );
+    addInput( "EG_Run2010A-Jun14thReReco_v1" );
+
+  } else if( dataset=="DATA_EG_2" ) {
+
+    addInput( "EG_Run2010A-PromptReco-v4" );
+    addInput( "EG_Run2010A_PromptReco_v4_139347_139375" );
+    addInput( "EG_Run2010A_PromptReco_v4_139376_139459" );
 
   } else {
   
@@ -144,12 +185,27 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   TH1D* h1_ptSecondJetRel_Nm1 = new TH1D("ptSecondJetRel_Nm1", "", 15, 0., 1.5);
   h1_ptSecondJetRel_Nm1->Sumw2();
 
+  TH1D* h1_deltaPhi_2ndJet_medium = new TH1D("deltaPhi_2ndJet_medium", "", 15, 0., 3.1416 );
+  h1_deltaPhi_2ndJet_medium->Sumw2();
+  TH1D* h1_deltaPhi_2ndJet_loose = new TH1D("deltaPhi_2ndJet_loose", "", 15, 0., 3.1416 );
+  h1_deltaPhi_2ndJet_loose->Sumw2();
+
   TH1D* h1_ptPhot_loose = new TH1D("ptPhot_loose", "", 10, ptPhot_binning[0], ptMax);
   h1_ptPhot_loose->Sumw2();
   TH1D* h1_etaPhot_loose = new TH1D("etaPhot_loose", "", 15, -1.3, 1.3);
   h1_etaPhot_loose->Sumw2();
   TH1D* h1_phiPhot_loose = new TH1D("phiPhot_loose", "", 15, -3.1416, 3.1416);
   h1_phiPhot_loose->Sumw2();
+
+  TH1D* h1_met_loose = new TH1D("met_loose", "", 100., 0., 500.);
+  h1_met_loose->Sumw2();
+  TH1D* h1_met_medium = new TH1D("met_medium", "", 100., 0., 500.);
+  h1_met_medium->Sumw2();
+
+  TH1D* h1_deltaPhi_phot_met_loose = new TH1D("deltaPhi_phot_met_loose", "", 15, -3.1416, 3.1416);
+  h1_deltaPhi_phot_met_loose->Sumw2();
+  TH1D* h1_deltaPhi_phot_met_medium = new TH1D("deltaPhi_phot_met_medium", "", 15, -3.1416, 3.1416);
+  h1_deltaPhi_phot_met_medium->Sumw2();
 
   TH1D* h1_ptPhot_medium = new TH1D("ptPhot_medium", "", 10, ptPhot_binning[0], ptMax);
   h1_ptPhot_medium->Sumw2();
@@ -261,41 +317,49 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   if( useGenJets )
     tree->SetBranchAddress("eventWeight_medium", &eventWeight_medium);
 
-  Float_t epfMet;
-  tree->SetBranchAddress("epfMet", &epfMet);
-  Float_t phipfMet;
-  tree->SetBranchAddress("phipfMet", &phipfMet);
+  Float_t eMet;
+  Float_t phiMet;
+  if( recoType == "pf" ) {
+    tree->SetBranchAddress("epfMet", &eMet);
+    tree->SetBranchAddress("phipfMet", &phiMet);
+  } else if( recoType == "calo" ) {
+    tree->SetBranchAddress("eMet", &eMet);
+    tree->SetBranchAddress("phiMet", &phiMet);
+  } else if( recoType == "jpt" ) {
+    tree->SetBranchAddress("etcMet", &eMet);
+    tree->SetBranchAddress("phitcMet", &phiMet);
+  }
 
-  Bool_t isIsolated_hcal_loose;
-  tree->SetBranchAddress("isIsolated_hcal_loose", &isIsolated_hcal_loose);
-  Bool_t isIsolated_ecal_loose;
-  tree->SetBranchAddress("isIsolated_ecal_loose", &isIsolated_ecal_loose);
-  Bool_t isIsolated_ptTracks_loose;
-  tree->SetBranchAddress("isIsolated_ptTracks_loose", &isIsolated_ptTracks_loose);
-  Bool_t isIsolated_nTracks_loose;
-  tree->SetBranchAddress("isIsolated_nTracks_loose", &isIsolated_nTracks_loose);
-  Bool_t clusterMajOK_loose;
-  tree->SetBranchAddress("clusterMajOK_loose", &clusterMajOK_loose);
-  Bool_t clusterMinOK_loose;
-  tree->SetBranchAddress("clusterMinOK_loose", &clusterMinOK_loose);
+//Bool_t isIsolated_hcal_loose;
+//tree->SetBranchAddress("isIsolated_hcal_loose", &isIsolated_hcal_loose);
+//Bool_t isIsolated_ecal_loose;
+//tree->SetBranchAddress("isIsolated_ecal_loose", &isIsolated_ecal_loose);
+//Bool_t isIsolated_ptTracks_loose;
+//tree->SetBranchAddress("isIsolated_ptTracks_loose", &isIsolated_ptTracks_loose);
+//Bool_t isIsolated_nTracks_loose;
+//tree->SetBranchAddress("isIsolated_nTracks_loose", &isIsolated_nTracks_loose);
+//Bool_t clusterMajOK_loose;
+//tree->SetBranchAddress("clusterMajOK_loose", &clusterMajOK_loose);
+//Bool_t clusterMinOK_loose;
+//tree->SetBranchAddress("clusterMinOK_loose", &clusterMinOK_loose);
 
-  Bool_t isIsolated_hcal_medium;
-  tree->SetBranchAddress("isIsolated_hcal_medium", &isIsolated_hcal_medium);
-  Bool_t isIsolated_ecal_medium;
-  tree->SetBranchAddress("isIsolated_ecal_medium", &isIsolated_ecal_medium);
-  Bool_t isIsolated_ptTracks_medium;
-  tree->SetBranchAddress("isIsolated_ptTracks_medium", &isIsolated_ptTracks_medium);
-  Bool_t isIsolated_nTracks_medium;
-  tree->SetBranchAddress("isIsolated_nTracks_medium", &isIsolated_nTracks_medium);
-  Bool_t clusterMajOK_medium;
-  tree->SetBranchAddress("clusterMajOK_medium", &clusterMajOK_medium);
-  Bool_t clusterMinOK_medium;
-  tree->SetBranchAddress("clusterMinOK_medium", &clusterMinOK_medium);
+//Bool_t isIsolated_hcal_medium;
+//tree->SetBranchAddress("isIsolated_hcal_medium", &isIsolated_hcal_medium);
+//Bool_t isIsolated_ecal_medium;
+//tree->SetBranchAddress("isIsolated_ecal_medium", &isIsolated_ecal_medium);
+//Bool_t isIsolated_ptTracks_medium;
+//tree->SetBranchAddress("isIsolated_ptTracks_medium", &isIsolated_ptTracks_medium);
+//Bool_t isIsolated_nTracks_medium;
+//tree->SetBranchAddress("isIsolated_nTracks_medium", &isIsolated_nTracks_medium);
+//Bool_t clusterMajOK_medium;
+//tree->SetBranchAddress("clusterMajOK_medium", &clusterMajOK_medium);
+//Bool_t clusterMinOK_medium;
+//tree->SetBranchAddress("clusterMinOK_medium", &clusterMinOK_medium);
 
-  Bool_t passedPhotonID_loose;
-  tree->SetBranchAddress("passedPhotonID_loose", &passedPhotonID_loose);
-  Bool_t passedPhotonID_medium;
-  tree->SetBranchAddress("passedPhotonID_medium", &passedPhotonID_medium);
+//Bool_t passedPhotonID_loose;
+//tree->SetBranchAddress("passedPhotonID_loose", &passedPhotonID_loose);
+//Bool_t passedPhotonID_medium;
+//tree->SetBranchAddress("passedPhotonID_medium", &passedPhotonID_medium);
 
   Float_t ptHat;
   tree->SetBranchAddress("ptHat", &ptHat);
@@ -394,7 +458,12 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
     tree->GetEntry(iEntry);
 
+
     if( eventWeight <= 0. ) eventWeight = 1.;
+
+
+    if( ONEVTX_ && dataset!="QCD_Spring10" ) continue;
+
 
     bool jetInBarrel = (fabs(etaJetReco)<1.3);
 
@@ -414,33 +483,55 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     Float_t pi = TMath::Pi();
     if( fabs(deltaPhi_jet) < (pi - 1.) ) back2back = false; //loose back to back for now
 
-    bool secondJetOK = ( pt2ndJetReco < 0.5*ptPhotReco );
-    //bool secondJetOK = ( pt2ndJetReco < 0.3*ptPhotReco || pt2ndJetReco < 5. );
+
+    Float_t deltaPhi_2ndJet = fabs(fitTools::delta_phi(phiPhotReco, phi2ndJetReco));
 
 
-    //temporary fix:
+
+    bool secondJetOK = ( pt2ndJetReco < secondJetThreshold*ptPhotReco || pt2ndJetReco < 5. );
+
+
+    // do them by hand just to be sure:
+    Bool_t isIsolated_hcal_loose = ( hcalIsoPhotReco<0.1 || hcalIsoPhotReco*ePhotReco<4. );
+    Bool_t isIsolated_ecal_loose = ( ecalIsoPhotReco<0.1  || ecalIsoPhotReco*ePhotReco<4.5 );
+    Bool_t isIsolated_ptTracks_loose = ( ptTrkIsoPhotReco<0.2 );
+    Bool_t isIsolated_nTracks_loose = (nTrkIsoPhotReco < 5 );
+    Bool_t clusterMajOK_loose = ( clusterMajPhotReco>0.15 && clusterMajPhotReco<0.35 );
+    Bool_t clusterMinOK_loose = ( clusterMinPhotReco>0.15 && clusterMinPhotReco<0.3 );
+
+    Bool_t isIsolated_hcal_medium = ( hcalIsoPhotReco<0.05 || hcalIsoPhotReco*ePhotReco<2.4 );
+    Bool_t isIsolated_ecal_medium = ( ecalIsoPhotReco<0.05  || ecalIsoPhotReco*ePhotReco<3. );
+    Bool_t isIsolated_ptTracks_medium = ( ptTrkIsoPhotReco<0.1 );
+    Bool_t isIsolated_nTracks_medium = (nTrkIsoPhotReco < 3 );
+    Bool_t clusterMajOK_medium = ( clusterMajPhotReco>0.15 && clusterMajPhotReco<0.35 );
+    Bool_t clusterMinOK_medium = ( clusterMinPhotReco>0.15 && clusterMinPhotReco<0.3 );
+
+  ////temporary fix:
     isIsolated_ecal_loose  = ( ecalIsoPhotReco<0.1  || ecalIsoPhotReco*ePhotReco<4.5 );
     isIsolated_ecal_medium = ( ecalIsoPhotReco<0.05 || ecalIsoPhotReco*ePhotReco<3.  );
+  //isIsolated_ecal_loose  = ( ecalIsoPhotReco<0.1  || ecalIsoPhotReco*ePhotReco<3. );
+  //isIsolated_ecal_medium = ( ecalIsoPhotReco<0.05 || ecalIsoPhotReco*ePhotReco<1.7  );
   
 
     //before selection fill N-1 isolation plots (no event topology for isolation variables):
-    if(                           isIsolated_ecal_medium && isIsolated_ptTracks_medium && isIsolated_nTracks_medium && clusterMajOK_medium && clusterMinOK_medium  ) h1_hcalIsoPhotReco_Nm1->Fill( hcalIsoPhotReco, eventWeight);
-    if(                           isIsolated_ecal_medium && isIsolated_ptTracks_medium && isIsolated_nTracks_medium && clusterMajOK_medium && clusterMinOK_medium  ) h1_hcalIsoEnergyPhotReco_Nm1->Fill( hcalIsoPhotReco*ePhotReco, eventWeight);
+    if(                           isIsolated_ecal_medium  && isIsolated_ptTracks_medium && isIsolated_nTracks_medium && clusterMajOK_medium && clusterMinOK_medium  ) h1_hcalIsoPhotReco_Nm1->Fill( hcalIsoPhotReco, eventWeight);
+    if(                           isIsolated_ecal_medium  && isIsolated_ptTracks_medium && isIsolated_nTracks_medium && clusterMajOK_medium && clusterMinOK_medium  ) h1_hcalIsoEnergyPhotReco_Nm1->Fill( hcalIsoPhotReco*ePhotReco, eventWeight);
     if( isIsolated_hcal_medium                           && isIsolated_ptTracks_medium && isIsolated_nTracks_medium && clusterMajOK_medium && clusterMinOK_medium  ) h1_ecalIsoPhotReco_Nm1->Fill( ecalIsoPhotReco, eventWeight);
     if( isIsolated_hcal_medium                           && isIsolated_ptTracks_medium && isIsolated_nTracks_medium && clusterMajOK_medium && clusterMinOK_medium  ) h1_ecalIsoEnergyPhotReco_Nm1->Fill( ecalIsoPhotReco*ePhotReco, eventWeight);
-    if( isIsolated_hcal_medium && isIsolated_ecal_medium                               && isIsolated_nTracks_medium && clusterMajOK_medium && clusterMinOK_medium  ) h1_ptTrkIsoPhotReco_Nm1->Fill( ptTrkIsoPhotReco, eventWeight);
-    if( isIsolated_hcal_medium && isIsolated_ecal_medium && isIsolated_ptTracks_medium                              && clusterMajOK_medium && clusterMinOK_medium  ) h1_nTrkIsoPhotReco_Nm1->Fill( nTrkIsoPhotReco, eventWeight);
+    if( isIsolated_hcal_medium && isIsolated_ecal_medium                                && isIsolated_nTracks_medium && clusterMajOK_medium && clusterMinOK_medium  ) h1_ptTrkIsoPhotReco_Nm1->Fill( ptTrkIsoPhotReco, eventWeight);
+    if( isIsolated_hcal_medium && isIsolated_ecal_medium  && isIsolated_ptTracks_medium                              && clusterMajOK_medium && clusterMinOK_medium  ) h1_nTrkIsoPhotReco_Nm1->Fill( nTrkIsoPhotReco, eventWeight);
     //no cluster cuts on cluster N-1's:
-    if( isIsolated_hcal_medium && isIsolated_ecal_medium && isIsolated_ptTracks_medium && isIsolated_nTracks_medium   ) h1_clusterMajPhotReco_Nm1->Fill( clusterMajPhotReco, eventWeight);
-    if( isIsolated_hcal_medium && isIsolated_ecal_medium && isIsolated_ptTracks_medium && isIsolated_nTracks_medium   ) h1_clusterMinPhotReco_Nm1->Fill( clusterMinPhotReco, eventWeight);
+    if( isIsolated_hcal_medium && isIsolated_ecal_medium  && isIsolated_ptTracks_medium && isIsolated_nTracks_medium   ) h1_clusterMajPhotReco_Nm1->Fill( clusterMajPhotReco, eventWeight);
+    if( isIsolated_hcal_medium && isIsolated_ecal_medium  && isIsolated_ptTracks_medium && isIsolated_nTracks_medium   ) h1_clusterMinPhotReco_Nm1->Fill( clusterMinPhotReco, eventWeight);
     // yes topology for topology variables:
-    if( isIsolated_hcal_medium && isIsolated_ecal_medium && isIsolated_ptTracks_medium && isIsolated_nTracks_medium && clusterMajOK_medium && clusterMinOK_medium              && secondJetOK && jetInBarrel) h1_deltaPhi_Nm1->Fill( deltaPhi_jet, eventWeight);
-    if( isIsolated_hcal_medium && isIsolated_ecal_medium && isIsolated_ptTracks_medium && isIsolated_nTracks_medium && clusterMajOK_medium && clusterMinOK_medium && back2back                && jetInBarrel) h1_ptSecondJetRel_Nm1->Fill( pt2ndJetReco/ptPhotReco, eventWeight);
+    if( isIsolated_hcal_medium && isIsolated_ecal_medium  && isIsolated_ptTracks_medium && isIsolated_nTracks_medium && clusterMajOK_medium && clusterMinOK_medium              && secondJetOK && jetInBarrel) h1_deltaPhi_Nm1->Fill( deltaPhi_jet, eventWeight);
+    if( isIsolated_hcal_medium && isIsolated_ecal_medium  && isIsolated_ptTracks_medium && isIsolated_nTracks_medium && clusterMajOK_medium && clusterMinOK_medium && back2back                && jetInBarrel) h1_ptSecondJetRel_Nm1->Fill( pt2ndJetReco/ptPhotReco, eventWeight);
 
 
     bool isIsolated_loose = (isIsolated_hcal_loose && isIsolated_ecal_loose && isIsolated_ptTracks_loose && isIsolated_nTracks_loose);
     bool isIsolated_medium = (isIsolated_hcal_medium && isIsolated_ecal_medium && isIsolated_ptTracks_medium && isIsolated_nTracks_medium);
     bool clusterShapeOK_medium = (clusterMajOK_medium && clusterMinOK_medium );
+
 
 
     //////////////////////////////////////////////
@@ -483,13 +574,14 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     h1_clusterMinPhotReco->Fill( clusterMinPhotReco, eventWeight );
 
 
-    bool photonOK_medium = passedPhotonID_medium || MCassoc || useGenJets;
-    bool photonOK_loose = (isIsolated_loose && clusterShapeOK_medium) || MCassoc || useGenJets;
+    bool photonOK_medium = (isIsolated_medium && clusterShapeOK_medium) || MCassoc || useGenJets;
+    bool photonOK_loose  = (isIsolated_loose  && clusterShapeOK_medium) || MCassoc || useGenJets;
 
     // compute mpf :
-    Float_t phi_Phot_Met = fitTools::delta_phi( phiPhotReco, phipfMet );
-    Float_t mpfResponse = 1. + epfMet*ptPhotReco*cos( phi_Phot_Met ) / (ptPhotReco*ptPhotReco);
+    Float_t phi_Phot_Met = fitTools::delta_phi( phiPhotReco, phiMet );
+    Float_t mpfResponse = 1. + eMet*ptPhotReco*cos( phi_Phot_Met ) / (ptPhotReco*ptPhotReco);
 
+    
 
   
     //////////////////////////////////////////////
@@ -511,8 +603,8 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
         h1_ptPhot_medium->Fill( ptPhotReco, correctWeight );
 
-
-        //fill responseGEN histos before any selection to avoid biases:
+        h1_deltaPhi_2ndJet_medium->Fill( deltaPhi_2ndJet, correctWeight );
+        
         int theBinGEN = hp_ptPhotMean->FindBin( ptJetGen );
         theBinGEN -= 1; //because arrays start from 0
       
@@ -532,9 +624,12 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
         hp_ptPhotMean->Fill( ptPhotReco, ptPhotReco, correctWeight );
         h1_response[theBin]->Fill( ptJetReco/ptPhotReco, correctWeight );
 
-        if( recoType=="pf" ) {
+   //   std::cout << "eMet: " << eMet << "\tptPhot: " << ptPhotReco << "\tphiMet: " << phiMet << "\tphiPhot: " << phiPhotReco << "\tdeltaPhi: " << phi_Phot_Met << "\tmpf: " << mpfResponse << std::endl;
+//        if( recoType=="pf" ) {
+          h1_deltaPhi_phot_met_medium->Fill( phi_Phot_Met, correctWeight );
+          h1_met_medium->Fill( eMet, correctWeight );
           h1_responseMPF[theBin]->Fill( mpfResponse, correctWeight );
-        } //if pf
+//        } //if pf
           
       } //if second jet ok
 
@@ -553,22 +648,26 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
       Float_t correctWeight = (useGenJets) ? eventWeight_loose : eventWeight;
       
-      // no cut in 2nd jet to produce gen response plot to have more stat
-      h1_responseGEN_loose[theBin]->Fill( ptJetReco/ptJetGen, correctWeight );
       
     
       if( passedLoose_FULL ) {
-        //if( ptPhotReco>28. && ptJetReco/ptPhotReco<0.1 )
-        //  std::cout << " ptPhot: " << ptPhotReco << "\tptJet: " << ptJetReco << "\tetaJet: " << etaJetReco << "\tphiJet: " << phiJetReco << "\tclustMin: " << clusterMinPhotReco << "\tclustMaj: " << clusterMajPhotReco << "\tdeltaPhi: " << deltaPhi_jet << "\tnTrkIso:" << nTrkIsoPhotReco << std::endl;
+
+        h1_responseGEN_loose[theBin]->Fill( ptJetReco/ptJetGen, correctWeight );
+
         h1_ptPhot_loose->Fill( ptPhotReco, correctWeight );
         h1_phiPhot_loose->Fill( phiPhotReco, correctWeight );
         h1_etaPhot_loose->Fill( etaPhotReco, correctWeight );
+
+        h1_deltaPhi_2ndJet_loose->Fill( deltaPhi_2ndJet, correctWeight );
+
         hp_ptPhotMean_loose->Fill( ptPhotReco, ptPhotReco, correctWeight );
         h1_response_loose[theBin]->Fill( ptJetReco/ptPhotReco, correctWeight );
 
-        if( recoType=="pf" ) {
+//        if( recoType=="pf" ) {
+          h1_deltaPhi_phot_met_loose->Fill( phi_Phot_Met, correctWeight );
+          h1_met_loose->Fill( eMet, correctWeight );
           h1_responseMPF_loose[theBin]->Fill( mpfResponse, correctWeight );
-        } //if pf
+//        } //if pf
       } //if second jet ok
 
     } //if loose
@@ -578,8 +677,6 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
 
 
-  //TFile* outFile = TFile::Open("secondJet_yesPtHat.root", "recreate");
-  
   std::string outfileName;
 
   if( DEBUG_ ) outfileName = "provaPhotonJet_"+dataset;
@@ -592,6 +689,14 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   if( noJetSelection ) outfileName = outfileName + "_NOJETSEL";
   if( MCassoc ) outfileName = outfileName + "_MCassoc";
   if( useGenJets ) outfileName = outfileName + "_GENJETS";
+  if( BINNINGFINO_ ) outfileName = outfileName + "_BINNINGFINO";
+  if( ONEVTX_ ) outfileName = outfileName + "_ONEVTX";
+  if( !noJetSelection && secondJetThreshold!=0.5 ) {
+    char outfileName_char[300];
+    sprintf( outfileName_char, "%s_2ndJet%d", outfileName.c_str(), (int)(100.*secondJetThreshold));
+    std::string outfileName_str( outfileName_char );
+    outfileName = outfileName_str;
+  }
   outfileName += ".root";
 
   TFile* outFile = new TFile(outfileName.c_str(), "RECREATE");
@@ -619,13 +724,21 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   h1_ptPhot_clusterOK_isolated->Write();
   h1_phiPhot_clusterOK_isolated->Write();
   h1_etaPhot_clusterOK_isolated->Write();
+  
+  h1_met_loose->Write();
+  h1_met_medium->Write();
 
+  h1_deltaPhi_phot_met_loose->Write();
+  h1_deltaPhi_phot_met_medium->Write();
 
   h1_deltaPhi_Nm1->Write();
   h1_ptSecondJetRel_Nm1->Write();
 
   h1_deltaPhi_clusterOK_isolated->Write();
   h1_ptSecondJetRel_clusterOK_isolated->Write();
+
+  h1_deltaPhi_2ndJet_medium->Write();
+  h1_deltaPhi_2ndJet_loose->Write();
 
   h1_hcalIsoPhotReco_Nm1->Write();
   h1_hcalIsoEnergyPhotReco_Nm1->Write();
@@ -662,10 +775,10 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     h1_response_clusterOK[i]->Write();
     h1_responseGEN_clusterOK[i]->Write();
 
-    if( recoType=="pf" ) {
+//    if( recoType=="pf" ) {
       h1_responseMPF[i]->Write();
       h1_responseMPF_loose[i]->Write();
-    }
+//    }
   }
 
 
@@ -733,6 +846,69 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 //delete h1_response;
 //h1_response = 0;
 
+  delete h1_totalLumi;
+  h1_totalLumi = 0;
+  delete h1_deltaPhi_2ndJet_medium;
+  h1_deltaPhi_2ndJet_medium= 0;
+  delete h1_deltaPhi_2ndJet_loose;
+  h1_deltaPhi_2ndJet_loose= 0;
+  delete h1_met_loose;
+  h1_met_loose= 0;
+  delete h1_met_medium;
+  h1_met_medium;
+  delete h1_deltaPhi_phot_met_loose;
+  h1_deltaPhi_phot_met_loose = 0;
+  delete h1_deltaPhi_phot_met_medium;
+  h1_deltaPhi_phot_met_medium = 0;
+  delete h1_ptPhot_clusterOK;
+  h1_ptPhot_clusterOK = 0;
+  delete h1_etaPhot_clusterOK;
+  h1_etaPhot_clusterOK = 0;
+  delete h1_phiPhot_clusterOK;
+  h1_phiPhot_clusterOK = 0;
+  delete h1_deltaPhi_clusterOK;
+  h1_deltaPhi_clusterOK = 0;
+  delete h1_ptPhot_clusterOK_isolated;
+  h1_ptPhot_clusterOK_isolated = 0;
+  delete h1_etaPhot_clusterOK_isolated;
+  h1_etaPhot_clusterOK_isolated = 0;
+  delete h1_phiPhot_clusterOK_isolated;
+  h1_phiPhot_clusterOK_isolated = 0;
+  delete h1_clusterMajPhotReco;
+  h1_clusterMajPhotReco = 0;
+  delete h1_clusterMinPhotReco;
+  h1_clusterMinPhotReco = 0;
+  delete h1_deltaPhi_clusterOK_isolated;
+  h1_deltaPhi_clusterOK_isolated = 0;
+  delete h1_ptSecondJetRel_clusterOK_isolated;
+  h1_ptSecondJetRel_clusterOK_isolated = 0;
+  delete hp_ptJetGenMean;
+  hp_ptJetGenMean = 0;
+  delete hp_ptPhotMean;
+  hp_ptPhotMean = 0;
+  delete hp_ptPhotMean_loose;
+  hp_ptPhotMean_loose = 0;
+
+  for( unsigned i=0; i< h1_response.size(); ++i) {
+    delete h1_response[i];
+    h1_response[i]=0;
+    delete h1_responseGEN[i];
+    h1_responseGEN[i]=0;
+    delete h1_responseMPF[i];
+    h1_responseMPF[i]=0;
+
+    delete h1_response_clusterOK[i];
+    h1_response_clusterOK[i]=0;
+    delete h1_responseGEN_clusterOK[i];
+    h1_responseGEN_clusterOK[i]=0;
+
+    delete h1_response_loose[i];
+    h1_response_loose[i]=0;
+    delete h1_responseGEN_loose[i];
+    h1_responseGEN_loose[i]=0;
+    delete h1_responseMPF_loose[i];
+    h1_responseMPF_loose[i]=0;
+  }
 
   delete tree;
   tree = 0;
@@ -752,9 +928,19 @@ void addInput( const std::string& dataset ) {
   FILE* iff = fopen(infileName.c_str(),"r");
   if(iff == 0) {
     std::cout << "cannot open input file '" << infileName << "' ... adding single file." << std::endl;
-    infileName = "PhotonJet_2ndLevelTree_" + dataset + suffix + ".root/jetTree";
-    tree->Add(infileName.c_str());
-    std::cout << "-> Added " << infileName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
+    infileName = "PhotonJet_2ndLevelTree_" + dataset + suffix + ".root";
+    std::string treeName = infileName +"/jetTree";
+    tree->Add(treeName.c_str());
+    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
+    TFile* infile = TFile::Open(infileName.c_str(), "READ");
+    h1_lumi = (TH1F*)infile->Get("lumi");
+    if( h1_lumi!=0 ) {
+      totalLumi += h1_lumi->GetBinContent(1);
+      std::cout << "\tTotal lumi: " << totalLumi << " ub-1" << std::endl;
+    } else {
+      std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
+    }
+    infile->Close();
 
   } else {
 
@@ -793,7 +979,11 @@ std::vector<TH1F*> getResponseHistos(const std::string& name) {
   for( unsigned i=0; i<(ptPhot_binning.size()-1); ++i ) {
     char histoName[100];
     sprintf( histoName, "%s_ptPhot_%.0f_%.0f", name.c_str(), ptPhot_binning[i], ptPhot_binning[i+1]);
-    TH1F* newHisto = new TH1F(histoName, "", 15, 0., 2.);
+    int nbins = (BINNINGFINO_) ? 1000 : 15;
+    float xmin = (BINNINGFINO_) ? -5. : 0.;
+    float xmax = (BINNINGFINO_) ? 10. : 2.;
+    //TH1F* newHisto = new TH1F(histoName, "", 15, 0., 2.);
+    TH1F* newHisto = new TH1F(histoName, "", nbins, xmin, xmax);
     newHisto->Sumw2();
     returnVector.push_back(newHisto);
   }
@@ -801,5 +991,4 @@ std::vector<TH1F*> getResponseHistos(const std::string& name) {
   return returnVector;
 
 }
-
 
