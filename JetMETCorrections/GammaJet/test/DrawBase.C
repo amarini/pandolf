@@ -1355,10 +1355,23 @@ void DrawBase::drawHisto_2bkg( std::string name, std::string etaRegion, std::str
       //responseGEN_sum->Draw("histo C same");
       //legend->AddEntry(responseGEN_sum, "Intrinsic", "L");
 
-      Float_t genResponse = responseGEN_sum->GetMean();
-      Float_t genResponseErr = responseGEN_sum->GetMeanError();
-      Float_t genRMS = responseGEN_sum->GetRMS();
-      Float_t genRMSErr = responseGEN_sum->GetMeanError();
+      Float_t genResponse;
+      Float_t genResponseErr;
+      Float_t genRMS;
+      Float_t genRMSErr;
+
+      if( recoType_ == "calo" ) { //until a better solution is found
+        genResponse = responseGEN_sum->GetMean();
+        genResponseErr = responseGEN_sum->GetMeanError();
+        genRMS = responseGEN_sum->GetRMS();
+        genRMSErr = responseGEN_sum->GetMeanError();
+      } else {
+        //compute responseGEN only from Photon+Jet
+        genResponse = responseGEN2->GetMean();
+        genResponseErr = responseGEN2->GetMeanError();
+        genRMS = responseGEN2->GetRMS();
+        genRMSErr = responseGEN2->GetMeanError();
+      }
 
     ////compute responseGEN only from QCD BG:
     //Float_t genResponse = responseGEN->GetMean();
@@ -1366,11 +1379,6 @@ void DrawBase::drawHisto_2bkg( std::string name, std::string etaRegion, std::str
     //Float_t genRMS = responseGEN->GetRMS();
     //Float_t genRMSErr = responseGEN->GetMeanError();
 
-    ////compute responseGEN only from Photon+Jet
-    //Float_t genResponse = responseGEN2->GetMean();
-    //Float_t genResponseErr = responseGEN2->GetMeanError();
-    //Float_t genRMS = responseGEN2->GetRMS();
-    //Float_t genRMSErr = responseGEN2->GetMeanError();
 
       Float_t genResolution = genRMS / genResponse;
       Float_t genResolutionErr = sqrt( genRMSErr*genRMSErr/(genResponse*genResponse) + genResolution*genResolution*genResponseErr*genResponseErr/(genResponse*genResponse*genResponse*genResponse) );
@@ -1958,7 +1966,8 @@ std::string DrawBase::getAxisName(std::string name) {
   if( name=="PTnhJet"|| name=="PTnh" ) axisName = "p_{T}^{nh} [GeV/c]";
   if( name=="PTgammaJet"|| name=="PTgamma" ) axisName = "p_{T}^{#gamma} [GeV/c]";
   if( name=="asymmJet" ) axisName = "Asymmetry";
-  if( name=="deltaPhiJet"||name=="deltaPhi" ) axisName = "#Delta#Phi";
+  if( name=="deltaPhiJet"||name=="deltaPhi" ) axisName = "Photon-Jet Azimuth Difference [rad]";
+  if( name=="deltaPhi2ndJet"||name=="deltaPhi_2ndJet" ) axisName = "Photon-2nd Jet Azimuth Difference [rad]";
   if( name=="massJet" ) axisName = "Jet Invariant Mass [GeV/c^{2}]";
   if( name=="MoEJet" ) axisName = "Jet Invariant Mass / Energy";
   if( name=="ptOverMJet" ) axisName = "Jet p_{T} / Invariant Mass";
@@ -1981,6 +1990,7 @@ std::string DrawBase::getAxisName(std::string name) {
   if( name=="pt2ndJet" ) axisName = "Second Jet p_{T}^{raw} [GeV/c]";
   if( name=="ptSecondJetRel" ) axisName = "p_{T}^{2ndJet} / p_{T}^{#gamma}";
   if( name=="response" || name=="response_loose" || name=="response_clusterOK" ) axisName = "p_{T}^{jet} / p_{T}^{#gamma}";
+  if( name=="responseMPF" ) axisName = "MPF Response";
 
   return axisName;
 
@@ -2301,7 +2311,7 @@ std::string DrawBase::getSqrtText() const {
     lumi4Text /= 1000.;
     units = "nb ^{-1}";
   }
-  if( lumi4Text > 50. ) {
+  if( lumi4Text > 100. ) {
     lumi4Text /= 1000.;
     units = "pb ^{-1}";
   } else if(  lumi4Text > 10. ) {
