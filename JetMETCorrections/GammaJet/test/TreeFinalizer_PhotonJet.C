@@ -306,6 +306,8 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
   Int_t run;
   tree->SetBranchAddress("run", &run);
+  Int_t nvertex;
+  tree->SetBranchAddress("nvertex", &nvertex);
   Int_t event;
   tree->SetBranchAddress("event", &event);
   Float_t eventWeight;
@@ -462,7 +464,9 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     if( eventWeight <= 0. ) eventWeight = 1.;
 
 
-    if( ONEVTX_ && dataset!="QCD_Spring10" ) continue;
+    if( ONEVTX_ && dataset!="QCD_Spring10" ) {
+      if( nvertex>1 ) continue;
+    }
 
 
     bool jetInBarrel = (fabs(etaJetReco)<1.3);
