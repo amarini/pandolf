@@ -19,9 +19,11 @@
 
 bool DEBUG_ = false;
 bool BINNINGFINO_ = false;
-bool ONEVTX_ = true;
+bool ONEVTX_ = false;
+bool NO2ndJETABS = true;
+bool TIGHTDELTAPHI_ = false;
 std::string RECOTYPE_;
-std::string algoType;
+std::string ALGOTYPE_;
 std::string suffix;
 
 TChain* tree;
@@ -33,7 +35,7 @@ std::vector<TH1F*> getResponseHistos(const std::string& name);
 
 
 
-void finalize(const std::string& dataset, std::string recoType, std::string jetAlgo, float secondJetThreshold=0.5, bool useGenJets=false, bool MCassoc=false) {
+void finalize(const std::string& dataset, std::string recoType, std::string jetAlgo="akt5", float secondJetThreshold=0.5, bool useGenJets=false, bool MCassoc=false) {
 
   bool noJetSelection = ( secondJetThreshold < 0. );
 
@@ -41,12 +43,12 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
   RECOTYPE_ = recoType;
 
-  algoType = (recoType=="calo") ? jetAlgo : recoType+jetAlgo;
-  if( recoType=="jpt"&&jetAlgo=="akt5" ) algoType="jptak5"; 
+  ALGOTYPE_ = (recoType=="calo") ? jetAlgo : recoType+jetAlgo;
+  if( recoType=="jpt"&&jetAlgo=="akt5" ) ALGOTYPE_="jptak5"; 
 
   std::string infileName, treeName;
 
-  suffix = "_"+algoType;
+  suffix = "_"+ALGOTYPE_;
   if( useGenJets ) suffix = suffix + "_GENJETS";
 
 
@@ -169,8 +171,13 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   std::vector<float> ptPhot_binning = fitTools::getPtPhot_binning();
 
   Float_t ptMax = 100.;
+  int nBins_photBinning = ptPhot_binning.size()-1;
+  Double_t ptPhot_binning_array[100];
+  for( unsigned i=0; i<nBins_photBinning; ++i)
+    ptPhot_binning_array[i] = ptPhot_binning[i];
 
-  TH1D* h1_ptPhot = new TH1D("ptPhot", "", 10, ptPhot_binning[0], ptMax);
+  TH1D* h1_ptPhot = new TH1D("ptPhot", "", nBins_photBinning-1, ptPhot_binning_array);
+  //TH1D* h1_ptPhot = new TH1D("ptPhot", "", 10, ptPhot_binning[0], ptMax);
   h1_ptPhot->Sumw2();
   TH1D* h1_ptJetReco = new TH1D("ptJetReco", "", 10, 0., ptMax);
   h1_ptJetReco->Sumw2();
@@ -180,7 +187,7 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   h1_etaPhot->Sumw2();
   TH1D* h1_phiPhot = new TH1D("phiPhot", "", 15, -3.1416, 3.1416);
   h1_phiPhot->Sumw2();
-  TH1D* h1_deltaPhi_Nm1 = new TH1D("deltaPhi_Nm1", "", 15, 0., 3.1416);
+  TH1D* h1_deltaPhi_Nm1 = new TH1D("deltaPhi_Nm1", "", 15, 2.1, 3.1416);
   h1_deltaPhi_Nm1->Sumw2();
   TH1D* h1_ptSecondJetRel_Nm1 = new TH1D("ptSecondJetRel_Nm1", "", 15, 0., 1.5);
   h1_ptSecondJetRel_Nm1->Sumw2();
@@ -190,7 +197,8 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   TH1D* h1_deltaPhi_2ndJet_loose = new TH1D("deltaPhi_2ndJet_loose", "", 15, 0., 3.1416 );
   h1_deltaPhi_2ndJet_loose->Sumw2();
 
-  TH1D* h1_ptPhot_loose = new TH1D("ptPhot_loose", "", 10, ptPhot_binning[0], ptMax);
+  TH1D* h1_ptPhot_loose = new TH1D("ptPhot_loose", "", nBins_photBinning-1, ptPhot_binning_array);
+  //TH1D* h1_ptPhot_loose = new TH1D("ptPhot_loose", "", 10, ptPhot_binning[0], ptMax);
   h1_ptPhot_loose->Sumw2();
   TH1D* h1_etaPhot_loose = new TH1D("etaPhot_loose", "", 15, -1.3, 1.3);
   h1_etaPhot_loose->Sumw2();
@@ -207,19 +215,22 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   TH1D* h1_deltaPhi_phot_met_medium = new TH1D("deltaPhi_phot_met_medium", "", 15, -3.1416, 3.1416);
   h1_deltaPhi_phot_met_medium->Sumw2();
 
-  TH1D* h1_ptPhot_medium = new TH1D("ptPhot_medium", "", 10, ptPhot_binning[0], ptMax);
+  //TH1D* h1_ptPhot_medium = new TH1D("ptPhot_medium", "", 10, ptPhot_binning[0], ptMax);
+  TH1D* h1_ptPhot_medium = new TH1D("ptPhot_medium", "", nBins_photBinning-1, ptPhot_binning_array);
   h1_ptPhot_medium->Sumw2();
 
-  TH1D* h1_ptPhot_clusterOK = new TH1D("ptPhot_clusterOK", "", 10, ptPhot_binning[0], ptMax);
+  //TH1D* h1_ptPhot_clusterOK = new TH1D("ptPhot_clusterOK", "", 10, ptPhot_binning[0], ptMax);
+  TH1D* h1_ptPhot_clusterOK = new TH1D("ptPhot_clusterOK", "", nBins_photBinning-1, ptPhot_binning_array);
   h1_ptPhot_clusterOK->Sumw2();
   TH1D* h1_etaPhot_clusterOK = new TH1D("etaPhot_clusterOK", "", 15, -1.3, 1.3);
   h1_etaPhot_clusterOK->Sumw2();
   TH1D* h1_phiPhot_clusterOK = new TH1D("phiPhot_clusterOK", "", 15, -3.1416, 3.1416);
   h1_phiPhot_clusterOK->Sumw2();
-  TH1D* h1_deltaPhi_clusterOK = new TH1D("deltaPhi_clusterOK", "", 15, 0., 3.1416);
+  TH1D* h1_deltaPhi_clusterOK = new TH1D("deltaPhi_clusterOK", "", 15, 2.1, 3.1416);
   h1_deltaPhi_clusterOK->Sumw2();
 
-  TH1D* h1_ptPhot_clusterOK_isolated = new TH1D("ptPhot_clusterOK_isolated", "", 28, ptPhot_binning[0], ptMax);
+  //TH1D* h1_ptPhot_clusterOK_isolated = new TH1D("ptPhot_clusterOK_isolated", "", 28, ptPhot_binning[0], ptMax);
+  TH1D* h1_ptPhot_clusterOK_isolated = new TH1D("ptPhot_clusterOK_isolated", "", nBins_photBinning-1, ptPhot_binning_array);
   h1_ptPhot_clusterOK_isolated->Sumw2();
   TH1D* h1_etaPhot_clusterOK_isolated = new TH1D("etaPhot_clusterOK_isolated", "", 15, -1.3, 1.3);
   h1_etaPhot_clusterOK_isolated->Sumw2();
@@ -266,7 +277,7 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   TH1D* h1_clusterMinPhotReco= new TH1D("clusterMinPhotReco", "", 20, 0., 0.6);
   h1_clusterMinPhotReco->Sumw2();
 
-  TH1D* h1_deltaPhi_clusterOK_isolated = new TH1D("deltaPhi_clusterOK_isolated", "", 15, 0., 3.1416);
+  TH1D* h1_deltaPhi_clusterOK_isolated = new TH1D("deltaPhi_clusterOK_isolated", "", 15, 2.1, 3.1416);
   h1_deltaPhi_clusterOK_isolated->Sumw2();
   TH1D* h1_ptSecondJetRel_clusterOK_isolated = new TH1D("ptSecondJetRel_clusterOK_isolated", "", 15, 0., 1.5);
   h1_ptSecondJetRel_clusterOK_isolated->Sumw2();
@@ -485,6 +496,7 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     bool back2back = true;
     Float_t deltaPhi_jet = fabs(fitTools::delta_phi(phiPhotReco, phiJetReco));
     Float_t pi = TMath::Pi();
+    float deltaPhiThreshold = (TIGHTDELTAPHI_) ? 0.2 : 1.;
     if( fabs(deltaPhi_jet) < (pi - 1.) ) back2back = false; //loose back to back for now
 
 
@@ -492,7 +504,11 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
 
 
-    bool secondJetOK = ( pt2ndJetReco < secondJetThreshold*ptPhotReco || pt2ndJetReco < 5. );
+    bool secondJetOK;
+    if( NO2ndJETABS )
+      secondJetOK = ( pt2ndJetReco < secondJetThreshold*ptPhotReco );
+    else
+      secondJetOK = ( pt2ndJetReco < secondJetThreshold*ptPhotReco || pt2ndJetReco < 5. );
 
 
     // do them by hand just to be sure:
@@ -695,9 +711,11 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   if( useGenJets ) outfileName = outfileName + "_GENJETS";
   if( BINNINGFINO_ ) outfileName = outfileName + "_BINNINGFINO";
   if( ONEVTX_ ) outfileName = outfileName + "_ONEVTX";
+  if( TIGHTDELTAPHI_ ) outfileName = outfileName + "_TIGHTDPHI";
   if( !noJetSelection && secondJetThreshold!=0.5 ) {
+    std::string R = ( NO2ndJETABS ) ? "R" : "";
     char outfileName_char[300];
-    sprintf( outfileName_char, "%s_2ndJet%d", outfileName.c_str(), (int)(100.*secondJetThreshold));
+    sprintf( outfileName_char, "%s_2ndJet%d%s", outfileName.c_str(), (int)(100.*secondJetThreshold), R.c_str());
     std::string outfileName_str( outfileName_char );
     outfileName = outfileName_str;
   }
@@ -924,7 +942,7 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
 void addInput( const std::string& dataset ) {
 
-  std::string infileName = "files_PhotonJet_2ndLevel_" + dataset+"_" + RECOTYPE_ +".txt";
+  std::string infileName = "files_PhotonJet_2ndLevel_" + dataset+"_" + ALGOTYPE_ +".txt";
   TH1F* h1_lumi;
 
 
@@ -983,8 +1001,8 @@ std::vector<TH1F*> getResponseHistos(const std::string& name) {
   for( unsigned i=0; i<(ptPhot_binning.size()-1); ++i ) {
     char histoName[100];
     sprintf( histoName, "%s_ptPhot_%.0f_%.0f", name.c_str(), ptPhot_binning[i], ptPhot_binning[i+1]);
-    int nbins = (BINNINGFINO_) ? 1000 : 15;
-    float xmin = (BINNINGFINO_) ? -5. : 0.;
+    int nbins = (BINNINGFINO_) ? 1000 : 14;
+    float xmin = (BINNINGFINO_) ? -5. : 0.1;
     float xmax = (BINNINGFINO_) ? 10. : 2.;
     //TH1F* newHisto = new TH1F(histoName, "", 15, 0., 2.);
     TH1F* newHisto = new TH1F(histoName, "", nbins, xmin, xmax);

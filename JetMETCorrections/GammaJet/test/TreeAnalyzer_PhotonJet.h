@@ -145,6 +145,10 @@ class TreeAnalyzer_PhotonJet : public TreeAnalyzer {
    // for mpf:
    Float_t epfMet_;
    Float_t phipfMet_;
+   Float_t eMet_;
+   Float_t phiMet_;
+   Float_t etcMet_;
+   Float_t phitcMet_;
 
    bool DEBUG_VERBOSE_;
    bool useGenJets_;

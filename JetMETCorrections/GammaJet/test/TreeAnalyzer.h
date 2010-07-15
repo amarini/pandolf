@@ -244,6 +244,7 @@ public :
    Int_t           hltNamesLen;
    Char_t          HLTNames[6000];   //[hltNamesLen]
    Bool_t          HLTResults[200];   //[nHLT]
+   Int_t           nvertex;
    Float_t         vx;
    Float_t         vy;
    Float_t         vz;
@@ -275,6 +276,7 @@ public :
    TTree* jetTree_;
 
    Int_t run_;
+   Int_t nvertex_;;
    Int_t oldrun_;
    Int_t currentLS_;
    Int_t event_;
@@ -491,6 +493,7 @@ public :
    TBranch        *b_hltNamesLen;   //!
    TBranch        *b_HLTNames;   //!
    TBranch        *b_HLTResults;   //!
+   TBranch        *b_nvertex;   //!
    TBranch        *b_vx;   //!
    TBranch        *b_vy;   //!
    TBranch        *b_vz;   //!

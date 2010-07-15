@@ -9,8 +9,10 @@
 #include "fitTools.C"
 
 
+
+
 TreeAnalyzer_PhotonJet::TreeAnalyzer_PhotonJet( const std::string& dataset, const std::string& recoType, const std::string& jetAlgo, const std::string& flags, bool useGenJets, TTree* tree ) :
-     TreeAnalyzer( "PhotonJet", dataset, recoType, jetAlgo, (std::string)"", tree ) {
+     TreeAnalyzer( "PhotonJet", dataset, recoType, jetAlgo, flags, tree ) {
 
 
   useGenJets_=useGenJets;
@@ -50,6 +52,7 @@ void TreeAnalyzer_PhotonJet::CreateOutputFile() {
 
   jetTree_->Branch("run",&run_,"run_/I");
   jetTree_->Branch("event",&event_,"event_/I");
+  jetTree_->Branch("nvertex",&nvertex_,"nvertex_/I");
 
   jetTree_->Branch("ptHat",&ptHat_,"ptHat_/F");
 
@@ -180,6 +183,10 @@ void TreeAnalyzer_PhotonJet::CreateOutputFile() {
 
   jetTree_->Branch("epfMet",&epfMet_,"epfMet_/F");
   jetTree_->Branch("phipfMet",&phipfMet_,"phipfMet_/F");
+  jetTree_->Branch("eMet",&eMet_,"eMet_/F");
+  jetTree_->Branch("phiMet",&phiMet_,"phiMet_/F");
+  jetTree_->Branch("etcMet",&etcMet_,"etcMet_/F");
+  jetTree_->Branch("phitcMet",&phitcMet_,"phitcMet_/F");
 
 } 
 
@@ -226,6 +233,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
      run_ = run;
      event_ = event;
+     nvertex_ = nvertex;
      ptHat_ = genpt;
 
      if( !isGoodLS() ) continue; //this takes care also of integrated luminosity
@@ -242,6 +250,14 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
      epfMet_ = epfMet;
      phipfMet_ = phipfMet;
+     eMet_ = eMet;
+     phiMet_ = phiMet;
+     etcMet_ = epfMet;
+     phitcMet_ = phitcMet;
+
+     //default values. if usegenjets, they will be updated afterwards:
+     eventWeight_medium_ = 1.;
+     eventWeight_loose_ = 1.;
 
      //default values. if usegenjets, they will be updated afterwards:
      eventWeight_medium_ = 1.;
@@ -466,7 +482,7 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
        thisJet.nHFEMReco = (recoType_=="pf" && jetAlgo_=="akt5") ? nHFEM[iRecoJet] : 0;
 
        //jet has to be in "Mercedes area" in transverse plane wrt phot:
-       Float_t deltaPhi = foundPhot.phi - thisJet.phiReco;
+       Float_t deltaPhi = fitTools::delta_phi( foundPhot.phi, thisJet.phiReco);
        Float_t pi = 3.14159;
        if( (fabs(deltaPhi) > 2.*pi/3.) && (thisJet.ptReco > firstJet.ptReco) )
          firstJet = thisJet;

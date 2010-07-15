@@ -39,6 +39,7 @@ std::vector<float> fitTools::getPtPhot_binning() {
   returnVector.push_back(47.);
   returnVector.push_back(70.);
   returnVector.push_back(100.);
+  returnVector.push_back(150.);
   returnVector.push_back(3500.);
 
 //returnVector.push_back(15.);

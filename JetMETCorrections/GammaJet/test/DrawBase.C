@@ -1235,7 +1235,7 @@ void DrawBase::drawHisto_2bkg( std::string name, std::string etaRegion, std::str
       Float_t label_cuts_xMax = 0.84;
       Float_t label_cuts_yMax = 0.68;
 
-      if( name=="deltaPhi" ) {
+      if( name=="deltaPhi" || name=="deltaPhi_2ndJet" ) {
        label_cuts_xMin = 0.25;
        label_cuts_yMin = 0.60;
        label_cuts_xMax = 0.36;
@@ -1491,7 +1491,7 @@ void DrawBase::drawHisto_2bkg( std::string name, std::string etaRegion, std::str
     Float_t ptPhotMax = ptPhot_binning[ptPhot_binning.size()-2];
 
     //TH2* h2_axes_lo_resp = new TH2D("axes_lo_resp", "", 10, 10., ptPhotMax, 10, (1.-3.*scale_uncert), (1.+3.*scale_uncert));
-    TH2* h2_axes_lo_resp = new TH2D("axes_lo_resp", "", 10, ptPhot_binning[0], ptPhotMax, 10, 0.81, 1.19);
+    TH2* h2_axes_lo_resp = new TH2D("axes_lo_resp", "", 10, ptPhot_binning[0], ptPhotMax, 10, 0.71, 1.29);
     h2_axes_lo_resp->SetXTitle("Photon p_{T} [GeV/c]");
     h2_axes_lo_resp->SetYTitle("Data / MC");
     h2_axes_lo_resp->GetXaxis()->SetTitleOffset(1.2);
@@ -1504,7 +1504,7 @@ void DrawBase::drawHisto_2bkg( std::string name, std::string etaRegion, std::str
     h2_axes_lo_resp->GetYaxis()->SetLabelSize(0.07);
     h2_axes_lo_resp->GetXaxis()->SetTitleSize(0.09);
     h2_axes_lo_resp->GetYaxis()->SetTitleSize(0.08);
-    h2_axes_lo_resp->GetYaxis()->SetNdivisions(5, kTRUE);
+    h2_axes_lo_resp->GetYaxis()->SetNdivisions(7, kTRUE);
     h2_axes_lo_resp->Draw("");
     
     TLine* line_one = new TLine( ptPhot_binning[0], 1., ptPhotMax, 1. );
@@ -1633,7 +1633,39 @@ void DrawBase::drawHisto_2bkg( std::string name, std::string etaRegion, std::str
     c1->SaveAs(canvName_eps.c_str());
     std::string canvName_png = canvName + ".png";
     c1->SaveAs(canvName_png.c_str());
-     
+
+
+    // add fit to the data/mc ratio:
+
+    pad_lo->cd();
+
+    TF1* constline = new TF1("constline", "[0]", ptPhot_binning[0], ptPhotMax);
+    constline->SetParameter(0, 0.);
+    //constline->SetLineColor(8);
+    constline->SetLineColor(38);
+    constline->SetLineStyle(3);
+    gr_resp_ratio->Fit( constline, "R" );
+    std::cout << "-> ChiSquare: " << constline->GetChisquare() << "   NDF: " << constline->GetNDF() << std::endl;
+
+    TPaveText* fitlabel = new TPaveText(0.55, 0.77, 0.88, 0.83, "brNDC");
+    fitlabel->SetTextSize(0.08);
+    fitlabel->SetFillColor(0);
+    char fitLabelText[150];
+    sprintf( fitLabelText, "FIT: %.3f #pm %.3f", constline->GetParameter(0), constline->GetParError(0) );
+    fitlabel->AddText( fitLabelText );
+    fitlabel->Draw("same");
+    line_plus_resp->Draw("same");
+    constline->Draw("same");
+    gr_resp_ratio->Draw("P same");
+    gPad->RedrawAxis();
+
+    std::string canvname_fit = canvName + "_FITLINE";
+    std::string canvName_fit_eps = canvname_fit + ".eps";
+    c1->SaveAs(canvName_fit_eps.c_str()); 
+    std::string canvName_fit_png = canvname_fit + ".png";
+    c1->SaveAs(canvName_fit_png.c_str()); 
+
+ 
 
     // ----------------------------------------------------
     //             and now resolutions:
@@ -2336,6 +2368,8 @@ std::string DrawBase::getAlgoName() const {
 
   if( jetAlgo_=="akt5" ) {
     algoName = "Anti-k_{T} 0.5 ";
+  } else if( jetAlgo_=="akt7" ) {
+    algoName = "Anti-k_{T} 0.7 ";
   } else {
     std::cout << "Jet algo '" << jetAlgo_ << "' currently not supported. Exiting." << std::endl;
     exit( 918 );
