@@ -1,9 +1,5 @@
 #include "TreeAnalyzer_PhotonJet.h"
 
-// ecco la stronzata
-// la metto all'inzii cosi` e` facile
-int xx = 0.;
-
 
 #include <iostream>
 #include "TMath.h"
@@ -256,12 +252,9 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      phipfMet_ = phipfMet;
      eMet_ = eMet;
      phiMet_ = phiMet;
-     etcMet_ = epfMet;
+     etcMet_ = etcMet;
      phitcMet_ = phitcMet;
 
-     //default values. if usegenjets, they will be updated afterwards:
-     eventWeight_medium_ = 1.;
-     eventWeight_loose_ = 1.;
 
      //default values. if usegenjets, they will be updated afterwards:
      eventWeight_medium_ = 1.;
