@@ -484,7 +484,8 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
        //jet has to be in "Mercedes area" in transverse plane wrt phot:
        Float_t deltaPhi = fitTools::delta_phi( foundPhot.phi, thisJet.phiReco);
        Float_t pi = 3.14159;
-       if( (fabs(deltaPhi) > 2.*pi/3.) && (thisJet.ptReco > firstJet.ptReco) )
+       //if( (fabs(deltaPhi) > 2.*pi/3.) && (thisJet.ptReco > firstJet.ptReco) )
+       if( (fabs(deltaPhi) > pi/2.) && (thisJet.ptReco > firstJet.ptReco) )
          firstJet = thisJet;
 
      } //for reco jets
