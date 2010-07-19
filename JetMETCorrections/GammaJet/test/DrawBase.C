@@ -457,12 +457,13 @@ void DrawBase::drawHisto_onlyData( std::string name, std::string etaRegion, std:
 
 
 
-    Float_t yAxisMaxScale = (name=="phiJet" || name=="etaJet" || name=="ptSecondJetRel" || name=="phiPhot" || name=="etaPhot" ) ? 1.8 : 1.6;
-    if( name=="phiPhot" || name=="etaPhot" ) yAxisMaxScale=2.;
+    Float_t yAxisMaxScale = (name=="phiJet" || name=="etaJet" || name=="ptSecondJetRel" || name=="phiPhot" || name=="etaPhot" ) ? 1.8 : 1.;
+    if( name=="phiPhot" || name=="etaPhot" ) yAxisMaxScale = 2.;
+    if( name=="ptPhot" ) yAxisMaxScale=4.;
     if(name=="clusterMajPhotReco" || name=="clusterMinPhotReco") yAxisMaxScale = 2.;
     Float_t xMin = dataHisto->GetXaxis()->GetXmin();
     Float_t xMax = dataHisto->GetXaxis()->GetXmax();
-    Float_t yMax = dataHisto->GetMaximum();
+    Float_t yMax = dataHisto->GetMaximum()*yAxisMaxScale;
     Float_t yMin = 0.;
 
 
@@ -470,7 +471,7 @@ void DrawBase::drawHisto_onlyData( std::string name, std::string etaRegion, std:
 
     std::string instanceName = (analysisType_=="PhotonJet") ? "Events" : "Jets";
     std::string yAxis = instanceName;
-    if( name=="ptJet" || name=="ptCorrJet"||name=="ptPhot" ) {
+    if( name=="ptJet" || name=="ptCorrJet" ) {
       char yAxis_char[50];
       sprintf(yAxis_char, "%s/(%d GeV/c)", instanceName.c_str(), (Int_t)dataHisto->GetBinWidth(1));
       std::string yAxis_tmp(yAxis_char);
@@ -700,6 +701,11 @@ void DrawBase::drawHisto_onlyData( std::string name, std::string etaRegion, std:
       h2_axes_log->GetXaxis()->SetTitleOffset(1.1);
       h2_axes_log->GetYaxis()->SetTitleOffset(1.5);
       c1->SetLogy();
+      if( name=="ptPhot" ) {
+        c1->SetLogx();
+        h2_axes_log->GetXaxis()->SetNoExponent();
+        h2_axes_log->GetXaxis()->SetMoreLogLabels();
+      }
       h2_axes_log->Draw("");
       dataHisto->Draw("E same");
       gPad->RedrawAxis();
@@ -1434,6 +1440,11 @@ void DrawBase::drawHisto_2bkg( std::string name, std::string etaRegion, std::str
       h2_axes_log->GetXaxis()->SetTitleOffset(1.1);
       h2_axes_log->GetYaxis()->SetTitleOffset(1.5);
       c1->SetLogy();
+      if( name=="ptPhot" ) {
+        c1->SetLogx();
+        h2_axes_log->GetXaxis()->SetNoExponent();
+        h2_axes_log->GetXaxis()->SetMoreLogLabels();
+      }
       h2_axes_log->Draw("");
       mcHisto_sum->Draw("histo same");
       mcHisto->Draw("histo same");
@@ -2370,6 +2381,10 @@ std::string DrawBase::getAlgoName() const {
     algoName = "Anti-k_{T} 0.5 ";
   } else if( jetAlgo_=="akt7" ) {
     algoName = "Anti-k_{T} 0.7 ";
+  } else if( jetAlgo_=="kt4" ) {
+    algoName = "k_{T} 0.4 ";
+  } else if( jetAlgo_=="kt6" ) {
+    algoName = "k_{T} 0.6 ";
   } else {
     std::cout << "Jet algo '" << jetAlgo_ << "' currently not supported. Exiting." << std::endl;
     exit( 918 );

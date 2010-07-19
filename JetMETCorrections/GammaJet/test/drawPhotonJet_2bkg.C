@@ -9,7 +9,7 @@
 int main(int argc, char* argv[]) {
 
   if( argc != 7 && argc!=8 ) {
-    std::cout << "USAGE: ./drawPhotonJet [data_dataset] [mc_BG_dataset] [mc_SIGNAL_dataset] [recoType] [jetAlgo] [norm ('LUMI' or 'SHAPE')] [flags=""]" << std::endl;
+    std::cout << "USAGE: ./drawPhotonJet [data_dataset] [mc_BG_dataset] [mc_SIGNAL_dataset] [recoType] [jetAlgo] [norm ('LUMI' or 'SHAPE')] [flags=\"\"]" << std::endl;
     exit(23);
   }
 
@@ -116,6 +116,9 @@ int main(int argc, char* argv[]) {
   db->drawHisto_2bkg( "deltaPhi", "", "Nm1",1);
   db->drawHisto_2bkg( "deltaPhi", "", "clusterOK",1);
 
+  db->drawHisto_2bkg( "deltaPhi_2ndJet", "", "loose",1);
+  db->drawHisto_2bkg( "deltaPhi_2ndJet", "", "medium",1);
+
   db->drawHisto_2bkg( "ptSecondJetRel", "", "Nm1",1, log);
   db->drawHisto_2bkg( "hcalIsoPhotReco", "", "Nm1",1, log);
   db->drawHisto_2bkg( "hcalIsoEnergyPhotReco", "", "Nm1",1, log);
@@ -146,10 +149,10 @@ int main(int argc, char* argv[]) {
   db->drawHisto_2bkg( "response", "", "loose",1);
   db->drawHisto_2bkg( "response", "", "",1);
   db->drawHisto_2bkg( "response", "", "clusterOK",1);
-  if( recoType=="pf" ) {
+//  if( recoType=="pf" ) {
     db->drawHisto_2bkg( "responseMPF", "", "",1);
     db->drawHisto_2bkg( "responseMPF", "", "loose",1);
-  }
+//  }
 
   delete db;
   db = 0;
