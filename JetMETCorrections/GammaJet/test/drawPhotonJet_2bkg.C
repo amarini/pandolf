@@ -94,7 +94,7 @@ int main(int argc, char* argv[]) {
   db->set_mcFile2( mcPhotonJetFile );
 
   if( norm=="LUMI" )
-    db->set_crossSectionNormalization();
+    db->set_lumiNormalization();
   else
     db->set_shapeNormalization();
 
