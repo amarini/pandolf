@@ -23,6 +23,12 @@
 #include "TPaveText.h"
 
 
+struct MCFile {
+  TFile* file;
+  std::string name;
+  int fillColor;
+};
+
 
 class DrawBase {
 
@@ -34,23 +40,24 @@ class DrawBase {
   ~DrawBase();
 
   void set_shapeNormalization();
-  void set_crossSectionNormalization();
+  void set_lumiNormalization();
   void set_sameEventNormalization();
   void set_sameInstanceNormalization();
-  void set_mcName( const std::string& name ) { mcName_ = name; };
-  void set_mcName2( const std::string& name ) { mcName2_ = name; };
+//void set_mcName( const std::string& name ) { mcName_ = name; };
+//void set_mcName2( const std::string& name ) { mcName2_ = name; };
 
   void drawHisto( std::string name, std::string etaRegion, std::string flags, int legendQuadrant=1, bool log_aussi=false);
   void drawHisto_onlyData( std::string name, std::string etaRegion, std::string flags, int legendQuadrant=1, bool log_aussi=false);
-  void drawHisto_2bkg( std::string name, std::string etaRegion, std::string flags, int legendQuadrant=1, bool log_aussi=false); //da cambiare!
+//  void drawHisto_2bkg( std::string name, std::string etaRegion, std::string flags, int legendQuadrant=1, bool log_aussi=false); //da cambiare!
   void drawProfile( std::string yVar, std::string xVar, int legendQuadrant=1);
   void drawStack(const std::string& varY, const std::string& varX, const std::string& RECO_GEN, bool isData) const { this->drawStack( varY, varX, "", RECO_GEN, isData); };
   void drawStack(const std::string& varY, const std::string& varX, const std::string& etaRegion, const std::string& RECO_GEN, bool isData) const;
 
   void set_analysisType( const std::string analysisType ) { analysisType_ = analysisType; };
   void set_dataFile( TFile* dataFile );
-  void set_mcFile( TFile* mcFile ) { mcFile_ = mcFile;};
-  void set_mcFile2( TFile* mcFile2 ){ mcFile2_ = mcFile2;} ;
+  void add_mcFile( TFile* mcFile, const std::string& bgName, int bgFillColor );
+//void set_mcFile( TFile* mcFile ) { mcFile_ = mcFile;};
+//void set_mcFile2( TFile* mcFile2 ){ mcFile2_ = mcFile2;} ;
   void set_outputdir( const std::string& outputdir ) { outputdir_ = outputdir; };
   void set_pt_thresh( Int_t pt_thresh ) { pt_thresh_ = pt_thresh; };
   void set_etamax( Float_t etamax ) { etamax_ = etamax; };
@@ -60,8 +67,9 @@ class DrawBase {
 
   std::string get_analysisType() const { return analysisType_; };
   TFile* get_dataFile() const { return dataFile_; };
-  TFile* get_mcFile() const { return mcFile_; };
-  TFile* get_mcFile2() const { return mcFile2_; };
+  TFile* get_mcFile( int i ) const { return mcFiles_[i].file; };
+//TFile* get_mcFile() const { return mcFile_; };
+//TFile* get_mcFile2() const { return mcFile2_; };
   std::string get_outputdir() const { return outputdir_; };
   Int_t get_pt_thresh() const { return pt_thresh_; };
   Float_t get_etamax() const { return etamax_; };
@@ -82,12 +90,15 @@ class DrawBase {
   std::string recoType_;
   std::string jetAlgo_;
 
-  std::string mcName_;
-  std::string mcName2_;
+//std::string mcName_;
+//std::string mcName2_;
 
   TFile* dataFile_;
-  TFile* mcFile_;
-  TFile* mcFile2_;
+  std::vector< MCFile > mcFiles_;
+//std::vector< std::string > mcNames_;
+//std::vector< int > mcFillColors_;
+//TFile* mcFile_;
+//TFile* mcFile2_;
   
   Float_t scaleFactor_;
   Float_t lumi_;

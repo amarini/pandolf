@@ -2,6 +2,7 @@
 #include "fitTools.h"
 
 
+
 DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType, const std::string& jetAlgo ) {
 
   TStyle *simpleStyle = new TStyle("simpleStyle","");
@@ -21,8 +22,12 @@ DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType
   jetAlgo_ = jetAlgo;
 
   dataFile_ = 0;
-  mcFile_ = 0;
-  mcFile2_ = 0;
+
+  // this is needed to avoid the same-histogram problem:
+  TH1F::AddDirectory(kFALSE);
+
+//  mcFile_ = 0;
+//  mcFile2_ = 0;
 
 }
 
@@ -60,28 +65,30 @@ DrawBase::~DrawBase() {
     dataFile_=0;
   }
 
-  if( mcFile_!=0 ) {
-    delete mcFile_;
-    mcFile_=0;
+  if( mcFiles_.size()!=0 ) {
+    for( unsigned i=0; i<mcFiles_.size(); ++i ) {
+      delete mcFiles_[i].file;
+      mcFiles_[i].file=0;
+    }
   }
 
-  if( mcFile2_!=0 ) {
-    delete mcFile2_;
-    mcFile2_=0;
-  }
+//if( mcFile2_!=0 ) {
+//  delete mcFile2_;
+//  mcFile2_=0;
+//}
 
 }
 
 
-void DrawBase::set_crossSectionNormalization() {
+void DrawBase::set_lumiNormalization() {
 
-  if( dataFile_==0 || mcFile_==0 ) {
+  if( dataFile_==0 || mcFiles_.size()==0 ) {
     std::cout << "Data/MC files not properly initialized. Cannot compute scale factor. Exiting." << std::endl;
     exit(132);
   }
 
   if( lumi_==0. ) {
-    std::cout << "lumi_ is equal to zero. Cannot compute cross section normalization. Exiting." << std::endl;
+    std::cout << "lumi_ is equal to zero. Cannot compute lumi normalization. Exiting." << std::endl;
     exit(97);
   }
 
@@ -98,17 +105,19 @@ void DrawBase::set_shapeNormalization() {
 
 void DrawBase::set_sameEventNormalization() {
 
-  if( dataFile_==0 || mcFile_==0 ) {
+  if( dataFile_==0 || mcFiles_.size()==0 ) {
     std::cout << "Data/MC files not properly initialized. Cannot compute scale factor. Exiting." << std::endl;
     exit(133);
   }
 
   TH1F* h1_nJets_data = (TH1F*)dataFile_->Get("nJets");
 
-  TH1F* h1_nJets_mc = (TH1F*)mcFile_->Get("nJets");
-  if( mcFile2_!=0 ) {
-    TH1F* h1_nJets_mc2 = (TH1F*)mcFile2_->Get("nJets"); 
-    h1_nJets_mc->Add( h1_nJets_mc2 );
+  TH1F* h1_nJets_mc = (TH1F*)mcFiles_[0].file->Get("nJets");
+  if( mcFiles_.size()>1 ) {
+    for( unsigned i=1; i<mcFiles_.size(); ++i ) {
+      TH1F* h1_nJets_mc2 = (TH1F*)mcFiles_[i].file->Get("nJets"); 
+      h1_nJets_mc->Add( h1_nJets_mc2 );
+    }
   }
 
   scaleFactor_ =  h1_nJets_data->Integral()/h1_nJets_mc->Integral();
@@ -117,7 +126,7 @@ void DrawBase::set_sameEventNormalization() {
 
 void DrawBase::set_sameInstanceNormalization() {
 
-  if( dataFile_==0 || mcFile_==0 ) {
+  if( dataFile_==0 || mcFiles_.size()==0 ) {
     std::cout << "Data/MC files not properly initialized. Cannot compute scale factor. Exiting." << std::endl;
     exit(133);
   }
@@ -135,10 +144,12 @@ void DrawBase::set_sameInstanceNormalization() {
   }
 
   h1_phi_data = (TH1F*)dataFile_->Get(hname.c_str());
-  h1_phi_mc = (TH1F*)mcFile_->Get(hname.c_str());
-  if( mcFile2_!=0 ) {
-    TH1F* h1_phi_mc2 = (TH1F*)mcFile2_->Get(hname.c_str());
-    h1_phi_mc->Add( h1_phi_mc2 );
+  h1_phi_mc = (TH1F*)mcFiles_[0].file->Get(hname.c_str());
+  if( mcFiles_.size()>1 ) {
+    for( unsigned i=1; i<mcFiles_.size(); ++i ) {
+      TH1F* h1_phi_mc2 = (TH1F*)mcFiles_[i].file->Get(hname.c_str());
+      h1_phi_mc->Add( h1_phi_mc2 );
+    }
   }
   scaleFactor_ =  h1_phi_data->Integral()/h1_phi_mc->Integral();
   std::cout << "ScaleFactor: " << scaleFactor_ << std::endl;
@@ -146,13 +157,13 @@ void DrawBase::set_sameInstanceNormalization() {
 }
 
 
-void DrawBase::drawHisto( std::string name, std::string etaRegion, std::string flags, int legendQuadrant, bool log_aussi) {
+/*void DrawBase::drawHisto( std::string name, std::string etaRegion, std::string flags, int legendQuadrant, bool log_aussi) {
 
   std::string histoName = name;
   if( etaRegion!="" ) histoName = name + "_" + etaRegion;
 
   TH1F* dataHisto = (TH1F*)dataFile_->Get(histoName.c_str());
-  TH1F* mcHisto = (TH1F*)mcFile_->Get(histoName.c_str());
+  TH1F* mcHisto = (TH1F*)mcFiles_[0]->Get(histoName.c_str()); //default: take first one. FIX THIS!
 
   if( dataHisto==0 || mcHisto==0 ) {
     std::cout << "Didn't find histo '" << histoName << "'. Continuing." << std::endl;
@@ -403,6 +414,10 @@ void DrawBase::drawHisto( std::string name, std::string etaRegion, std::string f
   delete h2_axes;
 
 } //drawHisto
+*/
+
+
+
 
 
 void DrawBase::drawHisto_onlyData( std::string name, std::string etaRegion, std::string flags, int legendQuadrant, bool log_aussi) {
@@ -998,12 +1013,13 @@ void DrawBase::drawHisto_onlyData( std::string name, std::string etaRegion, std:
 
 
 
-void DrawBase::drawHisto_2bkg( std::string name, std::string etaRegion, std::string flags, int legendQuadrant, bool log_aussi) {
+//void DrawBase::drawHisto_2bkg( std::string name, std::string etaRegion, std::string flags, int legendQuadrant, bool log_aussi) {
+void DrawBase::drawHisto( std::string name, std::string etaRegion, std::string flags, int legendQuadrant, bool log_aussi) {
 
-  if( mcFile2_==0 ) {
-    std::cout << "Set mcFile2 first!" << std::endl;
-    exit(918);
-  }
+//if( mcFile2_==0 ) {
+//  std::cout << "Set mcFile2 first!" << std::endl;
+//  exit(918);
+//}
 
 
   std::vector<float> ptPhot_binning = fitTools::getPtPhot_binning();
@@ -1016,13 +1032,29 @@ void DrawBase::drawHisto_2bkg( std::string name, std::string etaRegion, std::str
   std::string ptPhotMean_name = "ptPhotMean";
   if( flags!= "" ) ptPhotMean_name = ptPhotMean_name + "_" + flags;
 
-  TProfile* hp_ptPhot_data = (TProfile*)dataFile_->Get(ptPhotMean_name.c_str());
-  TProfile* hp_ptPhot_mc = (TProfile*)mcFile_->Get(ptPhotMean_name.c_str());
-  TProfile* hp_ptPhot_mc2 = (TProfile*)mcFile2_->Get(ptPhotMean_name.c_str());
-  TProfile* hp_ptJetGen_mc = (TProfile*)mcFile_->Get("ptJetGenMean");
-  TProfile* hp_ptJetGen_mc2 = (TProfile*)mcFile2_->Get("ptJetGenMean");
+  TProfile* hp_ptPhot_data = 0;
+  TProfile* hp_ptPhot_mc = 0;
+  TProfile* hp_ptJetGen_mc = 0;
 
-  if( drawResponseGraphs && (hp_ptPhot_data==0 || hp_ptPhot_mc==0 || hp_ptPhot_mc2==0) ) {
+  if( drawResponseGraphs ) {
+
+    hp_ptPhot_data = (TProfile*)dataFile_->Get(ptPhotMean_name.c_str());
+    hp_ptPhot_mc = (TProfile*)mcFiles_[0].file->Get(ptPhotMean_name.c_str());
+    hp_ptJetGen_mc = (TProfile*)mcFiles_[0].file->Get("ptJetGenMean");
+
+    if( mcFiles_.size() > 1 ) {
+      for( unsigned i=1; i<mcFiles_.size(); ++i ) {
+        TProfile* hp_ptPhot_mc2 = (TProfile*)mcFiles_[i].file->Get(ptPhotMean_name.c_str());
+        TProfile* hp_ptJetGen_mc2 = (TProfile*)mcFiles_[i].file->Get("ptJetGenMean");
+        hp_ptPhot_mc->Add( hp_ptPhot_mc2 );
+        hp_ptJetGen_mc->Add( hp_ptPhot_mc2 );
+      }
+    }
+
+  } //if drawresponsegraphs
+
+
+  if( drawResponseGraphs && (hp_ptPhot_data==0 || hp_ptPhot_mc==0) ) {
     std::cout << "Didn't find '" << ptPhotMean_name << "' profile. Skipping" << std::endl;
     return;
   }
@@ -1063,32 +1095,71 @@ void DrawBase::drawHisto_2bkg( std::string name, std::string etaRegion, std::str
 
 
     TH1F* dataHisto = (TH1F*)dataFile_->Get(histoName.c_str());
-    TH1F* mcHisto = (TH1F*)mcFile_->Get(histoName.c_str());
-    TH1F* mcHisto2 = (TH1F*)mcFile2_->Get(histoName.c_str());
-
-    if( dataHisto==0 || mcHisto==0 || mcHisto2==0 ) {
-      std::cout << "Didn't find histo '" << histoName << "'. Continuing." << std::endl;
+    if( dataHisto==0 ) {
+      std::cout << "Didn't find DATA histo '" << histoName << "'. Continuing." << std::endl;
       return;
     }
-
     dataHisto->SetMarkerStyle(20);
 
-    mcHisto->SetFillColor(38);
 
-    mcHisto2->SetFillColor(46);
+    std::vector<TH1F*> mcHistos;
+    mcHistos.push_back((TH1F*)mcFiles_[0].file->Get(histoName.c_str()));
+    mcHistos[0]->SetFillColor( mcFiles_[0].fillColor );
 
-    TH1F* mcHisto_sum = new TH1F(*mcHisto);
-    mcHisto_sum->Add(mcHisto2);
-    mcHisto_sum->SetFillColor(46);
+    TH1F* mcHisto_sum = new TH1F(*((TH1F*)mcHistos[0]->Clone()));
+    if( mcFiles_.size()>1 ) {
+      for( unsigned i=1; i<mcFiles_.size(); ++i ) {
+        mcFiles_[i].file->cd();
+        mcHistos.push_back((TH1F*)(mcFiles_[i].file->Get(histoName.c_str())));
+        if( mcHistos[i]==0 ) {
+          std::cout << "Didn't find MC histo '" << histoName << "'. Continuing." << std::endl;
+          return;
+        }
+        mcHistos[i]->SetFillColor( mcFiles_[i].fillColor );
+        mcHisto_sum->Add( (TH1F*)(mcHistos[i]->Clone()) );
+      } //for mc files
+    } //if mc files size > 1
+
+
+
+    // normalize:
     if( scaleFactor_ > 0. ) {
       mcHisto_sum->Scale(scaleFactor_);
-      mcHisto->Scale(scaleFactor_);
+      for( unsigned i=0; i<mcHistos.size(); ++i )
+        mcHistos[i]->Scale(scaleFactor_);
     } else {
       Float_t dataIntegral = dataHisto->Integral(0, dataHisto->GetNbinsX()+1);
       Float_t mcIntegral = mcHisto_sum->Integral(0, mcHisto_sum->GetNbinsX()+1);
       mcHisto_sum->Scale( dataIntegral/mcIntegral );
-      mcHisto->Scale( dataIntegral/mcIntegral );
-    }
+      for( unsigned i=0; i<mcHistos.size(); ++i )
+        mcHistos[i]->Scale( dataIntegral/mcIntegral );
+    } //if scalefactor
+
+    // create stack:
+    //THStack* mcHisto_stack = new THStack(mcHistos[0]);
+    THStack* mcHisto_stack = new THStack();
+    int nHistos = mcHistos.size();
+    for( unsigned i=0; i<nHistos; ++i )
+      mcHisto_stack->Add( (TH1F*)(mcHistos[nHistos-i-1]->Clone()), "HISTO" );
+    //mcHisto_stack->Draw();
+    mcHisto_stack->SetName("stack");
+
+
+//  mcHisto->SetFillColor(38);
+//  mcHisto2->SetFillColor(46);
+
+//  TH1F* mcHisto_sum = new TH1F(*mcHisto);
+//  mcHisto_sum->Add(mcHisto2);
+//  mcHisto_sum->SetFillColor(46);
+//  if( scaleFactor_ > 0. ) {
+//    mcHisto_sum->Scale(scaleFactor_);
+//    mcHisto->Scale(scaleFactor_);
+//  } else {
+//    Float_t dataIntegral = dataHisto->Integral(0, dataHisto->GetNbinsX()+1);
+//    Float_t mcIntegral = mcHisto_sum->Integral(0, mcHisto_sum->GetNbinsX()+1);
+//    mcHisto_sum->Scale( dataIntegral/mcIntegral );
+//    mcHisto->Scale( dataIntegral/mcIntegral );
+//  }
 
 
     Float_t yAxisMaxScale = (name=="phiJet" || name=="etaJet" || name=="ptSecondJetRel" || name=="phiPhot" || name=="etaPhot" ) ? 1.8 : 1.6;
@@ -1097,7 +1168,6 @@ void DrawBase::drawHisto_2bkg( std::string name, std::string etaRegion, std::str
     Float_t xMin = dataHisto->GetXaxis()->GetXmin();
     Float_t xMax = dataHisto->GetXaxis()->GetXmax();
     Float_t yMax_data = dataHisto->GetMaximum();
-////Float_t yMax_mc = mcStack->GetMaximum();
     Float_t yMax_mc = mcHisto_sum->GetMaximum();
     Float_t yMax = (yMax_data>yMax_mc) ? yAxisMaxScale*yMax_data : yAxisMaxScale*yMax_mc;
     Float_t yMin = 0.;
@@ -1107,7 +1177,7 @@ void DrawBase::drawHisto_2bkg( std::string name, std::string etaRegion, std::str
 
     std::string instanceName = (analysisType_=="PhotonJet") ? "Events" : "Jets";
     std::string yAxis = instanceName;
-    if( name=="ptJet" || name=="ptCorrJet"||name=="ptPhot" ) {
+    if( name=="ptJet" || name=="ptCorrJet" ) {
       char yAxis_char[50];
       sprintf(yAxis_char, "%s/(%d GeV/c)", instanceName.c_str(), (Int_t)dataHisto->GetBinWidth(1));
       std::string yAxis_tmp(yAxis_char);
@@ -1183,8 +1253,11 @@ void DrawBase::drawHisto_2bkg( std::string name, std::string etaRegion, std::str
     legend->SetFillColor(kWhite);
     legend->SetTextSize(0.035);
     legend->AddEntry(dataHisto, "Data", "P");
-    legend->AddEntry(mcHisto, mcName_.c_str(), "F");
-    legend->AddEntry(mcHisto2, mcName2_.c_str(), "F");
+    for( unsigned i=0; i<mcHistos.size(); ++i ) 
+      legend->AddEntry(mcHistos[i], (mcFiles_[i].name).c_str(), "F");
+  //  legend->AddEntry(mcHistos[i], mcNames_[i].c_str(), "F");
+  //legend->AddEntry(mcHisto, mcName_.c_str(), "F");
+  //legend->AddEntry(mcHisto2, mcName2_.c_str(), "F");
 
     TPaveText* label_cms = new TPaveText(0.25, 0.83, 0.42, 0.87, "brNDC");
     label_cms->SetFillColor(kWhite);
@@ -1277,27 +1350,17 @@ void DrawBase::drawHisto_2bkg( std::string name, std::string etaRegion, std::str
 
     }
 
-    TPaveText* label_mean = new TPaveText(0.63, 0.37, 0.84, 0.5, "brNDC");
-    label_mean->SetFillColor(kWhite);
-    label_mean->SetTextSize(0.035);
-    label_mean->SetTextFont(42);
-    label_mean->AddText("Mean:");
-    char dataMean[100];
-//    sprintf( dataMean, "Data Mean = %.2f #pm %.2f", dataHisto->GetMean(), dataHisto->GetMeanError());
-    sprintf( dataMean, "%.2f #pm %.2f (DATA)", dataHisto->GetMean(), dataHisto->GetMeanError());
-    label_mean->AddText(dataMean);
-    char mcMean[100];
-//    sprintf( mcMean, "MC Mean = %.2f #pm %.2f", mcHisto_sum->GetMean(), mcHisto_sum->GetMeanError());
-    sprintf( mcMean, "%.2f #pm %.2f (MC)", mcHisto_sum->GetMean(), mcHisto_sum->GetMeanError());
-    label_mean->AddText(mcMean);
-
 
     TCanvas* c1 = new TCanvas("c1", "c1", 800, 800);
     c1->cd();
 
     h2_axes->Draw("");
-    mcHisto_sum->Draw("histo same");
-    mcHisto->Draw("histo same");
+    mcHisto_stack->Draw("histo same");
+    //mcHisto_sum->SetFillColor(0);
+    //mcHisto_sum->SetLineColor(kGreen);
+    //mcHisto_sum->SetLineWidth(3);
+    //mcHisto_sum->Draw("histo same");
+    //mcHisto->Draw("histo same");
     dataHisto->Draw("E same");
     gPad->RedrawAxis();
     label_cms->Draw("same");
@@ -1322,13 +1385,13 @@ void DrawBase::drawHisto_2bkg( std::string name, std::string etaRegion, std::str
       gr_resolution_vs_pt->SetPointError( iplot, hp_ptPhot_data->GetBinError( iplot+1 ), dataResolutionErr );
 
       //weighted average of two MC pt's
-      Float_t xmc1 = hp_ptPhot_mc->GetBinContent(iplot+1);
-      Float_t xmc2 = hp_ptPhot_mc2->GetBinContent(iplot+1);
-      Float_t errmc1 = hp_ptPhot_mc->GetBinError(iplot+1);
-      Float_t errmc2 = hp_ptPhot_mc2->GetBinError(iplot+1);
-      Float_t denommc = ( (1./errmc1) + (1./errmc2) );
-      Float_t ptMeanMC = ( (xmc1/errmc1) + (xmc2/errmc2) ) / denommc;
-      Float_t ptMeanErrMC = 1./denommc;
+      //Float_t xmc1 = hp_ptPhot_mc->GetBinContent(iplot+1);
+      //Float_t xmc2 = hp_ptPhot_mc2->GetBinContent(iplot+1);
+      //Float_t errmc1 = hp_ptPhot_mc->GetBinError(iplot+1);
+      //Float_t errmc2 = hp_ptPhot_mc2->GetBinError(iplot+1);
+      //Float_t denommc = ( (1./errmc1) + (1./errmc2) );
+      Float_t ptMeanMC = hp_ptPhot_mc->GetBinContent(iplot+1);
+      Float_t ptMeanErrMC = hp_ptPhot_mc->GetBinError(iplot+1);
      
       Float_t mcResponse = mcHisto_sum->GetMean();
       Float_t mcResponseErr = mcHisto_sum->GetMeanError();
@@ -1350,34 +1413,47 @@ void DrawBase::drawHisto_2bkg( std::string name, std::string etaRegion, std::str
       //else
         sprintf( responseGEN_name, "responseGEN_%s", ptRange_str.c_str());
 
-      TH1F* responseGEN = (TH1F*)mcFile_->Get(responseGEN_name);
-      TH1F* responseGEN2 = (TH1F*)mcFile2_->Get(responseGEN_name);
+      TH1F* responseGEN = (TH1F*)mcFiles_[0].file->Get(responseGEN_name);
+      if( mcFiles_.size()>1 ) {
+        for( unsigned i=1; i<mcFiles_.size(); ++i ) {
+          TH1F* responseGEN2 = (TH1F*)mcFiles_[i].file->Get(responseGEN_name);
+          responseGEN->Add( responseGEN2 );
+        }
+      }
 
-      TH1F* responseGEN_sum = new TH1F(*responseGEN);
-      responseGEN_sum->Add(responseGEN2);
-      responseGEN_sum->Scale(scaleFactor_);
-      //responseGEN_sum->SetLineStyle(3);
-      responseGEN_sum->SetLineWidth(3);
-      //responseGEN_sum->Draw("histo C same");
-      //legend->AddEntry(responseGEN_sum, "Intrinsic", "L");
+      responseGEN->Scale(scaleFactor_);
+      responseGEN->SetLineWidth(3);
+  
+    //TH1F* responseGEN_sum = new TH1F(*responseGEN);
+    //responseGEN_sum->Add(responseGEN2);
+    //responseGEN_sum->Scale(scaleFactor_);
+    ////responseGEN_sum->SetLineStyle(3);
+    //responseGEN_sum->SetLineWidth(3);
+    ////responseGEN_sum->Draw("histo C same");
+    ////legend->AddEntry(responseGEN_sum, "Intrinsic", "L");
 
       Float_t genResponse;
       Float_t genResponseErr;
       Float_t genRMS;
       Float_t genRMSErr;
 
-      if( recoType_ == "calo" ) { //until a better solution is found
-        genResponse = responseGEN_sum->GetMean();
-        genResponseErr = responseGEN_sum->GetMeanError();
-        genRMS = responseGEN_sum->GetRMS();
-        genRMSErr = responseGEN_sum->GetMeanError();
-      } else {
-        //compute responseGEN only from Photon+Jet
-        genResponse = responseGEN2->GetMean();
-        genResponseErr = responseGEN2->GetMeanError();
-        genRMS = responseGEN2->GetRMS();
-        genRMSErr = responseGEN2->GetMeanError();
-      }
+      genResponse = responseGEN->GetMean();
+      genResponseErr = responseGEN->GetMeanError();
+      genRMS = responseGEN->GetRMS();
+      genRMSErr = responseGEN->GetMeanError();
+
+//    if( recoType_ == "calo" ) { //until a better solution is found
+//      genResponse = responseGEN_sum->GetMean();
+//      genResponseErr = responseGEN_sum->GetMeanError();
+//      genRMS = responseGEN_sum->GetRMS();
+//      genRMSErr = responseGEN_sum->GetMeanError();
+//    } else {
+//      //compute responseGEN only from Photon+Jet
+//      genResponse = responseGEN2->GetMean();
+//      genResponseErr = responseGEN2->GetMeanError();
+//      genRMS = responseGEN2->GetRMS();
+//      genRMSErr = responseGEN2->GetMeanError();
+//    }
 
     ////compute responseGEN only from QCD BG:
     //Float_t genResponse = responseGEN->GetMean();
@@ -1389,17 +1465,19 @@ void DrawBase::drawHisto_2bkg( std::string name, std::string etaRegion, std::str
       Float_t genResolution = genRMS / genResponse;
       Float_t genResolutionErr = sqrt( genRMSErr*genRMSErr/(genResponse*genResponse) + genResolution*genResolution*genResponseErr*genResponseErr/(genResponse*genResponse*genResponse*genResponse) );
 
-      Float_t xgen1 = hp_ptJetGen_mc->GetBinContent(iplot+1);
-      Float_t xgen2 = hp_ptJetGen_mc2->GetBinContent(iplot+1);
-      Float_t errgen1 = hp_ptJetGen_mc->GetBinError(iplot+1);
-      Float_t errgen2 = hp_ptJetGen_mc2->GetBinError(iplot+1);
+    //Float_t xgen1 = hp_ptJetGen_mc->GetBinContent(iplot+1);
+    //Float_t xgen2 = hp_ptJetGen_mc2->GetBinContent(iplot+1);
+    //Float_t errgen1 = hp_ptJetGen_mc->GetBinError(iplot+1);
+    //Float_t errgen2 = hp_ptJetGen_mc2->GetBinError(iplot+1);
     //Float_t xgen1 = hp_ptPhot_mc->GetBinContent(iplot+1);
     //Float_t xgen2 = hp_ptPhot_mc2->GetBinContent(iplot+1);
     //Float_t errgen1 = hp_ptPhot_mc->GetBinError(iplot+1);
     //Float_t errgen2 = hp_ptPhot_mc2->GetBinError(iplot+1);
-      Float_t denomgen = ( (1./errgen1) + (1./errgen2) );
-      Float_t ptMeanGEN = ( (xgen1/errgen1) + (xgen2/errgen2) ) / denomgen;
-      Float_t ptMeanErrGEN = 1./denomgen;
+    //Float_t denomgen = ( (1./errgen1) + (1./errgen2) );
+    //Float_t ptMeanGEN = ( (xgen1/errgen1) + (xgen2/errgen2) ) / denomgen;
+    //Float_t ptMeanErrGEN = 1./denomgen;
+      Float_t ptMeanGEN = hp_ptJetGen_mc->GetBinContent(iplot+1);
+      Float_t ptMeanErrGEN = hp_ptJetGen_mc->GetBinError(iplot+1);
       
       gr_responseGEN_vs_pt->SetPoint( iplot, ptMeanGEN, genResponse );
       gr_responseGEN_vs_pt->SetPointError( iplot, ptMeanErrGEN, genResponseErr );
@@ -1446,8 +1524,9 @@ void DrawBase::drawHisto_2bkg( std::string name, std::string etaRegion, std::str
         h2_axes_log->GetXaxis()->SetMoreLogLabels();
       }
       h2_axes_log->Draw("");
-      mcHisto_sum->Draw("histo same");
-      mcHisto->Draw("histo same");
+      mcHisto_stack->Draw("histo same");
+    //mcHisto_sum->Draw("histo same");
+    //mcHisto->Draw("histo same");
       dataHisto->Draw("E same");
       gPad->RedrawAxis();
       legend->Draw("same");
@@ -1473,7 +1552,7 @@ void DrawBase::drawHisto_2bkg( std::string name, std::string etaRegion, std::str
   } //for n plots
 
 
-  if( drawResponseGraphs ) {
+  if( drawResponseGraphs ) { // now draw the trends vs pt:
 
     gStyle->SetPadTickX(1);
     gStyle->SetPadTickY(1);
@@ -1815,7 +1894,7 @@ void DrawBase::drawHisto_2bkg( std::string name, std::string etaRegion, std::str
   } //if response
 
 
-} //drawHisto_2bkg
+} //drawHisto
 
 
 
@@ -1827,7 +1906,7 @@ void DrawBase::drawProfile( std::string yVar, std::string xVar, int legendQuadra
   if( xVar == "pt" || xVar == "ptCorr" ) name = name + "_barrel"; //ugly fix for now
 
   TProfile* dataProfile = (TProfile*)dataFile_->Get(name.c_str());
-  TProfile* mcProfile = (TProfile*)mcFile_->Get(name.c_str());
+  TProfile* mcProfile = (TProfile*)mcFiles_[0].file->Get(name.c_str()); //default: take first mc file. MUST BE FIXED
 
   if( dataProfile==0 || mcProfile==0 ) {
     std::cout << "Didn't find profile '" << name << "'. Continuing." << std::endl;
@@ -2053,7 +2132,7 @@ void DrawBase::drawStack(const std::string& varY, const std::string& varX, const
 
   TFile* file;
   if( isData ) file = dataFile_;
-  else file = mcFile_;
+  else file = mcFiles_[0].file;
 
   std::string histoName;
 
@@ -2314,6 +2393,20 @@ void DrawBase::set_dataFile( TFile* dataFile ) {
   } else {
     lumi_ = h1_lumi->GetBinContent(1);
   }
+
+}
+
+
+
+void DrawBase::add_mcFile( TFile* mcFile, const std::string& bgName, int bgFillColor ) {
+
+  MCFile thisfile;
+  thisfile.file = mcFile;
+  thisfile.name = bgName;
+  thisfile.fillColor = bgFillColor;
+  mcFiles_.push_back( thisfile );
+//mcNames_.push_back( bgName );
+//mcFillColors_.push_back( bgFillColor );
 
 }
 
