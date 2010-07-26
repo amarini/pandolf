@@ -30,6 +30,9 @@ TreeAnalyzer_PhotonJet.o: TreeAnalyzer_PhotonJet.C
 TreeAnalyzer_DiJet.o: TreeAnalyzer_DiJet.C
 	$(CC) $(CFLAGS) TreeAnalyzer_DiJet.C $(ROOTFLAG)
 
+TreeAnalyzer_HZZlljj.o: TreeAnalyzer_HZZlljj.C
+	$(CC) $(CFLAGS) TreeAnalyzer_HZZlljj.C $(ROOTFLAG)
+
 drawPhotonJet: fitTools.o DrawBase.o
 	$(CC) -Wall -o drawPhotonJet drawPhotonJet.C fitTools.o DrawBase.o $(ROOTFLAG)
 
