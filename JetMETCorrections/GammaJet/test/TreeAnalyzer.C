@@ -174,6 +174,9 @@ void TreeAnalyzer::LoadInput() {
    } else if( dataset_=="PhotonJet_Summer1036X_Pt170to300" ) {
      sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/PhotonJet_Summer1036X/PhotonJetPt170to300/output_*.root/myanalysis/pippo");
      chain->Add(treePath);
+   } else if( dataset_=="Wenu_Summer10_START37_V5_S09_v1" ) {
+     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/Wenu_Summer10_START37_V5_S09_v1/output_*.root/myanalysis/pippo");
+     chain->Add(treePath);
    } else {
      sprintf(treePath, "%s/output_*.root/myanalysis/pippo", dataset_.c_str());
      chain->Add(treePath);
@@ -893,7 +896,10 @@ GenEventParameters TreeAnalyzer::getGenEventParameters() {
      returnGenPars.ptHatMax = 1400.;
    } else if( dataset_=="QCD_Spring10_Pt1400" ) {
      returnGenPars.crossSection = 0.0112233;
-     returnGenPars.ptHatMax = 7000.;
+     returnGenPars.ptHatMax = 10000.;
+   } else if( dataset_=="Wenu_Summer10_START37_V5_S09_v1" ) {
+     returnGenPars.crossSection = 7899.;
+     returnGenPars.ptHatMax = 10000.;
    } else {
      std::cout << "WARNING! Dataset '" << dataset_ << "' has no hardwired cross-section, setting it to -1." << std::endl;
      returnGenPars.crossSection = -1.;

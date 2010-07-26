@@ -20,8 +20,9 @@
 bool DEBUG_ = false;
 bool BINNINGFINO_ = false;
 bool ONEVTX_ = false;
-bool NO2ndJETABS = true;
-bool TIGHTDELTAPHI_ = false;
+bool NO2ndJETABS = false;
+bool ADD12_ = false;
+float DELTAPHI_ = 1.;
 std::string RECOTYPE_;
 std::string ALGOTYPE_;
 std::string suffix;
@@ -187,7 +188,7 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   h1_etaPhot->Sumw2();
   TH1D* h1_phiPhot = new TH1D("phiPhot", "", 15, -3.1416, 3.1416);
   h1_phiPhot->Sumw2();
-  TH1D* h1_deltaPhi_Nm1 = new TH1D("deltaPhi_Nm1", "", 15, 2.1, 3.1416);
+  TH1D* h1_deltaPhi_Nm1 = new TH1D("deltaPhi_Nm1", "", 15, 3.1416/2., 3.1416);
   h1_deltaPhi_Nm1->Sumw2();
   TH1D* h1_ptSecondJetRel_Nm1 = new TH1D("ptSecondJetRel_Nm1", "", 15, 0., 1.5);
   h1_ptSecondJetRel_Nm1->Sumw2();
@@ -226,7 +227,7 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   h1_etaPhot_clusterOK->Sumw2();
   TH1D* h1_phiPhot_clusterOK = new TH1D("phiPhot_clusterOK", "", 15, -3.1416, 3.1416);
   h1_phiPhot_clusterOK->Sumw2();
-  TH1D* h1_deltaPhi_clusterOK = new TH1D("deltaPhi_clusterOK", "", 15, 2.1, 3.1416);
+  TH1D* h1_deltaPhi_clusterOK = new TH1D("deltaPhi_clusterOK", "", 15, 3.1416/2., 3.1416);
   h1_deltaPhi_clusterOK->Sumw2();
 
   //TH1D* h1_ptPhot_clusterOK_isolated = new TH1D("ptPhot_clusterOK_isolated", "", 28, ptPhot_binning[0], ptMax);
@@ -277,7 +278,7 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   TH1D* h1_clusterMinPhotReco= new TH1D("clusterMinPhotReco", "", 20, 0., 0.6);
   h1_clusterMinPhotReco->Sumw2();
 
-  TH1D* h1_deltaPhi_clusterOK_isolated = new TH1D("deltaPhi_clusterOK_isolated", "", 15, 2.1, 3.1416);
+  TH1D* h1_deltaPhi_clusterOK_isolated = new TH1D("deltaPhi_clusterOK_isolated", "", 15, 3.1416/2., 3.1416);
   h1_deltaPhi_clusterOK_isolated->Sumw2();
   TH1D* h1_ptSecondJetRel_clusterOK_isolated = new TH1D("ptSecondJetRel_clusterOK_isolated", "", 15, 0., 1.5);
   h1_ptSecondJetRel_clusterOK_isolated->Sumw2();
@@ -496,8 +497,8 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     bool back2back = true;
     Float_t deltaPhi_jet = fabs(fitTools::delta_phi(phiPhotReco, phiJetReco));
     Float_t pi = TMath::Pi();
-    float deltaPhiThreshold = (TIGHTDELTAPHI_) ? 0.2 : 1.;
-    if( fabs(deltaPhi_jet) < (pi - 1.) ) back2back = false; //loose back to back for now
+    float deltaPhiThreshold = DELTAPHI_;
+    if( fabs(deltaPhi_jet) < (pi - deltaPhiThreshold) ) back2back = false; //loose back to back for now
 
 
     Float_t deltaPhi_2ndJet = fabs(fitTools::delta_phi(phiPhotReco, phi2ndJetReco));
@@ -597,6 +598,24 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     bool photonOK_medium = (isIsolated_medium && clusterShapeOK_medium) || MCassoc || useGenJets;
     bool photonOK_loose  = (isIsolated_loose  && clusterShapeOK_medium) || MCassoc || useGenJets;
 
+
+    // compute response:
+    float response = ptJetReco/ptPhotReco;
+    if( ADD12_ && abs(deltaPhi_2ndJet) > pi/2. ) { //add first and second jet
+
+      float px1 = ptJetReco*cos(phiJetReco);
+      float py1 = ptJetReco*sin(phiJetReco);
+      float px2 = pt2ndJetReco*cos(phi2ndJetReco);
+      float py2 = pt2ndJetReco*sin(phi2ndJetReco);
+
+      float pxSum = px1 + px2;
+      float pySum = py1 + py2;
+      float ptSum = sqrt( pxSum*pxSum + pySum*pySum );
+
+      response = ptSum/ptPhotReco;
+
+    }
+
     // compute mpf :
     Float_t phi_Phot_Met = fitTools::delta_phi( phiPhotReco, phiMet );
     Float_t mpfResponse = 1. + eMet*ptPhotReco*cos( phi_Phot_Met ) / (ptPhotReco*ptPhotReco);
@@ -619,6 +638,7 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     //// no cut in 2nd jet to produce gen response plot to have more stat
     //h1_responseGEN[theBin]->Fill( ptJetReco/ptJetGen, correctWeight );
       
+      //if( passedMedium_FULL && ( RECOTYPE_=="pf" && eTracksReco>0. ) ) {
       if( passedMedium_FULL ) {
 
         h1_ptPhot_medium->Fill( ptPhotReco, correctWeight );
@@ -629,8 +649,6 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
         theBinGEN -= 1; //because arrays start from 0
       
 
-        //h1_responseGEN[theBin]->Fill( ptJetReco/ptJetGen, correctWeight );
-        
         if( ptJetGen>ptPhot_binning[0] ) {
           h1_responseGEN[theBinGEN]->Fill( ptJetReco/ptJetGen, eventWeight );
           hp_ptJetGenMean->Fill( ptJetGen, ptJetGen, eventWeight );
@@ -642,14 +660,11 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
         h1_ptJetReco->Fill( ptJetReco, correctWeight );
         h1_pt2ndJetReco->Fill( pt2ndJetReco, correctWeight );
         hp_ptPhotMean->Fill( ptPhotReco, ptPhotReco, correctWeight );
-        h1_response[theBin]->Fill( ptJetReco/ptPhotReco, correctWeight );
+        h1_response[theBin]->Fill( response, correctWeight );
 
-   //   std::cout << "eMet: " << eMet << "\tptPhot: " << ptPhotReco << "\tphiMet: " << phiMet << "\tphiPhot: " << phiPhotReco << "\tdeltaPhi: " << phi_Phot_Met << "\tmpf: " << mpfResponse << std::endl;
-//        if( recoType=="pf" ) {
-          h1_deltaPhi_phot_met_medium->Fill( phi_Phot_Met, correctWeight );
-          h1_met_medium->Fill( eMet, correctWeight );
-          h1_responseMPF[theBin]->Fill( mpfResponse, correctWeight );
-//        } //if pf
+        h1_deltaPhi_phot_met_medium->Fill( phi_Phot_Met, correctWeight );
+        h1_met_medium->Fill( eMet, correctWeight );
+        h1_responseMPF[theBin]->Fill( mpfResponse, correctWeight );
           
       } //if second jet ok
 
@@ -681,13 +696,12 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
         h1_deltaPhi_2ndJet_loose->Fill( deltaPhi_2ndJet, correctWeight );
 
         hp_ptPhotMean_loose->Fill( ptPhotReco, ptPhotReco, correctWeight );
-        h1_response_loose[theBin]->Fill( ptJetReco/ptPhotReco, correctWeight );
+        h1_response_loose[theBin]->Fill( response, correctWeight );
 
-//        if( recoType=="pf" ) {
-          h1_deltaPhi_phot_met_loose->Fill( phi_Phot_Met, correctWeight );
-          h1_met_loose->Fill( eMet, correctWeight );
-          h1_responseMPF_loose[theBin]->Fill( mpfResponse, correctWeight );
-//        } //if pf
+        h1_deltaPhi_phot_met_loose->Fill( phi_Phot_Met, correctWeight );
+        h1_met_loose->Fill( eMet, correctWeight );
+        h1_responseMPF_loose[theBin]->Fill( mpfResponse, correctWeight );
+
       } //if second jet ok
 
     } //if loose
@@ -711,7 +725,13 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   if( useGenJets ) outfileName = outfileName + "_GENJETS";
   if( BINNINGFINO_ ) outfileName = outfileName + "_BINNINGFINO";
   if( ONEVTX_ ) outfileName = outfileName + "_ONEVTX";
-  if( TIGHTDELTAPHI_ ) outfileName = outfileName + "_TIGHTDPHI";
+  if( DELTAPHI_ != 1. ) {
+    char outfileName_char[300];
+    sprintf( outfileName_char, "%s_DPHI%d", outfileName.c_str(), (int)(10.*DELTAPHI_));
+    std::string outfileName_str( outfileName_char );
+    outfileName = outfileName_str;
+  }
+  if( ADD12_ ) outfileName = outfileName + "_ADD12";
   if( !noJetSelection && secondJetThreshold!=0.5 ) {
     std::string R = ( NO2ndJETABS ) ? "R" : "";
     char outfileName_char[300];
@@ -877,7 +897,7 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   delete h1_met_loose;
   h1_met_loose= 0;
   delete h1_met_medium;
-  h1_met_medium;
+  h1_met_medium = 0;
   delete h1_deltaPhi_phot_met_loose;
   h1_deltaPhi_phot_met_loose = 0;
   delete h1_deltaPhi_phot_met_medium;
