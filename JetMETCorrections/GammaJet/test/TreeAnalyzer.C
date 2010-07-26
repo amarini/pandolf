@@ -177,6 +177,15 @@ void TreeAnalyzer::LoadInput() {
    } else if( dataset_=="Wenu_Summer10_START37_V5_S09_v1" ) {
      sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/Wenu_Summer10_START37_V5_S09_v1/output_*.root/myanalysis/pippo");
      chain->Add(treePath);
+   } else if( dataset_=="H130ZZlljj_gluonfusion" ) {
+     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/H130ZZlljj_gluonfusion/output_*.root/myanalysis/pippo");
+     chain->Add(treePath);
+   } else if( dataset_=="H150ZZlljj_gluonfusion" ) {
+     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/H150ZZlljj_gluonfusion/output_*.root/myanalysis/pippo");
+     chain->Add(treePath);
+   } else if( dataset_=="H500ZZlljj_gluonfusion" ) {
+     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/H500ZZlljj_gluonfusion/output_*.root/myanalysis/pippo");
+     chain->Add(treePath);
    } else {
      sprintf(treePath, "%s/output_*.root/myanalysis/pippo", dataset_.c_str());
      chain->Add(treePath);
@@ -312,6 +321,7 @@ void TreeAnalyzer::Init(TTree *tree)
    fChain->SetBranchAddress("event", &event, &b_event);
    fChain->SetBranchAddress("nMC", &nMC, &b_nMC);
    fChain->SetBranchAddress("pdgIdMC", pdgIdMC, &b_pdgIdMC);
+   fChain->SetBranchAddress("motherIDMC", motherIDMC, &b_motherIDMC);
    fChain->SetBranchAddress("statusMC", statusMC, &b_statusMC);
    fChain->SetBranchAddress("ptMC ", ptMC , &b_ptMC );
    fChain->SetBranchAddress("eMC  ", eMC  , &b_eMC  );

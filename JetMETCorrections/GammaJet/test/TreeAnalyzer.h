@@ -50,6 +50,7 @@ public :
    Int_t           event;
    Int_t           nMC;
    Int_t           pdgIdMC[150];   //[nMC]
+   Int_t           motherIDMC[150];   //[nMC]
    Int_t           statusMC[150];   //[nMC]
    Float_t         ptMC [150];   //[nMC]
    Float_t         eMC  [150];   //[nMC]
@@ -299,6 +300,7 @@ public :
    TBranch        *b_event;   //!
    TBranch        *b_nMC;   //!
    TBranch        *b_pdgIdMC;   //!
+   TBranch        *b_motherIDMC;   //!
    TBranch        *b_statusMC;   //!
    TBranch        *b_ptMC ;   //!
    TBranch        *b_eMC  ;   //!
