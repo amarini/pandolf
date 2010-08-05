@@ -245,7 +245,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
         continue; 
 
      if( isMC )
-       if( ptHat_ > ptHatMax_ ) continue;
+       if( (ptHat_ > ptHatMax_) || (ptHat_ < ptHatMin_) ) continue;
 
 
      epfMet_ = epfMet;
