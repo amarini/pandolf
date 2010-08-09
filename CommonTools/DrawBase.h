@@ -27,6 +27,7 @@ struct MCFile {
   TFile* file;
   std::string name;
   int fillColor;
+  int fillStyle;
 };
 
 
@@ -50,13 +51,14 @@ class DrawBase {
 
   void set_analysisType( const std::string analysisType ) { analysisType_ = analysisType; };
   void set_dataFile( TFile* dataFile );
-  void add_mcFile( TFile* mcFile, const std::string& bgName, int bgFillColor );
+  void add_mcFile( TFile* mcFile, const std::string& name, int fillColor, int fillStyle=-1 );
   void set_outputdir( const std::string& outputdir ) { outputdir_ = outputdir; };
   void set_pt_thresh( Int_t pt_thresh ) { pt_thresh_ = pt_thresh; };
   void set_etamax( Float_t etamax ) { etamax_ = etamax; };
   void set_raw_corr( const std::string& raw_corr ) { raw_corr_ = raw_corr; };
   void set_pdf_aussi( bool pdf_aussi ) { pdf_aussi_ = pdf_aussi; };
   void set_scaleFactor( float scaleFactor ) { scaleFactor_ = scaleFactor;};
+  void set_noStack( bool set ) { noStack_ = set; };
 
   std::string get_CMSText() const;
   std::string get_analysisType() const { return analysisType_; };
@@ -94,6 +96,7 @@ class DrawBase {
   std::string raw_corr_;
   bool pdf_aussi_;
 
+  bool noStack_;
 
 };
 

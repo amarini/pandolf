@@ -23,6 +23,9 @@ DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType
 
   dataFile_ = 0;
 
+  pdf_aussi_ = false;
+  noStack_ = false;
+
   // this is needed to avoid the same-histogram problem:
   TH1F::AddDirectory(kFALSE);
 
@@ -94,6 +97,7 @@ void DrawBase::set_lumiNormalization( float givenLumi) {
   } else {
 
     scaleFactor_ = givenLumi; //this is set to normalize MC histograms to a given int luminosity (if plotted with no data)
+    lumi_ = givenLumi*1000000.; //givenlumi is in pb-1
 
   }
 
@@ -157,266 +161,6 @@ void DrawBase::set_sameInstanceNormalization() {
   std::cout << "ScaleFactor: " << scaleFactor_ << std::endl;
 
 }
-
-
-/*void DrawBase::drawHisto( std::string name, std::string etaRegion, std::string flags, int legendQuadrant, bool log_aussi) {
-
-  std::string histoName = name;
-  if( etaRegion!="" ) histoName = name + "_" + etaRegion;
-
-  TH1F* dataHisto = (TH1F*)dataFile_->Get(histoName.c_str());
-  TH1F* mcHisto = (TH1F*)mcFiles_[0]->Get(histoName.c_str()); //default: take first one. FIX THIS!
-
-  if( dataHisto==0 || mcHisto==0 ) {
-    std::cout << "Didn't find histo '" << histoName << "'. Continuing." << std::endl;
-    return;
-  }
-
-  mcHisto->SetFillColor(38);
-//mcHisto->SetFillColor(kRed-7);
-//mcHisto->SetLineColor(kRed);
-//mcHisto->SetLineWidth(2);
-
-  if( scaleFactor_ > 0. ) 
-    mcHisto->Scale(scaleFactor_);
-  else {
-    Float_t dataIntegral = dataHisto->Integral(0, dataHisto->GetNbinsX()+1);
-    Float_t mcIntegral = mcHisto->Integral(0, mcHisto->GetNbinsX()+1);
-    mcHisto->Scale( dataIntegral/mcIntegral );
-  }
-
-  dataHisto->SetMarkerStyle(20);
-
-  Float_t yAxisMaxScale = (name=="phiJet" || name=="etaJet") ? 1.8 : 1.6;
-  Float_t xMin = dataHisto->GetXaxis()->GetXmin();
-  Float_t xMax = dataHisto->GetXaxis()->GetXmax();
-  Float_t yMax_data = dataHisto->GetMaximum();
-  Float_t yMax_mc = mcHisto->GetMaximum();
-  Float_t yMax = (yMax_data>yMax_mc) ? yAxisMaxScale*yMax_data : yAxisMaxScale*yMax_mc;
-  Float_t yMin = 0.;
-
-
-  std::string xAxis = getAxisName(name);
-
-  std::string instanceName = (analysisType_=="PhotonJet") ? "Events" : "Jets";
-  std::string yAxis = instanceName;
-  if( name=="ptJet" || name=="ptCorrJet" ) {
-    char yAxis_char[60];
-    sprintf(yAxis_char, "%s/(%d GeV/c)", instanceName.c_str(), (Int_t)dataHisto->GetBinWidth(1));
-    std::string yAxis_tmp(yAxis_char);
-    yAxis=yAxis_tmp;
-  }  
-
-  if( name=="EchJet" || name=="EgammaJet" || name=="EnhJet" ) {
-    char yAxis_char[60];
-    if( dataHisto->GetBinWidth(1) < 1. ) sprintf(yAxis_char, "%s/(%.1f GeV)", instanceName.c_str(), dataHisto->GetBinWidth(1));
-    else                                 sprintf(yAxis_char, "%s/(%.0f GeV)", instanceName.c_str(), dataHisto->GetBinWidth(1));
-    std::string yAxis_tmp(yAxis_char);
-    yAxis=yAxis_tmp;
-  }  
-
-
-  if( name=="diJetMass" ) {
-    char yAxis_char[60];
-    sprintf(yAxis_char, "Events/(%.2f GeV/c^{2})", dataHisto->GetBinWidth(1));
-    std::string yAxis_tmp(yAxis_char);
-    yAxis=yAxis_tmp;
-  }  
-  if( name=="massJet" ) {
-    char yAxis_char[60];
-    sprintf(yAxis_char, "Jets/(%.2f GeV/c^{2})", dataHisto->GetBinWidth(1));
-    //sprintf(yAxis_char, "Jets/(%d GeV/c^{2})", (Int_t)dataHisto->GetBinWidth(1));
-    std::string yAxis_tmp(yAxis_char);
-    yAxis=yAxis_tmp;
-  }  
-  if( name=="deltaPhiJet" || name=="asymmJet" ) yAxis = "Events";
-
-  std::string etaRange = getEtaRangeText(etaRegion);
-
-  TH2D* h2_axes = new TH2D("axes", "", 10, xMin, xMax, 10, yMin, yMax);
-  h2_axes->SetXTitle(xAxis.c_str());
-  h2_axes->SetYTitle(yAxis.c_str());
-  h2_axes->GetXaxis()->SetTitleOffset(1.1);
-  h2_axes->GetYaxis()->SetTitleOffset(1.5);
-
-  if( legendQuadrant<0 || legendQuadrant>5 ) {
-    std::cout << "Invalid legendQuadrant! Exiting!" << std::endl;
-    exit(1);
-  }
-
-  Float_t legend_xMin;
-  Float_t legend_yMin;
-  Float_t legend_xMax;
-  Float_t legend_yMax;
-
-  if( legendQuadrant==1 ) {
-    legend_xMin = 0.6;
-    legend_yMin = 0.73;
-    legend_xMax = 0.88;
-    legend_yMax = 0.88;
-  } else if( legendQuadrant==0 ) {
-    legend_xMin = 0.5;
-    legend_yMin = 0.73;
-    legend_xMax = 0.73;
-    legend_yMax = 0.88;
-  } else if( legendQuadrant==2 ) {
-    legend_xMin = 0.18;
-    legend_yMin = 0.73;
-    legend_xMax = 0.41;
-    legend_yMax = 0.88;
-  } else if( legendQuadrant==5 ) {
-    legend_xMin = 0.4;
-    legend_yMin = 0.15;
-    legend_xMax = 0.6;
-    legend_yMax = 0.25;
-  }
-
-
-  TLegend* legend = new TLegend(legend_xMin, legend_yMin, legend_xMax, legend_yMax);
-  legend->SetFillColor(kWhite);
-  legend->SetTextSize(0.035);
-  legend->AddEntry(dataHisto, "Data", "P");
-  legend->AddEntry(mcHisto, "Simulation", "F");
-
-  TPaveText* label_cms = new TPaveText(0.25, 0.83, 0.42, 0.87, "brNDC");
-  label_cms->SetFillColor(kWhite);
-  label_cms->SetTextSize(0.038);
-  label_cms->SetTextFont(62);
-  label_cms->AddText("CMS Preliminary 2010");
-
-  TPaveText* label_sqrt = new TPaveText(0.25, 0.78, 0.42, 0.82, "brNDC");
-  label_sqrt->SetFillColor(kWhite);
-  label_sqrt->SetTextSize(0.038);
-  label_sqrt->SetTextFont(42);
-  std::string label_sqrt_text = this->getSqrtText();
-  label_sqrt->AddText(label_sqrt_text.c_str());
-  
-
-  TPaveText* label_cuts;
-
-  if( analysisType_ == "MinBias" ) {
-
-    Float_t label_cuts_xMin = 0.63;
-    Float_t label_cuts_yMin = 0.5;
-    Float_t label_cuts_xMax = 0.84;
-    Float_t label_cuts_yMax = 0.65;
-
-    if( name=="asymmJet" || name=="deltaPhiJet" || name=="RchJet" || name=="etaJet" || name=="phiJet" ) {
-     label_cuts_xMin = 0.25;
-     label_cuts_yMin = 0.60;
-     label_cuts_xMax = 0.36;
-     label_cuts_yMax = 0.73;
-    }
-    if( name=="RnhJet" ) {
-     label_cuts_xMin = 0.4;
-     label_cuts_yMin = 0.6;
-     label_cuts_xMax = 0.6;
-     label_cuts_yMax = 0.7;
-    }
-
-    label_cuts = new TPaveText(label_cuts_xMin, label_cuts_yMin, label_cuts_xMax, label_cuts_yMax,  "brNDC");
-    label_cuts->SetFillColor(kWhite);
-    label_cuts->SetTextSize(0.035);
-    label_cuts->SetTextFont(42);
-    std::string jetAlgoName = this->getAlgoName();
-    label_cuts->AddText(jetAlgoName.c_str());
-    if( name != "etaJet" )
-      label_cuts->AddText(etaRange.c_str());
-    if( name != "ptJet" && name != "ptCorrJet" ) {
-      char labelText[70];
-      sprintf( labelText, "p_{T}^{%s} > %d GeV/c", raw_corr_.c_str(), pt_thresh_);
-      label_cuts->AddText(labelText);
-    }
-
-  } else if( analysisType_=="PhotonJet" ) {
-
-    Float_t label_cuts_xMin = 0.63;
-    Float_t label_cuts_yMin = 0.5;
-    Float_t label_cuts_xMax = 0.84;
-    Float_t label_cuts_yMax = 0.65;
-
-    if( name=="deltaPhi" ) {
-     label_cuts_xMin = 0.25;
-     label_cuts_yMin = 0.60;
-     label_cuts_xMax = 0.36;
-     label_cuts_yMax = 0.73;
-    }
-    label_cuts = new TPaveText(label_cuts_xMin, label_cuts_yMin, label_cuts_xMax, label_cuts_yMax,  "brNDC");
-    label_cuts->SetFillColor(kWhite);
-    label_cuts->SetTextSize(0.035);
-    label_cuts->SetTextFont(42);
-    label_cuts->AddText("|#eta_{#gamma}| < 1.3");
-    label_cuts->AddText("Anti-k_{T} 0.5 PFJets");
-
-  } else {
-
-    std::cout << "AnalysisType: '" << analysisType_ << "' not yet implemented. Exiting." << std::endl;
-    exit(991);
-
-  }
-
-  TCanvas* c1 = new TCanvas("c1", "c1", 800, 800);
-  c1->cd();
-
-
-  h2_axes->Draw("");
-  mcHisto->Draw("histo same");
-  dataHisto->Draw("E same");
-  gPad->RedrawAxis();
-  legend->Draw("same");
-  label_cms->Draw("same");
-  label_sqrt->Draw("same");
-  label_cuts->Draw("same");
-
-
-
-  std::string canvasName = outputdir_ + "/" + name;
-  if( etaRegion!="" )
-    canvasName = canvasName + "_" + etaRegion;
-  if( flags!="" )
-    canvasName = canvasName + "_" + flags;
-  std::string canvasName_eps = canvasName + ".eps";
-  c1->SetLeftMargin(0.12);
-  c1->SetBottomMargin(0.12);
-  c1->SaveAs(canvasName_eps.c_str());
-  std::string canvasName_png = canvasName + ".png";
-  c1->SaveAs(canvasName_png.c_str());
-  std::string canvasName_pdf = canvasName + ".pdf";
-  if( pdf_aussi_ )
-    c1->SaveAs(canvasName_pdf.c_str());
-
-  if( log_aussi ) {
-    TH2D* h2_axes_log = new TH2D("axes_log", "", 10, xMin, xMax, 10, 0.5, 5.*yMax);
-    h2_axes_log->SetXTitle(xAxis.c_str());
-    h2_axes_log->SetYTitle(yAxis.c_str());
-    h2_axes_log->GetXaxis()->SetTitleOffset(1.1);
-    h2_axes_log->GetYaxis()->SetTitleOffset(1.5);
-    c1->SetLogy();
-    h2_axes_log->Draw("");
-    mcHisto->Draw("histo same");
-    dataHisto->Draw("E same");
-    gPad->RedrawAxis();
-    legend->Draw("same");
-    label_cms->Draw("same");
-    label_sqrt->Draw("same");
-    label_cuts->Draw("same");
-    std::string canvasName_log = canvasName + "_log";
-    canvasName_eps = canvasName_log + ".eps";
-    c1->SaveAs(canvasName_eps.c_str());
-    canvasName_png = canvasName_log + ".png";
-    c1->SaveAs(canvasName_png.c_str());
-    canvasName_pdf = canvasName_log + ".pdf";
-    if( pdf_aussi_ )
-      c1->SaveAs(canvasName_pdf.c_str());
-    delete h2_axes_log;
-  }
-    
-  delete c1;
-  delete legend;
-  delete h2_axes;
-
-} //drawHisto
-*/
 
 
 
@@ -1131,20 +875,29 @@ void DrawBase::drawHisto( std::string name, std::string etaRegion, std::string f
     } // if !nomc
 
 
-    if( !noDATA && !noMC ) {
-      // normalize:
-      if( scaleFactor_ > 0. ) {
-        mcHisto_sum->Scale(scaleFactor_);
-        for( unsigned i=0; i<mcHistos.size(); ++i )
-          mcHistos[i]->Scale(scaleFactor_);
-      } else {
+    // normalize:
+    if( scaleFactor_ > 0. ) {
+      mcHisto_sum->Scale(scaleFactor_);
+      for( unsigned i=0; i<mcHistos.size(); ++i )
+        mcHistos[i]->Scale(scaleFactor_);
+    } else {
+      if( !noDATA && !noMC ) { //normalize mc to data shape
         Float_t dataIntegral = dataHisto->Integral(0, dataHisto->GetNbinsX()+1);
         Float_t mcIntegral = mcHisto_sum->Integral(0, mcHisto_sum->GetNbinsX()+1);
         mcHisto_sum->Scale( dataIntegral/mcIntegral );
         for( unsigned i=0; i<mcHistos.size(); ++i )
           mcHistos[i]->Scale( dataIntegral/mcIntegral );
-      } //if scalefactor
-    }
+      } else if( noDATA ) { //normalize each MC to its area
+        Float_t mcIntegral = mcHisto_sum->Integral(0, mcHisto_sum->GetNbinsX()+1);
+        mcHisto_sum->Scale( 1./mcIntegral );
+        for( unsigned i=0; i<mcHistos.size(); ++i ) {
+          mcIntegral = mcHistos[i]->Integral(0, mcHistos[i]->GetNbinsX()+1);
+          mcHistos[i]->Scale( 1./mcIntegral );
+        }
+      } else {
+        std::cout << "DATA and MC files not properly initialized. Will not normalize." << std::endl;
+      }
+    } //if scalefactor
 
     // create stack:
     THStack* mcHisto_stack = new THStack();
@@ -1168,7 +921,7 @@ void DrawBase::drawHisto( std::string name, std::string etaRegion, std::string f
 
     std::string xAxis = getAxisName(name);
 
-    std::string instanceName = (analysisType_=="PhotonJet") ? "Events" : "Jets";
+    std::string instanceName = (analysisType_=="MinBias") ? "Jets" : "Events";
     std::string yAxis = instanceName;
     if( name=="ptJet" || name=="ptCorrJet" ) {
       char yAxis_char[50];
@@ -1186,9 +939,14 @@ void DrawBase::drawHisto( std::string name, std::string etaRegion, std::string f
     }  
 
 
-    if( name=="diJetMass" ) {
+    if( name=="diJetMass" || name=="ZZInvMass" || name=="LeptLeptInvMass" || name=="JetJetInvMass" || name=="EleEleInvMass" || name=="MuMuInvMass" ) {
       char yAxis_char[50];
-      sprintf(yAxis_char, "Events/(%.2f GeV/c^{2})", refHisto->GetBinWidth(1));
+      double fractpart, intpart;
+      fractpart = modf( refHisto->GetBinWidth(1), &intpart);
+      if(fractpart==0.)
+        sprintf(yAxis_char, "Events/(%.0f GeV/c^{2})", refHisto->GetBinWidth(1));
+      else
+        sprintf(yAxis_char, "Events/(%.2f GeV/c^{2})", refHisto->GetBinWidth(1));
       std::string yAxis_tmp(yAxis_char);
       yAxis=yAxis_tmp;
     }  
@@ -1199,6 +957,8 @@ void DrawBase::drawHisto( std::string name, std::string etaRegion, std::string f
       yAxis=yAxis_tmp;
     }  
     if( name=="deltaPhiJet" || name=="asymmJet" ) yAxis = "Events";
+
+    if( scaleFactor_ < 0. ) yAxis = "Normalized to Unity";
 
     std::string etaRange = getEtaRangeText( etaRegion );
 
@@ -1352,8 +1112,17 @@ void DrawBase::drawHisto( std::string name, std::string etaRegion, std::string f
     c1->cd();
 
     h2_axes->Draw("");
-    if( !noMC )
-      mcHisto_stack->Draw("histo same");
+    if( !noMC ) {
+      if( !noStack_ ) {
+        mcHisto_stack->Draw("histo same");
+      } else {
+        for( unsigned i=0; i<mcHistos.size(); ++i ) {
+          int backwardsIndex = mcHistos.size()-1-i; //backwards is prettier: bg on the back, signal in front
+          mcHistos[backwardsIndex]->SetFillStyle(mcFiles_[backwardsIndex].fillStyle);
+          mcHistos[backwardsIndex]->Draw("h same");
+        }
+      }
+    } // if !nomc
     if( !noDATA )
       dataHisto->Draw("E same");
     gPad->RedrawAxis();
@@ -1494,8 +1263,17 @@ void DrawBase::drawHisto( std::string name, std::string etaRegion, std::string f
         h2_axes_log->GetXaxis()->SetMoreLogLabels();
       }
       h2_axes_log->Draw("");
-      if( !noMC )
-        mcHisto_stack->Draw("histo same");
+      if( !noMC ) {
+        if( !noStack_ ) {
+          mcHisto_stack->Draw("histo same");
+        } else {
+          for( unsigned i=0; i<mcHistos.size(); ++i ) {
+            int fillStyle = 3000+i+1;
+            mcHistos[i]->SetFillStyle(fillStyle);
+            mcHistos[i]->Draw("h same");
+          }
+        }
+      } // if !nomc
       if( !noDATA )
         dataHisto->Draw("E same");
       gPad->RedrawAxis();
@@ -2092,7 +1870,11 @@ std::string DrawBase::getAxisName(std::string name) {
   if( name=="MoEJet" ) axisName = "Jet Invariant Mass / Energy";
   if( name=="ptOverMJet" ) axisName = "Jet p_{T} / Invariant Mass";
   if( name=="pOverMJet" ) axisName = "Jet Momentum / Invariant Mass";
-  if( name=="diJetMass" ) axisName = "DiJet Invariant Mass [GeV/c ^{2}]";
+  if( name=="diJetMass" || name=="JetJetMass" ) axisName = "DiJet Invariant Mass [GeV/c ^{2}]";
+  if( name=="ZZInvMass" ) axisName = "ZZ Invariant Mass [GeV/c ^{2}]";
+  if( name=="LeptLeptMass" ) axisName = "DiLepton Invariant Mass [GeV/c ^{2}]";
+  if( name=="EleEleMass" ) axisName = "DiElectron Invariant Mass [GeV/c ^{2}]";
+  if( name=="MuMuMass" ) axisName = "DiMuon Invariant Mass [GeV/c ^{2}]";
   if( name=="EphotAveJet" ) axisName = "Average Photon Energy in Jet [GeV]";
   if( name=="NchJet" || name=="Nch" ) axisName = "Number of Charged Hadrons in Jet";
   if( name=="NgammaJet" || name=="Ngamma" ) axisName = "Number of Photons in Jet";
@@ -2397,15 +2179,18 @@ void DrawBase::set_dataFile( TFile* dataFile ) {
 
 
 
-void DrawBase::add_mcFile( TFile* mcFile, const std::string& bgName, int bgFillColor ) {
+void DrawBase::add_mcFile( TFile* mcFile, const std::string& name, int fillColor, int fillStyle ) {
 
   MCFile thisfile;
   thisfile.file = mcFile;
-  thisfile.name = bgName;
-  thisfile.fillColor = bgFillColor;
+  thisfile.name = name;
+  thisfile.fillColor = fillColor;
+  if( fillStyle==-1 ) {
+    thisfile.fillStyle = ( 3004+mcFiles_.size() ); //default
+  } else {
+    thisfile.fillStyle=fillStyle;
+  }
   mcFiles_.push_back( thisfile );
-//mcNames_.push_back( bgName );
-//mcFillColors_.push_back( bgFillColor );
 
 }
 
@@ -2435,8 +2220,7 @@ std::string DrawBase::getEtaRangeText( const std::string& etaRegion ) const {
 
 std::string DrawBase::getSqrtText() const {
 
-  if( lumi_==0. ) {
-    std::cout << "WARNING! Lumi histogram not found!" << std::endl;
+  if( lumi_==0. || scaleFactor_ < 0. ) {
     return std::string("#sqrt{s} = 7 TeV");
   }
   float lumi4Text(lumi_);
@@ -2449,7 +2233,13 @@ std::string DrawBase::getSqrtText() const {
   if( lumi4Text > 100. ) {
     lumi4Text /= 1000.;
     units = "pb ^{-1}";
-  } else if(  lumi4Text > 10. ) {
+  }
+  if( lumi4Text > 100. ) {
+    lumi4Text /= 1000.;
+    units = "fb ^{-1}";
+  }
+  
+  if(  lumi4Text > 10. ) {
     onlyOneDecimal=true;
   }
 
