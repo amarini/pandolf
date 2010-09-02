@@ -18,6 +18,7 @@
 
 
 bool DEBUG_ = false;
+bool MCassoc_ = false;
 bool BINNINGFINO_ = false;
 bool ONEVTX_ = false;
 bool NO2ndJETABS = false;
@@ -25,6 +26,7 @@ bool ADD12_ = false;
 float DELTAPHI_ = 1.;
 std::string RECOTYPE_;
 std::string ALGOTYPE_;
+std::string PARTTYPE_;
 std::string suffix;
 
 TChain* tree;
@@ -36,7 +38,7 @@ std::vector<TH1F*> getResponseHistos(const std::string& name);
 
 
 
-void finalize(const std::string& dataset, std::string recoType, std::string jetAlgo="akt5", float secondJetThreshold=0.5, bool useGenJets=false, bool MCassoc=false) {
+void finalize(const std::string& dataset, std::string recoType, std::string jetAlgo="akt5", float secondJetThreshold=0.5, std::string partType="", bool useGenJets=false) {
 
   bool noJetSelection = ( secondJetThreshold < 0. );
 
@@ -46,6 +48,8 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
   ALGOTYPE_ = (recoType=="calo") ? jetAlgo : recoType+jetAlgo;
   if( recoType=="jpt"&&jetAlgo=="akt5" ) ALGOTYPE_="jptak5"; 
+
+  PARTTYPE_ = partType;
 
   std::string infileName, treeName;
 
@@ -300,18 +304,24 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
 
   TProfile* hp_ptJetGenMean = new TProfile("ptJetGenMean", "", ptPhot_binning.size()-1, ptPhotBinning_array);
+  TProfile* hp_ptJetGenMean_loose = new TProfile("ptJetGenMean_loose", "", ptPhot_binning.size()-1, ptPhotBinning_array);
+  TProfile* hp_ptJetGenMean_clusterOK = new TProfile("ptJetGenMean_clusterOK", "", ptPhot_binning.size()-1, ptPhotBinning_array);
   TProfile* hp_ptPhotMean = new TProfile("ptPhotMean", "", ptPhot_binning.size()-1, ptPhotBinning_array);
   TProfile* hp_ptPhotMean_loose = new TProfile("ptPhotMean_loose", "", ptPhot_binning.size()-1, ptPhotBinning_array);
+  TProfile* hp_ptPhotMean_clusterOK = new TProfile("ptPhotMean_clusterOK", "", ptPhot_binning.size()-1, ptPhotBinning_array);
 
   std::vector<TH1F*> h1_response              = getResponseHistos("response");
   std::vector<TH1F*> h1_responseGEN           = getResponseHistos("responseGEN");
+  std::vector<TH1F*> h1_responsePART          = getResponseHistos("responsePART");
   std::vector<TH1F*> h1_responseMPF           = getResponseHistos("responseMPF");
 
   std::vector<TH1F*> h1_response_clusterOK    = getResponseHistos("response_clusterOK");
   std::vector<TH1F*> h1_responseGEN_clusterOK = getResponseHistos("responseGEN_clusterOK");
+  std::vector<TH1F*> h1_responsePART_clusterOK = getResponseHistos("responsePART_clusterOK");
 
   std::vector<TH1F*> h1_response_loose        = getResponseHistos("response_loose");
   std::vector<TH1F*> h1_responseGEN_loose     = getResponseHistos("responseGEN_loose");
+  std::vector<TH1F*> h1_responsePART_loose     = getResponseHistos("responsePART_loose");
   std::vector<TH1F*> h1_responseMPF_loose     = getResponseHistos("responseMPF_loose");
 
 
@@ -485,12 +495,15 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
     if( ptPhotReco<ptPhot_binning[0] ) continue;
     if( fabs(etaPhotReco)>1.3 ) continue;
-    if( clusterMinPhotReco<0.15 && !MCassoc && !useGenJets ) continue; //protection vs EB spikes
+    if( clusterMinPhotReco<0.15 && !MCassoc_ && !useGenJets ) continue; //protection vs EB spikes
 
 
     //first find correct photon pt bin:
     int theBin = hp_ptPhotMean->FindBin( ptPhotReco );
     theBin -= 1; //because arrays start from 0
+
+    int theBinGEN = hp_ptPhotMean->FindBin( ptJetGen );
+    theBinGEN -= 1; //because arrays start from 0
 
 
     //leading jet and photon back2back in transverse plane
@@ -503,6 +516,18 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
     Float_t deltaPhi_2ndJet = fabs(fitTools::delta_phi(phiPhotReco, phi2ndJetReco));
 
+    
+    // parton flavour selection:
+    bool partFlavorOK = true;
+    if( PARTTYPE_=="QUARK" ) {
+      partFlavorOK = ( (fabs(pdgIdPart)==1) || (fabs(pdgIdPart)==2) || (fabs(pdgIdPart)==3) );
+    } else if( PARTTYPE_=="GLUON" ) {
+      partFlavorOK = ( (fabs(pdgIdPart)==8) );
+    } else if( PARTTYPE_!="" ) {
+      std::cout << " --> WARNING!!! Parton type '" << PARTTYPE_ << "' not implemented yet. No selection will be applied." << std::endl;
+    }
+
+    if( !partFlavorOK ) continue;
 
 
     bool secondJetOK;
@@ -582,7 +607,12 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
         h1_phiPhot_clusterOK->Fill( phiPhotReco, eventWeight );
         h1_etaPhot_clusterOK->Fill( etaPhotReco, eventWeight );
         h1_response_clusterOK[theBin]->Fill( ptJetReco/ptPhotReco, eventWeight );
-        h1_responseGEN_clusterOK[theBin]->Fill( ptJetReco/ptJetGen, eventWeight );
+        hp_ptPhotMean_clusterOK->Fill( ptJetReco, ptJetReco, eventWeight );
+        if( ptJetGen>ptPhot_binning[0] ) {
+          h1_responseGEN_clusterOK[theBinGEN]->Fill( ptJetReco/ptJetGen, eventWeight );
+          h1_responsePART_clusterOK[theBinGEN]->Fill( ptJetGen/ptPart, eventWeight );
+          hp_ptJetGenMean_clusterOK->Fill( ptJetGen, ptJetGen, eventWeight );
+        }
       } //if back2back
     }
 
@@ -595,8 +625,8 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     h1_clusterMinPhotReco->Fill( clusterMinPhotReco, eventWeight );
 
 
-    bool photonOK_medium = (isIsolated_medium && clusterShapeOK_medium) || MCassoc || useGenJets;
-    bool photonOK_loose  = (isIsolated_loose  && clusterShapeOK_medium) || MCassoc || useGenJets;
+    bool photonOK_medium = (isIsolated_medium && clusterShapeOK_medium) || MCassoc_ || useGenJets;
+    bool photonOK_loose  = (isIsolated_loose  && clusterShapeOK_medium) || MCassoc_ || useGenJets;
 
 
     // compute response:
@@ -645,12 +675,9 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
         h1_deltaPhi_2ndJet_medium->Fill( deltaPhi_2ndJet, correctWeight );
         
-        int theBinGEN = hp_ptPhotMean->FindBin( ptJetGen );
-        theBinGEN -= 1; //because arrays start from 0
-      
-
         if( ptJetGen>ptPhot_binning[0] ) {
           h1_responseGEN[theBinGEN]->Fill( ptJetReco/ptJetGen, eventWeight );
+          h1_responsePART[theBinGEN]->Fill( ptJetGen/ptPart, eventWeight );
           hp_ptJetGenMean->Fill( ptJetGen, ptJetGen, eventWeight );
         }
 
@@ -687,7 +714,11 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     
       if( passedLoose_FULL ) {
 
-        h1_responseGEN_loose[theBin]->Fill( ptJetReco/ptJetGen, correctWeight );
+        if( ptJetGen>ptPhot_binning[0] ) {
+          h1_responseGEN_loose[theBinGEN]->Fill( ptJetReco/ptJetGen, correctWeight );
+          h1_responsePART_loose[theBinGEN]->Fill( ptJetGen/ptPart, correctWeight );
+          hp_ptJetGenMean->Fill( ptJetGen, ptJetGen, eventWeight );
+        }
 
         h1_ptPhot_loose->Fill( ptPhotReco, correctWeight );
         h1_phiPhot_loose->Fill( phiPhotReco, correctWeight );
@@ -721,8 +752,9 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
   outfileName = outfileName + suffix;
   if( noJetSelection ) outfileName = outfileName + "_NOJETSEL";
-  if( MCassoc ) outfileName = outfileName + "_MCassoc";
+  if( MCassoc_ ) outfileName = outfileName + "_MCassoc";
   if( useGenJets ) outfileName = outfileName + "_GENJETS";
+  if( PARTTYPE_!="" ) outfileName = outfileName + "_" + PARTTYPE_;
   if( BINNINGFINO_ ) outfileName = outfileName + "_BINNINGFINO";
   if( ONEVTX_ ) outfileName = outfileName + "_ONEVTX";
   if( DELTAPHI_ != 1. ) {
@@ -806,16 +838,21 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   h1_clusterMinPhotReco->Write();
 
   hp_ptJetGenMean->Write();
+  hp_ptJetGenMean_loose->Write();
+  hp_ptJetGenMean_clusterOK->Write();
   hp_ptPhotMean->Write();
   hp_ptPhotMean_loose->Write();
+  hp_ptPhotMean_clusterOK->Write();
 
   for( unsigned i=0; i<h1_response.size(); ++i ) {
     h1_response[i]->Write();
     h1_responseGEN[i]->Write();
+    h1_responsePART[i]->Write();
     h1_response_loose[i]->Write();
     h1_responseGEN_loose[i]->Write();
+    h1_responsePART_loose[i]->Write();
     h1_response_clusterOK[i]->Write();
-    h1_responseGEN_clusterOK[i]->Write();
+    h1_responsePART_clusterOK[i]->Write();
 
 //    if( recoType=="pf" ) {
       h1_responseMPF[i]->Write();
@@ -926,16 +963,24 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   h1_ptSecondJetRel_clusterOK_isolated = 0;
   delete hp_ptJetGenMean;
   hp_ptJetGenMean = 0;
+  delete hp_ptJetGenMean_loose;
+  hp_ptJetGenMean_loose = 0;
+  delete hp_ptJetGenMean_clusterOK;
+  hp_ptJetGenMean_clusterOK = 0;
   delete hp_ptPhotMean;
   hp_ptPhotMean = 0;
   delete hp_ptPhotMean_loose;
   hp_ptPhotMean_loose = 0;
+  delete hp_ptPhotMean_clusterOK;
+  hp_ptPhotMean_clusterOK = 0;
 
   for( unsigned i=0; i< h1_response.size(); ++i) {
     delete h1_response[i];
     h1_response[i]=0;
     delete h1_responseGEN[i];
     h1_responseGEN[i]=0;
+    delete h1_responsePART[i];
+    h1_responsePART[i]=0;
     delete h1_responseMPF[i];
     h1_responseMPF[i]=0;
 
@@ -943,11 +988,15 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     h1_response_clusterOK[i]=0;
     delete h1_responseGEN_clusterOK[i];
     h1_responseGEN_clusterOK[i]=0;
+    delete h1_responsePART_clusterOK[i];
+    h1_responsePART_clusterOK[i]=0;
 
     delete h1_response_loose[i];
     h1_response_loose[i]=0;
     delete h1_responseGEN_loose[i];
     h1_responseGEN_loose[i]=0;
+    delete h1_responsePART_loose[i];
+    h1_responsePART_loose[i]=0;
     delete h1_responseMPF_loose[i];
     h1_responseMPF_loose[i]=0;
   }
