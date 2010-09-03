@@ -35,6 +35,9 @@ Double_t totalLumi=0.;
 
 void addInput(const std::string& dataset);
 std::vector<TH1F*> getResponseHistos(const std::string& name);
+std::vector< std::vector< TH1D* > > getExtrapHistoVector(const std::string& name, const std::string& abs_rel, Int_t nPoints, bool is_pt=false);
+void deleteExtrapHistoVector(std::vector< std::vector< TH1D* > > histoVector, int nPoints);
+
 
 
 
@@ -144,22 +147,10 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     addInput( "EG_Run2010A_PromptReco_v4_139347_139375" );
     addInput( "EG_Run2010A_PromptReco_v4_139376_139459" );
 
-  } else if( dataset=="DATA_EG_NEW" ) {
+  } else if( dataset=="DATA_EG_37X" ) {
 
-    addInput( "MinimumBias_Commissioning10_SD_EG_Jun14thSkim_v1_80MeV_MET" );
-    addInput( "EG_Run2010A_Jun14thReReco_v1_80MeV_MET" );
-    addInput( "EG_Run2010A_PromptReco_v4_80MeV_MET" );
-
-  } else if( dataset=="DATA_EG_1" ) {
-
-    addInput( "MinimumBias_Commissioning10_SD_EG_Jun14thSkim_v1" );
-    addInput( "EG_Run2010A-Jun14thReReco_v1" );
-
-  } else if( dataset=="DATA_EG_2" ) {
-
-    addInput( "EG_Run2010A-PromptReco-v4" );
-    addInput( "EG_Run2010A_PromptReco_v4_139347_139375" );
-    addInput( "EG_Run2010A_PromptReco_v4_139376_139459" );
+    addInput( "EG_Run2010A_Jul15thReReco_v1" );
+    addInput( "EG_Run2010A_Jul26thReReco_v1" );
 
   } else {
   
@@ -286,16 +277,6 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   h1_deltaPhi_clusterOK_isolated->Sumw2();
   TH1D* h1_ptSecondJetRel_clusterOK_isolated = new TH1D("ptSecondJetRel_clusterOK_isolated", "", 15, 0., 1.5);
   h1_ptSecondJetRel_clusterOK_isolated->Sumw2();
-//TH1D* h1_response = new TH1D("response", "", 15, 0., 2.);
-//h1_response->Sumw2();
-
-//std::vector<TH1F*> h1_ptPhotMean;
-//for( unsigned i=0; i<(ptPhot_binning.size()-1); ++i ) {
-//  Float_t ptMin = ptPhot_binning[i];
-//  Float_t ptMax = ptPhot_binning[i+1];
-//  char histoName[100];
-//  sprintf( histoName, "ptPhot_%.0f_%.0f", ptMin, ptMax );
-//  TH1F* tmp = new Th1F(histoName, "", 
 
 
   Double_t ptPhotBinning_array[200]; //ugly! no more than 200 pt bins supported
@@ -317,13 +298,20 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
   std::vector<TH1F*> h1_response_clusterOK    = getResponseHistos("response_clusterOK");
   std::vector<TH1F*> h1_responseGEN_clusterOK = getResponseHistos("responseGEN_clusterOK");
-  std::vector<TH1F*> h1_responsePART_clusterOK = getResponseHistos("responsePART_clusterOK");
+  std::vector<TH1F*> h1_responsePART_clusterOK= getResponseHistos("responsePART_clusterOK");
 
   std::vector<TH1F*> h1_response_loose        = getResponseHistos("response_loose");
   std::vector<TH1F*> h1_responseGEN_loose     = getResponseHistos("responseGEN_loose");
-  std::vector<TH1F*> h1_responsePART_loose     = getResponseHistos("responsePART_loose");
+  std::vector<TH1F*> h1_responsePART_loose    = getResponseHistos("responsePART_loose");
   std::vector<TH1F*> h1_responseMPF_loose     = getResponseHistos("responseMPF_loose");
 
+
+  // and now allocate histograms for 2nd jet pt extrapolation:
+  int nPoints = 5;
+  std::vector< std::vector< TH1D* > > h1_RecoPhot_vs_recoRel = getExtrapHistoVector("RecoPhot_vs_RecoRel", "rel", nPoints);
+  std::vector< std::vector< TH1D* > > h1_RecoGen_vs_recoRel  = getExtrapHistoVector("RecoGen_vs_RecoRel",  "rel", nPoints);
+  std::vector< std::vector< TH1D* > > h1_GenPhot_vs_recoRel  = getExtrapHistoVector("GenPhot_vs_RecoRel",  "rel", nPoints);
+  std::vector< std::vector< TH1D* > > h1_pt2ndJetRecoRelMean = getExtrapHistoVector("pt2ndJetRecoRelMean", "rel", nPoints, (bool)true);
 
 
   Int_t run;
@@ -665,10 +653,30 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
       Float_t correctWeight = (useGenJets) ? eventWeight_medium : eventWeight;
 
-    //// no cut in 2nd jet to produce gen response plot to have more stat
-    //h1_responseGEN[theBin]->Fill( ptJetReco/ptJetGen, correctWeight );
+      // --------------------------------------
+      // BEGIN  extrapolation to pt(2ndjet)->0:
+      // --------------------------------------
+      Float_t minPerc = h1_pt2ndJetRecoRelMean[theBin][0]->GetXaxis()->GetXmin();
+      Float_t percStep = h1_pt2ndJetRecoRelMean[theBin][0]->GetXaxis()->GetXmax()  - minPerc;
+      Double_t pt2ndJetRecoRel = 100.*pt2ndJetReco/ptPhotReco; //in percentage
+      int iRecoRel = (int)floor((pt2ndJetRecoRel-minPerc)/percStep);
+    
+      Float_t r_RecoPhot = ptJetReco/ptPhotReco;
+      Float_t r_RecoGen  = ptJetReco/ptJetGen;
+      Float_t r_GenPhot  = ptJetGen/ptPhotReco;
+
+      if( (iRecoRel>=0)&&(iRecoRel<5) ) {
+        if(r_RecoPhot!=0.) h1_RecoPhot_vs_recoRel[theBin][iRecoRel]->Fill(r_RecoPhot, eventWeight);
+        if(r_RecoGen!=0.)  h1_RecoGen_vs_recoRel[theBin][iRecoRel]->Fill(r_RecoGen, eventWeight);
+        if(r_GenPhot!=0.)  h1_GenPhot_vs_recoRel[theBin][iRecoRel]->Fill(r_GenPhot, eventWeight);
+        h1_pt2ndJetRecoRelMean[theBin][iRecoRel]->Fill(pt2ndJetRecoRel, eventWeight);
+      } 
+      // --------------------------------------
+      // END  extrapolation to pt(2ndjet)->0:
+      // --------------------------------------
+
+
       
-      //if( passedMedium_FULL && ( RECOTYPE_=="pf" && eTracksReco>0. ) ) {
       if( passedMedium_FULL ) {
 
         h1_ptPhot_medium->Fill( ptPhotReco, correctWeight );
@@ -853,13 +861,24 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     h1_responsePART_loose[i]->Write();
     h1_response_clusterOK[i]->Write();
     h1_responsePART_clusterOK[i]->Write();
+    h1_responseMPF[i]->Write();
+    h1_responseMPF_loose[i]->Write();
 
-//    if( recoType=="pf" ) {
-      h1_responseMPF[i]->Write();
-      h1_responseMPF_loose[i]->Write();
-//    }
+    TF1* gaussian = new TF1("gaussian", "gaus");
+    Float_t nSigma = 2.5;
+
+    for( int ip=0; ip<nPoints; ++ip) {
+      
+      fitTools::fitProjection(h1_RecoPhot_vs_recoRel[i][ip], gaussian, nSigma, "QR");
+      h1_RecoPhot_vs_recoRel[i][ip]->Write();
+      fitTools::fitProjection(h1_RecoGen_vs_recoRel[i][ip], gaussian, nSigma, "QR");
+      h1_RecoGen_vs_recoRel[i][ip]->Write();
+      fitTools::fitProjection(h1_GenPhot_vs_recoRel[i][ip], gaussian, nSigma, "QR");
+      h1_GenPhot_vs_recoRel[i][ip]->Write();
+      h1_pt2ndJetRecoRelMean[i][ip]->Write();
+     
+    } //for npoints
   }
-
 
   outFile->Close();
 
@@ -922,8 +941,6 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   h1_clusterMajPhotReco_isolated = 0;
   delete h1_clusterMinPhotReco_isolated;
   h1_clusterMinPhotReco_isolated = 0;
-//delete h1_response;
-//h1_response = 0;
 
   delete h1_totalLumi;
   h1_totalLumi = 0;
@@ -1000,6 +1017,12 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     delete h1_responseMPF_loose[i];
     h1_responseMPF_loose[i]=0;
   }
+
+
+  deleteExtrapHistoVector(h1_RecoPhot_vs_recoRel, nPoints);
+  deleteExtrapHistoVector(h1_RecoGen_vs_recoRel, nPoints);
+  deleteExtrapHistoVector(h1_GenPhot_vs_recoRel, nPoints);
+  deleteExtrapHistoVector(h1_pt2ndJetRecoRelMean, nPoints);
 
   delete tree;
   tree = 0;
@@ -1083,3 +1106,93 @@ std::vector<TH1F*> getResponseHistos(const std::string& name) {
 
 }
 
+
+std::vector< std::vector< TH1D* > > getExtrapHistoVector(const std::string& name, const std::string& abs_rel, Int_t nPoints, bool is_pt) {
+
+
+  std::vector< std::vector< TH1D* > > returnVector;
+
+  std::vector<float> ptPhot_binning = fitTools::getPtPhot_binning();
+
+
+  for( int i_ptBin=0; i_ptBin<(ptPhot_binning.size()-1); ++i_ptBin ) {
+
+    std::vector< TH1D* > histoVector;
+    returnVector.push_back( histoVector );
+
+    Float_t minPt;
+    Float_t ptStep;
+    if( abs_rel=="abs" ) {
+      minPt = 5.;
+      ptStep = 5.;
+    } else { //minpt and step are in percent:
+
+      if( RECOTYPE_=="pf"||RECOTYPE_=="jpt" ) {
+        if( ptPhot_binning[i_ptBin]<=80.) {
+          minPt = 8.;
+          ptStep = 3.;
+        } else if( ptPhot_binning[i_ptBin]<=350.) {
+          minPt = 5.;
+          ptStep = 3.;
+        } else {
+          minPt = 2.;
+          ptStep = 2.;
+        }
+      } else { //is calo
+        if( ptPhot_binning[i_ptBin]<=80.) {
+          minPt = 8.;
+          ptStep = 1.5;
+        } else if( ptPhot_binning[i_ptBin]<=350.) {
+          minPt = 6.;
+          ptStep = 2.;
+        } else {
+          minPt = 2.;
+          ptStep = 2.;
+        }
+      } //if calo-pf
+    }
+ 
+    double iPt = minPt;
+    Int_t nBins = 50;
+
+    for( int i=0; i<nPoints; ++i) {
+
+      Double_t xMin = (is_pt) ? iPt : 0.;
+      Double_t xMax = (is_pt) ? (iPt+ptStep) : 2.;
+
+      TH1D* tmp;
+
+      std::string prefix = (is_pt) ? "" : "r_";
+      char histName[100];
+      sprintf(histName, "%s%s_%d_%d", prefix.c_str(), name.c_str(), i_ptBin, i);
+      tmp = new TH1D(histName, "", nBins, xMin, xMax); 
+      tmp->Sumw2();
+      returnVector[i_ptBin].push_back(tmp);
+
+      iPt+=ptStep;
+
+    } //for nPoints
+
+  } //for ptBins
+
+
+  return returnVector;
+
+}
+  
+
+void deleteExtrapHistoVector(std::vector< std::vector< TH1D* > > histoVector, int nPoints) {
+
+  std::vector<float> ptPhot_binning = fitTools::getPtPhot_binning();
+
+  for( int i_ptBin=0; i_ptBin<(ptPhot_binning.size()-1); ++i_ptBin ) {
+
+    for( int i=0; i<nPoints; ++i) {
+
+      delete histoVector[i_ptBin][i];
+      histoVector[i_ptBin][i] = 0;
+
+    }
+  }
+
+}
