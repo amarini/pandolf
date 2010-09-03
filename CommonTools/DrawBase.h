@@ -43,8 +43,7 @@ class DrawBase {
   void set_sameEventNormalization();
   void set_sameInstanceNormalization();
 
-  void drawHisto( std::string name, std::string etaRegion, std::string flags, int legendQuadrant=1, bool log_aussi=false);
-//  void drawHisto_onlyData( std::string name, std::string etaRegion, std::string flags, int legendQuadrant=1, bool log_aussi=false);
+  void drawHisto( std::string name, std::string etaRegion, std::string flags, std::string axisName="", int legendQuadrant=1, bool log_aussi=false);
   void drawProfile( std::string yVar, std::string xVar, int legendQuadrant=1);
   void drawStack(const std::string& varY, const std::string& varX, const std::string& RECO_GEN, bool isData) const { this->drawStack( varY, varX, "", RECO_GEN, isData); };
   void drawStack(const std::string& varY, const std::string& varX, const std::string& etaRegion, const std::string& RECO_GEN, bool isData) const;
