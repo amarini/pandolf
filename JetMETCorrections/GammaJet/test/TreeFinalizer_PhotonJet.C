@@ -1,3 +1,4 @@
+
 #include <TH2F.h>
 #include <TH1D.h>
 #include <TProfile.h>
@@ -288,6 +289,7 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   TProfile* hp_ptJetGenMean_loose = new TProfile("ptJetGenMean_loose", "", ptPhot_binning.size()-1, ptPhotBinning_array);
   TProfile* hp_ptJetGenMean_clusterOK = new TProfile("ptJetGenMean_clusterOK", "", ptPhot_binning.size()-1, ptPhotBinning_array);
   TProfile* hp_ptPhotMean = new TProfile("ptPhotMean", "", ptPhot_binning.size()-1, ptPhotBinning_array);
+  TH2D* hp_ptPhotMean_no2ndJet = new TH2D("ptPhotMean_no2ndJet", "", ptPhot_binning.size()-1, ptPhotBinning_array, (int)floor(ptPhot_binning[ptPhot_binning.size()-1]), 0., ptPhot_binning[ptPhot_binning.size()-1]);
   TProfile* hp_ptPhotMean_loose = new TProfile("ptPhotMean_loose", "", ptPhot_binning.size()-1, ptPhotBinning_array);
   TProfile* hp_ptPhotMean_clusterOK = new TProfile("ptPhotMean_clusterOK", "", ptPhot_binning.size()-1, ptPhotBinning_array);
 
@@ -656,6 +658,7 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
       // --------------------------------------
       // BEGIN  extrapolation to pt(2ndjet)->0:
       // --------------------------------------
+      hp_ptPhotMean_no2ndJet->Fill( ptPhotReco, ptPhotReco, eventWeight );
       Float_t minPerc = h1_pt2ndJetRecoRelMean[theBin][0]->GetXaxis()->GetXmin();
       Float_t percStep = h1_pt2ndJetRecoRelMean[theBin][0]->GetXaxis()->GetXmax()  - minPerc;
       Double_t pt2ndJetRecoRel = 100.*pt2ndJetReco/ptPhotReco; //in percentage
@@ -849,10 +852,14 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   hp_ptJetGenMean_loose->Write();
   hp_ptJetGenMean_clusterOK->Write();
   hp_ptPhotMean->Write();
+  hp_ptPhotMean_no2ndJet->Write();
   hp_ptPhotMean_loose->Write();
   hp_ptPhotMean_clusterOK->Write();
 
   for( unsigned i=0; i<h1_response.size(); ++i ) {
+
+    outFile->cd();
+
     h1_response[i]->Write();
     h1_responseGEN[i]->Write();
     h1_responsePART[i]->Write();
@@ -866,6 +873,11 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
     TF1* gaussian = new TF1("gaussian", "gaus");
     Float_t nSigma = 2.5;
+
+    char dirName[40];
+    sprintf(dirName, "extrap_ptBin_%d_%d", (int)ptPhot_binning[i], (int)ptPhot_binning[i+1]);
+    outFile->mkdir(dirName);
+    outFile->cd(dirName);
 
     for( int ip=0; ip<nPoints; ++ip) {
       
@@ -986,6 +998,8 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   hp_ptJetGenMean_clusterOK = 0;
   delete hp_ptPhotMean;
   hp_ptPhotMean = 0;
+  delete hp_ptPhotMean_no2ndJet;
+  hp_ptPhotMean_no2ndJet = 0;
   delete hp_ptPhotMean_loose;
   hp_ptPhotMean_loose = 0;
   delete hp_ptPhotMean_clusterOK;
