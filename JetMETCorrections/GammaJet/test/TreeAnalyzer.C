@@ -650,15 +650,16 @@ void TreeAnalyzer::ReadCSVFile(const std::string& csv) {
     exit(-2);
   }
 
-  int irun, iLS, iHFcounts, iVtxcounts;
-  double iHFlumi, iVtxlumi;
+  int irun, iLS;
+  double iDelivered, iRecorded;
 
-  while( fscanf(iff,"%*[ \t\n]%d,%*[ \t\n]%d,%*[ \t\n]%d,%*[ \t\n]%d,%*[ \t\n]%lf,%*[ \t\n]%lf", &irun, &iLS, &iHFcounts, &iVtxcounts, &iHFlumi, &iVtxlumi) != EOF ) {
+  //while( fscanf(iff,"%*[ \t\n]%d,%*[ \t\n]%d,%*[ \t\n]%lf,%*[ \t\n]%lf", &irun, &iLS, &iDelivered, &iRecorded) != EOF ) {
+  while( fscanf(iff,"%d,%d,%lf,%lf", &irun, &iLS, &iDelivered, &iRecorded) != EOF ) {
 
     RunLumiPair rlpair( std::pair<int, int>(irun, iLS) );
-    double istLumi = (iVtxlumi>0.) ? iVtxlumi : iHFlumi; //using Vtx lumi as default
-    double intLumi = 23.*istLumi/1.0e30; //in microb-1 (1 LS = 23 seconds)
-    LSLumimap_[rlpair] = intLumi; 
+    //double istLumi = iRecorded;
+    //double intLumi = 23.*istLumi/1.0e30; //in microb-1 (1 LS = 23 seconds)
+    LSLumimap_[rlpair] = iRecorded; //in microb-1 
 
   }
   fclose(iff);

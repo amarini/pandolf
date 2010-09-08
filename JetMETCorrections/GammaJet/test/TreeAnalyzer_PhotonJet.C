@@ -240,9 +240,11 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
      //trigger:
      //if( !useGenJets_ && maybe this gives bias?
-     if( !HLTResults[0] &&  //this is HLT_Photon10_L1R
-         !HLTResults[2] )   //this is HLT_Photon15_L1R
-        continue; 
+//   if( !HLTResults[0] &&  //this is HLT_Photon10_L1R
+//       !HLTResults[2] &&  //this is HLT_Photon15_L1R
+//       !HLTResults[3] &&  //this is HLT_Photon20_LooseEcalIso_TrackIso_L1R
+//       !HLTResults[4] )   //this is HLT_Photon25_L1R
+//      continue; 
 
      if( isMC )
        if( (ptHat_ > ptHatMax_) || (ptHat_ < ptHatMin_) ) continue;
@@ -443,7 +445,6 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
      deltaR_phot_ = sqrt( deltaEta*deltaEta + deltaPhi*deltaPhi );
 
      matchedToMC_ = (deltaR_phot_<0.1);
-
 
      AnalysisJet firstJet;
      AnalysisJet secondJet;
@@ -771,7 +772,7 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
 
      bool eventOK = (matchedToMC_ || isIsolated_veryloose_);
 
-     if( eventOK && (ptPhotReco_>5.) )
+     if( eventOK && (ptPhotReco_>15.) )
        jetTree_->Fill(); 
 
      h1_ptPhot->Fill( ptPhotReco_, eventWeight_ );
