@@ -1,5 +1,6 @@
 #include "DrawBase.h"
 #include "fitTools.h"
+#include <iostream>
 
 
 
@@ -165,7 +166,7 @@ void DrawBase::set_sameInstanceNormalization() {
 
 
 
-void DrawBase::drawHisto( std::string name, std::string etaRegion, std::string flags, std::string axisName, int legendQuadrant, bool log_aussi) {
+void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion, const std::string& flags, const std::string& axisName, int legendQuadrant, bool log_aussi) {
 
 
   std::vector<float> ptPhot_binning = fitTools::getPtPhot_binning();
@@ -363,7 +364,7 @@ void DrawBase::drawHisto( std::string name, std::string etaRegion, std::string f
     }  
     if( name=="deltaPhiJet" || name=="asymmJet" ) yAxis = "Events";
 
-    if( scaleFactor_ < 0. ) yAxis = "Normalized to Unity";
+    if( scaleFactor_ < 0. && dataFile_==0 ) yAxis = "Normalized to Unity";
 
     std::string etaRange = getEtaRangeText( etaRegion );
 
@@ -708,6 +709,13 @@ void DrawBase::drawHisto( std::string name, std::string etaRegion, std::string f
 
   if( drawResponseGraphs ) { // now draw the trends vs pt:
 
+    TFile* graphFile = TFile::Open("graphs.root", "recreate");
+    graphFile->cd();
+    gr_response_vs_pt->Write();
+    gr_responseMC_vs_pt->Write();
+    gr_responseGEN_vs_pt->Write();
+    graphFile->Close();
+
     gStyle->SetPadTickX(1);
     gStyle->SetPadTickY(1);
 
@@ -730,7 +738,7 @@ void DrawBase::drawHisto( std::string name, std::string etaRegion, std::string f
     Float_t ptPhotMax = ptPhot_binning[ptPhot_binning.size()-2];
     TGraphErrors* gr_resp_ratio = 0;
     Float_t scale_uncert = (recoType_=="calo") ? 0.1 : 0.05;
-    TH2* h2_axes_lo_resp = new TH2D("axes_lo_resp", "", 10, ptPhot_binning[0], ptPhotMax, 10, 0.71, 1.29);
+    TH2* h2_axes_lo_resp = new TH2D("axes_lo_resp", "", 10, ptPhot_binning[0], ptPhotMax, 10, 0.86, 1.14);
     TLine* line_one = new TLine( ptPhot_binning[0], 1., ptPhotMax, 1. );
     TLine* line_plus_resp = new TLine( ptPhot_binning[0], 1.05, ptPhotMax, 1.05 );
     TLine* line_minus_resp = new TLine( ptPhot_binning[0], 0.95, ptPhotMax, 0.95 );
@@ -757,27 +765,27 @@ void DrawBase::drawHisto( std::string name, std::string etaRegion, std::string f
       
       line_one->Draw("same");
       
-      line_plus_resp->SetLineColor(46);
+      //line_plus_resp->SetLineColor(46);
       line_plus_resp->SetLineWidth(2);
-      //line_plus_resp->SetLineStyle(2);
+      line_plus_resp->SetLineStyle(2);
       line_plus_resp->Draw("same");
       
-      line_minus_resp->SetLineColor(46);
+      //line_minus_resp->SetLineColor(46);
       line_minus_resp->SetLineWidth(2);
-      //line_minus_resp->SetLineStyle(2);
+      line_minus_resp->SetLineStyle(2);
       line_minus_resp->Draw("same");
       
-      TLine* line_plus2_resp = new TLine( ptPhot_binning[0], 1.1, ptPhotMax, 1.1 );
-      line_plus2_resp->SetLineColor(46);
-      line_plus2_resp->SetLineWidth(2);
-      line_plus2_resp->SetLineStyle(2);
-      line_plus2_resp->Draw("same");
-      
-      TLine* line_minus2_resp = new TLine( ptPhot_binning[0], 0.9, ptPhotMax, 0.9 );
-      line_minus2_resp->SetLineColor(46);
-      line_minus2_resp->SetLineWidth(2);
-      line_minus2_resp->SetLineStyle(2);
-      line_minus2_resp->Draw("same");
+    //TLine* line_plus2_resp = new TLine( ptPhot_binning[0], 1.1, ptPhotMax, 1.1 );
+    //line_plus2_resp->SetLineColor(46);
+    //line_plus2_resp->SetLineWidth(2);
+    //line_plus2_resp->SetLineStyle(2);
+    //line_plus2_resp->Draw("same");
+    //
+    //TLine* line_minus2_resp = new TLine( ptPhot_binning[0], 0.9, ptPhotMax, 0.9 );
+    //line_minus2_resp->SetLineColor(46);
+    //line_minus2_resp->SetLineWidth(2);
+    //line_minus2_resp->SetLineStyle(2);
+    //line_minus2_resp->Draw("same");
       
 
       gr_resp_ratio = this->getGraphRatio( gr_response_vs_pt, gr_responseMC_vs_pt );
@@ -898,10 +906,17 @@ void DrawBase::drawHisto( std::string name, std::string etaRegion, std::string f
       TF1* constline = new TF1("constline", "[0]", ptPhot_binning[0], ptPhotMax);
       constline->SetParameter(0, 0.);
       //constline->SetLineColor(8);
-      constline->SetLineColor(38);
-      constline->SetLineStyle(3);
+      //constline->SetLineColor(38);
+      constline->SetLineColor(46);
+      //constline->SetLineStyle(3);
+      constline->SetLineWidth(3);
       gr_resp_ratio->Fit( constline, "R" );
       std::cout << "-> ChiSquare: " << constline->GetChisquare() << "   NDF: " << constline->GetNDF() << std::endl;
+
+      TF1* constline_highpt = new TF1("constline_highpt", "[0]", 30., ptPhotMax);
+      constline_highpt->SetParameter(0, 1.);
+      gr_resp_ratio->Fit( constline_highpt, "RN" );
+std::cout << " ---------> const line fit for pt > 30.: " << constline_highpt->GetParameter(0) << std::endl;
 
       TPaveText* fitlabel = new TPaveText(0.55, 0.77, 0.88, 0.83, "brNDC");
       fitlabel->SetTextSize(0.08);
@@ -1080,7 +1095,7 @@ void DrawBase::drawHisto( std::string name, std::string etaRegion, std::string f
 
 
 
-void DrawBase::drawProfile( std::string yVar, std::string xVar, int legendQuadrant) {
+void DrawBase::drawProfile( const std::string& yVar, const std::string& xVar, int legendQuadrant) {
 
   std::string name = yVar + "_vs_" + xVar;
   if( xVar == "pt" || xVar == "ptCorr" ) name = name + "_barrel"; //ugly fix for now
@@ -1568,6 +1583,11 @@ void DrawBase::drawStack(const std::string& varY, const std::string& varX, const
 } //drawStack
 
 
+
+
+
+
+
 void DrawBase::set_dataFile( TFile* dataFile ) {
 
   dataFile_ = dataFile;
@@ -1625,7 +1645,7 @@ std::string DrawBase::getEtaRangeText( const std::string& etaRegion ) const {
 
 std::string DrawBase::getSqrtText() const {
 
-  if( lumi_==0. || scaleFactor_ < 0. ) {
+  if( lumi_==0. || dataFile_==0 ) {
     return std::string("#sqrt{s} = 7 TeV");
   }
   float lumi4Text(lumi_);
