@@ -21,6 +21,7 @@
 
 //#include <TROOT.h>
 #include <TChain.h>
+#include <TH1F.h>
 #include <TFile.h>
 #include <iostream>
 
@@ -275,6 +276,8 @@ public :
 
    TFile* outfile_;
    TTree* jetTree_;
+   TH1F* h1_lumi_;
+   TH1F* h1_nCounter_;
 
    Int_t run_;
    Int_t nvertex_;;
@@ -505,6 +508,7 @@ public :
    TreeAnalyzer( const std::string& analyzerType, const std::string& dataset, const std::string& recoType, const std::string& jetAlgo, const std::string& flags="", TTree *tree=0);
    virtual ~TreeAnalyzer();
 
+   virtual std::string GetFlags() { return flags_; };
    virtual void SetFlags( const std::string& flags ) { flags_ = flags; };
 
    virtual Int_t    Cut(Long64_t entry);

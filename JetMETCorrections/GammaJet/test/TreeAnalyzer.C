@@ -36,9 +36,9 @@ TreeAnalyzer::~TreeAnalyzer()
    delete fChain->GetCurrentFile();
    std::cout << "Total Int Lumi: " << totalIntLumi_ << " ub-1." << std::endl;
    outfile_->cd();
-   TH1F* h1_lumi = new TH1F("lumi", "", 1, 0., 1.);
-   h1_lumi->SetBinContent(1, totalIntLumi_);
-   h1_lumi->Write();
+   h1_lumi_->SetBinContent(1, totalIntLumi_);
+   h1_lumi_->Write();
+   h1_nCounter_->Write();
    jetTree_->Write();
    outfile_->Write();
    outfile_->Close();
@@ -195,9 +195,8 @@ void TreeAnalyzer::LoadInput() {
    std::cout << "-> Tree has " << tree->GetEntries() << " entries." << std::endl;
    //std::cout << "-> Added " << nFiles << " files. Tree has " << tree->GetEntries() << " entries." << std::endl;
 
+   CreateOutputFile();
    Init(tree);
-
-   this->CreateOutputFile();
 
 }
 
@@ -228,9 +227,9 @@ void TreeAnalyzer::LoadInputFromFile( const std::string& fileName ) {
    std::cout << "-> Tree has " << tree->GetEntries() << " entries." << std::endl;
    //std::cout << "-> Added " << nFiles << " files. Tree has " << tree->GetEntries() << " entries." << std::endl;
 
+   CreateOutputFile();
    Init(tree);
   
-   this->CreateOutputFile();
 
 }
 
@@ -253,6 +252,9 @@ void TreeAnalyzer::CreateOutputFile() {
 
    jetTree_ = new TTree("jetTree", "Reduced Tree for Jet Studies");
    jetTree_->SetMaxTreeSize(100000000000ULL); //setting max tree size to 100 GB
+
+   h1_lumi_ = new TH1F("lumi", "", 1, 0., 1.);
+   h1_nCounter_ = new TH1F("nCounter", "", 1, 0., 1.);
 
 }
 
@@ -291,16 +293,23 @@ void TreeAnalyzer::Init(TTree *tree)
    if (!tree) return;
 
    GenEventParameters genPars = this->getGenEventParameters();
-   Float_t xsection = genPars.crossSection;
+ //Float_t xsection = genPars.crossSection;
    ptHatMin_ = genPars.ptHatMin;
    ptHatMax_ = genPars.ptHatMax;
 
 
-   //will cut on pt_hat, so have to divide only by correct number of events:
+ ////will cut on pt_hat, so have to divide only by correct number of events:
+ //char cutOnPtHat[70];
+ //sprintf( cutOnPtHat, "genpt>%f && genpt<%f", ptHatMin_, ptHatMax_);
+ //Float_t nEntries_cut = (Float_t)tree->GetEntries(cutOnPtHat);
+ //eventWeight_ = ( (nEntries_cut>0.) && (xsection>0.) ) ? xsection/nEntries_cut : 1.;
+
+   //will cut on pt_hat, so nCounter needs to be set to number of actual events which will be analyzed:
    char cutOnPtHat[70];
-   sprintf( cutOnPtHat, "genpt>%f && genpt<%f", ptHatMin_, ptHatMax_);
-   Float_t nEntries_cut = (Float_t)tree->GetEntries(cutOnPtHat);
-   eventWeight_ = ( (nEntries_cut>0.) && (xsection>0.) ) ? xsection/nEntries_cut : 1.;
+   sprintf( cutOnPtHat, "genpt>%lf && genpt<%lf", (Double_t)ptHatMin_, (Double_t)ptHatMax_);
+   Int_t nEntries_cut = tree->GetEntries(cutOnPtHat);
+   h1_nCounter_->SetBinContent( 1, nEntries_cut );
+
 
 
 
@@ -922,4 +931,4 @@ GenEventParameters TreeAnalyzer::getGenEventParameters() {
 
    return returnGenPars;
 
-}
+} // getGenEventParameters
