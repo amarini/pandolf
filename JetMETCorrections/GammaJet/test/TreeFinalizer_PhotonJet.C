@@ -42,7 +42,10 @@ void deleteExtrapHistoVector(std::vector< std::vector< TH1D* > > histoVector, in
 
 
 
-void finalize(const std::string& dataset, std::string recoType, std::string jetAlgo="akt5", float secondJetThreshold=0.5, std::string partType="", bool useGenJets=false) {
+void finalize(const std::string& dataset, std::string recoType, std::string jetAlgo="akt5", float secondJetThreshold=0.1, std::string partType="", bool useGenJets=false) {
+
+//if( dataset=="PhotonJet_Summer1036X" )
+//  MCassoc_ = true;
 
   bool noJetSelection = ( secondJetThreshold < 0. );
 
@@ -131,7 +134,26 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     addInput( "QCD_Spring10_Pt50to80" );
     addInput( "QCD_Spring10_Pt80" );
     addInput( "QCD_Spring10_Pt170" );
-    //addInput( "QCD_Spring10_Pt300" );
+    addInput( "QCD_Spring10_Pt300" );
+
+  } else if( dataset=="PhotonJet_Summer1036X_QCD_Spring10" ) { //this option is the one to be used in case of extrapolation
+
+    addInput( "PhotonJet_Summer1036X_Pt5to15" );
+    addInput( "PhotonJet_Summer1036X_Pt15to20" );
+    addInput( "PhotonJet_Summer1036X_Pt20to30" );
+    addInput( "PhotonJet_Summer1036X_Pt30to50" );
+    addInput( "PhotonJet_Summer1036X_Pt50to80" );
+    addInput( "PhotonJet_Summer1036X_Pt80to120" );
+    addInput( "PhotonJet_Summer1036X_Pt120to170" );
+    addInput( "PhotonJet_Summer1036X_Pt170to300" );
+    addInput( "QCD_Spring10_Pt15to20" );
+    addInput( "QCD_Spring10_Pt20to30" );
+    addInput( "QCD_Spring10_Pt30to50" );
+    addInput( "QCD_Spring10_Pt50to80" );
+    addInput( "QCD_Spring10_Pt80" );
+    addInput( "QCD_Spring10_Pt170" );
+    addInput( "QCD_Spring10_Pt300" );
+
 
   } else if( dataset=="DATA_EG_35X" ) {
 
@@ -152,6 +174,11 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
     addInput( "EG_Run2010A_Jul15thReReco_v1" );
     addInput( "EG_Run2010A_Jul26thReReco_v1" );
+
+  } else if( dataset=="EG_3pb" ) {
+
+    addInput( "EG_Run2010A-PromptReco-v4" );
+    addInput( "EG_Run2010A-PromptReco-v4_runs143337-144114" );
 
   } else {
   
@@ -409,6 +436,9 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   Float_t clusterMinPhotReco;
   tree->SetBranchAddress("clusterMinPhotReco", &clusterMinPhotReco);
 
+  Bool_t matchedToMC;
+  tree->SetBranchAddress("matchedToMC", &matchedToMC);
+
   Float_t eJetReco;
   tree->SetBranchAddress("eJetReco", &eJetReco);
   Float_t ptJetReco;
@@ -568,7 +598,11 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     bool isIsolated_medium = (isIsolated_hcal_medium && isIsolated_ecal_medium && isIsolated_ptTracks_medium && isIsolated_nTracks_medium);
     bool clusterShapeOK_medium = (clusterMajOK_medium && clusterMinOK_medium );
 
-
+    if( MCassoc_ && matchedToMC ) {
+      isIsolated_loose = true;
+      isIsolated_medium = true;
+      clusterShapeOK_medium = true;
+    }
 
     //////////////////////////////////////////////
     /////      CLUSTER SHAPE ONLY SELECTION 
@@ -775,7 +809,8 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     outfileName = outfileName_str;
   }
   if( ADD12_ ) outfileName = outfileName + "_ADD12";
-  if( !noJetSelection && secondJetThreshold!=0.5 ) {
+  //if( !noJetSelection && secondJetThreshold!=0.5 ) {
+  if( !noJetSelection ) {
     std::string R = ( NO2ndJETABS ) ? "R" : "";
     char outfileName_char[300];
     sprintf( outfileName_char, "%s_2ndJet%d%s", outfileName.c_str(), (int)(100.*secondJetThreshold), R.c_str());
@@ -1048,19 +1083,25 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
 void addInput( const std::string& dataset ) {
 
-  std::string infileName = "files_PhotonJet_2ndLevel_" + dataset+"_" + ALGOTYPE_ +".txt";
+
+  // opening from filelist now deprecated (files have to be merged with merge_and_setWeights
+  //std::string infileName = "files_PhotonJet_2ndLevel_" + dataset+"_" + ALGOTYPE_ +".txt";
   TH1F* h1_lumi;
 
 
-  //open from file.txt:
-  FILE* iff = fopen(infileName.c_str(),"r");
-  if(iff == 0) {
-    std::cout << "cannot open input file '" << infileName << "' ... adding single file." << std::endl;
-    infileName = "PhotonJet_2ndLevelTree_" + dataset + suffix + ".root";
+  //FILE* iff = fopen(infileName.c_str(),"r");
+  //if(iff == 0) {
+    //std::cout << "cannot open input file '" << infileName << "' ... adding single file." << std::endl;
+    std::string infileName = "PhotonJet_2ndLevelTreeW_" + dataset + suffix + ".root";
+    TFile* infile = TFile::Open(infileName.c_str(), "read");
+    if( infile==0 ) {
+      std::cout << "Didn't find file '" << infileName << "'. Did you forget to finalize (i.e. the \"W\")?" << std::endl;
+      std::cout << "Exiting." << std::endl;
+      exit(77);
+    }
     std::string treeName = infileName +"/jetTree";
     tree->Add(treeName.c_str());
     std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
-    TFile* infile = TFile::Open(infileName.c_str(), "READ");
     h1_lumi = (TH1F*)infile->Get("lumi");
     if( h1_lumi!=0 ) {
       totalLumi += h1_lumi->GetBinContent(1);
@@ -1070,7 +1111,7 @@ void addInput( const std::string& dataset ) {
     }
     infile->Close();
 
-  } else {
+  /*} else {
 
     char singleLine[500];
 
@@ -1093,7 +1134,7 @@ void addInput( const std::string& dataset ) {
     }
     fclose(iff);
 
-  }
+  } */
 
 } //addinput
 
