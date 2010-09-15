@@ -23,7 +23,7 @@ float getWeight( const std::string& dataset, int nEvents );
 int main( int argc, char* argv[] ) {
 
   if( argc!=4 && argc!=5 ) {
-    std::cout << "USAGE: ./merge_and_setWeights [dataset] [recoType] [jetAlgo] [flags=\"\"]" << std::endl;
+    std::cout << "USAGE: ./merge_and_setWeights_PhotonJet [dataset] [recoType] [jetAlgo] [flags=\"\"]" << std::endl;
     exit(917);
   }
 
