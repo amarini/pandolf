@@ -6,14 +6,8 @@ ROOTFLAG = `${ROOTSYS}/bin/root-config --cflags --libs`
 do2ndLevel_DiJet: AnalysisJet.o TreeAnalyzer.o TreeAnalyzer_DiJet.o
 	$(CC) -Wall -o do2ndLevel_DiJet do2ndLevel_DiJet.cpp AnalysisJet.o TreeAnalyzer.o TreeAnalyzer_DiJet.o $(ROOTFLAG)
 
-do2ndLevel_PhotonJet: AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJet.o do2ndLevel_PhotonJet.cpp
+do2ndLevel_PhotonJet: AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJet.o
 	$(CC) -Wall -o do2ndLevel_PhotonJet do2ndLevel_PhotonJet.cpp AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJet.o $(ROOTFLAG)
-
-do2ndLevel_PhotonJet_batch: AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJet.o do2ndLevel_PhotonJet_batch.cpp
-	$(CC) -Wall -o do2ndLevel_PhotonJet_batch do2ndLevel_PhotonJet_batch.cpp AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJet.o $(ROOTFLAG)
-
-do2ndLevel_HZZlljj: AnalysisJet.o TreeAnalyzer.o TreeAnalyzer_HZZlljj.o
-	$(CC) -Wall -o do2ndLevel_HZZlljj do2ndLevel_HZZlljj.cpp AnalysisJet.o TreeAnalyzer.o TreeAnalyzer_HZZlljj.o $(ROOTFLAG)
 
 prova: AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJet.o
 	$(CC) -Wall -o prova prova_TreeAnalyzer_Photon.cpp AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJet.o $(ROOTFLAG)
@@ -32,9 +26,6 @@ TreeAnalyzer_PhotonJet.o: TreeAnalyzer_PhotonJet.C
 
 TreeAnalyzer_DiJet.o: TreeAnalyzer_DiJet.C
 	$(CC) $(CFLAGS) TreeAnalyzer_DiJet.C $(ROOTFLAG)
-
-TreeAnalyzer_HZZlljj.o: TreeAnalyzer_HZZlljj.C
-	$(CC) $(CFLAGS) TreeAnalyzer_HZZlljj.C $(ROOTFLAG)
 
 drawPhotonJet: fitTools.o DrawBase.o
 	$(CC) -Wall -o drawPhotonJet drawPhotonJet.C fitTools.o DrawBase.o $(ROOTFLAG)

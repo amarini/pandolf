@@ -1,7 +1,6 @@
 #! /usr/bin/env python
 import os
 import sys
-import time
 # set parameters to use cmst3 batch 
 #######################################
 ### usage  cmst3_submit_manyfilesperjob.py dataset njobs applicationName queue 
@@ -12,7 +11,8 @@ if len(sys.argv) != 6:
 dataset = sys.argv[1]
 recoType = sys.argv[2]
 #inputlist = "files_EG_Run2010A_PromptReco_v4.txt"
-inputlist = "files_QCD_Spring10_Pt15to20.txt"
+#inputlist = "files_EG_Run2010A_Jun14thReReco_v1.txt"
+inputlist = "files_QCD_Spring10_Pt5to15.txt"
 #inputlist = "files_MinimumBias_Commissioning10_SD_EG_Jun14thSkim_v1.txt"
 #settingfile = "config/RSZZsettings.txt"
 output = dataset
@@ -32,10 +32,8 @@ application = sys.argv[4]
 ################################################
 #diskoutputdir = "/cmsrm/pc21_2/pandolf/DATA/EG/Run2010A-PromptReco-v4/"
 #diskoutputdir = "/cmsrm/pc21_2/pandolf/DATA/MinimumBias/Commissioning10_SD_EG_Jun14thSkim_v1/"
-#diskoutputdir = "/cmsrm/pc21_2/pandolf/DATA/EG/Run2010A-PromptReco-v4/"
-#castordir = "/castor/cern.ch/user/p/pandolf/DATA/EG/Run2010A-PromptReco-v4/"
-diskoutputdir = "/cmsrm/pc21_2/pandolf/MC/QCD_Spring10/QCDPt15to20_prova/"
-castordir = "/castor/cern.ch/user/p/pandolf/MC/QCD_Spring10/QCDPt15to20_prova/"
+diskoutputdir = "/cmsrm/pc21_2/pandolf/MC/QCD_Spring10/QCDPt5to15/"
+castordir = "/castor/cern.ch/user/p/pandolf/MC/QCD_Spring10/QCDPt5to15/"
 #castordir = "/castor/cern.ch/user/p/pandolf/DATA/MinimumBias/Commissioning10_SD_EG_Jun14thSkim_v1/"
 outputmain = castordir
 diskoutputmain = diskoutputdir
@@ -91,8 +89,8 @@ for ijob in range(ijobmax):
     outputfile.write('#!/bin/bash\n')
     outputfile.write('export STAGE_HOST=castorcms\n')
     #    outputfile.write('cd '+pwd)
-    outputfile.write('cp '+pwd+'/Cert_132440-143336_7TeV_StreamExpress_Collisions10_CMSSWConfig_v2.txt $WORKDIR\n')
-    outputfile.write('cp '+pwd+'/csvfile_upto143336.csv $WORKDIR\n')
+    outputfile.write('cp '+pwd+'/Cert_132440-139239_7TeV_StreamExpress_Collisions10_CMSSWConfig.txt $WORKDIR\n')
+    outputfile.write('cp '+pwd+'/lumi_by_LS_upto139375.csv $WORKDIR\n')
     outputfile.write('cd $WORKDIR\n')
     outputfile.write(pwd+'/'+application+" "+dataset+" "+recoType+" akt5 "+inputfilename+" _"+str(ijob)+"\n")
     outputfile.write('ls *.root | xargs -i rfcp {} '+outputroot+'\n')
@@ -101,5 +99,4 @@ for ijob in range(ijobmax):
     os.system("echo bsub -q "+queue+" -o "+dataset+"_"+recoType+"/log/"+dataset+"_"+str(ijob)+".log source "+pwd+"/"+outputname)
     os.system("bsub -q "+queue+" -o "+dataset+"_"+recoType+"/log/"+dataset+"_"+str(ijob)+".log source "+pwd+"/"+outputname+" -copyInput="+dataset+"_"+str(ijob))
     ijob = ijob+1
-    time.sleep(5.)
     continue

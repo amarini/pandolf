@@ -8,10 +8,6 @@ AnalysisPhoton::AnalysisPhoton() {
   eta = 20.;
   phi = 0.;
 
-  ptGen = 0.;
-  etaGen = 20.;
-  phiGen = 0.;
-
 }
   
 bool AnalysisPhoton::isIsolated_hcal( const std::string& tightness ) const {
