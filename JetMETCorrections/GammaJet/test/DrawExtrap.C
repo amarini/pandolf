@@ -528,9 +528,22 @@ void DrawExtrap::drawResponseExtrap( const std::string& recoGen ) const {
   } //for iPtBin
 
 
-  std::string graphFileName = get_outputSuffix();
+  std::string suffix = get_fullSuffix();
+  std::string graphFileName = "PhotonJetExtrapGraphs_" + suffix + "_" + FIT_RMS_ + ".root";
 
   TFile* graphFile = new TFile( graphFileName.c_str(), "recreate" );
+  graphFile->cd();
+
+  gr_DATAResp_vs_pt->Write();
+  gr_extrapResp_vs_pt->Write();
+  gr_intrResp_vs_pt->Write();
+
+  gr_DATAReso_vs_pt->Write();
+  gr_extrapReso_vs_pt->Write();
+  gr_intrReso_vs_pt->Write();
+
+  graphFile->Close();
+
 
 } //drawExtrap
 

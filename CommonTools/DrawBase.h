@@ -23,9 +23,10 @@
 #include "TPaveText.h"
 
 
-struct MCFile {
+struct InputFile {
   TFile* file;
-  std::string name;
+  std::string datasetName;
+  std::string legendName;
   int fillColor;
   int fillStyle;
 };
@@ -35,23 +36,24 @@ class DrawBase {
 
  public:
 
-  DrawBase( const std::string& analysisType, const std::string& recoType="", const std::string& jetAlgo="" );
-  ~DrawBase();
+  DrawBase( const std::string& analysisType, const std::string& recoType="", const std::string& jetAlgo="", const std::string& flags="" );
+  virtual ~DrawBase();
 
   void set_shapeNormalization();
   void set_lumiNormalization( float givenLumi=-1.);
   void set_sameEventNormalization();
   void set_sameInstanceNormalization();
 
-  void drawHisto( std::string name, std::string etaRegion, std::string flags, std::string axisName="", int legendQuadrant=1, bool log_aussi=false);
-  void drawProfile( std::string yVar, std::string xVar, int legendQuadrant=1);
+  void drawHisto( const std::string& name, const std::string& etaRegion, const std::string& flags, const std::string& axisName="", int legendQuadrant=1, bool log_aussi=false);
+  void drawProfile( const std::string& yVar, const std::string& xVar, int legendQuadrant=1);
   void drawStack(const std::string& varY, const std::string& varX, const std::string& RECO_GEN, bool isData) const { this->drawStack( varY, varX, "", RECO_GEN, isData); };
   void drawStack(const std::string& varY, const std::string& varX, const std::string& etaRegion, const std::string& RECO_GEN, bool isData) const;
 
   void set_analysisType( const std::string analysisType ) { analysisType_ = analysisType; };
-  void set_dataFile( TFile* dataFile );
-  void add_mcFile( TFile* mcFile, const std::string& name, int fillColor, int fillStyle=-1 );
-  void set_outputdir( const std::string& outputdir ) { outputdir_ = outputdir; };
+  void add_dataFile( TFile* dataFile, const std::string& datasetName );
+  void add_mcFile( TFile* mcFile, const std::string& datasetName, const std::string& legendName, int fillColor, int fillStyle=-1 );
+  void set_outputdir( const std::string& outputdir="" ); //if "" is passed, default outputdir is set (recommended)
+  void set_flags( const std::string& flags ) { flags_ = flags; };
   void set_pt_thresh( Int_t pt_thresh ) { pt_thresh_ = pt_thresh; };
   void set_etamax( Float_t etamax ) { etamax_ = etamax; };
   void set_raw_corr( const std::string& raw_corr ) { raw_corr_ = raw_corr; };
@@ -61,7 +63,8 @@ class DrawBase {
 
   std::string get_CMSText() const;
   std::string get_analysisType() const { return analysisType_; };
-  TFile* get_dataFile() const { return dataFile_; };
+  std::string get_recoType() const { return recoType_; };
+  TFile* get_dataFile() const { return dataFile_.file; };
   TFile* get_mcFile( int i ) const { return mcFiles_[i].file; };
   std::string get_outputdir() const { return outputdir_; };
   Int_t get_pt_thresh() const { return pt_thresh_; };
@@ -69,22 +72,26 @@ class DrawBase {
   std::string get_raw_corr() const { return raw_corr_; };
   bool get_pdf_aussi() const { return pdf_aussi_; };
 
+  std::string get_etaRangeText( const std::string& etaRegion ) const;
+  std::string get_sqrtText() const;
+  std::string get_algoName() const;
+  std::string get_axisName(std::string name);
+  std::string get_outputSuffix() const;
+  std::string get_fullSuffix() const;
+
  private:
 
-  std::string getEtaRangeText( const std::string& etaRegion ) const;
-  std::string getSqrtText() const;
-  std::string getAlgoName() const;
-  void shrinkPad(double b=0.1, double l=0.1, double r=0.1, double t=0.1);
-  std::string getAxisName(std::string name);
-  TGraphErrors* getGraphRatio( TGraphErrors* gr_data, TGraphErrors* gr_MC);
+  TGraphErrors* get_graphRatio( TGraphErrors* gr_data, TGraphErrors* gr_MC);
 
 
   std::string analysisType_;
   std::string recoType_;
   std::string jetAlgo_;
 
-  TFile* dataFile_;
-  std::vector< MCFile > mcFiles_;
+  std::string flags_;
+
+  InputFile dataFile_;
+  std::vector< InputFile > mcFiles_;
   
   Float_t scaleFactor_;
   Float_t lumi_;

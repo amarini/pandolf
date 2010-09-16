@@ -4,7 +4,7 @@
 
 
 
-DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType, const std::string& jetAlgo ) {
+DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType, const std::string& jetAlgo, const std::string& flags ) {
 
   TStyle *simpleStyle = new TStyle("simpleStyle","");
   simpleStyle->SetCanvasColor(0);
@@ -22,7 +22,11 @@ DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType
   recoType_ = recoType;
   jetAlgo_ = jetAlgo;
 
-  dataFile_ = 0;
+  flags_ = flags;
+
+  dataFile_.file = 0;
+
+  scaleFactor_ = 0.;
 
   pdf_aussi_ = false;
   noStack_ = false;
@@ -64,9 +68,9 @@ DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType
 
 DrawBase::~DrawBase() {
 
-  if( dataFile_!=0 ) {
-    delete dataFile_;
-    dataFile_=0;
+  if( dataFile_.file!=0 ) {
+    delete dataFile_.file;
+    dataFile_.file=0;
   }
 
   if( mcFiles_.size()!=0 ) {
@@ -88,7 +92,7 @@ void DrawBase::set_lumiNormalization( float givenLumi) {
 
   if( givenLumi==-1. ) {
 
-    if( dataFile_==0 ) {
+    if( dataFile_.file==0 ) {
       std::cout << "Data/MC files not properly initialized. Cannot compute scale factor. Exiting." << std::endl;
       exit(132);
     }
@@ -112,12 +116,12 @@ void DrawBase::set_shapeNormalization() {
 
 void DrawBase::set_sameEventNormalization() {
 
-  if( dataFile_==0 || mcFiles_.size()==0 ) {
+  if( dataFile_.file==0 || mcFiles_.size()==0 ) {
     std::cout << "Data/MC files not properly initialized. Cannot compute scale factor. Exiting." << std::endl;
     exit(133);
   }
 
-  TH1F* h1_nJets_data = (TH1F*)dataFile_->Get("nJets");
+  TH1F* h1_nJets_data = (TH1F*)dataFile_.file->Get("nJets");
 
   TH1F* h1_nJets_mc = (TH1F*)mcFiles_[0].file->Get("nJets");
   if( mcFiles_.size()>1 ) {
@@ -133,7 +137,7 @@ void DrawBase::set_sameEventNormalization() {
 
 void DrawBase::set_sameInstanceNormalization() {
 
-  if( dataFile_==0 || mcFiles_.size()==0 ) {
+  if( dataFile_.file==0 || mcFiles_.size()==0 ) {
     std::cout << "Data/MC files not properly initialized. Cannot compute scale factor. Exiting." << std::endl;
     exit(133);
   }
@@ -150,7 +154,7 @@ void DrawBase::set_sameInstanceNormalization() {
     exit(765);
   }
 
-  h1_phi_data = (TH1F*)dataFile_->Get(hname.c_str());
+  h1_phi_data = (TH1F*)dataFile_.file->Get(hname.c_str());
   h1_phi_mc = (TH1F*)mcFiles_[0].file->Get(hname.c_str());
   if( mcFiles_.size()>1 ) {
     for( unsigned i=1; i<mcFiles_.size(); ++i ) {
@@ -171,10 +175,10 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
 
   std::vector<float> ptPhot_binning = fitTools::getPtPhot_binning();
 
-  bool drawResponseGraphs = ( name=="response" || name=="responseMPF" );
+  bool draw_vs_pt_graphs = ( name=="response" || name=="responseMPF" );
 
   // if response will have to do a plot for each pt bin:
-  int number_of_plots = (drawResponseGraphs) ? (ptPhot_binning.size()-1) : 1;
+  int number_of_plots = (draw_vs_pt_graphs) ? (ptPhot_binning.size()-1) : 1;
 
   std::string ptPhotMean_name = "ptPhotMean";
   if( flags!= "" ) ptPhotMean_name = ptPhotMean_name + "_" + flags;
@@ -183,9 +187,9 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
   TProfile* hp_ptPhot_mc = 0;
   TProfile* hp_ptJetGen_mc = 0;
 
-  if( drawResponseGraphs ) {
+  if( draw_vs_pt_graphs ) {
 
-    hp_ptPhot_data = (TProfile*)dataFile_->Get(ptPhotMean_name.c_str());
+    hp_ptPhot_data = (TProfile*)dataFile_.file->Get(ptPhotMean_name.c_str());
     hp_ptPhot_mc = (TProfile*)mcFiles_[0].file->Get(ptPhotMean_name.c_str());
     hp_ptJetGen_mc = (TProfile*)mcFiles_[0].file->Get("ptJetGenMean");
 
@@ -198,7 +202,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
       }
     }
 
-  } //if drawresponsegraphs
+  } //if draw_vs_pt_graphs
 
 
   TGraphErrors* gr_response_vs_pt = new TGraphErrors(0);
@@ -219,6 +223,10 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
   TGraphErrors* gr_resolutionGEN_vs_pt = new TGraphErrors(0);
   gr_resolutionGEN_vs_pt->SetName("resolutionGEN_vs_pt");
 
+  TGraphErrors* gr_purity_vs_pt = new TGraphErrors(0);
+  gr_purity_vs_pt->SetName("purity_vs_pt");
+
+
   bool noDATA = false;
   bool noMC = false;
 
@@ -232,7 +240,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
     if( flags!="" ) histoName = histoName + "_" + flags;
 
     std::string ptRange_str; 
-    if( drawResponseGraphs ) {
+    if( draw_vs_pt_graphs ) {
       char ptRange[60];
       sprintf( ptRange, "ptPhot_%.0f_%.0f", ptPhot_binning[iplot], ptPhot_binning[iplot+1]);
       std::string ptRange_str_tmp(ptRange);
@@ -240,7 +248,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
       histoName = histoName + "_" + ptRange_str;
     }
 
-    TH1F* dataHisto = (dataFile_==0) ? 0 : (TH1F*)dataFile_->Get(histoName.c_str());
+    TH1F* dataHisto = (dataFile_.file==0) ? 0 : (TH1F*)dataFile_.file->Get(histoName.c_str());
     if( dataHisto==0 ) {
       //std::cout << "Didn't find DATA histo '" << histoName << "'. Continuing." << std::endl;
       //return;
@@ -325,7 +333,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
     Float_t yMin = 0.;
 
 
-    std::string xAxis = (axisName=="") ? getAxisName(name) : axisName;
+    std::string xAxis = (axisName=="") ? get_axisName(name) : axisName;
 
     std::string instanceName = (analysisType_=="MinBias") ? "Jets" : "Events";
     std::string yAxis = instanceName;
@@ -364,9 +372,9 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
     }  
     if( name=="deltaPhiJet" || name=="asymmJet" ) yAxis = "Events";
 
-    if( scaleFactor_ < 0. && dataFile_==0 ) yAxis = "Normalized to Unity";
+    if( scaleFactor_ < 0. && dataFile_.file==0 ) yAxis = "Normalized to Unity";
 
-    std::string etaRange = getEtaRangeText( etaRegion );
+    std::string etaRange = get_etaRangeText( etaRegion );
 
     TH2D* h2_axes = new TH2D("axes", "", 10, xMin, xMax, 10, yMin, yMax);
     h2_axes->SetXTitle(xAxis.c_str());
@@ -414,7 +422,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
       legend->AddEntry(dataHisto, "Data", "P");
     if( !noMC ) {
       for( unsigned i=0; i<mcHistos.size(); ++i ) 
-        legend->AddEntry(mcHistos[i], (mcFiles_[i].name).c_str(), "F");
+        legend->AddEntry(mcHistos[i], (mcFiles_[i].legendName).c_str(), "F");
     }
 
     TPaveText* label_cms = new TPaveText(0.25, 0.83, 0.42, 0.87, "brNDC");
@@ -428,7 +436,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
     label_sqrt->SetFillColor(kWhite);
     label_sqrt->SetTextSize(0.038);
     label_sqrt->SetTextFont(42);
-    std::string label_sqrt_text = this->getSqrtText();
+    std::string label_sqrt_text = this->get_sqrtText();
     label_sqrt->AddText(label_sqrt_text.c_str());
 
     TPaveText* label_cuts = 0;
@@ -456,7 +464,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
       label_cuts->SetFillColor(kWhite);
       label_cuts->SetTextSize(0.035);
       label_cuts->SetTextFont(42);
-      std::string jetAlgoName = getAlgoName();
+      std::string jetAlgoName = get_algoName();
       label_cuts->AddText(jetAlgoName.c_str());
       if( name != "etaJet" )
         label_cuts->AddText(etaRange.c_str());
@@ -486,7 +494,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
       
       if( name != "ptPhot" ) {
         char ptCutName[60];
-        if( drawResponseGraphs )
+        if( draw_vs_pt_graphs )
           sprintf( ptCutName, "%.0f < p_{T}^{#gamma} < %.0f GeV/c", ptPhot_binning[iplot], ptPhot_binning[iplot+1] );
         else
           sprintf( ptCutName, "p_{T}^{#gamma} > %.0f GeV/c", ptPhot_binning[0]);
@@ -497,8 +505,8 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
       if( name != "etaPhot" )
         label_cuts->AddText("|#eta_{#gamma}| < 1.3");
 
-      if( drawResponseGraphs||name=="deltaPhi"||name=="ptSecondJetRel" ) {
-        std::string jetAlgoName = getAlgoName();
+      if( draw_vs_pt_graphs||name=="deltaPhi"||name=="ptSecondJetRel" ) {
+        std::string jetAlgoName = get_algoName();
         label_cuts->AddText(jetAlgoName.c_str());
       }
 
@@ -537,7 +545,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
     if( label_cuts!=0 )
       label_cuts->Draw("same");
 
-    if( drawResponseGraphs ) {  //store info for response vs. pt plots (to be done later)
+    if( draw_vs_pt_graphs ) {  //store info for response vs. pt plots (to be done later)
 
       Float_t dataResponse = (noDATA) ? 0. : dataHisto->GetMean();
       Float_t dataResponseErr = (noDATA) ? 0. : dataHisto->GetMeanError();
@@ -573,6 +581,19 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
         gr_resolutionMC_vs_pt->SetPoint( iplot, ptMeanMC, mcResolution );
         gr_resolutionMC_vs_pt->SetPointError( iplot, ptMeanErrMC, mcResolutionErr );
 
+        float purityNum = mcHistos[0]->Integral(0, mcHistos[0]->GetNbinsX()+1);
+        float purityNumErr = mcHistos[0]->Integral(0, mcHistos[0]->GetNbinsX()+1)/((float)mcHistos[0]->GetEntries());
+        float purityDenom = 0.;
+        float purityDenomErr = 0.;
+        for( unsigned iHisto=0; iHisto<mcHistos.size(); ++iHisto ) {
+          purityDenom +=  mcHistos[iHisto]->Integral(0, mcHistos[iHisto]->GetNbinsX()+1);
+          purityDenomErr += mcHistos[iHisto]->Integral(0, mcHistos[iHisto]->GetNbinsX()+1)*mcHistos[iHisto]->Integral(0, mcHistos[iHisto]->GetNbinsX()+1)/((float)mcHistos[iHisto]->GetEntries()*mcHistos[iHisto]->GetEntries());
+        }
+        purityDenomErr = sqrt(purityDenomErr);
+        float purity = purityNum/purityDenom;
+        float purityErr = sqrt( purityNumErr*purityNumErr/(purityDenom*purityDenom) + purityNum*purityNum*purityDenomErr*purityDenomErr/(purityDenom*purityDenom*purityDenom*purityDenom) );
+        gr_purity_vs_pt->SetPoint( iplot, ptMeanMC, purity );
+        gr_purity_vs_pt->SetPointError( iplot, ptMeanErrMC, purityErr );
    
         char responseGEN_name[100];
         //if( flags!="" )
@@ -643,7 +664,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
     if( flags!="" )
       canvasName = canvasName + "_" + flags;
 
-    if( drawResponseGraphs )
+    if( draw_vs_pt_graphs )
       canvasName = canvasName + "_" + ptRange_str;
 
     std::string canvasName_eps = canvasName + ".eps";
@@ -707,13 +728,26 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
   } //for n plots
 
 
-  if( drawResponseGraphs ) { // now draw the trends vs pt:
+  if( draw_vs_pt_graphs ) { // now draw the trends vs pt:
 
-    TFile* graphFile = TFile::Open("graphs.root", "recreate");
+    std::string graphFileName = "PhotonJetGraphs_" + get_fullSuffix() + ".root";
+    TFile* graphFile = TFile::Open(graphFileName.c_str(), "update");
     graphFile->cd();
+    std::string varName = name;
+    if( etaRegion!="" )  varName += ("_" + etaRegion);
+    if( flags!="" )  varName += ("_" + flags);
+    std::string graphName = varName + "_vs_pt";
+    gr_response_vs_pt->SetName(graphName.c_str());
     gr_response_vs_pt->Write();
+    graphName = "MC"+varName + "_vs_pt";
+    gr_responseMC_vs_pt->SetName(graphName.c_str());
     gr_responseMC_vs_pt->Write();
+    graphName = "GEN"+varName + "_vs_pt";
+    gr_responseGEN_vs_pt->SetName(graphName.c_str());
     gr_responseGEN_vs_pt->Write();
+    graphName = "purity_" + varName;
+    gr_purity_vs_pt->SetName(graphName.c_str());
+    gr_purity_vs_pt->Write();
     graphFile->Close();
 
     gStyle->SetPadTickX(1);
@@ -788,7 +822,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
     //line_minus2_resp->Draw("same");
       
 
-      gr_resp_ratio = this->getGraphRatio( gr_response_vs_pt, gr_responseMC_vs_pt );
+      gr_resp_ratio = this->get_graphRatio( gr_response_vs_pt, gr_responseMC_vs_pt );
       gr_resp_ratio->SetName("response_ratio");
       gr_resp_ratio->SetMarkerStyle(20);
       gr_resp_ratio->SetMarkerSize(1.8);
@@ -815,7 +849,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
     h2_axes->Draw();
 
     Float_t labelTextSize = 0.035;
-    std::string jetAlgoName = getAlgoName();
+    std::string jetAlgoName = get_algoName();
     TPaveText* label_algo = new TPaveText(0.27, 0.03, 0.32, 0.10, "brNDC");
     label_algo->SetFillColor(kWhite);
     label_algo->SetTextSize(labelTextSize);
@@ -853,7 +887,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
     label_sqrt->SetFillColor(kWhite);
     label_sqrt->SetTextSize(sqrtTextSize);
     label_sqrt->SetTextFont(42);
-    std::string label_sqrt_text = this->getSqrtText();
+    std::string label_sqrt_text = this->get_sqrtText();
     label_sqrt->AddText(label_sqrt_text.c_str());
   
     label_cms->Draw("same");
@@ -977,7 +1011,7 @@ std::cout << " ---------> const line fit for pt > 30.: " << constline_highpt->Ge
       line_minus_reso->SetLineStyle(2);
       line_minus_reso->Draw("same");
       
-      TGraphErrors* gr_reso_ratio = this->getGraphRatio( gr_resolution_vs_pt, gr_resolutionMC_vs_pt );
+      TGraphErrors* gr_reso_ratio = this->get_graphRatio( gr_resolution_vs_pt, gr_resolutionMC_vs_pt );
       gr_reso_ratio->SetName("reso_ratio");
       gr_reso_ratio->SetMarkerStyle(20);
       gr_reso_ratio->SetMarkerSize(1.8);
@@ -1100,7 +1134,7 @@ void DrawBase::drawProfile( const std::string& yVar, const std::string& xVar, in
   std::string name = yVar + "_vs_" + xVar;
   if( xVar == "pt" || xVar == "ptCorr" ) name = name + "_barrel"; //ugly fix for now
 
-  TProfile* dataProfile = (TProfile*)dataFile_->Get(name.c_str());
+  TProfile* dataProfile = (TProfile*)dataFile_.file->Get(name.c_str());
   TProfile* mcProfile = (TProfile*)mcFiles_[0].file->Get(name.c_str()); //default: take first mc file. MUST BE FIXED
 
   if( dataProfile==0 || mcProfile==0 ) {
@@ -1131,8 +1165,8 @@ void DrawBase::drawProfile( const std::string& yVar, const std::string& xVar, in
   Float_t mcMax = mcProfile->GetMaximum();
   Float_t plotMax = (dataMax>mcMax) ? dataMax : mcMax;
 
-  std::string xAxisName = getAxisName(xVar);
-  std::string yAxisName = getAxisName(yVar);
+  std::string xAxisName = get_axisName(xVar);
+  std::string yAxisName = get_axisName(yVar);
 
   Float_t yAxisMaxScale = 1.5;
   if( yVar=="pt" || yVar=="ptCorr" || yVar=="Rch" || yVar=="PTch" || yVar=="Nch" || yVar=="Ngamma" || yVar=="Nnh" || yVar=="Rnh" || yVar=="Rgamma" || yVar=="Rgammanh" ) yAxisMaxScale=1.8;
@@ -1189,7 +1223,7 @@ void DrawBase::drawProfile( const std::string& yVar, const std::string& xVar, in
   label_sqrt->SetFillColor(kWhite);
   label_sqrt->SetTextSize(0.038);
   label_sqrt->SetTextFont(42);
-  std::string label_sqrt_text = this->getSqrtText();
+  std::string label_sqrt_text = this->get_sqrtText();
   label_sqrt->AddText(label_sqrt_text.c_str());
 
   Float_t label_cuts_xMin = 0.4;
@@ -1263,7 +1297,7 @@ void DrawBase::drawProfile( const std::string& yVar, const std::string& xVar, in
 
 
 
-std::string DrawBase::getAxisName(std::string name) { 
+std::string DrawBase::get_axisName(std::string name) { 
   
   std::string axisName = "";
 
@@ -1319,19 +1353,12 @@ std::string DrawBase::getAxisName(std::string name) {
 }
 
 
-void DrawBase::shrinkPad(double b, double l, double r, double t) {
- gPad->SetBottomMargin(b); 
- gPad->SetLeftMargin(l);
- gPad->SetRightMargin(r);
- gPad->SetTopMargin(t);
-}
-
 
 
 void DrawBase::drawStack(const std::string& varY, const std::string& varX, const std::string& etaRegion, const std::string& RECO_GEN, bool isData) const {
 
   TFile* file;
-  if( isData ) file = dataFile_;
+  if( isData ) file = dataFile_.file;
   else file = mcFiles_[0].file;
 
   std::string histoName;
@@ -1502,7 +1529,7 @@ void DrawBase::drawStack(const std::string& varY, const std::string& varX, const
   std::string apexText = ( RECO_GEN=="RECO" ) ? raw_corr_ : "GEN";
   //std::string apexText = raw_corr_;
   if( varX != "eta" ) {
-    std::string etaRange = getEtaRangeText( etaRegion );
+    std::string etaRange = get_etaRangeText( etaRegion );
     label_cuts->AddText(etaRange.c_str());
   }
   if( (varX != "pt") && (varX != "ptCorr") ) {
@@ -1588,11 +1615,12 @@ void DrawBase::drawStack(const std::string& varY, const std::string& varX, const
 
 
 
-void DrawBase::set_dataFile( TFile* dataFile ) {
+void DrawBase::add_dataFile( TFile* dataFile, const std::string& datasetName ) {
 
-  dataFile_ = dataFile;
+  dataFile_.file = dataFile;
+  dataFile_.datasetName = datasetName;
 
-  TH1F* h1_lumi = (TH1F*)dataFile_->Get("totalLumi");
+  TH1F* h1_lumi = (TH1F*)dataFile_.file->Get("totalLumi");
   if( h1_lumi==0 ) {
     std::cout << "WARNING! Lumi histogram not found!" << std::endl;
     lumi_ = 0.;
@@ -1604,11 +1632,12 @@ void DrawBase::set_dataFile( TFile* dataFile ) {
 
 
 
-void DrawBase::add_mcFile( TFile* mcFile, const std::string& name, int fillColor, int fillStyle ) {
+void DrawBase::add_mcFile( TFile* mcFile, const std::string& datasetName, const std::string& legendName, int fillColor, int fillStyle ) {
 
-  MCFile thisfile;
+  InputFile thisfile;
   thisfile.file = mcFile;
-  thisfile.name = name;
+  thisfile.datasetName = datasetName;
+  thisfile.legendName = legendName;
   thisfile.fillColor = fillColor;
   if( fillStyle==-1 ) {
     thisfile.fillStyle = ( 3004+mcFiles_.size() ); //default
@@ -1620,7 +1649,56 @@ void DrawBase::add_mcFile( TFile* mcFile, const std::string& name, int fillColor
 }
 
 
-std::string DrawBase::getEtaRangeText( const std::string& etaRegion ) const {
+
+
+std::string DrawBase::get_fullSuffix() const {
+
+  std::string fullSuffix = get_outputSuffix();
+
+  fullSuffix += "_";
+  if( scaleFactor_ == 0. ) {
+    std::cout << "Scale factor has to be set before getting full suffix." << std::endl;
+    std::cout << "You probably did:" << std::endl;
+    std::cout << "   DrawBase::set_outputdir()" << std::endl;
+    std::cout << "   DrawBase::set_normalization()" << std::endl;
+    std::cout << "instead of: " << std::endl;
+    std::cout << "   DrawBase::set_normalization()" << std::endl;
+    std::cout << "   DrawBase::set_outputdir()" << std::endl;
+    std::cout << "Please fix this!" << std::endl;
+  } else {
+    if( scaleFactor_==-1. )
+      fullSuffix += "SHAPE";
+    else 
+      fullSuffix += "LUMI";
+  }
+
+  if( flags_!="" ) fullSuffix += ("_" + flags_);
+
+  return fullSuffix;
+
+}
+
+
+
+
+void DrawBase::set_outputdir( const std::string& outputdir ) {
+
+  if( outputdir != "" ) {
+
+    outputdir_ = outputdir;
+    
+  } else { //default outputdir
+
+    outputdir_ = analysisType_ + "Plots_" + get_fullSuffix();
+
+  }
+
+}
+
+
+
+
+std::string DrawBase::get_etaRangeText( const std::string& etaRegion ) const {
 
   char etaRange_ch[100];
   sprintf(etaRange_ch, "|#eta| < %.1f", etamax_);
@@ -1643,9 +1721,9 @@ std::string DrawBase::getEtaRangeText( const std::string& etaRegion ) const {
 }
 
 
-std::string DrawBase::getSqrtText() const {
+std::string DrawBase::get_sqrtText() const {
 
-  if( lumi_==0. || dataFile_==0 ) {
+  if( lumi_==0. || dataFile_.file==0 ) {
     return std::string("#sqrt{s} = 7 TeV");
   }
   float lumi4Text(lumi_);
@@ -1680,7 +1758,7 @@ std::string DrawBase::getSqrtText() const {
 
 }
 
-std::string DrawBase::getAlgoName() const {
+std::string DrawBase::get_algoName() const {
 
   std::string algoName;
 
@@ -1712,11 +1790,12 @@ std::string DrawBase::getAlgoName() const {
 
 }
 
+
 std::string DrawBase::get_CMSText() const {
 
   std::string returnString;
 
-  if(dataFile_==0) {
+  if(dataFile_.file==0) {
     returnString = "CMS Simulation 2010";
   } else {
     returnString = "CMS Preliminary 2010";
@@ -1727,7 +1806,38 @@ std::string DrawBase::get_CMSText() const {
 }
 
 
-TGraphErrors* DrawBase::getGraphRatio( TGraphErrors* gr_data, TGraphErrors* gr_MC ) {
+std::string DrawBase::get_outputSuffix() const {
+
+  std::string suffix = "";
+
+  if( dataFile_.file!=0 ) {
+
+    suffix = dataFile_.datasetName;
+
+    if( mcFiles_.size() != 0 )
+      suffix += "_vs_";
+
+  }
+
+  suffix += mcFiles_[0].datasetName;
+  
+  for( unsigned int i = 1; i<mcFiles_.size(); ++i ) {
+    suffix += "_plus_";
+    suffix += mcFiles_[i].datasetName;
+  }
+
+  std::string algoName = jetAlgo_;
+  if( recoType_ != "calo" ) algoName = recoType_+algoName;
+  if( recoType_=="jpt" && jetAlgo_=="akt5" ) algoName = "jptak5";
+  if( recoType_=="jpt" && jetAlgo_=="akt7" ) algoName = "jptak7";
+  suffix += ("_" + algoName);
+
+  return suffix;
+
+}
+
+
+TGraphErrors* DrawBase::get_graphRatio( TGraphErrors* gr_data, TGraphErrors* gr_MC ) {
 
   TGraphErrors* gr_ratio = new TGraphErrors(0);
 
