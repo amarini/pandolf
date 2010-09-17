@@ -425,19 +425,21 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
         legend->AddEntry(mcHistos[i], (mcFiles_[i].legendName).c_str(), "F");
     }
 
-    TPaveText* label_cms = new TPaveText(0.25, 0.83, 0.42, 0.87, "brNDC");
-    label_cms->SetFillColor(kWhite);
-    label_cms->SetTextSize(0.038);
-    label_cms->SetTextFont(62);
-    std::string label_CMS_text = this->get_CMSText();
-    label_cms->AddText(label_CMS_text.c_str());
+    TPaveText* label_cms = get_labelCMS(2);
+  //TPaveText* label_cms = new TPaveText(0.25, 0.83, 0.42, 0.87, "brNDC");
+  //label_cms->SetFillColor(kWhite);
+  //label_cms->SetTextSize(0.038);
+  //label_cms->SetTextFont(62);
+  //std::string label_CMS_text = this->get_CMSText();
+  //label_cms->AddText(label_CMS_text.c_str());
 
-    TPaveText* label_sqrt = new TPaveText(0.25, 0.78, 0.42, 0.82, "brNDC");
-    label_sqrt->SetFillColor(kWhite);
-    label_sqrt->SetTextSize(0.038);
-    label_sqrt->SetTextFont(42);
-    std::string label_sqrt_text = this->get_sqrtText();
-    label_sqrt->AddText(label_sqrt_text.c_str());
+    TPaveText* label_sqrt = get_labelSqrt(2);
+  //TPaveText* label_sqrt = new TPaveText(0.25, 0.78, 0.42, 0.82, "brNDC");
+  //label_sqrt->SetFillColor(kWhite);
+  //label_sqrt->SetTextSize(0.038);
+  //label_sqrt->SetTextFont(42);
+  //std::string label_sqrt_text = this->get_sqrtText();
+  //label_sqrt->AddText(label_sqrt_text.c_str());
 
     TPaveText* label_cuts = 0;
     if( analysisType_ == "MinBias" ) {
@@ -875,20 +877,24 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
     legend->Draw("same");
 
     Float_t cmsTextSize = 0.043;
-    TPaveText* label_cms = new TPaveText(0.25, 0.83, 0.42, 0.87, "brNDC");
-    label_cms->SetFillColor(kWhite);
-    label_cms->SetTextSize(cmsTextSize);
-    label_cms->SetTextFont(62);
-    std::string label_CMS_text = this->get_CMSText();
-    label_cms->AddText(label_CMS_text.c_str());
+    TPaveText* label_cms = get_labelCMS(2);
+    label_cms->SetTextSize( cmsTextSize );
+
+//  TPaveText* label_cms = new TPaveText(0.25, 0.83, 0.42, 0.87, "brNDC");
+//  label_cms->SetFillColor(kWhite);
+//  label_cms->SetTextSize(cmsTextSize);
+//  label_cms->SetTextFont(62);
+//  std::string label_CMS_text = this->get_CMSText();
+//  label_cms->AddText(label_CMS_text.c_str());
 
     Float_t sqrtTextSize = 0.041;
-    TPaveText* label_sqrt = new TPaveText(0.25, 0.78, 0.42, 0.82, "brNDC");
-    label_sqrt->SetFillColor(kWhite);
-    label_sqrt->SetTextSize(sqrtTextSize);
-    label_sqrt->SetTextFont(42);
-    std::string label_sqrt_text = this->get_sqrtText();
-    label_sqrt->AddText(label_sqrt_text.c_str());
+    TPaveText* label_sqrt = get_labelSqrt(2);
+  //TPaveText* label_sqrt = new TPaveText(0.25, 0.78, 0.42, 0.82, "brNDC");
+  //label_sqrt->SetFillColor(kWhite);
+  //label_sqrt->SetTextSize(sqrtTextSize);
+  //label_sqrt->SetTextFont(42);
+  //std::string label_sqrt_text = this->get_sqrtText();
+  //label_sqrt->AddText(label_sqrt_text.c_str());
   
     label_cms->Draw("same");
     label_sqrt->Draw("same");
@@ -1032,22 +1038,26 @@ std::cout << " ---------> const line fit for pt > 30.: " << constline_highpt->Ge
 
     h2_axes2->Draw();
 
-    TPaveText* label_cms2 = new TPaveText(0.58, 0.83, 0.75, 0.87, "brNDC");
-    label_cms2->SetFillColor(kWhite);
+    TPaveText* label_cms2 = get_labelCMS(1);
     label_cms2->SetTextSize(cmsTextSize);
-    label_cms2->SetTextFont(62);
-    label_cms2->AddText(label_CMS_text.c_str());
+//  TPaveText* label_cms2 = new TPaveText(0.58, 0.83, 0.75, 0.87, "brNDC");
+//  label_cms2->SetFillColor(kWhite);
+//  label_cms2->SetTextSize(cmsTextSize);
+//  label_cms2->SetTextFont(62);
+//  label_cms2->AddText(label_CMS_text.c_str());
 
-    TPaveText* label_sqrt2 = new TPaveText(0.58, 0.78, 0.75, 0.82, "brNDC");
-    label_sqrt2->SetFillColor(kWhite);
-    label_sqrt2->SetTextSize(sqrtTextSize);
-    label_sqrt2->SetTextFont(42);
-    label_sqrt2->AddText(label_sqrt_text.c_str());
+    TPaveText* label_sqrt2 = get_labelSqrt(1);
+//  TPaveText* label_sqrt2 = new TPaveText(0.58, 0.78, 0.75, 0.82, "brNDC");
+//  label_sqrt2->SetFillColor(kWhite);
+//  label_sqrt2->SetTextSize(sqrtTextSize);
+//  label_sqrt2->SetTextFont(42);
+//  label_sqrt2->AddText(label_sqrt_text.c_str());
   
-    TPaveText* label_algo2 = new TPaveText(0.27, 0.82, 0.32, 0.86, "brNDC");
-    label_algo2->SetFillColor(kWhite);
-    label_algo2->SetTextSize(labelTextSize);
-    label_algo2->AddText(jetAlgoName.c_str());
+    TPaveText* label_algo2 = get_labelAlgo(2);
+//  TPaveText* label_algo2 = new TPaveText(0.27, 0.82, 0.32, 0.86, "brNDC");
+//  label_algo2->SetFillColor(kWhite);
+//  label_algo2->SetTextSize(labelTextSize);
+//  label_algo2->AddText(jetAlgoName.c_str());
 
     TLegend* legend2 = new TLegend(0.5, 0.5, 0.85, 0.73, "|#eta^{Jet}| < 1.3");
     legend2->SetFillColor(kWhite);
@@ -1212,19 +1222,21 @@ void DrawBase::drawProfile( const std::string& yVar, const std::string& xVar, in
   legend->AddEntry(dataProfile, "Data", "P");
   legend->AddEntry(mcProfile, "Simulation", "F");
 
-  TPaveText* label_cms = new TPaveText(0.25, 0.83, 0.42, 0.87, "brNDC");
-  label_cms->SetFillColor(kWhite);
-  label_cms->SetTextSize(0.038);
-  label_cms->SetTextFont(62);
-  std::string label_CMS_text = this->get_CMSText();
-  label_cms->AddText(label_CMS_text.c_str());
+  TPaveText* label_cms = get_labelCMS(2);
+//TPaveText* label_cms = new TPaveText(0.25, 0.83, 0.42, 0.87, "brNDC");
+//label_cms->SetFillColor(kWhite);
+//label_cms->SetTextSize(0.038);
+//label_cms->SetTextFont(62);
+//std::string label_CMS_text = this->get_CMSText();
+//label_cms->AddText(label_CMS_text.c_str());
 
-  TPaveText* label_sqrt = new TPaveText(0.25, 0.78, 0.42, 0.82, "brNDC");
-  label_sqrt->SetFillColor(kWhite);
-  label_sqrt->SetTextSize(0.038);
-  label_sqrt->SetTextFont(42);
-  std::string label_sqrt_text = this->get_sqrtText();
-  label_sqrt->AddText(label_sqrt_text.c_str());
+  TPaveText* label_sqrt = get_labelSqrt(2);
+//TPaveText* label_sqrt = new TPaveText(0.25, 0.78, 0.42, 0.82, "brNDC");
+//label_sqrt->SetFillColor(kWhite);
+//label_sqrt->SetTextSize(0.038);
+//label_sqrt->SetTextFont(42);
+//std::string label_sqrt_text = this->get_sqrtText();
+//label_sqrt->AddText(label_sqrt_text.c_str());
 
   Float_t label_cuts_xMin = 0.4;
   Float_t label_cuts_yMin = 0.55;
@@ -1498,12 +1510,13 @@ void DrawBase::drawStack(const std::string& varY, const std::string& varX, const
   stack->GetXaxis()->SetTitle(xTitle.c_str());
   stack->GetYaxis()->SetTitle(yTitle.c_str());
 
-  TPaveText* label_cms = new TPaveText(0.25, 0.83, 0.42, 0.87, "brNDC");
-  label_cms->SetFillColor(kWhite);
-  label_cms->SetTextSize(0.038);
-  label_cms->SetTextFont(62);
-  std::string label_CMS_text = this->get_CMSText();
-  label_cms->AddText(label_CMS_text.c_str());
+  TPaveText* label_cms = get_labelCMS(2);
+//TPaveText* label_cms = new TPaveText(0.25, 0.83, 0.42, 0.87, "brNDC");
+//label_cms->SetFillColor(kWhite);
+//label_cms->SetTextSize(0.038);
+//label_cms->SetTextFont(62);
+//std::string label_CMS_text = this->get_CMSText();
+//label_cms->AddText(label_CMS_text.c_str());
 
 
   TPaveText* label_sqrt = new TPaveText(0.25, 0.78, 0.42, 0.82, "brNDC");
@@ -1611,6 +1624,69 @@ void DrawBase::drawStack(const std::string& varY, const std::string& varX, const
 
 
 
+void DrawBase::drawObjects( const std::vector< TObject* > objects, const std::string& name,
+                            const std::string& xAxisName, float xMin, float xMax,
+                            const std::string& yAxisName, float yMin, float yMax,
+                            bool logx, bool logy  ) {
+
+
+  TH2D* axes = new TH2D( "axes", "", 10, xMin, xMax, 10, yMin, yMax);
+  axes->SetXTitle( xAxisName.c_str() );
+  axes->SetYTitle( yAxisName.c_str() );
+  if( logx ) {
+    axes->GetXaxis()->SetMoreLogLabels();
+    axes->GetXaxis()->SetNoExponent();
+  }  
+  axes->GetXaxis()->SetTitleOffset(1.1);
+  axes->GetYaxis()->SetTitleOffset(1.5);
+
+
+  TLegend* legend = new TLegend( 0.45, 0.15, 0.88, 0.4, "|#eta| < 1.3" );
+  legend->SetFillColor(kWhite);
+  legend->SetTextSize(0.035);
+  for( unsigned i=0; i<objects.size(); ++i ) 
+    legend->AddEntry( objects[i], objects[i]->GetName(), "P");
+
+  TPaveText* label_cms = get_labelCMS();
+  TPaveText* label_sqrt = get_labelSqrt();
+
+  Float_t labelTextSize = 0.035;
+  std::string jetAlgoName = get_algoName();
+  TPaveText* label_algo = get_labelAlgo(3);
+//TPaveText* label_algo = new TPaveText(0.27, 0.15, 0.32, 0.2, "brNDC");
+//label_algo->SetFillColor(kWhite);
+//label_algo->SetTextSize(labelTextSize);
+//label_algo->AddText(jetAlgoName.c_str());
+
+  TCanvas* c1 = new TCanvas("c1", "c1", 600, 600);
+  c1->SetLeftMargin(0.12);
+  c1->SetBottomMargin(0.12);
+  c1->cd();
+  if( logx ) c1->SetLogx();
+  if( logy ) c1->SetLogy();
+  axes->Draw();
+  for( unsigned i=0; i<objects.size(); ++i ) {
+    if( i==0 ) objects[i]->Draw("pl same");
+    else objects[i]->Draw("p same");
+  }
+  legend->Draw("same");
+  label_cms->Draw("same");
+  label_sqrt->Draw("same");
+  label_algo->Draw("same");
+
+  std::string name_eps = outputdir_ + "/" + name+".eps";
+  std::string name_png = outputdir_ + "/" + name+".png";
+  c1->SaveAs( name_eps.c_str() );
+  c1->SaveAs( name_png.c_str() );
+
+  delete c1;
+  c1 = 0;
+  delete axes;
+  axes = 0;
+  delete legend;
+  legend = 0;
+
+}
 
 
 
@@ -1787,6 +1863,105 @@ std::string DrawBase::get_algoName() const {
   }
 
   return algoName;
+
+}
+
+
+
+TPaveText* DrawBase::get_labelCMS( int legendQuadrant ) const {
+
+  if( legendQuadrant!=1 && legendQuadrant!=2 ) {
+    std::cout << "WARNING! Legend quadrant '" << legendQuadrant << "' not yet implemented for CMS label. Using 2." << std::endl;
+    legendQuadrant = 2;
+  }
+
+  float x1, y1, x2, y2;
+  if( legendQuadrant==1 ) {
+    x1 = 0.58;
+    y1 = 0.83;
+    x2 = 0.75;
+    y2 = 0.87;
+  } else if( legendQuadrant==2 ) {
+    x1 = 0.25;
+    y1 = 0.83;
+    x2 = 0.42;
+    y2 = 0.87;
+  }
+  
+  TPaveText* cmslabel = new TPaveText( x1, y1, x2, y2, "brNDC" );
+  cmslabel->SetFillColor(kWhite);
+  cmslabel->SetTextSize(0.038);
+  cmslabel->SetTextFont(62);
+  std::string label_CMS_text = this->get_CMSText();
+  cmslabel->AddText(label_CMS_text.c_str());
+
+  return cmslabel;
+
+}
+
+
+
+
+TPaveText* DrawBase::get_labelSqrt( int legendQuadrant ) const {
+
+  if( legendQuadrant!=1 && legendQuadrant!=2 ) {
+    std::cout << "WARNING! Legend quadrant '" << legendQuadrant << "' not yet implemented for Sqrt label. Using 2." << std::endl;
+    legendQuadrant = 2;
+  }
+
+
+  float x1, y1, x2, y2;
+  if( legendQuadrant==1 ) {
+    x1 = 0.58;
+    y1 = 0.78;
+    x2 = 0.75;
+    y2 = 0.82;
+  } else if( legendQuadrant==2 ) {
+    x1 = 0.25;
+    y1 = 0.78;
+    x2 = 0.42;
+    y2 = 0.82;
+  }
+
+
+  TPaveText* label_sqrt = new TPaveText(x1,y1,x2,y2, "brNDC");
+  label_sqrt->SetFillColor(kWhite);
+  label_sqrt->SetTextSize(0.038);
+  label_sqrt->SetTextFont(42);
+  std::string label_sqrt_text = this->get_sqrtText();
+  label_sqrt->AddText(label_sqrt_text.c_str());
+
+  return label_sqrt;
+
+}
+
+
+TPaveText* DrawBase::get_labelAlgo( int legendQuadrant ) const {
+
+  if( legendQuadrant!=2 && legendQuadrant!=3 ) {
+    std::cout << "WARNING! Legend quadrant '" << legendQuadrant << "' not yet implemented for Algo label. Using 3." << std::endl;
+    legendQuadrant = 3;
+  }
+
+  float x1, y1, x2, y2;
+  if( legendQuadrant==2 ) {
+    x1 = 0.27;
+    y1 = 0.82;
+    x2 = 0.32;
+    y2 = 0.86;
+  } else if( legendQuadrant==3 ) {
+    x1 = 0.27;
+    y1 = 0.15;
+    x2 = 0.32;
+    y2 = 0.2;
+  }
+
+  Float_t labelTextSize = 0.035;
+  std::string jetAlgoName = get_algoName();
+  TPaveText* label_algo = new TPaveText(x1,y1,x2,y2, "brNDC");
+  label_algo->SetFillColor(kWhite);
+  label_algo->SetTextSize(labelTextSize);
+  label_algo->AddText(jetAlgoName.c_str());
 
 }
 

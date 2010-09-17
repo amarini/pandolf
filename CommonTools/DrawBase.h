@@ -48,6 +48,10 @@ class DrawBase {
   void drawProfile( const std::string& yVar, const std::string& xVar, int legendQuadrant=1);
   void drawStack(const std::string& varY, const std::string& varX, const std::string& RECO_GEN, bool isData) const { this->drawStack( varY, varX, "", RECO_GEN, isData); };
   void drawStack(const std::string& varY, const std::string& varX, const std::string& etaRegion, const std::string& RECO_GEN, bool isData) const;
+  void drawObjects( const std::vector< TObject* > objects, const std::string& name, 
+                   const std::string& xAxisName, float xMin, float xMax, 
+                   const std::string& yAxisName, float yMin, float yMax, 
+                   bool logx=false, bool logy=false);
 
   void set_analysisType( const std::string analysisType ) { analysisType_ = analysisType; };
   void add_dataFile( TFile* dataFile, const std::string& datasetName );
@@ -61,9 +65,13 @@ class DrawBase {
   void set_scaleFactor( float scaleFactor ) { scaleFactor_ = scaleFactor;};
   void set_noStack( bool set ) { noStack_ = set; };
 
+  TPaveText* get_labelCMS( int legendQuadrant=2 ) const;
+  TPaveText* get_labelSqrt( int legendQuadrant=2 ) const;
+  TPaveText* get_labelAlgo( int legendQuadrant=3 ) const;
   std::string get_CMSText() const;
   std::string get_analysisType() const { return analysisType_; };
   std::string get_recoType() const { return recoType_; };
+  std::string get_flags() const { return flags_; };
   TFile* get_dataFile() const { return dataFile_.file; };
   TFile* get_mcFile( int i ) const { return mcFiles_[i].file; };
   std::string get_outputdir() const { return outputdir_; };
