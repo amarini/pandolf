@@ -6,9 +6,13 @@
 #include "AnalysisPhoton.h"
 #include "AnalysisJet.h"
 #include "TRandom3.h"
+#include "TVector2.h"
 #include "fitTools.C"
 
 
+#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
+#include "CondFormats/JetMETObjects/interface/SimpleJetCorrector.h"
+#include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 
 
 TreeAnalyzer_PhotonJet::TreeAnalyzer_PhotonJet( const std::string& dataset, const std::string& recoType, const std::string& jetAlgo, const std::string& flags, bool useGenJets, TTree* tree ) :
@@ -94,21 +98,6 @@ void TreeAnalyzer_PhotonJet::CreateOutputFile() {
   jetTree_->Branch("passedPhotonID_tight",&passedPhotonID_tight_, "passedPhotonID_tight_/O");
   jetTree_->Branch("matchedToMC",&matchedToMC_, "matchedToMC_/O");
 
-/*  jetTree_->Branch("nJetReco_caloItCone5",&nJetReco_caloItCone5_,"nJetReco_caloItCone5_/I");
-  jetTree_->Branch( "eJetReco_caloItCone5",  eJetReco_caloItCone5_,  "eJetReco_caloItCone5_/F");
-  jetTree_->Branch( "ptJetReco_caloItCone5",  ptJetReco_caloItCone5_,  "ptJetReco_caloItCone5_/F");
-  jetTree_->Branch("etaJetReco_caloItCone5", etaJetReco_caloItCone5_, "etaJetReco_caloItCone5_/F");
-  jetTree_->Branch("phiJetReco_caloItCone5", phiJetReco_caloItCone5_, "phiJetReco_caloItCone5_/F");
-  jetTree_->Branch( "eJetGen_caloItCone5",  eJetGen_caloItCone5_,  "eJetGen_caloItCone5_/F");
-  jetTree_->Branch(  "ptJetGen_caloItCone5",   ptJetGen_caloItCone5_,   "ptJetGen_caloItCone5_/F");
-  jetTree_->Branch( "etaJetGen_caloItCone5",  etaJetGen_caloItCone5_,  "etaJetGen_caloItCone5_/F");
-  jetTree_->Branch( "phiJetGen_caloItCone5",  phiJetGen_caloItCone5_,  "phiJetGen_caloItCone5_/F");
-  jetTree_->Branch("pdgIdPart_caloItCone5", pdgIdPart_caloItCone5_, "pdgIdPart_caloItCone5_/I");
-  jetTree_->Branch(   "ptPart_caloItCone5",    ptPart_caloItCone5_,    "ptPart_caloItCone5_/F");
-  jetTree_->Branch(  "etaPart_caloItCone5",   etaPart_caloItCone5_,   "etaPart_caloItCone5_/F");
-  jetTree_->Branch(  "phiPart_caloItCone5",   phiPart_caloItCone5_,   "phiPart_caloItCone5_/F");
-*/
-
   jetTree_->Branch("ePhotReco",  &ePhotReco_,  "ePhotReco_/F");
   jetTree_->Branch("ptPhotReco",  &ptPhotReco_,  "ptPhotReco_/F");
   jetTree_->Branch("etaPhotReco",  &etaPhotReco_,  "etaPhotReco_/F");
@@ -128,9 +117,8 @@ void TreeAnalyzer_PhotonJet::CreateOutputFile() {
   jetTree_->Branch("deltaR_phot",  &deltaR_phot_,  "deltaR_phot_/F");
 
   jetTree_->Branch("eJetReco",  &eJetReco_,  "eJetReco_/F");
-//jetTree_->Branch( "ptCorrJetReco",  &ptCorrJetReco_,  "ptCorrJetReco_/F");
-//jetTree_->Branch("eCorrJetReco",  &eCorrJetReco_,  "eCorrJetReco_/F");
   jetTree_->Branch( "ptJetReco",  &ptJetReco_,  "ptJetReco_/F");
+  jetTree_->Branch( "ptCorrJetReco",  &ptCorrJetReco_,  "ptCorrJetReco_/F");
   jetTree_->Branch("etaJetReco", &etaJetReco_, "etaJetReco_/F");
   jetTree_->Branch("phiJetReco", &phiJetReco_, "phiJetReco_/F");
   jetTree_->Branch(  "eJetGen",   &eJetGen_,   "eJetGen_/F");
@@ -147,6 +135,7 @@ void TreeAnalyzer_PhotonJet::CreateOutputFile() {
   jetTree_->Branch(  "phiPart2nd",   &phiPart2nd_,   "phiPart2nd_/F");
 
   jetTree_->Branch("pt2ndJetReco", &pt2ndJetReco_, "pt2ndJetReco_/F");
+  jetTree_->Branch("ptCorr2ndJetReco", &ptCorr2ndJetReco_, "ptCorr2ndJetReco_/F");
   jetTree_->Branch("eta2ndJetReco", &eta2ndJetReco_, "eta2ndJetReco_/F");
   jetTree_->Branch("phi2ndJetReco", &phi2ndJetReco_, "phi2ndJetReco_/F");
 
@@ -186,6 +175,7 @@ void TreeAnalyzer_PhotonJet::CreateOutputFile() {
   jetTree_->Branch("nPhotonsGen", &nPhotonsGen_, "nPhotonsGen_/I");
 
   jetTree_->Branch("epfMet",&epfMet_,"epfMet_/F");
+  jetTree_->Branch("epfMetCorr",&epfMetCorr_,"epfMetCorr_/F");
   jetTree_->Branch("phipfMet",&phipfMet_,"phipfMet_/F");
   jetTree_->Branch("eMet",&eMet_,"eMet_/F");
   jetTree_->Branch("phiMet",&phiMet_,"phiMet_/F");
@@ -459,6 +449,10 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
      AnalysisJet firstJet;
      AnalysisJet secondJet;
 
+     TVector2 vpfmet( epfMet*cos(phipfMet), epfMet*sin(phipfMet) );
+     vpfmet *= -1.; //now its just sum(pt vectors)
+     TVector2 vpfmetCorr( 0., 0.);
+
      //look for first jet:
      for(unsigned int iRecoJet=0; iRecoJet<nJet; ++iRecoJet) {
 
@@ -469,7 +463,6 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
        thisJet.phiReco = phiJet[iRecoJet];
        thisJet.etaReco = etaJet[iRecoJet];
      //thisJet.eCorrReco  =  eCorrJet[iRecoJet];
-     //thisJet.ptCorrReco  =  ptCorrJet[iRecoJet];
 
        thisJet.emfReco = (recoType_=="pf") ? 0. : emfJet[iRecoJet];
 
@@ -493,12 +486,33 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
        Float_t deltaPhi = fitTools::delta_phi( foundPhot.phi, thisJet.phiReco);
        Float_t pi = 3.14159;
        //if( (fabs(deltaPhi) > 2.*pi/3.) && (thisJet.ptReco > firstJet.ptReco) )
-       if( (fabs(deltaPhi) > pi/2.) && (thisJet.ptReco > firstJet.ptReco) )
+       if( (fabs(deltaPhi) > pi/2.) && (thisJet.ptReco > firstJet.ptReco) ) {
+         if(isMC) {
+           thisJet.ptCorrReco  =  (isMC) ? ptCorrJet[iRecoJet] : getCorrectedPt( thisJet.ptReco, thisJet.etaReco, (bool)false );
+         } else {
+           thisJet.ptCorrReco  =  (isMC) ? ptCorrJet[iRecoJet] : getCorrectedPt( thisJet.ptReco, thisJet.etaReco, (bool)true );
+         }
          firstJet = thisJet;
+       }
+
+
+     //// correct pf met by hand and create corrected missing et:
+     //if( thisJet.ptCorrReco>6. ) { // correct using only jets with pt corr > 6
+     // TVector2 v( thisJet.ptReco*cos(thisJet.phiReco), thisJet.ptReco*sin(thisJet.phiReco) );
+     // vpfmet -= v;
+     // TVector2 v2( thisJet.ptCorrReco*cos(thisJet.phiReco), thisJet.ptCorrReco*sin(thisJet.phiReco) );
+     // vpfmetCorr += v2;
+     //}
 
      } //for reco jets
 
+     //adding corrected met (with jets down to 6 gev) with the uncorrected soft leftovers:
+     //epfMetCorr_ = vpfmetCorr.Mod() + vpfmet.Mod(); 
+     epfMetCorr_ = 0.;
+
      if( firstJet.eReco == 0. ) continue;
+
+     
 
 
      //look for second jet:
@@ -514,8 +528,6 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
        thisJet.ptReco  =  ptJet[iRecoJet];
        thisJet.phiReco = phiJet[iRecoJet];
        thisJet.etaReco = etaJet[iRecoJet];
-     //thisJet.eCorrReco  =  eCorrJet[iRecoJet];
-     //thisJet.ptCorrReco  =  ptCorrJet[iRecoJet];
 
        if( (thisJet.etaReco == firstJet.etaReco)&&(thisJet.phiReco==firstJet.phiReco)&&
            (thisJet.ptReco==firstJet.ptReco) ) continue;
@@ -525,14 +537,17 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
        Float_t deltaPhi = foundPhot.phi - thisJet.phiReco;
        Float_t deltaR = sqrt( deltaEta*deltaEta + deltaPhi*deltaPhi );
 
-       if( deltaR > 0.25 ) { //far away from photon
+       float deltaR_thresh = (jetAlgo_=="akt7") ? 0.35 : 0.25;
+       if( deltaR > deltaR_thresh ) { //far away from photon
     
          pxSumReco += thisJet.pxReco();
          pySumReco += thisJet.pyReco();
          pzSumReco += thisJet.pzReco();
 
-         if( (thisJet.ptReco < firstJet.ptReco) && (thisJet.ptReco > secondJet.ptReco) )
+         if( (thisJet.ptReco < firstJet.ptReco) && (thisJet.ptReco > secondJet.ptReco) ) {
+           thisJet.ptCorrReco  =  (isMC) ? ptCorrJet[iRecoJet] : getCorrectedPt( thisJet.ptReco, thisJet.etaReco, (bool)true );
            secondJet = thisJet;
+         }
 
        }
 
@@ -644,7 +659,7 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
        eJetReco_  =  firstJet.eReco;
       ptJetReco_  =  firstJet.ptReco;
   //eCorrJetReco_  =  firstJet.eCorrReco;
-  //ptCorrJetReco_  =  firstJet.ptCorrReco;
+  ptCorrJetReco_  =  firstJet.ptCorrReco;
      phiJetReco_  =  firstJet.phiReco;
      etaJetReco_  =  firstJet.etaReco;
         eJetGen_  =  firstJet.eGen;
@@ -679,6 +694,7 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
      nMuonsGen_= firstJet.nMuonsGen;
 
      pt2ndJetReco_= secondJet.ptReco;
+     ptCorr2ndJetReco_= secondJet.ptCorrReco;
      eta2ndJetReco_= secondJet.etaReco;
      phi2ndJetReco_= secondJet.phiReco;
 
@@ -789,7 +805,8 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
 
      Float_t ptPhotMin = h1_eff_denom_vs_pt->GetBinLowEdge(1);
      // to compute efficiencies:
-     h1_eff_denom_vs_pt->Fill(ptPhotGen_, eventWeight_);
+     if( fabs(foundRecoPhot.eta)<1.3 )
+       h1_eff_denom_vs_pt->Fill(ptPhotGen_, eventWeight_);
      if( foundRecoPhot.pt>ptPhotMin && fabs(foundRecoPhot.eta)<1.3 && foundRecoPhot.passedPhotonID("medium") )
        h1_eff_num_medium_vs_pt->Fill(foundRecoPhot.ptGen, eventWeight_);
      if( foundRecoPhot.pt>ptPhotMin && fabs(foundRecoPhot.eta)<1.3 && foundRecoPhot.passedPhotonID("loose") )
@@ -865,4 +882,54 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
 } //loop
 
 
+float TreeAnalyzer_PhotonJet::getCorrectedPt( float pt, float eta, bool applyAlsoResidual ) {
+
+  std::string acronym;
+  if( recoType_=="calo" )
+    acronym = "Calo";
+  else if( recoType_=="pf" )
+    acronym = "PF";
+  else if( recoType_=="jpt" )
+    acronym = "JPT";
+  else {
+    std::cout << "RECOTYPE: " << recoType_ << " not implemented. Exiting" << std::endl;
+    exit(9191);
+  }
+  
+  std::string L2_filename = "Spring10_L2Relative_AK5" + acronym + ".txt"; 
+  std::string L3_filename = "Spring10_L3Absolute_AK5" + acronym + ".txt"; 
+  std::string Residual_filename = "Spring10DataV1_L2L3Residual_AK5" + acronym + ".txt"; 
+
+//std::cout << "eta: " << eta << " ptraw: " << pt;
+  pt *= getCorrectionFactor(L2_filename, pt, eta);
+//std::cout << " -> L2: " << pt;
+  pt *= getCorrectionFactor(L3_filename, pt, eta);
+//std::cout << " -> L3: " << pt;
+  if( applyAlsoResidual )
+    pt *= getCorrectionFactor(Residual_filename, pt, eta);
+//std::cout << " -> Residual: " << pt << std::endl;;
+
+  return pt;
+
+}
+
+
+float TreeAnalyzer_PhotonJet::getCorrectionFactor( const std::string& fileName, float pt, float eta ) {
+
+  std::string filePath = "CondFormats/JetMETObjects/data/" + fileName;
+  JetCorrectorParameters *JetCorPar = new JetCorrectorParameters(filePath);
+  std::vector<JetCorrectorParameters> vParam;
+  vParam.push_back(*JetCorPar);
+  FactorizedJetCorrector* jec = new FactorizedJetCorrector(vParam);
+  jec->setJetEta(eta);
+  jec->setJetPt(pt);
+  double corr = jec->getCorrection();
+  delete JetCorPar;
+  JetCorPar=0;
+  delete jec;
+  jec=0;
+
+  return corr;
+
+}
 
