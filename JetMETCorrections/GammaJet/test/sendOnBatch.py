@@ -1,57 +1,49 @@
 #! /usr/bin/env python
 import os
 import sys
+import re
 import time
 # set parameters to use cmst3 batch 
 #######################################
 ### usage  cmst3_submit_manyfilesperjob.py dataset njobs applicationName queue 
 #######################################
 if len(sys.argv) != 6:
-    print "usage sendOnBatch.py dataset recoType njobs applicationName queue"
+    print "usage sendOnBatch.py PDname SDname recoType jetAlgo njobs"
+    print "example : sendOnBatch.py QCD_Spring10 Pt80 pf akt5 100"
+    print "example : sendOnBatch.py EG Run2010A-PromptReco-v4 calo kt6 100"
     sys.exit(1)
-dataset = sys.argv[1]
-recoType = sys.argv[2]
+PDname = sys.argv[1]
+SDname = sys.argv[2]
+dataset_name = PDname + "_" + SDname
+dataset_path = PDname + "/" + SDname
+print "path: " + dataset_path + "  name: " + dataset_name
+recoType = sys.argv[3]
+jetAlgo = sys.argv[4]
+inputlist = "files_"+dataset_name+".txt"
 #inputlist = "files_EG_Run2010A_PromptReco_v4.txt"
-inputlist = "files_QCD_Spring10_Pt15to20.txt"
 #inputlist = "files_MinimumBias_Commissioning10_SD_EG_Jun14thSkim_v1.txt"
-#settingfile = "config/RSZZsettings.txt"
-output = dataset
 # choose among cmt3 8nm 1nh 8nh 1nd 1nw 
-#queue = "cmst3"
-#queue = "cms8nht3"
-queue = sys.argv[5]
+#queue = sys.argv[5]
+queue = "8nh"
 #ijobmax = 40
-ijobmax = int(sys.argv[3])
-#application = "VecbosApp"
-application = sys.argv[4]
+ijobmax = int(sys.argv[5])
+application = "do2ndLevel_PhotonJet_batch"
 # to write on the cmst3 cluster disks
 ################################################
-#castordir = "/castor/cern.ch/user/m/mpierini/CMST3/Vecbos/output/"
-#outputmain = castordir+output
 # to write on local disks
 ################################################
-#diskoutputdir = "/cmsrm/pc21_2/pandolf/DATA/EG/Run2010A-PromptReco-v4/"
-#diskoutputdir = "/cmsrm/pc21_2/pandolf/DATA/MinimumBias/Commissioning10_SD_EG_Jun14thSkim_v1/"
-#diskoutputdir = "/cmsrm/pc21_2/pandolf/DATA/EG/Run2010A-PromptReco-v4/"
-#castordir = "/castor/cern.ch/user/p/pandolf/DATA/EG/Run2010A-PromptReco-v4/"
-diskoutputdir = "/cmsrm/pc21_2/pandolf/MC/QCD_Spring10/QCDPt15to20_prova/"
-castordir = "/castor/cern.ch/user/p/pandolf/MC/QCD_Spring10/QCDPt15to20_prova/"
-#castordir = "/castor/cern.ch/user/p/pandolf/DATA/MinimumBias/Commissioning10_SD_EG_Jun14thSkim_v1/"
-outputmain = castordir
+#diskoutputdir = "/cmsrm/pc21_2/pandolf/DATA/EG/Run2010A-PromptReco-v4"
+if PDname=="EG":
+  diskoutputdir = "/cmsrm/pc21_2/pandolf/DATA/" + dataset_path
+else:
+  diskoutputdir = "/cmsrm/pc21_2/pandolf/MC/" + dataset_path
 diskoutputmain = diskoutputdir
 # prepare job to write on the cmst3 cluster disks
 ################################################
-os.system("mkdir -p "+dataset+"_"+recoType)
-os.system("mkdir -p "+dataset+"_"+recoType+"/log/")
-os.system("mkdir -p "+dataset+"_"+recoType+"/input/")
-os.system("mkdir -p "+dataset+"_"+recoType+"/src/")
-outputroot = outputmain+"/root/"
-if castordir != "none": 
-    os.system("rfmkdir -p "+outputmain)
-    os.system("rfmkdir -p "+outputroot)
-    os.system("rfchmod 777 "+outputmain)
-    os.system("rfchmod 777 "+outputroot)
-else: os.system("mkdir -p "+outputroot)
+os.system("mkdir -p "+dataset_name+"_"+recoType+jetAlgo)
+os.system("mkdir -p "+dataset_name+"_"+recoType+jetAlgo+"/log/")
+os.system("mkdir -p "+dataset_name+"_"+recoType+jetAlgo+"/input/")
+os.system("mkdir -p "+dataset_name+"_"+recoType+jetAlgo+"/src/")
 
 if diskoutputdir != "none": 
     os.system("ssh -o BatchMode=yes -o StrictHostKeyChecking=no pccmsrm21 mkdir -p "+diskoutputmain)
@@ -68,7 +60,7 @@ input = open(inputlist)
 
 for ijob in range(ijobmax):
     # prepare the list file
-    inputfilename = pwd+"/"+dataset+"_"+recoType+"/input/input_"+str(ijob)+".list"
+    inputfilename = pwd+"/"+dataset_name+"_"+recoType+jetAlgo+"/input/input_"+str(ijob)+".list"
     inputfile = open(inputfilename,'w')
     # if it is a normal job get filesperjob lines
     if ijob != (ijobmax-1):
@@ -86,20 +78,23 @@ for ijob in range(ijobmax):
     inputfile.close()
 
     # prepare the script to run
-    outputname = dataset+"_"+recoType+"/src/submit_"+str(ijob)+".src"
+    outputname = dataset_name+"_"+recoType+jetAlgo+"/src/submit_"+str(ijob)+".src"
     outputfile = open(outputname,'w')
     outputfile.write('#!/bin/bash\n')
     outputfile.write('export STAGE_HOST=castorcms\n')
     #    outputfile.write('cd '+pwd)
-    outputfile.write('cp '+pwd+'/Cert_132440-143336_7TeV_StreamExpress_Collisions10_CMSSWConfig_v2.txt $WORKDIR\n')
-    outputfile.write('cp '+pwd+'/csvfile_upto143336.csv $WORKDIR\n')
+    outputfile.write('cp '+pwd+'/Cert_*.txt $WORKDIR\n')
+    outputfile.write('cp '+pwd+'/csv*.txt $WORKDIR\n')
+    outputfile.write('cp -r  /afs/cern.ch/user/p/pandolf/scratch1/CMSSW_3_6_3/src/CondFormats $WORKDIR\n')
+    outputfile.write("echo copied CondFormats\n")
     outputfile.write('cd $WORKDIR\n')
-    outputfile.write(pwd+'/'+application+" "+dataset+" "+recoType+" akt5 "+inputfilename+" _"+str(ijob)+"\n")
-    outputfile.write('ls *.root | xargs -i rfcp {} '+outputroot+'\n')
+    outputfile.write(pwd+'/'+application+" "+dataset_name+" "+recoType+" "+jetAlgo+" "+inputfilename+" _"+str(ijob)+"\n") 
+    # select this for GENJETS ntuples:
+    #outputfile.write(pwd+'/'+application+" "+dataset_name+" "+recoType+" "+jetAlgo+" "+inputfilename+" _"+str(ijob)+" true\n")
     outputfile.write('ls *.root | xargs -i scp -o BatchMode=yes -o StrictHostKeyChecking=no {} pccmsrm21:'+diskoutputmain+'/{}\n') 
     outputfile.close
-    os.system("echo bsub -q "+queue+" -o "+dataset+"_"+recoType+"/log/"+dataset+"_"+str(ijob)+".log source "+pwd+"/"+outputname)
-    os.system("bsub -q "+queue+" -o "+dataset+"_"+recoType+"/log/"+dataset+"_"+str(ijob)+".log source "+pwd+"/"+outputname+" -copyInput="+dataset+"_"+str(ijob))
+    os.system("echo bsub -q "+queue+" -o "+dataset_name+"_"+recoType+jetAlgo+"/log/"+dataset_name+"_"+str(ijob)+".log source "+pwd+"/"+outputname)
+    os.system("bsub -q "+queue+" -o "+dataset_name+"_"+recoType+jetAlgo+"/log/"+dataset_name+"_"+str(ijob)+".log source "+pwd+"/"+outputname+" -copyInput="+dataset_name+"_"+str(ijob))
     ijob = ijob+1
     time.sleep(5.)
     continue
