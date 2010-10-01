@@ -322,18 +322,26 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
 
     TH1F* refHisto = (noDATA) ? mcHistos[0] : dataHisto;
 
-    Float_t yAxisMaxScale = (name=="phiJet" || name=="etaJet" || name=="ptSecondJetRel" || name=="phiPhot" || name=="etaPhot" ) ? 1.8 : 1.6;
+    Float_t yAxisMaxScale = (name=="phiJet" || name=="etaJet" || name=="ptSecondJetRel" || name=="phiPhot" || name=="etaPhot" ) ? 1.8 : 1.4;
     if( name=="phiPhot" || name=="etaPhot" ) yAxisMaxScale=2.;
     if(name=="clusterMajPhotReco" || name=="clusterMinPhotReco") yAxisMaxScale = 2.;
     Float_t xMin = refHisto->GetXaxis()->GetXmin();
     Float_t xMax = refHisto->GetXaxis()->GetXmax();
     Float_t yMax_data = (noDATA) ? 0. : dataHisto->GetMaximum();
     Float_t yMax_mc = (noMC) ? 0. : mcHisto_sum->GetMaximum();
+    if( scaleFactor_<0. ) yMax_mc /= mcHisto_sum->Integral(0, mcHisto_sum->GetNbinsX()+1);
+    if( scaleFactor_<0. && noDATA ) {
+      for( unsigned i=0; i<mcHistos.size(); ++i ) {
+        if( mcHistos[i]->GetMaximum() > yMax_mc ) yMax_mc = mcHistos[i]->GetMaximum();
+      }
+    }
     Float_t yMax = (yMax_data>yMax_mc) ? yAxisMaxScale*yMax_data : yAxisMaxScale*yMax_mc;
     Float_t yMin = 0.;
 
 
     std::string xAxis = (axisName=="") ? get_axisName(name) : axisName;
+    if( flags=="1" ) xAxis = "First " + xAxis;
+    if( flags=="2" ) xAxis = "Second " + xAxis;
 
     std::string instanceName = (analysisType_=="MinBias") ? "Jets" : "Events";
     std::string yAxis = instanceName;
@@ -376,12 +384,6 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
 
     std::string etaRange = get_etaRangeText( etaRegion );
 
-    TH2D* h2_axes = new TH2D("axes", "", 10, xMin, xMax, 10, yMin, yMax);
-    h2_axes->SetXTitle(xAxis.c_str());
-    h2_axes->SetYTitle(yAxis.c_str());
-    h2_axes->GetXaxis()->SetTitleOffset(1.1);
-    h2_axes->GetYaxis()->SetTitleOffset(1.5);
-
     if( legendQuadrant<0 || legendQuadrant>5 ) {
       std::cout << "Invalid legendQuadrant! Exiting!" << std::endl;
       exit(1);
@@ -414,6 +416,13 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
       legend_yMax = 0.25;
     }
 
+    if( mcFiles_.size() > 4 ) {
+      yMax *= 1.2;
+      if( legendQuadrant==1 || legendQuadrant==2 )  legend_yMin *= 0.85;
+      if( legendQuadrant==3 || legendQuadrant==4 )  legend_yMax *= 1.15;
+    }
+       
+
 
     TLegend* legend = new TLegend(legend_xMin, legend_yMin, legend_xMax, legend_yMax);
     legend->SetFillColor(kWhite);
@@ -425,21 +434,16 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
         legend->AddEntry(mcHistos[i], (mcFiles_[i].legendName).c_str(), "F");
     }
 
+    TH2D* h2_axes = new TH2D("axes", "", 10, xMin, xMax, 10, yMin, yMax);
+    h2_axes->SetXTitle(xAxis.c_str());
+    h2_axes->SetYTitle(yAxis.c_str());
+    h2_axes->GetXaxis()->SetTitleOffset(1.1);
+    h2_axes->GetYaxis()->SetTitleOffset(1.5);
+
+
     TPaveText* label_cms = get_labelCMS(2);
-  //TPaveText* label_cms = new TPaveText(0.25, 0.83, 0.42, 0.87, "brNDC");
-  //label_cms->SetFillColor(kWhite);
-  //label_cms->SetTextSize(0.038);
-  //label_cms->SetTextFont(62);
-  //std::string label_CMS_text = this->get_CMSText();
-  //label_cms->AddText(label_CMS_text.c_str());
 
     TPaveText* label_sqrt = get_labelSqrt(2);
-  //TPaveText* label_sqrt = new TPaveText(0.25, 0.78, 0.42, 0.82, "brNDC");
-  //label_sqrt->SetFillColor(kWhite);
-  //label_sqrt->SetTextSize(0.038);
-  //label_sqrt->SetTextFont(42);
-  //std::string label_sqrt_text = this->get_sqrtText();
-  //label_sqrt->AddText(label_sqrt_text.c_str());
 
     TPaveText* label_cuts = 0;
     if( analysisType_ == "MinBias" ) {
@@ -535,6 +539,8 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
         for( unsigned i=0; i<mcHistos.size(); ++i ) {
           int backwardsIndex = mcHistos.size()-1-i; //backwards is prettier: bg on the back, signal in front
           mcHistos[backwardsIndex]->SetFillStyle(mcFiles_[backwardsIndex].fillStyle);
+          mcHistos[backwardsIndex]->SetLineColor(mcFiles_[backwardsIndex].fillColor);
+          mcHistos[backwardsIndex]->SetLineWidth(2);
           mcHistos[backwardsIndex]->Draw("h same");
         }
       }
@@ -1318,13 +1324,13 @@ std::string DrawBase::get_axisName(std::string name) {
   if( name=="etaJet"|| name=="eta" ) axisName = "Jet #eta";
   if( name=="phiJet"|| name=="phi" ) axisName = "Jet #phi";
   if( name=="nCandJet" ) axisName = "N Candidates";
-  if( name=="RchJet"|| name=="Rch" ) axisName = "R_{ch}";
-  if( name=="RnhJet"|| name=="Rnh" ) axisName = "R_{nh}";
-  if( name=="RgammaJet"|| name=="Rgamma" ) axisName = "R_{#gamma}";
-  if( name=="RgammanhJet"|| name=="Rgammanh" ) axisName = "R_{#gamma+nh}";
-  if( name=="EchJet"|| name=="Ech" ) axisName = "E_{ch} [GeV]";
-  if( name=="EnhJet"|| name=="Enh" ) axisName = "E_{nh} [GeV]";
-  if( name=="EgammaJet"|| name=="Egamma" ) axisName = "E_{#gamma} [GeV]";
+  if( name=="RchJet"|| name=="Rch" ) axisName = "Jet R_{ch}";
+  if( name=="RnhJet"|| name=="Rnh" ) axisName = "Jet R_{nh}";
+  if( name=="RgammaJet"|| name=="Rgamma" ) axisName = "Jet R_{#gamma}";
+  if( name=="RgammanhJet"|| name=="Rgammanh" ) axisName = "Jet R_{#gamma+nh}";
+  if( name=="EchJet"|| name=="Ech" ) axisName = "Jet E_{ch} [GeV]";
+  if( name=="EnhJet"|| name=="Enh" ) axisName = "Jet E_{nh} [GeV]";
+  if( name=="EgammaJet"|| name=="Egamma" ) axisName = "Jet E_{#gamma} [GeV]";
   if( name=="EgammanhJet" || name=="Egammanh" ) axisName = "Energy of Photons + Neutral Hadrons in Jet";
   if( name=="PTchJet"|| name=="PTch" ) axisName = "p_{T}^{ch} [GeV/c]";
   if( name=="PTnhJet"|| name=="PTnh" ) axisName = "p_{T}^{nh} [GeV/c]";
@@ -1336,10 +1342,14 @@ std::string DrawBase::get_axisName(std::string name) {
   if( name=="MoEJet" ) axisName = "Jet Invariant Mass / Energy";
   if( name=="ptOverMJet" ) axisName = "Jet p_{T} / Invariant Mass";
   if( name=="pOverMJet" ) axisName = "Jet Momentum / Invariant Mass";
-  if( name=="diJetMass" || name=="JetJetMass" ) axisName = "DiJet Invariant Mass [GeV/c ^{2}]";
-  if( name=="ZZInvMass" ) axisName = "ZZ Invariant Mass [GeV/c ^{2}]";
-  if( name=="LeptLeptMass" ) axisName = "DiLepton Invariant Mass [GeV/c ^{2}]";
-  if( name=="EleEleMass" ) axisName = "DiElectron Invariant Mass [GeV/c ^{2}]";
+  if( name=="diJetMass" || name=="JetJetMass" ) axisName = "DiJet Invariant Mass [GeV/c^{2}]";
+  if( name=="deltaRjj" ) axisName = "Jet-Jet #Delta R";
+  if( name=="deltaRZZ" ) axisName = "Z-Z #Delta R";
+  if( name=="ptZZ" ) axisName = "ZZ p_{T} [GeV/c]";
+  if( name=="ZZInvMass" ) axisName = "ZZ Invariant Mass [GeV/c^{2}]";
+  if( name=="ZZInvMass" ) axisName = "ZZ Invariant Mass [GeV/c^{2}]";
+  if( name=="LeptLeptMass" ) axisName = "DiLepton Invariant Mass [GeV/c^{2}]";
+  if( name=="EleEleMass" ) axisName = "DiElectron Invariant Mass [GeV/c^{2}]";
   if( name=="MuMuMass" ) axisName = "DiMuon Invariant Mass [GeV/c ^{2}]";
   if( name=="EphotAveJet" ) axisName = "Average Photon Energy in Jet [GeV]";
   if( name=="NchJet" || name=="Nch" ) axisName = "Number of Charged Hadrons in Jet";
