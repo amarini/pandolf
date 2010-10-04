@@ -64,6 +64,7 @@ class DrawBase {
   void set_pdf_aussi( bool pdf_aussi ) { pdf_aussi_ = pdf_aussi; };
   void set_scaleFactor( float scaleFactor ) { scaleFactor_ = scaleFactor;};
   void set_noStack( bool set ) { noStack_ = set; };
+  void set_rebin( int rebin ) { rebin_ = rebin; };
 
   TPaveText* get_labelCMS( int legendQuadrant=2 ) const;
   TPaveText* get_labelSqrt( int legendQuadrant=2 ) const;
@@ -103,6 +104,8 @@ class DrawBase {
   
   Float_t scaleFactor_;
   Float_t lumi_;
+
+  Int_t rebin_;
 
   std::string outputdir_;
   Int_t pt_thresh_;

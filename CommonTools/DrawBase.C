@@ -27,6 +27,7 @@ DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType
   dataFile_.file = 0;
 
   scaleFactor_ = 0.;
+  rebin_ = 1;
 
   pdf_aussi_ = false;
   noStack_ = false;
@@ -34,37 +35,10 @@ DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType
   // this is needed to avoid the same-histogram problem:
   TH1F::AddDirectory(kFALSE);
 
-//  mcFile_ = 0;
-//  mcFile2_ = 0;
 
 }
 
 
-/*DrawBase::DrawBase(  const std::string analysisType, TFile* dataFile, TFile* mcFile, std::string outputdir, Int_t pt_thresh, Float_t etamax, std::string raw_corr, bool pdf_aussi ) {
-
-  TStyle *simpleStyle = new TStyle("simpleStyle","");
-  simpleStyle->SetCanvasColor(0);
-  simpleStyle->SetPadColor(0);
-  simpleStyle->SetFrameFillColor(0);
-  simpleStyle->SetStatColor(0);
-  simpleStyle->SetOptStat(0);
-  simpleStyle->SetTitleFillColor(0);
-  simpleStyle->SetCanvasBorderMode(0);
-  simpleStyle->SetPadBorderMode(0);
-  simpleStyle->SetFrameBorderMode(0);
-  simpleStyle->cd();
-
-  dataFile_ = dataFile;
-  mcFile_ = mcFile;
-
-  outputdir_ = outputdir;
-  pt_thresh_ = pt_thresh;
-  etamax_ = etamax;
-  raw_corr_ = raw_corr;
-  pdf_aussi_ = pdf_aussi;
-
-}
-*/
 
 DrawBase::~DrawBase() {
 
@@ -80,10 +54,6 @@ DrawBase::~DrawBase() {
     }
   }
 
-//if( mcFile2_!=0 ) {
-//  delete mcFile2_;
-//  mcFile2_=0;
-//}
 
 }
 
@@ -254,8 +224,10 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
       //return;
       noDATA = true;
     }
-    if( !noDATA )
+    if( !noDATA ) {
+      dataHisto->Rebin(rebin_);
       dataHisto->SetMarkerStyle(20);
+    }
 
 
     std::vector<TH1F*> mcHistos;
@@ -272,8 +244,9 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
     if( !noMC ) {
       mcHistos.push_back(mcHisto0);
       mcHistos[0]->SetFillColor( mcFiles_[0].fillColor );
+      mcHistos[0]->Rebin(rebin_);
 
-       mcHisto_sum = new TH1F(*((TH1F*)mcHistos[0]->Clone()));
+      mcHisto_sum = new TH1F(*((TH1F*)mcHistos[0]->Clone()));
       if( mcFiles_.size()>1 ) {
         for( unsigned i=1; i<mcFiles_.size(); ++i ) {
           mcFiles_[i].file->cd();
@@ -282,6 +255,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
             std::cout << "Didn't find MC histo '" << histoName << "'. Continuing." << std::endl;
             return;
           }
+          mcHistos[i]->Rebin(rebin_);
           mcHistos[i]->SetFillColor( mcFiles_[i].fillColor );
           mcHisto_sum->Add( (TH1F*)(mcHistos[i]->Clone()) );
         } //for mc files
@@ -312,6 +286,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
         std::cout << "DATA and MC files not properly initialized. Will not normalize." << std::endl;
       }
     } //if scalefactor
+
 
     // create stack:
     THStack* mcHisto_stack = new THStack();
@@ -417,7 +392,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
     }
 
     if( mcFiles_.size() > 4 ) {
-      yMax *= 1.2;
+      yMax *= 1.15;
       if( legendQuadrant==1 || legendQuadrant==2 )  legend_yMin *= 0.85;
       if( legendQuadrant==3 || legendQuadrant==4 )  legend_yMax *= 1.15;
     }
@@ -545,8 +520,9 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
         }
       }
     } // if !nomc
-    if( !noDATA )
+    if( !noDATA ) {
       dataHisto->Draw("E same");
+    }
     gPad->RedrawAxis();
     label_cms->Draw("same");
     label_sqrt->Draw("same");
@@ -709,8 +685,9 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
           }
         }
       } // if !nomc
-      if( !noDATA )
+      if( !noDATA ) {
         dataHisto->Draw("E same");
+      }
       gPad->RedrawAxis();
       legend->Draw("same");
       label_cms->Draw("same");
@@ -1809,7 +1786,7 @@ std::string DrawBase::get_etaRangeText( const std::string& etaRegion ) const {
 
 std::string DrawBase::get_sqrtText() const {
 
-  if( lumi_==0. || dataFile_.file==0 ) {
+  if( lumi_==0. ) {
     return std::string("#sqrt{s} = 7 TeV");
   }
   float lumi4Text(lumi_);
