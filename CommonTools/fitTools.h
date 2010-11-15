@@ -25,6 +25,8 @@ public:
 
   static void getBins( int nBins_total, Double_t* Lower, Double_t xmin, Double_t xmax, bool plotLog=true);
 
+  static void getBins_int( int nBins_total, Double_t* Lower, Double_t xmin, Double_t xmax, bool plotLog=true);
+
   static void getPtBins(int nBins, Double_t* Lower, bool plotLog=true);
 
   static int getNbins_stack( const std::string& varName );

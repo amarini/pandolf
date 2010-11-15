@@ -70,7 +70,28 @@ void fitTools::getBins( int nBins_total, Double_t* Lower, Double_t xmin, Double_
     if (plotLog) Lower[i] = Lower[i-1] * dx;
     else         Lower[i] = Lower[i-1] + dx;
 
-std::cout << Lower[i] << std::endl;
+
+  }
+
+  Lower[nBins] = xmax;
+
+}
+
+void fitTools::getBins_int( int nBins_total, Double_t* Lower, Double_t xmin, Double_t xmax, bool plotLog) {
+
+  Double_t Lower_exact;
+  int nBins = nBins_total-1;
+  const double dx = (plotLog) ? pow((xmax / xmin), (1. / (double)nBins)) : ((xmax - xmin) / (double)nBins);
+  Lower[0] = xmin;
+  Lower_exact = Lower[0];
+  for (int i = 1; i != nBins; ++i) {
+
+    if (plotLog) {
+      Lower_exact *= dx;
+      Lower[i] = TMath::Ceil(Lower_exact);
+    } else {
+      Lower[i] = TMath::Ceil(Lower[i-1] + dx);
+    }
 
   }
 

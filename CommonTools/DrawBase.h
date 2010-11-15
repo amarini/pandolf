@@ -32,6 +32,22 @@ struct InputFile {
 };
 
 
+struct HistoAndName {
+  std::string histoName;
+  std::string legendName;
+};
+
+
+struct LegendBox {
+
+  float xMin;
+  float xMax;
+  float yMin;
+  float yMax;
+
+};
+
+
 class DrawBase {
 
  public:
@@ -48,6 +64,8 @@ class DrawBase {
   void drawProfile( const std::string& yVar, const std::string& xVar, int legendQuadrant=1);
   void drawStack(const std::string& varY, const std::string& varX, const std::string& RECO_GEN, bool isData) const { this->drawStack( varY, varX, "", RECO_GEN, isData); };
   void drawStack(const std::string& varY, const std::string& varX, const std::string& etaRegion, const std::string& RECO_GEN, bool isData) const;
+  void compareDifferentHistos( const std::vector< HistoAndName > histosandnames, const std::string xAxisName, const std::string saveVarName, bool normalized=true, int legendQuadrant=1 );
+  void compareDifferentHistos_singleFile( InputFile file, const std::vector< HistoAndName > histosandnames, const std::string xAxisName, const std::string saveVarName, bool normalized=true, int legendQuadrant=1 );
   void drawObjects( const std::vector< TObject* > objects, const std::string& name, 
                    const std::string& xAxisName, float xMin, float xMax, 
                    const std::string& yAxisName, float yMin, float yMax, 
@@ -66,6 +84,7 @@ class DrawBase {
   void set_noStack( bool set ) { noStack_ = set; };
   void set_rebin( int rebin ) { rebin_ = rebin; };
 
+  LegendBox get_legendBox( int legendQuadrant=1, const std::vector<std::string>* legendNames=0 ) const;
   TPaveText* get_labelCMS( int legendQuadrant=2 ) const;
   TPaveText* get_labelSqrt( int legendQuadrant=2 ) const;
   TPaveText* get_labelAlgo( int legendQuadrant=3 ) const;

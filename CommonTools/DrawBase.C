@@ -1,6 +1,8 @@
 #include "DrawBase.h"
 #include "fitTools.h"
 #include <iostream>
+#include <algorithm>
+
 
 
 
@@ -22,6 +24,7 @@ DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType
   recoType_ = recoType;
   jetAlgo_ = jetAlgo;
 
+  lumi_ = 0.;
   flags_ = flags;
 
   dataFile_.file = 0;
@@ -231,7 +234,9 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
 
 
     std::vector<TH1F*> mcHistos;
-    TH1F* mcHisto0 = (mcFiles_[0].file==0) ? 0 : (TH1F*)mcFiles_[0].file->Get(histoName.c_str());
+    TH1F* mcHisto0 = 0;
+    if( mcFiles_.size()> 0 && mcFiles_[0].file!=0) 
+      mcHisto0 = (TH1F*)mcFiles_[0].file->Get(histoName.c_str());
     if( mcHisto0==0 ) noMC = true;
 
     if( noDATA && noMC ) {
@@ -264,7 +269,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
 
 
     // normalize:
-    if( scaleFactor_ > 0. ) {
+    if( scaleFactor_ > 0. && !noMC ) {
       mcHisto_sum->Scale(scaleFactor_);
       for( unsigned i=0; i<mcHistos.size(); ++i )
         mcHistos[i]->Scale(scaleFactor_);
@@ -322,7 +327,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
     std::string yAxis = instanceName;
     if( name=="ptJet" || name=="ptCorrJet" ) {
       char yAxis_char[50];
-      sprintf(yAxis_char, "%s/(%d GeV/c)", instanceName.c_str(), (Int_t)refHisto->GetBinWidth(1));
+      sprintf(yAxis_char, "%s / (%d GeV/c)", instanceName.c_str(), (Int_t)refHisto->GetBinWidth(1));
       std::string yAxis_tmp(yAxis_char);
       yAxis=yAxis_tmp;
     }  
@@ -341,9 +346,9 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
       double fractpart, intpart;
       fractpart = modf( refHisto->GetBinWidth(1), &intpart);
       if(fractpart==0.)
-        sprintf(yAxis_char, "Events/(%.0f GeV/c^{2})", refHisto->GetBinWidth(1));
+        sprintf(yAxis_char, "Events / (%.0f GeV/c^{2})", refHisto->GetBinWidth(1));
       else
-        sprintf(yAxis_char, "Events/(%.2f GeV/c^{2})", refHisto->GetBinWidth(1));
+        sprintf(yAxis_char, "Events / (%.2f GeV/c^{2})", refHisto->GetBinWidth(1));
       std::string yAxis_tmp(yAxis_char);
       yAxis=yAxis_tmp;
     }  
@@ -359,47 +364,17 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
 
     std::string etaRange = get_etaRangeText( etaRegion );
 
-    if( legendQuadrant<0 || legendQuadrant>5 ) {
-      std::cout << "Invalid legendQuadrant! Exiting!" << std::endl;
-      exit(1);
+
+    LegendBox lb = get_legendBox(legendQuadrant);
+    int totalNfiles = mcFiles_.size();
+    if( dataFile_.file!=0 ) totalNfiles++;
+
+    if( totalNfiles > 5 ) {
+      yMax *= 1.2;
     }
 
-    Float_t legend_xMin;
-    Float_t legend_yMin;
-    Float_t legend_xMax;
-    Float_t legend_yMax;
 
-    if( legendQuadrant==1 ) {
-      legend_xMin = 0.6;
-      legend_yMin = 0.73;
-      legend_xMax = 0.88;
-      legend_yMax = 0.88;
-    } else if( legendQuadrant==0 ) {
-      legend_xMin = 0.5;
-      legend_yMin = 0.73;
-      legend_xMax = 0.73;
-      legend_yMax = 0.88;
-    } else if( legendQuadrant==2 ) {
-      legend_xMin = 0.18;
-      legend_yMin = 0.73;
-      legend_xMax = 0.41;
-      legend_yMax = 0.88;
-    } else if( legendQuadrant==5 ) {
-      legend_xMin = 0.4;
-      legend_yMin = 0.15;
-      legend_xMax = 0.6;
-      legend_yMax = 0.25;
-    }
-
-    if( mcFiles_.size() > 4 ) {
-      yMax *= 1.15;
-      if( legendQuadrant==1 || legendQuadrant==2 )  legend_yMin *= 0.85;
-      if( legendQuadrant==3 || legendQuadrant==4 )  legend_yMax *= 1.15;
-    }
-       
-
-
-    TLegend* legend = new TLegend(legend_xMin, legend_yMin, legend_xMax, legend_yMax);
+    TLegend* legend = new TLegend(lb.xMin, lb.yMin, lb.xMax, lb.yMax);
     legend->SetFillColor(kWhite);
     legend->SetTextSize(0.035);
     if( !noDATA )
@@ -1171,35 +1146,9 @@ void DrawBase::drawProfile( const std::string& yVar, const std::string& xVar, in
   h2_axes->GetYaxis()->SetTitleOffset(1.2);
 
 
-  if( legendQuadrant<0 || legendQuadrant>5 ) {
-    std::cout << "Invalid legendQuadrant! Exiting!" << std::endl;
-    exit(1);
-  }
+  LegendBox lb = get_legendBox(legendQuadrant);
 
-  Float_t legend_xMin;
-  Float_t legend_yMin;
-  Float_t legend_xMax;
-  Float_t legend_yMax;
-
-  if( legendQuadrant==1 ) {
-    legend_xMin = 0.6;
-    legend_yMin = 0.73;
-    legend_xMax = 0.88;
-    legend_yMax = 0.88;
-  } else if( legendQuadrant==2 ) {
-    legend_xMin = 0.20;
-    legend_yMin = 0.7;
-    legend_xMax = 0.41;
-    legend_yMax = 0.88;
-  } else if( legendQuadrant==5 ) {
-    legend_xMin = 0.4;
-    legend_yMin = 0.15;
-    legend_xMax = 0.6;
-    legend_yMax = 0.25;
-  }
-
-
-  TLegend* legend = new TLegend(legend_xMin, legend_yMin, legend_xMax, legend_yMax);
+  TLegend* legend = new TLegend(lb.xMin, lb.yMin, lb.xMax, lb.yMax);
   legend->SetFillColor(kWhite);
   legend->SetTextSize(0.035);
   legend->AddEntry(dataProfile, "Data", "P");
@@ -1611,6 +1560,176 @@ void DrawBase::drawStack(const std::string& varY, const std::string& varX, const
 
 
 
+
+void DrawBase::compareDifferentHistos( const std::vector< HistoAndName > histos, const std::string xAxisName, const std::string saveVarName, bool normalized, int legendQuadrant ) {
+
+  if( dataFile_.file!=0 ) compareDifferentHistos_singleFile( dataFile_, histos, xAxisName, saveVarName, normalized, legendQuadrant );
+  for( unsigned iMC=0; iMC<mcFiles_.size(); ++iMC ) compareDifferentHistos_singleFile( mcFiles_[iMC], histos, xAxisName, saveVarName, normalized, legendQuadrant );
+
+}
+
+
+
+
+void DrawBase::compareDifferentHistos_singleFile( InputFile infile, const std::vector< HistoAndName > histosandnames, const std::string xAxisName, const std::string saveVarName, bool normalized, int legendQuadrant ) {
+
+  std::vector< TH1F* > histos;
+  std::vector<std::string> legendNames;
+
+  for( unsigned i=0; i<histosandnames.size(); ++i ) {
+    TH1F* thisHisto = (TH1F*)infile.file->Get((histosandnames[i].histoName).c_str());
+    if( thisHisto!=0 ) histos.push_back(thisHisto);
+    else  std::cout << "Didn't find histo '" << histosandnames[i].histoName << "' in file '" << infile.file->GetName() << "'. Skipping." << std::endl;
+
+    legendNames.push_back( histosandnames[i].legendName );
+
+  }
+
+  if( histos.size()==0 ) {
+    std::cout << "Didn't find anything. Exiting." << std::endl;
+    return;
+  }
+
+
+  std::vector< int > fillColors;
+  fillColors.push_back( 46 );
+  fillColors.push_back( 38 );
+  fillColors.push_back( kOrange );
+  fillColors.push_back( kGray+3 );
+  fillColors.push_back( kRed+3 );
+  fillColors.push_back( 30 );
+  fillColors.push_back( 40 );
+
+  LegendBox lb = get_legendBox(legendQuadrant, &legendNames);
+  // look for longest legend name:
+//int maxSize=0;
+//for( unsigned i=0; i<histosandnames.size(); ++i) {
+//  if( histosandnames[i].legendName.size() > maxSize ) maxSize = histosandnames[i].legendName.size();
+//}
+//if( maxSize > 15 ) {
+//  if( legendQuadrant==1 || legendQuadrant==4 ) lb.xMin *=0.95;
+//  if( legendQuadrant==2 || legendQuadrant==3 ) lb.xMax *=1.05;
+//}
+
+  TLegend* legend = new TLegend( lb.xMin, lb.yMin, lb.xMax, lb.yMax );
+  legend->SetFillColor(0);
+  legend->SetTextSize(0.035);
+
+
+  float xMin, xMax, yMin, yMax;
+  yMin = 0.;
+
+
+  for( unsigned iHisto=0; iHisto<histos.size(); ++iHisto ) {
+
+    if( normalized ) {
+      Float_t integral = histos[iHisto]->Integral(0, histos[iHisto]->GetNbinsX()+1);
+      histos[iHisto]->Scale( 1./integral );
+    }
+
+    // 1. look for axis ranges:
+    float this_xMin = histos[0]->GetXaxis()->GetXmin();
+    float this_xMax = histos[0]->GetXaxis()->GetXmax();
+    float this_yMax = histos[0]->GetMaximum();
+  
+    if( iHisto==0 ) {  
+      xMin = this_xMin;
+      xMax = this_xMax;
+      yMax = this_yMax;
+    } else {
+      if( this_xMin < xMin ) xMin = this_xMin;
+      if( this_xMax > xMax ) xMax = this_xMax;
+      if( this_yMax > yMax ) yMax = this_yMax;
+    }
+
+    // 2. set fill colors and styles
+    histos[iHisto]->SetFillStyle( 3004+iHisto );
+    if( iHisto<fillColors.size() ) {
+      histos[iHisto]->SetFillColor( fillColors[iHisto] );
+      histos[iHisto]->SetLineColor( fillColors[iHisto] );
+    } else {
+      histos[iHisto]->SetFillColor( iHisto );
+      histos[iHisto]->SetLineColor( iHisto );
+    }
+    histos[iHisto]->SetLineWidth(2);
+    histos[iHisto]->Rebin(rebin_);
+
+    
+    // 3. add to legend
+    legend->AddEntry( histos[iHisto], (histosandnames[iHisto].legendName).c_str() , "F");
+
+  }
+
+  yMax *= 1.6;
+  if( histos.size()>4 ) yMax *= 1.15;
+
+  TH2D* h2_axes = new TH2D("axes", "", 10, xMin, xMax, 10, yMin, yMax);
+  h2_axes->GetXaxis()->SetTitleOffset(1.1);
+  h2_axes->GetYaxis()->SetTitleOffset(1.5);
+  h2_axes->SetXTitle( xAxisName.c_str() );
+  if( normalized )
+    h2_axes->SetYTitle( "Normalized to Unity" );
+  else
+    h2_axes->SetYTitle( "Entries" ) ;
+  
+  TPaveText* label_CMS = get_labelCMS();
+  TPaveText* label_sqrt = get_labelSqrt();
+
+  std::vector<TPaveText*> rmsText;
+  float yMin_text = 0.25;
+  float yMax_text = 0.55;
+  //float yStep = (yMax_text-yMin_text)/(float)histos.size();
+  float yStep = std::min( (float)0.05, (yMax_text-yMin_text)/(float)histos.size() );
+  for( unsigned iText=0; iText<histos.size(); ++iText ) {
+    TPaveText* rms = new TPaveText(0.6, yMax_text-(iText+1)*yStep, 0.8, yMax_text-iText*yStep, "brNDC");
+    rms->SetFillColor(0);
+    rms->SetTextSize(0.035);
+    rms->SetTextColor(histos[iText]->GetFillColor());
+    char rms_text[150];
+    sprintf( rms_text, "RMS = %.2f #pm %.2f", histos[iText]->GetRMS(), histos[iText]->GetRMSError());
+    rms->AddText( rms_text );
+    rmsText.push_back(rms);
+  }
+
+
+
+  TCanvas* c1 = new TCanvas("c1", "", 600, 600 );
+  c1->cd();
+  c1->SetLeftMargin(0.12);
+  c1->SetBottomMargin(0.12);
+
+  h2_axes->Draw();
+  for(unsigned i=0; i<histos.size(); ++i ) {
+  //if( normalized ) histos[i]->DrawNormalized("histo same");
+  //else histos[i]->Draw("histo same");
+    // reverse order is prettier:
+    if( normalized ) histos[histos.size()-i-1]->DrawNormalized("histo same");
+    else histos[histos.size()-i-1]->Draw("histo same");
+    //rmsText[i]->Draw("same");
+  }
+  legend->Draw("same");
+  label_CMS->Draw("same");
+  label_sqrt->Draw("same");
+  gPad->RedrawAxis();
+
+  std::string canvasName = this->get_outputdir() + "/" + infile.datasetName + "_" + saveVarName;
+  std::string canvasName_eps = canvasName + ".eps";
+  std::string canvasName_png = canvasName + ".png";
+  c1->SaveAs( canvasName_eps.c_str() );
+  c1->SaveAs( canvasName_png.c_str() );
+    
+  delete c1;
+  c1=0;
+  delete h2_axes;
+  h2_axes=0;
+  delete legend;
+  legend = 0;
+
+} //compareDifferentHistos
+
+
+
+
 void DrawBase::drawObjects( const std::vector< TObject* > objects, const std::string& name,
                             const std::string& xAxisName, float xMin, float xMax,
                             const std::string& yAxisName, float yMin, float yMax,
@@ -1782,6 +1901,77 @@ std::string DrawBase::get_etaRangeText( const std::string& etaRegion ) const {
   return etaRange;
 
 }
+
+
+LegendBox DrawBase::get_legendBox( int legendQuadrant, const std::vector<std::string>* legendNames ) const {
+
+
+    if( legendQuadrant<0 || legendQuadrant>5 ) {
+      legendQuadrant=1;
+      std::cout << "Invalid legend quadrant '" << legendQuadrant << "'. Using 1." << std::endl;
+    }
+
+    int nNames_total = 0;
+    if( legendNames!=0 ) {
+      nNames_total += legendNames->size();
+    } else {
+      if( dataFile_.file!=0 ) nNames_total +=1;
+      nNames_total += mcFiles_.size();
+    }
+
+    LegendBox lb;
+
+    if( legendQuadrant==1 ) {
+      lb.xMin = 0.6;
+      lb.yMax = 0.88;
+      lb.yMin = lb.yMax - 0.05*(float)nNames_total;
+      lb.xMax = 0.88;
+    } else if( legendQuadrant==0 ) {
+      lb.xMin = 0.5;
+      lb.yMax = 0.88;
+      lb.yMin = lb.yMax - 0.05*(float)nNames_total;
+      lb.xMax = 0.73;
+    } else if( legendQuadrant==2 ) {
+      lb.xMin = 0.18;
+      lb.yMax = 0.88;
+      lb.yMin = lb.yMax - 0.05*(float)nNames_total;
+      lb.xMax = 0.41;
+    } else if( legendQuadrant==3 ) {
+      lb.xMin = 0.18;
+      lb.yMin = 0.15;
+      lb.xMax = 0.41;
+      lb.yMax = lb.yMin + 0.05*(float)nNames_total;
+    } else if( legendQuadrant==4 ) {
+      lb.xMin = 0.5;
+      lb.yMin = 0.15;
+      lb.xMax = 0.73;
+      lb.yMax = lb.yMin + 0.05*(float)nNames_total;
+    } else if( legendQuadrant==5 ) {
+      lb.xMin = 0.4;
+      lb.yMin = 0.15;
+      lb.xMax = 0.6;
+      lb.yMax = lb.yMin + 0.05*(float)nNames_total;
+    }
+
+    bool widen = false;
+    if( legendNames!=0 ) {
+      for( unsigned i=0;i<legendNames->size(); ++i )
+        if( legendNames->at(i).length() > 15 ) widen=true;
+    } else {
+      if( dataFile_.legendName.length() > 15 ) widen=true;
+      for( unsigned i=0;i<mcFiles_.size(); ++i )
+        if( mcFiles_[i].legendName.length() > 15 ) widen=true;
+    }
+
+    if( widen ) {
+      if( legendQuadrant==1 || legendQuadrant==4 ) lb.xMin *=0.9;
+      if( legendQuadrant==2 || legendQuadrant==3 ) lb.xMax *=1.1;
+    }
+
+    return lb;
+
+}
+
 
 
 std::string DrawBase::get_sqrtText() const {
