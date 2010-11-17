@@ -23,8 +23,8 @@ class TreeAnalyzer_PhotonJet : public TreeAnalyzer {
 
    virtual void CreateOutputFile();
    virtual void Loop();
-   float getCorrectionFactor( const std::string& fileName, float pt, float eta );
-   float getCorrectedPt( float pt, float eta, bool applyAlsoResidual );
+   //float getCorrectionFactor( const std::string& fileName, float pt, float eta );
+   //float getCorrectedPt( float pt, float eta, bool applyAlsoResidual );
 
 
 

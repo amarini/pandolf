@@ -10,9 +10,9 @@
 #include "fitTools.C"
 
 
-#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
-#include "CondFormats/JetMETObjects/interface/SimpleJetCorrector.h"
-#include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
+//#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
+//#include "CondFormats/JetMETObjects/interface/SimpleJetCorrector.h"
+//#include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 
 
 TreeAnalyzer_PhotonJet::TreeAnalyzer_PhotonJet( const std::string& dataset, const std::string& recoType, const std::string& jetAlgo, const std::string& flags, bool useGenJets, TTree* tree ) :
@@ -460,6 +460,7 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
 
        thisJet.eReco  =  eJet[iRecoJet];
        thisJet.ptReco  =  ptJet[iRecoJet];
+       thisJet.ptCorrReco  =  ptCorrJet[iRecoJet];
        thisJet.phiReco = phiJet[iRecoJet];
        thisJet.etaReco = etaJet[iRecoJet];
      //thisJet.eCorrReco  =  eCorrJet[iRecoJet];
@@ -487,11 +488,6 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
        Float_t pi = 3.14159;
        //if( (fabs(deltaPhi) > 2.*pi/3.) && (thisJet.ptReco > firstJet.ptReco) )
        if( (fabs(deltaPhi) > pi/2.) && (thisJet.ptReco > firstJet.ptReco) ) {
-         if(isMC) {
-           thisJet.ptCorrReco  =  (isMC) ? ptCorrJet[iRecoJet] : getCorrectedPt( thisJet.ptReco, thisJet.etaReco, (bool)false );
-         } else {
-           thisJet.ptCorrReco  =  (isMC) ? ptCorrJet[iRecoJet] : getCorrectedPt( thisJet.ptReco, thisJet.etaReco, (bool)true );
-         }
          firstJet = thisJet;
        }
 
@@ -526,6 +522,7 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
 
        thisJet.eReco  =  eJet[iRecoJet];
        thisJet.ptReco  =  ptJet[iRecoJet];
+       thisJet.ptCorrReco  =  ptCorrJet[iRecoJet];
        thisJet.phiReco = phiJet[iRecoJet];
        thisJet.etaReco = etaJet[iRecoJet];
 
@@ -545,7 +542,6 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
          pzSumReco += thisJet.pzReco();
 
          if( (thisJet.ptReco < firstJet.ptReco) && (thisJet.ptReco > secondJet.ptReco) ) {
-           thisJet.ptCorrReco  =  (isMC) ? ptCorrJet[iRecoJet] : getCorrectedPt( thisJet.ptReco, thisJet.etaReco, (bool)true );
            secondJet = thisJet;
          }
 
@@ -658,7 +654,6 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
 
        eJetReco_  =  firstJet.eReco;
       ptJetReco_  =  firstJet.ptReco;
-  //eCorrJetReco_  =  firstJet.eCorrReco;
   ptCorrJetReco_  =  firstJet.ptCorrReco;
      phiJetReco_  =  firstJet.phiReco;
      etaJetReco_  =  firstJet.etaReco;
@@ -882,6 +877,7 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
 } //loop
 
 
+/*
 float TreeAnalyzer_PhotonJet::getCorrectedPt( float pt, float eta, bool applyAlsoResidual ) {
 
   std::string acronym;
@@ -932,4 +928,4 @@ float TreeAnalyzer_PhotonJet::getCorrectionFactor( const std::string& fileName, 
   return corr;
 
 }
-
+*/
