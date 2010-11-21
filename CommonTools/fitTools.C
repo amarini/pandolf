@@ -1,6 +1,10 @@
 #include "fitTools.h"
 #include <cmath>
+#include "TMinuit.h"
 
+
+Double_t rpf(Double_t *x, Double_t *p);
+Double_t powerlaw(Double_t *x, Double_t *p);
 
 
 double fitTools::delta_phi(double phi1, double phi2) {
@@ -300,6 +304,10 @@ void fitTools::fitProjection_sameArea(TH1D* h1_projection, TF1* gaussian, TH1D* 
 //    newHisto->DrawClone("HISTO same");
 
 
+   //initialize parameters to likely values:
+   gaussian->SetParameter( 0, newHisto_tmp->Integral() );
+   gaussian->SetParameter( 1, newHisto_tmp->GetMean() );
+   gaussian->SetParameter( 2, newHisto_tmp->GetRMS() );
 
    gaussian->SetRange(xMin_fit, xMax_fit);
    newHisto_tmp->Fit(gaussian, option.c_str());
@@ -991,4 +999,219 @@ TGraphAsymmErrors* fitTools::getEfficiencyGraph(const std::string& name, TH1F* h
 
 }
 
+
+
+
+TF1* fitTools::fitResponseGraph( TGraphErrors* graph, std::string funcType, std::string funcName, const std::string& option, float rangeMax) {
+
+  
+  TF1* fitFunction;
+
+  if( funcType=="rpf" ) {
+    fitFunction = new TF1(funcName.c_str(), rpf, 10., rangeMax, 6); //will have to fix the range issue!
+    fitFunction->SetParameters(100,0.85,4.2,80,250,1.);
+    fitFunction->SetParLimits(1,0.5,1.0);
+    fitFunction->SetParLimits(2,1.,10.);
+    fitFunction->SetParLimits(4, 100., 500.);
+    fitFunction->SetParameter(0, 0.6);
+    fitFunction->SetParameter(5, 1.);
+    //fitFunction->SetParameter(1, -0.6);
+  } else if( funcType=="powerlaw" ) {
+    fitFunction = new TF1(funcName.c_str(), "[0] - [1]/(pow(x, [2]))");
+    fitFunction->SetRange( 10., 1400. );
+    fitFunction->SetParameters(1., 1., 0.3);
+  } else if( funcType=="powerlaw_corr" ) {
+    fitFunction = new TF1(funcName.c_str(), "[0] - [1]/(pow(x, [2])) + [3]/x");
+    fitFunction->SetRange( 10., 1400. );
+    fitFunction->SetParameters(1., 1., 0.3, 1.);
+  } else {
+    std::cout << "Function '" << funcType << "' not implemented yet for fitResponseGraph. Exiting." << std::endl;
+    exit(119);
+  }
+
+  graph->Fit(fitFunction, option.c_str());
+
+  return fitFunction;
+
+}
+
+
+Double_t rpf(Double_t *x, Double_t *p) {
+
+  double pt = x[0];
+  double a = p[0];
+  double m = p[1];
+  double r = p[2];
+  double x1 = std::max(std::min(p[3],p[4]),1.);
+  double x2 = std::max(std::max(p[3],p[4]),1.);
+  double r_inf = p[5];
+
+  double f = a*pow(pt,-m);
+
+  // Transition roughly from 80 to 250
+  double xmid = 0.5 * (x2 + x1);
+  double xwid = 2 * 0.5 * std::max(x2 - x1, 1.);
+  double w = 0.5 * (1 + TMath::Erf( (pt - xmid) / xwid ));
+
+  // Logarithmic transition. Linear seems to work better, though
+  //double xmid = 0.5*(log(x2) + log(x1));
+  //double xwid = log(x2/sqrt(x1*x2));
+  //double w = 0.5 * (1 + TMath::Erf( (log(pt) - xmid) / xwid ));
+
+  //double w = (pt-x1)/max(x2-x1,1.);
+  //double w = log(pt/x1)/log(x2/x1);
+  if (w<0.) w = 0.;
+  if (w>1.) w = 1.;
+
+  return ((1.-w)*(r_inf-f) + w*(r_inf-r*f));
+
+}
+
+
+
+Double_t powerlaw(Double_t *x, Double_t *p) {
+
+  Double_t pt = x[0];
+
+  Double_t value = p[0] - p[1]/(pow(pt, p[2])) + p[3]/pt;
+
+  return value;
+
+}
+
+
+
+
+TH1D* fitTools::getBand( TF1* f, const std::string& name ) {
+
+  const int ndim_resp_q = f->GetNpar();
+  TMatrixD emat_resp_q(ndim_resp_q, ndim_resp_q);
+  gMinuit->mnemat(&emat_resp_q[0][0], ndim_resp_q);
+
+  return getBand(f, emat_resp_q, name);
+
+}
+
+
+
+// Create uncertainty band (histogram) for a given function and error matrix
+// in the range of the function.
+TH1D* fitTools::getBand(TF1 *f, TMatrixD const& m, std::string name, bool getRelativeBand, int npx) {
+
+  Bool_t islog = true;
+  //double xmin = f->GetXmin()*0.9;
+  //double xmax = f->GetXmax()*1.1; //fixes problem in drawing with c option
+  double xmin = f->GetXmin();
+  double xmax = f->GetXmax()*1.1; //fixes problem in drawing with c option
+  int npar = f->GetNpar();
+  //TString formula = f->GetExpFormula();
+
+  // Create binning (linear or log)
+  Double_t xvec[npx];
+  xvec[0] = xmin;
+  double dx = (islog ? pow(xmax/xmin, 1./npx) : (xmax-xmin)/npx);
+  for (int i = 0; i != npx; ++i) {
+    xvec[i+1] = (islog ? xvec[i]*dx : xvec[i]+dx);
+  }
+
+
+  //
+  // Compute partial derivatives numerically
+  // can be used with any fit function
+  //
+  Double_t sigmaf[npx];
+  TH1D* h1_band = new TH1D(name.c_str(), "", npx, xvec);
+
+  for( unsigned ipx=0; ipx<npx; ++ipx ) {
+
+    sigmaf[ipx] = 0.;
+    Double_t partDeriv[npar];
+
+    //compute partial derivatives of f wrt its parameters:
+    for( unsigned ipar=0; ipar<npar; ++ipar ) {
+
+      Float_t pi = f->GetParameter(ipar);
+      Float_t dpi = sqrt(m[ipar][ipar])*0.01; //small compared to the par sigma
+      f->SetParameter(ipar, pi+dpi);
+      Float_t fplus = f->Eval(xvec[ipx]); 
+      f->SetParameter(ipar, pi-dpi);
+      Float_t fminus = f->Eval(xvec[ipx]); 
+      f->SetParameter(ipar, pi); //put it back as it was
+
+      partDeriv[ipar] = (fplus-fminus)/(2.*dpi);
+
+    } //for params
+
+    //compute sigma(f) at x:
+    for( unsigned ipar=0; ipar<npar; ++ipar ) {
+      for( unsigned jpar=0; jpar<npar; ++jpar ) {
+        sigmaf[ipx] += partDeriv[ipar]*partDeriv[jpar]*m[ipar][jpar];
+      }
+    }
+    sigmaf[ipx] = sqrt(sigmaf[ipx]); //absolute band
+
+    h1_band->SetBinContent( ipx, f->Eval(xvec[ipx]) );
+    if( getRelativeBand )
+      h1_band->SetBinError( ipx, sigmaf[ipx]/f->Eval(xvec[ipx]) );
+    else
+      h1_band->SetBinError( ipx, sigmaf[ipx] );
+
+  } //for points
+
+  h1_band->SetMarkerStyle(20);
+  h1_band->SetMarkerSize(0);
+
+
+  //TGraph* h1_statError = new TGraph(npx, xvec, sigmaf);
+//TH2D* h2_axesStat = new TH2D("axesStat", "", 10, 20., 1400., 10, 0., 10.);
+//h2_axesStat->GetXaxis()->SetNoExponent();
+//h2_axesStat->GetXaxis()->SetMoreLogLabels();
+//TCanvas* cStat = new TCanvas("cStat", "cStat", 600, 600);
+//cStat->cd();
+//cStat->SetLogx();
+//h2_axesStat->Draw();
+//h1_band->Draw("psame");
+//std::string canvasName = "stat/" + name + ".eps";
+//cStat->SaveAs(canvasName.c_str());
+ 
+//delete h2_axesStat;
+//delete cStat;
+
+  return h1_band;
+
+} //getband
+
+
+
+TGraphErrors* fitTools::get_graphRatio( TGraphErrors* gr_data, TGraphErrors* gr_MC ) {
+
+  TGraphErrors* gr_ratio = new TGraphErrors(0);
+
+  for( unsigned i= 0; i<gr_MC->GetN(); ++i ) {
+
+    Double_t datax, datay;
+    gr_data->GetPoint( i, datax, datay );
+    Double_t dataxerr = gr_data->GetErrorX(i);
+    Double_t datayerr = gr_data->GetErrorY(i);
+
+    Double_t mcx, mcy;
+    gr_MC->GetPoint( i, mcx, mcy );
+    Double_t mcxerr = gr_MC->GetErrorX(i);
+    Double_t mcyerr = gr_MC->GetErrorY(i);
+
+    Double_t ratiox = mcx;
+    Double_t ratioxerr = mcxerr;
+
+    Double_t ratioy = datay / mcy;
+    Double_t ratioyerr = sqrt( datayerr*datayerr/(mcy*mcy) + datay*datay*mcyerr*mcyerr/(mcy*mcy*mcy*mcy) );
+
+
+    gr_ratio->SetPoint( i, ratiox, ratioy );
+    gr_ratio->SetPointError( i, ratioxerr, ratioyerr );
+
+  } //for points
+
+  return gr_ratio;
+
+}
 

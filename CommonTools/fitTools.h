@@ -11,6 +11,7 @@
 #include "TGraphAsymmErrors.h"
 #include "TCanvas.h"
 #include "TMath.h"
+#include "TMatrixD.h"
 
 
 class fitTools {
@@ -53,6 +54,14 @@ public:
   static int getEfficiencyUncertainties(int n, int k, double p, double &xmin, double &xmax);
 
   static TGraphAsymmErrors* getEfficiencyGraph(const std::string& name, TH1F* h1_numerator, TH1F* h1_denominator);
+
+  static TF1* fitResponseGraph( TGraphErrors* graph , std::string funcType, std::string funcName, const std::string& option="RQ", float rangeMax=350.);
+
+  static TH1D* getBand( TF1* f, const std::string& name );
+
+  static TH1D* getBand(TF1 *f, TMatrixD const& m, std::string name, bool getRelativeBand=false, int npx=100);
+
+  static TGraphErrors* get_graphRatio( TGraphErrors* gr_data, TGraphErrors* gr_MC);
 
  private:
 
