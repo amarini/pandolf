@@ -1,5 +1,6 @@
 #include "DrawBase.h"
 #include "fitTools.h"
+#include "TRegexp.h"
 #include <iostream>
 #include <algorithm>
 
@@ -143,12 +144,19 @@ void DrawBase::set_sameInstanceNormalization() {
 
 
 
-void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion, const std::string& flags, const std::string& axisName, int legendQuadrant, bool log_aussi) {
+//void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion, const std::string& flags, const std::string& axisName, const std::string& units, int legendQuadrant, bool log_aussi) {
+void DrawBase::drawHisto( const std::string& name, const std::string& axisName, const std::string& units, const std::string& instanceName, bool log_aussi, int legendQuadrant, const std::string& labelText, const std::string& flags ) {
+
 
 
   std::vector<float> ptPhot_binning = fitTools::getPtPhot_binning();
 
-  bool draw_vs_pt_graphs = ( name=="response" || name=="responseMPF" );
+  // if is a response variable, draw a histo per pt bin
+  // and then the trend vs. pt
+  TString name_tstr(name);
+  TRegexp resp_regexp("response");
+  bool draw_vs_pt_graphs = name_tstr.Contains(resp_regexp); 
+  //bool draw_vs_pt_graphs = ( name=="response" || name=="responseMPF" );
 
   // if response will have to do a plot for each pt bin:
   int number_of_plots = (draw_vs_pt_graphs) ? (ptPhot_binning.size()-1) : 1;
@@ -209,7 +217,6 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
     noMC = false;
 
     std::string histoName = name;
-    if( etaRegion!="" ) histoName = histoName + "_" + etaRegion;
     if( flags!="" ) histoName = histoName + "_" + flags;
 
     std::string ptRange_str; 
@@ -302,7 +309,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
 
     TH1F* refHisto = (noDATA) ? mcHistos[0] : dataHisto;
 
-    Float_t yAxisMaxScale = (name=="phiJet" || name=="etaJet" || name=="ptSecondJetRel" || name=="phiPhot" || name=="etaPhot" ) ? 1.8 : 1.4;
+    Float_t yAxisMaxScale = (name=="phiJet" || name=="etaJet" || name=="ptSecondJetRel" || name=="phiPhot" || name=="etaPhot" ) ? 1.8 : 1.6;
     if( name=="phiPhot" || name=="etaPhot" ) yAxisMaxScale=2.;
     if(name=="clusterMajPhotReco" || name=="clusterMinPhotReco") yAxisMaxScale = 2.;
     Float_t xMin = refHisto->GetXaxis()->GetXmin();
@@ -319,50 +326,60 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
     Float_t yMin = 0.;
 
 
-    std::string xAxis = (axisName=="") ? get_axisName(name) : axisName;
-    if( flags=="1" ) xAxis = "First " + xAxis;
-    if( flags=="2" ) xAxis = "Second " + xAxis;
+//  if( name=="ptJet" || name=="ptCorrJet" ) {
+//    char yAxis_char[50];
+//    sprintf(yAxis_char, "%s / (%d GeV/c)", instanceName.c_str(), (Int_t)refHisto->GetBinWidth(1));
+//    std::string yAxis_tmp(yAxis_char);
+//    yAxis=yAxis_tmp;
+//  }  
 
-    std::string instanceName = (analysisType_=="MinBias") ? "Jets" : "Events";
+//  if( name=="EchJet" || name=="EgammaJet" || name=="EnhJet" ) {
+//    char yAxis_char[50];
+//    if( refHisto->GetBinWidth(1) < 1. ) sprintf(yAxis_char, "%s / (%.1f GeV)", instanceName.c_str(), refHisto->GetBinWidth(1));
+//    else                                 sprintf(yAxis_char, "%s / (%.0f GeV)", instanceName.c_str(), refHisto->GetBinWidth(1));
+//    std::string yAxis_tmp(yAxis_char);
+//    yAxis=yAxis_tmp;
+//  }  
+
+
+//  if( name=="diJetMass" || name=="ZZInvMass" || name=="LeptLeptInvMass" || name=="JetJetInvMass" || name=="EleEleInvMass" || name=="MuMuInvMass" ) {
+//    char yAxis_char[50];
+//    double fractpart, intpart;
+//    fractpart = modf( refHisto->GetBinWidth(1), &intpart);
+//    if(fractpart==0.)
+//      sprintf(yAxis_char, "Events / (%.0f GeV/c^{2})", refHisto->GetBinWidth(1));
+//    else
+//      sprintf(yAxis_char, "Events / (%.2f GeV/c^{2})", refHisto->GetBinWidth(1));
+//    std::string yAxis_tmp(yAxis_char);
+//    yAxis=yAxis_tmp;
+//  }  
+//  if( name=="massJet" ) {
+//    char yAxis_char[50];
+//    sprintf(yAxis_char, "Jets/(%.2f GeV/c ^{2})", refHisto->GetBinWidth(1));
+//    std::string yAxis_tmp(yAxis_char);
+//    yAxis=yAxis_tmp;
+//  }  
+//  if( name=="deltaPhiJet" || name=="asymmJet" ) yAxis = "Events";
+
+
+    std::string xAxis = axisName;
+    if( units!="" ) xAxis += " [" + units + "]";
+
     std::string yAxis = instanceName;
-    if( name=="ptJet" || name=="ptCorrJet" ) {
-      char yAxis_char[50];
-      sprintf(yAxis_char, "%s / (%d GeV/c)", instanceName.c_str(), (Int_t)refHisto->GetBinWidth(1));
-      std::string yAxis_tmp(yAxis_char);
-      yAxis=yAxis_tmp;
-    }  
 
-    if( name=="EchJet" || name=="EgammaJet" || name=="EnhJet" ) {
-      char yAxis_char[50];
-      if( refHisto->GetBinWidth(1) < 1. ) sprintf(yAxis_char, "%s/(%.1f GeV)", instanceName.c_str(), refHisto->GetBinWidth(1));
-      else                                 sprintf(yAxis_char, "%s/(%.0f GeV)", instanceName.c_str(), refHisto->GetBinWidth(1));
-      std::string yAxis_tmp(yAxis_char);
-      yAxis=yAxis_tmp;
-    }  
+    if( scaleFactor_ < 0. && dataFile_.file==0 ) {
+      yAxis = "Normalized to Unity";
+    } else {
+      char yAxis_char[150];
+      if( units!="" ) {
+        sprintf( yAxis_char, "%s / (%.1f %s)", instanceName.c_str(), refHisto->GetBinWidth(1), units.c_str() );
+      } else {
+        sprintf( yAxis_char, "%s", instanceName.c_str());
+      }
+      std::string yAxis_str_tmp(yAxis_char);
+      yAxis = yAxis_str_tmp;
+    }
 
-
-    if( name=="diJetMass" || name=="ZZInvMass" || name=="LeptLeptInvMass" || name=="JetJetInvMass" || name=="EleEleInvMass" || name=="MuMuInvMass" ) {
-      char yAxis_char[50];
-      double fractpart, intpart;
-      fractpart = modf( refHisto->GetBinWidth(1), &intpart);
-      if(fractpart==0.)
-        sprintf(yAxis_char, "Events / (%.0f GeV/c^{2})", refHisto->GetBinWidth(1));
-      else
-        sprintf(yAxis_char, "Events / (%.2f GeV/c^{2})", refHisto->GetBinWidth(1));
-      std::string yAxis_tmp(yAxis_char);
-      yAxis=yAxis_tmp;
-    }  
-    if( name=="massJet" ) {
-      char yAxis_char[50];
-      sprintf(yAxis_char, "Jets/(%.2f GeV/c ^{2})", refHisto->GetBinWidth(1));
-      std::string yAxis_tmp(yAxis_char);
-      yAxis=yAxis_tmp;
-    }  
-    if( name=="deltaPhiJet" || name=="asymmJet" ) yAxis = "Events";
-
-    if( scaleFactor_ < 0. && dataFile_.file==0 ) yAxis = "Normalized to Unity";
-
-    std::string etaRange = get_etaRangeText( etaRegion );
 
 
     LegendBox lb = get_legendBox(legendQuadrant);
@@ -422,8 +439,8 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
       label_cuts->SetTextFont(42);
       std::string jetAlgoName = get_algoName();
       label_cuts->AddText(jetAlgoName.c_str());
-      if( name != "etaJet" )
-        label_cuts->AddText(etaRange.c_str());
+    //if( name != "etaJet" )
+    //  label_cuts->AddText(etaRange.c_str());
       if( name != "ptJet" && name != "ptCorrJet" ) {
         char labelText[70];
         sprintf( labelText, "p_{T}^{%s} > %d GeV/c", raw_corr_.c_str(), pt_thresh_);
@@ -477,6 +494,12 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
 
     }
 
+    TPaveText* label_bonus = new TPaveText(0.63, lb.yMin-0.07, 0.84, lb.yMin-0.02,  "brNDC");
+    label_bonus->SetFillColor(kWhite);
+    label_bonus->SetTextSize(0.035);
+    label_bonus->SetTextFont(42);
+    label_bonus->AddText(labelText.c_str());
+
 
     TCanvas* c1 = new TCanvas("c1", "c1", 800, 800);
     c1->cd();
@@ -503,6 +526,8 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
     label_sqrt->Draw("same");
     if( label_cuts!=0 )
       label_cuts->Draw("same");
+    if( labelText!="" )
+      label_bonus->Draw("same");
 
     if( draw_vs_pt_graphs ) {  //store info for response vs. pt plots (to be done later)
 
@@ -555,10 +580,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
         gr_purity_vs_pt->SetPointError( iplot, ptMeanErrMC, purityErr );
    
         char responseGEN_name[100];
-        //if( flags!="" )
-        //  sprintf( responseGEN_name, "%sGEN_%s_%s", name.c_str(), flags.c_str(), ptRange_str.c_str());
-        //else
-          sprintf( responseGEN_name, "responseGEN_%s", ptRange_str.c_str());
+        sprintf( responseGEN_name, "responseGEN_%s", ptRange_str.c_str());
 
         TH1F* responseGEN = (TH1F*)mcFiles_[0].file->Get(responseGEN_name);
         if( mcFiles_.size()>1 ) {
@@ -618,8 +640,6 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
     legend->Draw("same");
       
     std::string canvasName = outputdir_ + "/" + name;
-    if( etaRegion!="" )
-      canvasName = canvasName + "_" + etaRegion;
     if( flags!="" )
       canvasName = canvasName + "_" + flags;
 
@@ -669,6 +689,8 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
       label_sqrt->Draw("same");
       if( label_cuts!=0 )
         label_cuts->Draw("same");
+      if( labelText!="" )
+        label_bonus->Draw("same");
       std::string canvasName_log = canvasName + "_log";
       canvasName_eps = canvasName_log + ".eps";
       c1->SaveAs(canvasName_eps.c_str());
@@ -694,7 +716,6 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
     TFile* graphFile = TFile::Open(graphFileName.c_str(), "update");
     graphFile->cd();
     std::string varName = name;
-    if( etaRegion!="" )  varName += ("_" + etaRegion);
     if( flags!="" )  varName += ("_" + flags);
     std::string graphName = varName + "_vs_pt";
     gr_response_vs_pt->SetName(graphName.c_str());
@@ -838,25 +859,21 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
     TPaveText* label_cms = get_labelCMS(2);
     label_cms->SetTextSize( cmsTextSize );
 
-//  TPaveText* label_cms = new TPaveText(0.25, 0.83, 0.42, 0.87, "brNDC");
-//  label_cms->SetFillColor(kWhite);
-//  label_cms->SetTextSize(cmsTextSize);
-//  label_cms->SetTextFont(62);
-//  std::string label_CMS_text = this->get_CMSText();
-//  label_cms->AddText(label_CMS_text.c_str());
-
     Float_t sqrtTextSize = 0.041;
     TPaveText* label_sqrt = get_labelSqrt(2);
-  //TPaveText* label_sqrt = new TPaveText(0.25, 0.78, 0.42, 0.82, "brNDC");
-  //label_sqrt->SetFillColor(kWhite);
-  //label_sqrt->SetTextSize(sqrtTextSize);
-  //label_sqrt->SetTextFont(42);
-  //std::string label_sqrt_text = this->get_sqrtText();
-  //label_sqrt->AddText(label_sqrt_text.c_str());
+
+  //TPaveText* label_bonus = new TPaveText(0.63, lb.yMin-0.07, 0.84, lb.yMin-0.02,  "brNDC");
+  //label_bonus->SetFillColor(kWhite);
+  //label_bonus->SetTextSize(0.035);
+  //label_bonus->SetTextFont(42);
+  //label_bonus->AddText(labelText.c_str());
+
   
     label_cms->Draw("same");
     label_sqrt->Draw("same");
     label_algo->Draw("same");
+  //if( labelText!="" )
+  //  label_bonus->Draw("same");
 
 
     if( !noMC ) {
@@ -914,7 +931,6 @@ void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion,
       TF1* constline_highpt = new TF1("constline_highpt", "[0]", 30., ptPhotMax);
       constline_highpt->SetParameter(0, 1.);
       gr_resp_ratio->Fit( constline_highpt, "RN" );
-std::cout << " ---------> const line fit for pt > 30.: " << constline_highpt->GetParameter(0) << std::endl;
 
       TPaveText* fitlabel = new TPaveText(0.55, 0.77, 0.88, 0.83, "brNDC");
       fitlabel->SetTextSize(0.08);
@@ -2139,6 +2155,8 @@ TPaveText* DrawBase::get_labelAlgo( int legendQuadrant ) const {
   label_algo->SetFillColor(kWhite);
   label_algo->SetTextSize(labelTextSize);
   label_algo->AddText(jetAlgoName.c_str());
+
+  return label_algo;
 
 }
 
