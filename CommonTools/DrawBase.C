@@ -153,10 +153,10 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
 
   // if is a response variable, draw a histo per pt bin
   // and then the trend vs. pt
-  TString name_tstr(name);
-  TRegexp resp_regexp("response");
-  bool draw_vs_pt_graphs = name_tstr.Contains(resp_regexp); 
-  //bool draw_vs_pt_graphs = ( name=="response" || name=="responseMPF" );
+  bool draw_vs_pt_graphs = ( name=="response" || name=="responseMPF" );
+//TString name_tstr(name);
+//TRegexp resp_regexp("response");
+//bool draw_vs_pt_graphs = name_tstr.Contains(resp_regexp); 
 
   // if response will have to do a plot for each pt bin:
   int number_of_plots = (draw_vs_pt_graphs) ? (ptPhot_binning.size()-1) : 1;
@@ -657,7 +657,14 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
       c1->SaveAs(canvasName_pdf.c_str());
 
     if( log_aussi ) {
-      TH2D* h2_axes_log = new TH2D("axes_log", "", 10, xMin, xMax, 10, 0.5, 5.*yMax);
+
+      float yMin=yMax;
+      for(unsigned iHisto=0; iHisto<mcHistos.size(); ++iHisto) 
+        for( unsigned iBin=1; iBin<mcHistos[iHisto]->GetNbinsX(); ++iBin ) 
+          if( mcHistos[iHisto]->GetBinContent(iBin)>0. && mcHistos[iHisto]->GetBinContent(iBin) < yMin ) 
+            yMin = mcHistos[iHisto]->GetBinContent(iBin);
+
+      TH2D* h2_axes_log = new TH2D("axes_log", "", 10, xMin, xMax, 10, 0.1*yMin, 5.*yMax);
       h2_axes_log->SetXTitle(xAxis.c_str());
       h2_axes_log->SetYTitle(yAxis.c_str());
       h2_axes_log->GetXaxis()->SetTitleOffset(1.1);
@@ -1577,17 +1584,17 @@ void DrawBase::drawStack(const std::string& varY, const std::string& varX, const
 
 
 
-void DrawBase::compareDifferentHistos( const std::vector< HistoAndName > histos, const std::string xAxisName, const std::string saveVarName, bool normalized, int legendQuadrant ) {
+void DrawBase::compareDifferentHistos( const std::vector< HistoAndName > histos, const std::string saveVarName, const std::string xAxisName, const std::string& units, const std::string& instanceName, bool normalized, int legendQuadrant ) {
 
-  if( dataFile_.file!=0 ) compareDifferentHistos_singleFile( dataFile_, histos, xAxisName, saveVarName, normalized, legendQuadrant );
-  for( unsigned iMC=0; iMC<mcFiles_.size(); ++iMC ) compareDifferentHistos_singleFile( mcFiles_[iMC], histos, xAxisName, saveVarName, normalized, legendQuadrant );
+  if( dataFile_.file!=0 ) compareDifferentHistos_singleFile( dataFile_, histos, saveVarName, xAxisName, units, instanceName, normalized, legendQuadrant );
+  for( unsigned iMC=0; iMC<mcFiles_.size(); ++iMC ) compareDifferentHistos_singleFile( mcFiles_[iMC], histos, saveVarName, xAxisName, units, instanceName, normalized, legendQuadrant );
 
 }
 
 
 
 
-void DrawBase::compareDifferentHistos_singleFile( InputFile infile, const std::vector< HistoAndName > histosandnames, const std::string xAxisName, const std::string saveVarName, bool normalized, int legendQuadrant ) {
+void DrawBase::compareDifferentHistos_singleFile( InputFile infile, const std::vector< HistoAndName > histosandnames, const std::string saveVarName, const std::string xAxisName, const std::string& units, const std::string& instanceName, bool normalized, int legendQuadrant ) {
 
   std::vector< TH1F* > histos;
   std::vector<std::string> legendNames;
@@ -1638,15 +1645,17 @@ void DrawBase::compareDifferentHistos_singleFile( InputFile infile, const std::v
 
   for( unsigned iHisto=0; iHisto<histos.size(); ++iHisto ) {
 
+    histos[iHisto]->Rebin(rebin_);
+
     if( normalized ) {
       Float_t integral = histos[iHisto]->Integral(0, histos[iHisto]->GetNbinsX()+1);
       histos[iHisto]->Scale( 1./integral );
     }
 
     // 1. look for axis ranges:
-    float this_xMin = histos[0]->GetXaxis()->GetXmin();
-    float this_xMax = histos[0]->GetXaxis()->GetXmax();
-    float this_yMax = histos[0]->GetMaximum();
+    float this_xMin = histos[iHisto]->GetXaxis()->GetXmin();
+    float this_xMax = histos[iHisto]->GetXaxis()->GetXmax();
+    float this_yMax = histos[iHisto]->GetMaximum();
   
     if( iHisto==0 ) {  
       xMin = this_xMin;
@@ -1668,7 +1677,6 @@ void DrawBase::compareDifferentHistos_singleFile( InputFile infile, const std::v
       histos[iHisto]->SetLineColor( iHisto );
     }
     histos[iHisto]->SetLineWidth(2);
-    histos[iHisto]->Rebin(rebin_);
 
     
     // 3. add to legend
@@ -1676,17 +1684,27 @@ void DrawBase::compareDifferentHistos_singleFile( InputFile infile, const std::v
 
   }
 
-  yMax *= 1.6;
-  if( histos.size()>4 ) yMax *= 1.15;
+  yMax *= 1.35;
+  if( histos.size()>=4 ) yMax *= 1.15;
 
   TH2D* h2_axes = new TH2D("axes", "", 10, xMin, xMax, 10, yMin, yMax);
   h2_axes->GetXaxis()->SetTitleOffset(1.1);
   h2_axes->GetYaxis()->SetTitleOffset(1.5);
+  std::string xAxisName_full(xAxisName);
+  if( units!="" )
+    xAxisName_full += " ["+units+"]";
   h2_axes->SetXTitle( xAxisName.c_str() );
   if( normalized )
     h2_axes->SetYTitle( "Normalized to Unity" );
-  else
-    h2_axes->SetYTitle( "Entries" ) ;
+  else {
+    char yAxisName_char[150];
+    if( units!="" ) {
+      sprintf( yAxisName_char, "%s / (%.1f %s)", instanceName.c_str(), histos[0]->GetBinWidth(1), units.c_str() );
+    } else {
+      sprintf( yAxisName_char, "%s", instanceName.c_str());
+    }
+    h2_axes->SetYTitle( yAxisName_char );
+  }
   
   TPaveText* label_CMS = get_labelCMS();
   TPaveText* label_sqrt = get_labelSqrt();
@@ -1721,6 +1739,7 @@ void DrawBase::compareDifferentHistos_singleFile( InputFile infile, const std::v
     // reverse order is prettier:
     if( normalized ) histos[histos.size()-i-1]->DrawNormalized("histo same");
     else histos[histos.size()-i-1]->Draw("histo same");
+    //histos[histos.size()-i-1]->Draw("histo same");
     //rmsText[i]->Draw("same");
   }
   legend->Draw("same");
