@@ -26,6 +26,7 @@
 struct InputFile {
   TFile* file;
   std::string datasetName;
+  float weight;
   std::string legendName;
   int fillColor;
   int fillStyle;
@@ -60,12 +61,13 @@ class DrawBase {
   void set_sameEventNormalization();
   void set_sameInstanceNormalization();
 
-  void drawHisto( const std::string& name, const std::string& etaRegion, const std::string& flags, const std::string& axisName="", int legendQuadrant=1, bool log_aussi=false);
+  //void drawHisto( const std::string& name, const std::string& etaRegion, const std::string& flags, const std::string& axisName="", const std::string& units="", int legendQuadrant=1, bool log_aussi=false);
+  void drawHisto( const std::string& name, const std::string& axisName, const std::string& units="", const std::string& instanceName="Entries", bool log_aussi=false, int legendQuadrant=1, const std::string& labelText="", const std::string& flags="" );
   void drawProfile( const std::string& yVar, const std::string& xVar, int legendQuadrant=1);
   void drawStack(const std::string& varY, const std::string& varX, const std::string& RECO_GEN, bool isData) const { this->drawStack( varY, varX, "", RECO_GEN, isData); };
   void drawStack(const std::string& varY, const std::string& varX, const std::string& etaRegion, const std::string& RECO_GEN, bool isData) const;
-  void compareDifferentHistos( const std::vector< HistoAndName > histosandnames, const std::string xAxisName, const std::string saveVarName, bool normalized=true, int legendQuadrant=1 );
-  void compareDifferentHistos_singleFile( InputFile file, const std::vector< HistoAndName > histosandnames, const std::string xAxisName, const std::string saveVarName, bool normalized=true, int legendQuadrant=1 );
+  void compareDifferentHistos( const std::vector< HistoAndName > histosandnames, const std::string saveVarName, const std::string xAxisName, const std::string& units="", const std::string& instanceName="Entries", bool normalized=true, int legendQuadrant=1 );
+  void compareDifferentHistos_singleFile( InputFile file, const std::vector< HistoAndName > histosandnames, const std::string saveVarName, const std::string xAxisName, const std::string& units="", const std::string& instanceName="Entries", bool normalized=true, int legendQuadrant=1 );
   void drawObjects( const std::vector< TObject* > objects, const std::string& name, 
                    const std::string& xAxisName, float xMin, float xMax, 
                    const std::string& yAxisName, float yMin, float yMax, 
@@ -74,6 +76,7 @@ class DrawBase {
   void set_analysisType( const std::string analysisType ) { analysisType_ = analysisType; };
   void add_dataFile( TFile* dataFile, const std::string& datasetName );
   void add_mcFile( TFile* mcFile, const std::string& datasetName, const std::string& legendName, int fillColor, int fillStyle=-1 );
+  void add_mcFile( TFile* mcFile, float weight, const std::string& datasetName, const std::string& legendName, int fillColor, int fillStyle=-1 );
   void set_outputdir( const std::string& outputdir="" ); //if "" is passed, default outputdir is set (recommended)
   void set_flags( const std::string& flags ) { flags_ = flags; };
   void set_pt_thresh( Int_t pt_thresh ) { pt_thresh_ = pt_thresh; };
