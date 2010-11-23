@@ -253,9 +253,16 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
 
 
     TH1F* mcHisto_sum = 0;
+    float fillStyle=3001;
     if( !noMC ) {
       mcHistos.push_back(mcHisto0);
       mcHistos[0]->SetFillColor( mcFiles_[0].fillColor );
+      mcHistos[0]->SetLineColor( mcFiles_[0].fillColor );
+      mcHistos[0]->SetLineWidth(2);
+      if( mcFiles_[0].fillStyle==-1 ) 
+        mcHistos[0]->SetFillStyle( fillStyle++ ); //so that it changes at every histo
+      else
+        mcHistos[0]->SetFillStyle( mcFiles_[0].fillStyle );
       mcHistos[0]->Rebin(rebin_);
 
       mcHisto_sum = new TH1F(*((TH1F*)mcHistos[0]->Clone()));
@@ -269,6 +276,12 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
           }
           mcHistos[i]->Rebin(rebin_);
           mcHistos[i]->SetFillColor( mcFiles_[i].fillColor );
+          mcHistos[i]->SetLineColor( mcFiles_[i].fillColor );
+          mcHistos[i]->SetLineWidth(2);
+          if( mcFiles_[i].fillStyle==-1 ) 
+            mcHistos[i]->SetFillStyle( fillStyle++ ); //so that it changes at every histo
+          else
+            mcHistos[i]->SetFillStyle( mcFiles_[i].fillStyle );
           mcHisto_sum->Add( (TH1F*)(mcHistos[i]->Clone()) );
         } //for mc files
       } //if mc files size > 1
@@ -511,9 +524,9 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
       } else {
         for( unsigned i=0; i<mcHistos.size(); ++i ) {
           int backwardsIndex = mcHistos.size()-1-i; //backwards is prettier: bg on the back, signal in front
-          mcHistos[backwardsIndex]->SetFillStyle(mcFiles_[backwardsIndex].fillStyle);
-          mcHistos[backwardsIndex]->SetLineColor(mcFiles_[backwardsIndex].fillColor);
-          mcHistos[backwardsIndex]->SetLineWidth(2);
+        //mcHistos[backwardsIndex]->SetFillStyle(mcFiles_[backwardsIndex].fillStyle);
+        //mcHistos[backwardsIndex]->SetLineColor(mcFiles_[backwardsIndex].fillColor);
+        //mcHistos[backwardsIndex]->SetLineWidth(2);
           mcHistos[backwardsIndex]->Draw("h same");
         }
       }
@@ -681,8 +694,8 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
           mcHisto_stack->Draw("histo same");
         } else {
           for( unsigned i=0; i<mcHistos.size(); ++i ) {
-            int fillStyle = 3000+i+1;
-            mcHistos[i]->SetFillStyle(fillStyle);
+         // int fillStyle = 3000+i+1;
+         // mcHistos[i]->SetFillStyle(fillStyle);
             mcHistos[i]->Draw("h same");
           }
         }
