@@ -65,8 +65,8 @@ class DrawBase {
   void drawProfile( const std::string& yVar, const std::string& xVar, int legendQuadrant=1);
   void drawStack(const std::string& varY, const std::string& varX, const std::string& RECO_GEN, bool isData) const { this->drawStack( varY, varX, "", RECO_GEN, isData); };
   void drawStack(const std::string& varY, const std::string& varX, const std::string& etaRegion, const std::string& RECO_GEN, bool isData) const;
-  void compareDifferentHistos( const std::vector< HistoAndName > histosandnames, const std::string xAxisName, const std::string saveVarName, bool normalized=true, int legendQuadrant=1 );
-  void compareDifferentHistos_singleFile( InputFile file, const std::vector< HistoAndName > histosandnames, const std::string xAxisName, const std::string saveVarName, bool normalized=true, int legendQuadrant=1 );
+  void compareDifferentHistos( const std::vector< HistoAndName > histosandnames, const std::string saveVarName, const std::string xAxisName, const std::string& units="", const std::string& instanceName="Entries", bool normalized=true, int legendQuadrant=1 );
+  void compareDifferentHistos_singleFile( InputFile file, const std::vector< HistoAndName > histosandnames, const std::string saveVarName, const std::string xAxisName, const std::string& units="", const std::string& instanceName="Entries", bool normalized=true, int legendQuadrant=1 );
   void drawObjects( const std::vector< TObject* > objects, const std::string& name, 
                    const std::string& xAxisName, float xMin, float xMax, 
                    const std::string& yAxisName, float yMin, float yMax, 
