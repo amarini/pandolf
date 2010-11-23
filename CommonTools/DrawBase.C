@@ -257,13 +257,18 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     if( !noMC ) {
       mcHistos.push_back(mcHisto0);
       mcHistos[0]->SetFillColor( mcFiles_[0].fillColor );
-      mcHistos[0]->SetLineColor( mcFiles_[0].fillColor );
-      mcHistos[0]->SetLineWidth(2);
-      if( mcFiles_[0].fillStyle==-1 ) 
-        mcHistos[0]->SetFillStyle( fillStyle++ ); //so that it changes at every histo
-      else
+      if( noStack_ ) {
+        mcHistos[0]->SetLineColor( mcFiles_[0].fillColor );
+        mcHistos[0]->SetLineWidth(2);
+      }
+      if( mcFiles_[0].fillStyle==-1 ) {
+        if( noStack_ ) //default is solid fill (if stacked)
+          mcHistos[0]->SetFillStyle( fillStyle++ ); //so that it changes at every histo
+      } else {
         mcHistos[0]->SetFillStyle( mcFiles_[0].fillStyle );
+      }
       mcHistos[0]->Rebin(rebin_);
+      mcHistos[0]->Scale(mcFiles_[0].weight );
 
       mcHisto_sum = new TH1F(*((TH1F*)mcHistos[0]->Clone()));
       if( mcFiles_.size()>1 ) {
@@ -275,13 +280,18 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
             return;
           }
           mcHistos[i]->Rebin(rebin_);
+          mcHistos[i]->Scale(mcFiles_[i].weight );
           mcHistos[i]->SetFillColor( mcFiles_[i].fillColor );
-          mcHistos[i]->SetLineColor( mcFiles_[i].fillColor );
-          mcHistos[i]->SetLineWidth(2);
-          if( mcFiles_[i].fillStyle==-1 ) 
-            mcHistos[i]->SetFillStyle( fillStyle++ ); //so that it changes at every histo
-          else
+          if( noStack_ ) {
+            mcHistos[i]->SetLineColor( mcFiles_[i].fillColor );
+            mcHistos[i]->SetLineWidth(2);
+          }
+          if( mcFiles_[i].fillStyle==-1 ) {
+            if( noStack_ ) //default is solid fill (if stacked)
+              mcHistos[i]->SetFillStyle( fillStyle++ ); //so that it changes at every histo
+          } else {
             mcHistos[i]->SetFillStyle( mcFiles_[i].fillStyle );
+          }
           mcHisto_sum->Add( (TH1F*)(mcHistos[i]->Clone()) );
         } //for mc files
       } //if mc files size > 1
@@ -301,11 +311,16 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
         for( unsigned i=0; i<mcHistos.size(); ++i )
           mcHistos[i]->Scale( dataIntegral/mcIntegral );
       } else if( noDATA ) { //normalize each MC to its area
-        Float_t mcIntegral = mcHisto_sum->Integral(0, mcHisto_sum->GetNbinsX()+1);
-        mcHisto_sum->Scale( 1./mcIntegral );
+        //Float_t mcIntegral = mcHisto_sum->Integral(0, mcHisto_sum->GetNbinsX()+1);
+        Float_t mcIntegral_sum = mcHisto_sum->GetEntries();
+        mcHisto_sum->Scale( 1./mcIntegral_sum );
         for( unsigned i=0; i<mcHistos.size(); ++i ) {
-          mcIntegral = mcHistos[i]->Integral(0, mcHistos[i]->GetNbinsX()+1);
-          mcHistos[i]->Scale( 1./mcIntegral );
+          //mcIntegral = mcHistos[i]->Integral(0, mcHistos[i]->GetNbinsX()+1);
+          Float_t mcIntegral = mcHistos[i]->GetEntries();
+          if( noStack_ )
+            mcHistos[i]->Scale( 1./mcIntegral );
+          else 
+            mcHistos[i]->Scale( 1./mcIntegral_sum );
         }
       } else {
         std::cout << "DATA and MC files not properly initialized. Will not normalize." << std::endl;
@@ -322,14 +337,17 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
 
     TH1F* refHisto = (noDATA) ? mcHistos[0] : dataHisto;
 
-    Float_t yAxisMaxScale = (name=="phiJet" || name=="etaJet" || name=="ptSecondJetRel" || name=="phiPhot" || name=="etaPhot" ) ? 1.8 : 1.6;
-    if( name=="phiPhot" || name=="etaPhot" ) yAxisMaxScale=2.;
-    if(name=="clusterMajPhotReco" || name=="clusterMinPhotReco") yAxisMaxScale = 2.;
+  //Float_t yAxisMaxScale = (name=="phiJet" || name=="etaJet" || name=="ptSecondJetRel" || name=="phiPhot" || name=="etaPhot" ) ? 1.8 : 1.6;
+  //if( name=="phiPhot" || name=="etaPhot" ) yAxisMaxScale=2.;
+  //if(name=="clusterMajPhotReco" || name=="clusterMinPhotReco") yAxisMaxScale = 2.;
+    Float_t yAxisMaxScale = 1.6;
     Float_t xMin = refHisto->GetXaxis()->GetXmin();
     Float_t xMax = refHisto->GetXaxis()->GetXmax();
     Float_t yMax_data = (noDATA) ? 0. : dataHisto->GetMaximum();
-    Float_t yMax_mc = (noMC) ? 0. : mcHisto_sum->GetMaximum();
-    if( scaleFactor_<0. ) yMax_mc /= mcHisto_sum->Integral(0, mcHisto_sum->GetNbinsX()+1);
+    //Float_t yMax_mc = (noMC) ? 0. : mcHisto_sum->GetMaximum();
+    std::string nostack_str = (noStack_) ? "nostack" : "";
+    Float_t yMax_mc = (noMC) ? 0. : mcHisto_stack->GetMaximum(nostack_str.c_str());
+    //if( scaleFactor_<0. ) yMax_mc /= mcHisto_sum->Integral(0, mcHisto_sum->GetNbinsX()+1);
     if( scaleFactor_<0. && noDATA ) {
       for( unsigned i=0; i<mcHistos.size(); ++i ) {
         if( mcHistos[i]->GetMaximum() > yMax_mc ) yMax_mc = mcHistos[i]->GetMaximum();
@@ -672,10 +690,16 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     if( log_aussi ) {
 
       float yMin=yMax;
-      for(unsigned iHisto=0; iHisto<mcHistos.size(); ++iHisto) 
-        for( unsigned iBin=1; iBin<mcHistos[iHisto]->GetNbinsX(); ++iBin ) 
-          if( mcHistos[iHisto]->GetBinContent(iBin)>0. && mcHistos[iHisto]->GetBinContent(iBin) < yMin ) 
-            yMin = mcHistos[iHisto]->GetBinContent(iBin);
+      if( noStack_ ) {
+        for(unsigned iHisto=0; iHisto<mcHistos.size(); ++iHisto) 
+          for( unsigned iBin=1; iBin<mcHistos[iHisto]->GetNbinsX(); ++iBin ) 
+            if( mcHistos[iHisto]->GetBinContent(iBin)>0. && mcHistos[iHisto]->GetBinContent(iBin) < yMin ) 
+              yMin = mcHistos[iHisto]->GetBinContent(iBin);
+      } else {
+          for( unsigned iBin=1; iBin<mcHisto_sum->GetNbinsX(); ++iBin ) 
+            if( mcHisto_sum->GetBinContent(iBin)>0. && mcHisto_sum->GetBinContent(iBin) < yMin ) 
+              yMin = mcHisto_sum->GetBinContent(iBin);
+      }
 
       TH2D* h2_axes_log = new TH2D("axes_log", "", 10, xMin, xMax, 10, 0.1*yMin, 5.*yMax);
       h2_axes_log->SetXTitle(xAxis.c_str());
@@ -1849,6 +1873,7 @@ void DrawBase::add_dataFile( TFile* dataFile, const std::string& datasetName ) {
 
   dataFile_.file = dataFile;
   dataFile_.datasetName = datasetName;
+  dataFile_.weight = 1.;
 
   TH1F* h1_lumi = (TH1F*)dataFile_.file->Get("totalLumi");
   if( h1_lumi==0 ) {
@@ -1858,24 +1883,30 @@ void DrawBase::add_dataFile( TFile* dataFile, const std::string& datasetName ) {
     lumi_ = h1_lumi->GetBinContent(1);
   }
 
+  std::cout << "-> Added DATA file '" << dataFile->GetName() << std::endl;
+
 }
 
 
 
 void DrawBase::add_mcFile( TFile* mcFile, const std::string& datasetName, const std::string& legendName, int fillColor, int fillStyle ) {
 
+  this->add_mcFile( mcFile, 1., datasetName, legendName, fillColor, fillStyle );
+
+}
+
+void DrawBase::add_mcFile( TFile* mcFile, float weight, const std::string& datasetName, const std::string& legendName, int fillColor, int fillStyle ) {
+
   InputFile thisfile;
   thisfile.file = mcFile;
   thisfile.datasetName = datasetName;
+  thisfile.weight = weight;
   thisfile.legendName = legendName;
   thisfile.fillColor = fillColor;
-  if( fillStyle==-1 ) {
-    thisfile.fillStyle = ( 3004+mcFiles_.size() ); //default
-  } else {
-    thisfile.fillStyle=fillStyle;
-  }
+  thisfile.fillStyle=fillStyle;
   mcFiles_.push_back( thisfile );
 
+  std::cout << "-> Added MC file '" << mcFile->GetName() << std::endl;
 }
 
 
