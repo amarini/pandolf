@@ -28,7 +28,7 @@ DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType
   lumi_ = 0.;
   flags_ = flags;
 
-  dataFile_.file = 0;
+  //dataFiles_.file = 0;
 
   scaleFactor_ = 0.;
   rebin_ = 1;
@@ -46,9 +46,11 @@ DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType
 
 DrawBase::~DrawBase() {
 
-  if( dataFile_.file!=0 ) {
-    delete dataFile_.file;
-    dataFile_.file=0;
+  if( dataFiles_.size()!=0 ) {
+    for( unsigned i=0; i<dataFiles_.size(); ++i ) {
+      delete dataFiles_[i].file;
+      dataFiles_[i].file=0;
+    }
   }
 
   if( mcFiles_.size()!=0 ) {
@@ -66,7 +68,7 @@ void DrawBase::set_lumiNormalization( float givenLumi) {
 
   if( givenLumi==-1. ) {
 
-    if( dataFile_.file==0 ) {
+    if( dataFiles_.size()==0 ) {
       std::cout << "Data/MC files not properly initialized. Cannot compute scale factor. Exiting." << std::endl;
       exit(132);
     }
@@ -88,9 +90,10 @@ void DrawBase::set_shapeNormalization() {
 
 }
 
+/*
 void DrawBase::set_sameEventNormalization() {
 
-  if( dataFile_.file==0 || mcFiles_.size()==0 ) {
+  if( dataFiles_.file==0 || mcFiles_.size()==0 ) {
     std::cout << "Data/MC files not properly initialized. Cannot compute scale factor. Exiting." << std::endl;
     exit(133);
   }
@@ -140,7 +143,7 @@ void DrawBase::set_sameInstanceNormalization() {
   std::cout << "ScaleFactor: " << scaleFactor_ << std::endl;
 
 }
-
+*/
 
 
 
@@ -170,7 +173,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
 
   if( draw_vs_pt_graphs ) {
 
-    hp_ptPhot_data = (TProfile*)dataFile_.file->Get(ptPhotMean_name.c_str());
+    hp_ptPhot_data = (TProfile*)dataFiles_[0].file->Get(ptPhotMean_name.c_str());
     hp_ptPhot_mc = (TProfile*)mcFiles_[0].file->Get(ptPhotMean_name.c_str());
     hp_ptJetGen_mc = (TProfile*)mcFiles_[0].file->Get("ptJetGenMean");
 
@@ -228,16 +231,39 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
       histoName = histoName + "_" + ptRange_str;
     }
 
-    TH1F* dataHisto = (dataFile_.file==0) ? 0 : (TH1F*)dataFile_.file->Get(histoName.c_str());
-    if( dataHisto==0 ) {
+    //TH1F* dataHisto = (dataFiles_.size()==0) ? 0 : (TH1F*)dataFile_.file->Get(histoName.c_str());
+    std::vector<TH1F*> dataHistos;
+    for( unsigned int iData=0; iData<dataFiles_.size(); iData++ )
+      dataHistos.push_back( (TH1F*)dataFiles_[iData].file->Get(histoName.c_str()) );
+
+    if( dataHistos.size()==0 ) {
       //std::cout << "Didn't find DATA histo '" << histoName << "'. Continuing." << std::endl;
       //return;
       noDATA = true;
     }
-    if( !noDATA ) {
-      dataHisto->Rebin(rebin_);
-      dataHisto->SetMarkerStyle(20);
+
+    int markerStyle_default=20;
+    int markerColor_default=1;
+    for( unsigned iData=0; iData<dataHistos.size(); ++iData ) {
+      dataHistos[iData]->Rebin(rebin_);
+
+      if( dataFiles_[iData].markerStyle!=-1 )
+        dataHistos[iData]->SetMarkerStyle(dataFiles_[iData].markerStyle);
+      else
+        dataHistos[iData]->SetMarkerStyle(markerStyle_default++); // make it change at every histo
+
+      if( dataFiles_[iData].fillColor!=-1 )
+        dataHistos[iData]->SetMarkerColor(dataFiles_[iData].fillColor);
+      else
+        dataHistos[iData]->SetMarkerColor(markerColor_default++); // make it change at every histo
+
     }
+
+
+//  if( !noDATA ) {
+//    dataHisto->Rebin(rebin_);
+//    dataHisto->SetMarkerStyle(20);
+//  }
 
 
     std::vector<TH1F*> mcHistos;
@@ -312,7 +338,8 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
         mcHistos[i]->Scale(scaleFactor_);
     } else {
       if( !noDATA && !noMC ) { //normalize mc to data shape
-        Float_t dataIntegral = dataHisto->Integral(0, dataHisto->GetNbinsX()+1);
+        // default: choose first data histo:
+        Float_t dataIntegral = dataHistos[0]->Integral(0, dataHistos[0]->GetNbinsX()+1);
         Float_t mcIntegral = mcHisto_sum->Integral(0, mcHisto_sum->GetNbinsX()+1);
         mcHisto_sum->Scale( dataIntegral/mcIntegral );
         for( unsigned i=0; i<mcHistos.size(); ++i )
@@ -329,6 +356,8 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
           else 
             mcHistos[i]->Scale( 1./mcIntegral_sum );
         }
+      } else if( !noDATA && noMC ) {
+        // nothing to do here, as data does not have to be normalized
       } else {
         std::cout << "DATA and MC files not properly initialized. Will not normalize." << std::endl;
       }
@@ -342,7 +371,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
       mcHisto_stack->Add( (TH1F*)(mcHistos[nHistos-i-1]->Clone()), "HISTO" );
     mcHisto_stack->SetName("stack");
 
-    TH1F* refHisto = (noDATA) ? mcHistos[0] : dataHisto;
+    TH1F* refHisto = (noDATA) ? mcHistos[0] : dataHistos[0];
 
   //Float_t yAxisMaxScale = (name=="phiJet" || name=="etaJet" || name=="ptSecondJetRel" || name=="phiPhot" || name=="etaPhot" ) ? 1.8 : 1.6;
   //if( name=="phiPhot" || name=="etaPhot" ) yAxisMaxScale=2.;
@@ -350,7 +379,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     Float_t yAxisMaxScale = 1.6;
     Float_t xMin = refHisto->GetXaxis()->GetXmin();
     Float_t xMax = refHisto->GetXaxis()->GetXmax();
-    Float_t yMax_data = (noDATA) ? 0. : dataHisto->GetMaximum();
+    Float_t yMax_data = (noDATA) ? 0. : dataHistos[0]->GetMaximum();
     //Float_t yMax_mc = (noMC) ? 0. : mcHisto_sum->GetMaximum();
     std::string nostack_str = (noStack_) ? "nostack" : "";
     Float_t yMax_mc = (noMC) ? 0. : mcHisto_stack->GetMaximum(nostack_str.c_str());
@@ -405,7 +434,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
 
     std::string yAxis = instanceName;
 
-    if( scaleFactor_ < 0. && dataFile_.file==0 ) {
+    if( scaleFactor_ < 0. && dataFiles_.size()==0 ) {
       yAxis = "Normalized to Unity";
     } else {
       char yAxis_char[150];
@@ -421,8 +450,8 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
 
 
     LegendBox lb = get_legendBox(legendQuadrant);
-    int totalNfiles = mcFiles_.size();
-    if( dataFile_.file!=0 ) totalNfiles++;
+    int totalNfiles = mcFiles_.size() + dataFiles_.size();
+//    if( dataFile_.file!=0 ) totalNfiles++;
 
     if( totalNfiles > 5 ) {
       yMax *= 1.2;
@@ -432,12 +461,10 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     TLegend* legend = new TLegend(lb.xMin, lb.yMin, lb.xMax, lb.yMax);
     legend->SetFillColor(kWhite);
     legend->SetTextSize(0.035);
-    if( !noDATA )
-      legend->AddEntry(dataHisto, "Data", "P");
-    if( !noMC ) {
-      for( unsigned i=0; i<mcHistos.size(); ++i ) 
-        legend->AddEntry(mcHistos[i], (mcFiles_[i].legendName).c_str(), "F");
-    }
+    for( unsigned i=0; i<dataHistos.size(); ++i ) 
+      legend->AddEntry(dataHistos[i], (dataFiles_[i].legendName).c_str(), "P");
+    for( unsigned i=0; i<mcHistos.size(); ++i ) 
+      legend->AddEntry(mcHistos[i], (mcFiles_[i].legendName).c_str(), "F");
 
     TH2D* h2_axes = new TH2D("axes", "", 10, xMin, xMax, 10, yMin, yMax);
     h2_axes->SetXTitle(xAxis.c_str());
@@ -556,9 +583,8 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
         }
       }
     } // if !nomc
-    if( !noDATA ) {
-      dataHisto->Draw("E same");
-    }
+    for( unsigned i=0; i<dataHistos.size(); ++i )
+      dataHistos[i]->Draw("E same");
     gPad->RedrawAxis();
     label_cms->Draw("same");
     label_sqrt->Draw("same");
@@ -569,10 +595,10 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
 
     if( draw_vs_pt_graphs ) {  //store info for response vs. pt plots (to be done later)
 
-      Float_t dataResponse = (noDATA) ? 0. : dataHisto->GetMean();
-      Float_t dataResponseErr = (noDATA) ? 0. : dataHisto->GetMeanError();
-      Float_t dataRMS = (noDATA) ? 0. : dataHisto->GetRMS();
-      Float_t dataRMSErr = (noDATA) ? 0. : dataHisto->GetMeanError();
+      Float_t dataResponse = (noDATA) ? 0. : dataHistos[0]->GetMean();
+      Float_t dataResponseErr = (noDATA) ? 0. : dataHistos[0]->GetMeanError();
+      Float_t dataRMS = (noDATA) ? 0. : dataHistos[0]->GetRMS();
+      Float_t dataRMSErr = (noDATA) ? 0. : dataHistos[0]->GetMeanError();
       Float_t dataResolution = (noDATA) ? 0. : dataRMS / dataResponse;
       Float_t dataResolutionErr = (noDATA) ? 0. : sqrt( dataRMSErr*dataRMSErr/(dataResponse*dataResponse) + dataResolution*dataResolution*dataResponseErr*dataResponseErr/(dataResponse*dataResponse*dataResponse*dataResponse) );
 
@@ -697,15 +723,19 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     if( log_aussi ) {
 
       float yMin=yMax;
-      if( noStack_ ) {
-        for(unsigned iHisto=0; iHisto<mcHistos.size(); ++iHisto) 
-          for( unsigned iBin=1; iBin<mcHistos[iHisto]->GetNbinsX(); ++iBin ) 
-            if( mcHistos[iHisto]->GetBinContent(iBin)>0. && mcHistos[iHisto]->GetBinContent(iBin) < yMin ) 
-              yMin = mcHistos[iHisto]->GetBinContent(iBin);
-      } else {
-          for( unsigned iBin=1; iBin<mcHisto_sum->GetNbinsX(); ++iBin ) 
-            if( mcHisto_sum->GetBinContent(iBin)>0. && mcHisto_sum->GetBinContent(iBin) < yMin ) 
-              yMin = mcHisto_sum->GetBinContent(iBin);
+      if( !noMC ) {
+        if( noStack_ ) {
+          for(unsigned iHisto=0; iHisto<mcHistos.size(); ++iHisto) 
+            for( unsigned iBin=1; iBin<mcHistos[iHisto]->GetNbinsX(); ++iBin ) 
+              if( mcHistos[iHisto]->GetBinContent(iBin)>0. && mcHistos[iHisto]->GetBinContent(iBin) < yMin ) 
+                yMin = mcHistos[iHisto]->GetBinContent(iBin);
+        } else {
+            for( unsigned iBin=1; iBin<mcHisto_sum->GetNbinsX(); ++iBin ) 
+              if( mcHisto_sum->GetBinContent(iBin)>0. && mcHisto_sum->GetBinContent(iBin) < yMin ) 
+                yMin = mcHisto_sum->GetBinContent(iBin);
+        }
+      } else { // only data, so min entry is 1:
+        yMin = 1.;
       }
 
       TH2D* h2_axes_log = new TH2D("axes_log", "", 10, xMin, xMax, 10, 0.1*yMin, 5.*yMax);
@@ -731,9 +761,8 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
           }
         }
       } // if !nomc
-      if( !noDATA ) {
-        dataHisto->Draw("E same");
-      }
+      for( unsigned i=0; i<dataHistos.size(); ++i )
+        dataHistos[i]->Draw("E same");
       gPad->RedrawAxis();
       legend->Draw("same");
       label_cms->Draw("same");
@@ -1169,7 +1198,7 @@ void DrawBase::drawProfile( const std::string& yVar, const std::string& xVar, in
   std::string name = yVar + "_vs_" + xVar;
   if( xVar == "pt" || xVar == "ptCorr" ) name = name + "_barrel"; //ugly fix for now
 
-  TProfile* dataProfile = (TProfile*)dataFile_.file->Get(name.c_str());
+  TProfile* dataProfile = (TProfile*)dataFiles_[0].file->Get(name.c_str());
   TProfile* mcProfile = (TProfile*)mcFiles_[0].file->Get(name.c_str()); //default: take first mc file. MUST BE FIXED
 
   if( dataProfile==0 || mcProfile==0 ) {
@@ -1373,7 +1402,7 @@ std::string DrawBase::get_axisName(std::string name) {
 void DrawBase::drawStack(const std::string& varY, const std::string& varX, const std::string& etaRegion, const std::string& RECO_GEN, bool isData) const {
 
   TFile* file;
-  if( isData ) file = dataFile_.file;
+  if( isData ) file = dataFiles_[0].file;
   else file = mcFiles_[0].file;
 
   std::string histoName;
@@ -1630,7 +1659,7 @@ void DrawBase::drawStack(const std::string& varY, const std::string& varX, const
 
 void DrawBase::compareDifferentHistos( const std::vector< HistoAndName > histos, const std::string saveVarName, const std::string xAxisName, const std::string& units, const std::string& instanceName, bool normalized, int legendQuadrant ) {
 
-  if( dataFile_.file!=0 ) compareDifferentHistos_singleFile( dataFile_, histos, saveVarName, xAxisName, units, instanceName, normalized, legendQuadrant );
+  for( unsigned iData=0; iData<dataFiles_.size(); ++iData ) compareDifferentHistos_singleFile( dataFiles_[iData], histos, saveVarName, xAxisName, units, instanceName, normalized, legendQuadrant );
   for( unsigned iMC=0; iMC<mcFiles_.size(); ++iMC ) compareDifferentHistos_singleFile( mcFiles_[iMC], histos, saveVarName, xAxisName, units, instanceName, normalized, legendQuadrant );
 
 }
@@ -1867,13 +1896,17 @@ void DrawBase::drawObjects( const std::vector< TObject* > objects, const std::st
 
 
 
-void DrawBase::add_dataFile( TFile* dataFile, const std::string& datasetName ) {
+void DrawBase::add_dataFile( TFile* dataFile, const std::string& datasetName, const std::string& legendName, int markerColor, int markerStyle ) {
 
-  dataFile_.file = dataFile;
-  dataFile_.datasetName = datasetName;
-  dataFile_.weight = 1.;
+  InputFile thisFile;
+  thisFile.file = dataFile;
+  thisFile.datasetName = datasetName;
+  thisFile.legendName = legendName;
+  thisFile.weight = 1.;
+  thisFile.fillColor = markerColor;
+  thisFile.markerStyle = markerStyle;
 
-  TH1F* h1_lumi = (TH1F*)dataFile_.file->Get("totalLumi");
+  TH1F* h1_lumi = (TH1F*)dataFile->Get("totalLumi");
   if( h1_lumi==0 ) {
     std::cout << "WARNING! Lumi histogram not found!" << std::endl;
     lumi_ = 0.;
@@ -1881,6 +1914,7 @@ void DrawBase::add_dataFile( TFile* dataFile, const std::string& datasetName ) {
     lumi_ = h1_lumi->GetBinContent(1);
   }
 
+  dataFiles_.push_back( thisFile );
   std::cout << "-> Added DATA file '" << dataFile->GetName() << std::endl;
 
 }
@@ -1992,7 +2026,7 @@ LegendBox DrawBase::get_legendBox( int legendQuadrant, const std::vector<std::st
     if( legendNames!=0 ) {
       nNames_total += legendNames->size();
     } else {
-      if( dataFile_.file!=0 ) nNames_total +=1;
+      nNames_total += dataFiles_.size();
       nNames_total += mcFiles_.size();
     }
 
@@ -2033,11 +2067,12 @@ LegendBox DrawBase::get_legendBox( int legendQuadrant, const std::vector<std::st
     bool widen = false;
     if( legendNames!=0 ) {
       for( unsigned i=0;i<legendNames->size(); ++i )
-        if( legendNames->at(i).length() > 15 ) widen=true;
+        if( legendNames->at(i).length() > 13 ) widen=true;
     } else {
-      if( dataFile_.legendName.length() > 15 ) widen=true;
+      for( unsigned i=0;i<dataFiles_.size(); ++i )
+        if( dataFiles_[i].legendName.length() > 13 ) widen=true;
       for( unsigned i=0;i<mcFiles_.size(); ++i )
-        if( mcFiles_[i].legendName.length() > 15 ) widen=true;
+        if( mcFiles_[i].legendName.length() > 13 ) widen=true;
     }
 
     if( widen ) {
@@ -2226,7 +2261,7 @@ std::string DrawBase::get_CMSText() const {
 
   std::string returnString;
 
-  if(dataFile_.file==0) {
+  if(dataFiles_.size()==0) {
     returnString = "CMS Simulation 2010";
   } else {
     returnString = "CMS Preliminary 2010";
@@ -2241,9 +2276,12 @@ std::string DrawBase::get_outputSuffix() const {
 
   std::string suffix = "";
 
-  if( dataFile_.file!=0 ) {
+  if( dataFiles_.size()!=0 ) {
 
-    suffix = dataFile_.datasetName;
+    for( unsigned iData=0; iData<dataFiles_.size(); ++iData ) {
+      if( iData>0 ) suffix += "_";
+      suffix = dataFiles_[iData].datasetName;
+    }
 
     if( mcFiles_.size() != 0 )
       suffix += "_vs_";

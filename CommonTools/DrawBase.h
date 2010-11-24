@@ -30,6 +30,7 @@ struct InputFile {
   std::string legendName;
   int fillColor;
   int fillStyle;
+  int markerStyle;
 };
 
 
@@ -74,7 +75,7 @@ class DrawBase {
                    bool logx=false, bool logy=false);
 
   void set_analysisType( const std::string analysisType ) { analysisType_ = analysisType; };
-  void add_dataFile( TFile* dataFile, const std::string& datasetName );
+  void add_dataFile( TFile* dataFile, const std::string& datasetName, const std::string& legendName="DATA", int markerColor=-1, int markerStyle=-1 );
   void add_mcFile( TFile* mcFile, const std::string& datasetName, const std::string& legendName, int fillColor=-1, int fillStyle=-1 );
   // in the following function weight must be cross_section(in pb) / Nevents:
   void add_mcFile( TFile* mcFile, float weight, const std::string& datasetName, const std::string& legendName, int fillColor=-1, int fillStyle=-1 );
@@ -96,7 +97,7 @@ class DrawBase {
   std::string get_analysisType() const { return analysisType_; };
   std::string get_recoType() const { return recoType_; };
   std::string get_flags() const { return flags_; };
-  TFile* get_dataFile() const { return dataFile_.file; };
+  TFile* get_dataFile( int i ) const { return dataFiles_[i].file; };
   TFile* get_mcFile( int i ) const { return mcFiles_[i].file; };
   std::string get_outputdir() const { return outputdir_; };
   Int_t get_pt_thresh() const { return pt_thresh_; };
@@ -122,7 +123,7 @@ class DrawBase {
 
   std::string flags_;
 
-  InputFile dataFile_;
+  std::vector< InputFile > dataFiles_;
   std::vector< InputFile > mcFiles_;
   
   Float_t scaleFactor_;
