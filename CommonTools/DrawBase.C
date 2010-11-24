@@ -332,11 +332,16 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
 
 
     // normalize:
-    if( scaleFactor_ > 0. && !noMC ) {
-      mcHisto_sum->Scale(scaleFactor_);
-      for( unsigned i=0; i<mcHistos.size(); ++i )
-        mcHistos[i]->Scale(scaleFactor_);
-    } else {
+    if( scaleFactor_ > 0. ) {
+
+      if( !noMC ) {
+        mcHisto_sum->Scale(scaleFactor_);
+        for( unsigned i=0; i<mcHistos.size(); ++i )
+          mcHistos[i]->Scale(scaleFactor_);
+      }
+
+    } else { //scale factor < 0 --> normalize to shapes
+
       if( !noDATA && !noMC ) { //normalize mc to data shape
         // default: choose first data histo:
         Float_t dataIntegral = dataHistos[0]->Integral(0, dataHistos[0]->GetNbinsX()+1);
@@ -344,22 +349,31 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
         mcHisto_sum->Scale( dataIntegral/mcIntegral );
         for( unsigned i=0; i<mcHistos.size(); ++i )
           mcHistos[i]->Scale( dataIntegral/mcIntegral );
-      } else if( noDATA ) { //normalize each MC to its area
-        //Float_t mcIntegral = mcHisto_sum->Integral(0, mcHisto_sum->GetNbinsX()+1);
-        Float_t mcIntegral_sum = mcHisto_sum->GetEntries();
-        mcHisto_sum->Scale( 1./mcIntegral_sum );
-        for( unsigned i=0; i<mcHistos.size(); ++i ) {
-          //mcIntegral = mcHistos[i]->Integral(0, mcHistos[i]->GetNbinsX()+1);
-          Float_t mcIntegral = mcHistos[i]->GetEntries();
-          if( noStack_ )
-            mcHistos[i]->Scale( 1./mcIntegral );
-          else 
-            mcHistos[i]->Scale( 1./mcIntegral_sum );
+      //} else if( noDATA ) { //normalize each MC to its area
+      } else { //normalize each histo to its area
+        // first: MC
+        if( !noMC ) {
+          //Float_t mcIntegral = mcHisto_sum->Integral(0, mcHisto_sum->GetNbinsX()+1);
+          Float_t mcIntegral_sum = mcHisto_sum->GetEntries();
+          mcHisto_sum->Scale( 1./mcIntegral_sum );
+          for( unsigned i=0; i<mcHistos.size(); ++i ) {
+            //mcIntegral = mcHistos[i]->Integral(0, mcHistos[i]->GetNbinsX()+1);
+            Float_t mcIntegral = mcHistos[i]->GetEntries();
+            if( noStack_ )
+              mcHistos[i]->Scale( 1./mcIntegral );
+            else 
+              mcHistos[i]->Scale( 1./mcIntegral_sum );
+          }
         }
-      } else if( !noDATA && noMC ) {
-        // nothing to do here, as data does not have to be normalized
-      } else {
-        std::cout << "DATA and MC files not properly initialized. Will not normalize." << std::endl;
+        // second: data
+        for( unsigned i=0; i<dataHistos.size(); ++i ) {
+          Float_t dataIntegral = dataHistos[i]->GetEntries();
+          dataHistos[i]->Scale( 1./dataIntegral );
+        }
+    //} else if( !noDATA && noMC ) {
+    //  // nothing to do here, as data does not have to be normalized
+    //} else {
+    //  std::cout << "DATA and MC files not properly initialized. Will not normalize." << std::endl;
       }
     } //if scalefactor
 
@@ -434,7 +448,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
 
     std::string yAxis = instanceName;
 
-    if( scaleFactor_ < 0. && dataFiles_.size()==0 ) {
+    if( scaleFactor_ < 0. && (dataFiles_.size()==0||mcFiles_.size()==0) ) {
       yAxis = "Normalized to Unity";
     } else {
       char yAxis_char[150];
@@ -722,7 +736,9 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
 
     if( log_aussi ) {
 
+      // look for minimum in histos:
       float yMin=yMax;
+      // first: MC
       if( !noMC ) {
         if( noStack_ ) {
           for(unsigned iHisto=0; iHisto<mcHistos.size(); ++iHisto) 
@@ -734,9 +750,12 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
               if( mcHisto_sum->GetBinContent(iBin)>0. && mcHisto_sum->GetBinContent(iBin) < yMin ) 
                 yMin = mcHisto_sum->GetBinContent(iBin);
         }
-      } else { // only data, so min entry is 1:
-        yMin = 1.;
-      }
+      } // if nomc
+      // second: data
+      for(unsigned iHisto=0; iHisto<dataHistos.size(); ++iHisto) 
+        for( unsigned iBin=1; iBin<dataHistos[iHisto]->GetNbinsX(); ++iBin ) 
+          if( dataHistos[iHisto]->GetBinContent(iBin)>0. && dataHistos[iHisto]->GetBinContent(iBin) < yMin ) 
+            yMin = dataHistos[iHisto]->GetBinContent(iBin);
 
       TH2D* h2_axes_log = new TH2D("axes_log", "", 10, xMin, xMax, 10, 0.1*yMin, 5.*yMax);
       h2_axes_log->SetXTitle(xAxis.c_str());
