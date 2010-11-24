@@ -242,6 +242,8 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
       noDATA = true;
     }
 
+
+    // FIRST: SET BASIC AESTHETICS FOR DATA HISTO(S)
     int markerStyle_default=20;
     int markerColor_default=1;
     for( unsigned iData=0; iData<dataHistos.size(); ++iData ) {
@@ -278,6 +280,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     }
 
 
+    // SECOND: SET BASIC AESTHETICS FOR DATA HISTO(S) and CREATE MC HISTO SUM
     TH1F* mcHisto_sum = 0;
     float fillColor_default=1;
     float fillStyle_default=3004;
@@ -296,6 +299,11 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
           mcHistos[0]->SetFillStyle( fillStyle_default++ ); //so that it changes at every histo
       } else {
         mcHistos[0]->SetFillStyle( mcFiles_[0].fillStyle );
+      }
+      if( mcFiles_[0].markerStyle!=-1 ) {
+        mcHistos[0]->SetMarkerStyle( mcFiles_[0].markerStyle );
+        mcHistos[0]->SetMarkerColor( mcFiles_[0].fillColor );
+        mcHistos[0]->SetMarkerSize( 1.6 );
       }
       mcHistos[0]->Rebin(rebin_);
       mcHistos[0]->Scale(mcFiles_[0].weight );
@@ -324,6 +332,11 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
               mcHistos[i]->SetFillStyle( fillStyle_default++ ); //so that it changes at every histo
           } else {
             mcHistos[i]->SetFillStyle( mcFiles_[i].fillStyle );
+          }
+          if( mcFiles_[i].markerStyle!=-1 ) {
+            mcHistos[i]->SetMarkerStyle( mcFiles_[i].markerStyle );
+            mcHistos[i]->SetMarkerColor( mcFiles_[i].fillColor );
+            mcHistos[i]->SetMarkerSize( 1.6 );
           }
           mcHisto_sum->Add( (TH1F*)(mcHistos[i]->Clone()) );
         } //for mc files
@@ -477,8 +490,12 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     legend->SetTextSize(0.035);
     for( unsigned i=0; i<dataHistos.size(); ++i ) 
       legend->AddEntry(dataHistos[i], (dataFiles_[i].legendName).c_str(), "P");
-    for( unsigned i=0; i<mcHistos.size(); ++i ) 
-      legend->AddEntry(mcHistos[i], (mcFiles_[i].legendName).c_str(), "F");
+    for( unsigned i=0; i<mcHistos.size(); ++i )  {
+      if( mcFiles_[i].markerStyle==-1 )
+        legend->AddEntry(mcHistos[i], (mcFiles_[i].legendName).c_str(), "F");
+      else
+        legend->AddEntry(mcHistos[i], (mcFiles_[i].legendName).c_str(), "P");
+    }
 
     TH2D* h2_axes = new TH2D("axes", "", 10, xMin, xMax, 10, yMin, yMax);
     h2_axes->SetXTitle(xAxis.c_str());
@@ -593,7 +610,10 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
         //mcHistos[backwardsIndex]->SetFillStyle(mcFiles_[backwardsIndex].fillStyle);
         //mcHistos[backwardsIndex]->SetLineColor(mcFiles_[backwardsIndex].fillColor);
         //mcHistos[backwardsIndex]->SetLineWidth(2);
-          mcHistos[backwardsIndex]->Draw("h same");
+          if( mcFiles_[backwardsIndex].markerStyle!=-1 )
+            mcHistos[backwardsIndex]->Draw("p same");
+          else
+            mcHistos[backwardsIndex]->Draw("h same");
         }
       }
     } // if !nomc
@@ -776,7 +796,10 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
           for( unsigned i=0; i<mcHistos.size(); ++i ) {
          // int fillStyle = 3000+i+1;
          // mcHistos[i]->SetFillStyle(fillStyle);
-            mcHistos[i]->Draw("h same");
+            if( mcFiles_[i].markerStyle!=-1 )
+              mcHistos[i]->Draw("p same");
+            else
+              mcHistos[i]->Draw("h same");
           }
         }
       } // if !nomc
@@ -1940,13 +1963,13 @@ void DrawBase::add_dataFile( TFile* dataFile, const std::string& datasetName, co
 
 
 
-void DrawBase::add_mcFile( TFile* mcFile, const std::string& datasetName, const std::string& legendName, int fillColor, int fillStyle ) {
+void DrawBase::add_mcFile( TFile* mcFile, const std::string& datasetName, const std::string& legendName, int fillColor, int fillStyle, int markerStyle ) {
 
-  this->add_mcFile( mcFile, 1., datasetName, legendName, fillColor, fillStyle );
+  this->add_mcFile( mcFile, 1., datasetName, legendName, fillColor, fillStyle, markerStyle );
 
 }
 
-void DrawBase::add_mcFile( TFile* mcFile, float weight, const std::string& datasetName, const std::string& legendName, int fillColor, int fillStyle ) {
+void DrawBase::add_mcFile( TFile* mcFile, float weight, const std::string& datasetName, const std::string& legendName, int fillColor, int fillStyle, int markerStyle ) {
 
   InputFile thisfile;
   thisfile.file = mcFile;
@@ -1955,6 +1978,7 @@ void DrawBase::add_mcFile( TFile* mcFile, float weight, const std::string& datas
   thisfile.legendName = legendName;
   thisfile.fillColor = fillColor;
   thisfile.fillStyle=fillStyle;
+  thisfile.markerStyle=markerStyle;
   mcFiles_.push_back( thisfile );
 
   std::cout << "-> Added MC file '" << mcFile->GetName() << std::endl;
@@ -2004,6 +2028,17 @@ void DrawBase::set_outputdir( const std::string& outputdir ) {
     outputdir_ = analysisType_ + "Plots_" + get_fullSuffix();
 
   }
+
+}
+
+
+
+void DrawBase::set_mcMarkers() { 
+
+  int markerStyle=20+dataFiles_.size();
+  for( unsigned i=0; i<mcFiles_.size(); ++i )
+    mcFiles_[i].markerStyle = markerStyle++;
+
 
 }
 
