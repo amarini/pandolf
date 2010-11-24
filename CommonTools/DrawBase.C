@@ -461,7 +461,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
 
     std::string yAxis = instanceName;
 
-    if( scaleFactor_ < 0. && (dataFiles_.size()==0||mcFiles_.size()==0) ) {
+    if( scaleFactor_<0. && (dataFiles_.size()==0||mcFiles_.size()==0) ) {
       yAxis = "Normalized to Unity";
     } else {
       char yAxis_char[150];
@@ -2033,12 +2033,18 @@ void DrawBase::set_outputdir( const std::string& outputdir ) {
 
 
 
-void DrawBase::set_mcMarkers() { 
+void DrawBase::set_mcMarkers( bool set) { 
 
   int markerStyle=20+dataFiles_.size();
-  for( unsigned i=0; i<mcFiles_.size(); ++i )
-    mcFiles_[i].markerStyle = markerStyle++;
+  for( unsigned i=0; i<mcFiles_.size(); ++i ) {
+    if( set )
+      mcFiles_[i].markerStyle = markerStyle++;
+    else
+      mcFiles_[i].markerStyle = -1;
+  }
 
+  if( mcFiles_.size()==0 ) 
+    std::cout << "-> MC Files not set! Set them before calling set_mcMarkers()!" << std::endl;
 
 }
 

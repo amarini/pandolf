@@ -75,7 +75,7 @@ class DrawBase {
                    bool logx=false, bool logy=false);
 
   void set_analysisType( const std::string analysisType ) { analysisType_ = analysisType; };
-  void add_dataFile( TFile* dataFile, const std::string& datasetName, const std::string& legendName="DATA", int markerColor=-1, int markerStyle=-1 );
+  void add_dataFile( TFile* dataFile, const std::string& datasetName, const std::string& legendName="Data", int markerColor=-1, int markerStyle=-1 );
   void add_mcFile( TFile* mcFile, const std::string& datasetName, const std::string& legendName, int fillColor=-1, int fillStyle=-1, int markerStyle=-1 );
   // in the following function weight must be cross_section(in pb) / Nevents:
   void add_mcFile( TFile* mcFile, float weight, const std::string& datasetName, const std::string& legendName, int fillColor=-1, int fillStyle=-1, int markerStyle=-1 );
@@ -88,7 +88,7 @@ class DrawBase {
   void set_scaleFactor( float scaleFactor ) { scaleFactor_ = scaleFactor;};
   void set_noStack( bool set=true ) { noStack_ = set; };
   void set_rebin( int rebin ) { rebin_ = rebin; };
-  void set_mcMarkers();
+  void set_mcMarkers( bool set=true );
 
   LegendBox get_legendBox( int legendQuadrant=1, const std::vector<std::string>* legendNames=0 ) const;
   TPaveText* get_labelCMS( int legendQuadrant=2 ) const;
