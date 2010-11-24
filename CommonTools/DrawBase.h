@@ -75,9 +75,10 @@ class DrawBase {
 
   void set_analysisType( const std::string analysisType ) { analysisType_ = analysisType; };
   void add_dataFile( TFile* dataFile, const std::string& datasetName );
-  void add_mcFile( TFile* mcFile, const std::string& datasetName, const std::string& legendName, int fillColor, int fillStyle=-1 );
-  void add_mcFile( TFile* mcFile, float weight, const std::string& datasetName, const std::string& legendName, int fillColor, int fillStyle=-1 );
-  void set_outputdir( const std::string& outputdir="" ); //if "" is passed, default outputdir is set (recommended)
+  void add_mcFile( TFile* mcFile, const std::string& datasetName, const std::string& legendName, int fillColor=-1, int fillStyle=-1 );
+  // in the following function weight must be cross_section(in pb) / Nevents:
+  void add_mcFile( TFile* mcFile, float weight, const std::string& datasetName, const std::string& legendName, int fillColor=-1, int fillStyle=-1 );
+  void set_outputdir( const std::string& outputdir="" ); //if "" is passed, default outputdir is set
   void set_flags( const std::string& flags ) { flags_ = flags; };
   void set_pt_thresh( Int_t pt_thresh ) { pt_thresh_ = pt_thresh; };
   void set_etamax( Float_t etamax ) { etamax_ = etamax; };

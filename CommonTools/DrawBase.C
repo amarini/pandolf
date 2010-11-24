@@ -253,17 +253,21 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
 
 
     TH1F* mcHisto_sum = 0;
-    float fillStyle=3001;
+    float fillColor_default=1;
+    float fillStyle_default=3004;
     if( !noMC ) {
       mcHistos.push_back(mcHisto0);
-      mcHistos[0]->SetFillColor( mcFiles_[0].fillColor );
+      if( mcFiles_[0].fillColor==-1 )
+        mcHistos[0]->SetFillColor( fillColor_default++ ); //so that it changes at every histo
+      else
+        mcHistos[0]->SetFillColor( mcFiles_[0].fillColor );
       if( noStack_ ) {
         mcHistos[0]->SetLineColor( mcFiles_[0].fillColor );
         mcHistos[0]->SetLineWidth(2);
       }
       if( mcFiles_[0].fillStyle==-1 ) {
         if( noStack_ ) //default is solid fill (if stacked)
-          mcHistos[0]->SetFillStyle( fillStyle++ ); //so that it changes at every histo
+          mcHistos[0]->SetFillStyle( fillStyle_default++ ); //so that it changes at every histo
       } else {
         mcHistos[0]->SetFillStyle( mcFiles_[0].fillStyle );
       }
@@ -281,14 +285,17 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
           }
           mcHistos[i]->Rebin(rebin_);
           mcHistos[i]->Scale(mcFiles_[i].weight );
-          mcHistos[i]->SetFillColor( mcFiles_[i].fillColor );
+          if( mcFiles_[i].fillColor==-1 )
+            mcHistos[i]->SetFillColor( fillColor_default++ ); //so that it changes at every histo
+          else
+            mcHistos[i]->SetFillColor( mcFiles_[i].fillColor );
           if( noStack_ ) {
             mcHistos[i]->SetLineColor( mcFiles_[i].fillColor );
             mcHistos[i]->SetLineWidth(2);
           }
           if( mcFiles_[i].fillStyle==-1 ) {
             if( noStack_ ) //default is solid fill (if stacked)
-              mcHistos[i]->SetFillStyle( fillStyle++ ); //so that it changes at every histo
+              mcHistos[i]->SetFillStyle( fillStyle_default++ ); //so that it changes at every histo
           } else {
             mcHistos[i]->SetFillStyle( mcFiles_[i].fillStyle );
           }
@@ -1661,15 +1668,6 @@ void DrawBase::compareDifferentHistos_singleFile( InputFile infile, const std::v
   fillColors.push_back( 40 );
 
   LegendBox lb = get_legendBox(legendQuadrant, &legendNames);
-  // look for longest legend name:
-//int maxSize=0;
-//for( unsigned i=0; i<histosandnames.size(); ++i) {
-//  if( histosandnames[i].legendName.size() > maxSize ) maxSize = histosandnames[i].legendName.size();
-//}
-//if( maxSize > 15 ) {
-//  if( legendQuadrant==1 || legendQuadrant==4 ) lb.xMin *=0.95;
-//  if( legendQuadrant==2 || legendQuadrant==3 ) lb.xMax *=1.05;
-//}
 
   TLegend* legend = new TLegend( lb.xMin, lb.yMin, lb.xMax, lb.yMax );
   legend->SetFillColor(0);
