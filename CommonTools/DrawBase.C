@@ -280,7 +280,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     }
 
 
-    // SECOND: SET BASIC AESTHETICS FOR DATA HISTO(S) and CREATE MC HISTO SUM
+    // SECOND: SET BASIC AESTHETICS FOR MC HISTO(S) and CREATE MC HISTO SUM
     TH1F* mcHisto_sum = 0;
     float fillColor_default=1;
     float fillStyle_default=3004;
@@ -366,12 +366,12 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
       } else { //normalize each histo to its area
         // first: MC
         if( !noMC ) {
-          //Float_t mcIntegral = mcHisto_sum->Integral(0, mcHisto_sum->GetNbinsX()+1);
-          Float_t mcIntegral_sum = mcHisto_sum->GetEntries();
+          Float_t mcIntegral_sum = mcHisto_sum->Integral(0, mcHisto_sum->GetNbinsX()+1);
+          //Float_t mcIntegral_sum = mcHisto_sum->GetEntries();
           mcHisto_sum->Scale( 1./mcIntegral_sum );
           for( unsigned i=0; i<mcHistos.size(); ++i ) {
-            //mcIntegral = mcHistos[i]->Integral(0, mcHistos[i]->GetNbinsX()+1);
-            Float_t mcIntegral = mcHistos[i]->GetEntries();
+            Float_t mcIntegral = mcHistos[i]->Integral(0, mcHistos[i]->GetNbinsX()+1);
+            //Float_t mcIntegral = mcHistos[i]->GetEntries();
             if( noStack_ )
               mcHistos[i]->Scale( 1./mcIntegral );
             else 
