@@ -31,6 +31,8 @@ struct InputFile {
   int fillColor;
   int fillStyle;
   int markerStyle;
+  int lineColor;
+  int lineWidth;
 };
 
 
@@ -75,20 +77,24 @@ class DrawBase {
                    bool logx=false, bool logy=false);
 
   void set_analysisType( const std::string analysisType ) { analysisType_ = analysisType; };
-  void add_dataFile( TFile* dataFile, const std::string& datasetName, const std::string& legendName="Data", int markerColor=-1, int markerStyle=-1 );
-  void add_mcFile( TFile* mcFile, const std::string& datasetName, const std::string& legendName, int fillColor=-1, int fillStyle=-1, int markerStyle=-1 );
+  void add_dataFile( TFile* dataFile, const std::string& datasetName, const std::string& legendName="Data", int markerColor=-1, int markerStyle=-1, int fillStyle=-1 );
+  void add_mcFile( TFile* mcFile, const std::string& datasetName, const std::string& legendName, int fillColor=-1, int fillStyle=-1, int markerStyle=-1, int lineColor=-1, int lineWidth=-1 );
   // in the following function weight must be cross_section(in pb) / Nevents:
-  void add_mcFile( TFile* mcFile, float weight, const std::string& datasetName, const std::string& legendName, int fillColor=-1, int fillStyle=-1, int markerStyle=-1 );
+  void add_mcFile( TFile* mcFile, float weight, const std::string& datasetName, const std::string& legendName, int fillColor=-1, int fillStyle=-1, int markerStyle=-1, int lineColor=-1, int lineWidth=-1 );
   void set_outputdir( const std::string& outputdir="" ); //if "" is passed, default outputdir is set
   void set_flags( const std::string& flags ) { flags_ = flags; };
   void set_pt_thresh( Int_t pt_thresh ) { pt_thresh_ = pt_thresh; };
   void set_etamax( Float_t etamax ) { etamax_ = etamax; };
   void set_raw_corr( const std::string& raw_corr ) { raw_corr_ = raw_corr; };
   void set_pdf_aussi( bool pdf_aussi ) { pdf_aussi_ = pdf_aussi; };
+  void set_logx( bool logx=true ) { logx_ = logx; };
   void set_scaleFactor( float scaleFactor ) { scaleFactor_ = scaleFactor;};
+  void set_yAxisMaxScale( float yAxisMaxScale ) { yAxisMaxScale_ = yAxisMaxScale;};
   void set_noStack( bool set=true ) { noStack_ = set; };
   void set_rebin( int rebin ) { rebin_ = rebin; };
   void set_mcMarkers( bool set=true );
+  void set_markerSize( float markerSize ) { markerSize_ = markerSize; };
+  void set_getBinLabels( bool getBinL=true ) { getBinLabels_ = getBinL; };
 
   LegendBox get_legendBox( int legendQuadrant=1, const std::vector<std::string>* legendNames=0 ) const;
   TPaveText* get_labelCMS( int legendQuadrant=2 ) const;
@@ -128,6 +134,8 @@ class DrawBase {
   std::vector< InputFile > mcFiles_;
   
   Float_t scaleFactor_;
+  Float_t yAxisMaxScale_;
+  Float_t markerSize_;
   Float_t lumi_;
 
   Int_t rebin_;
@@ -137,6 +145,8 @@ class DrawBase {
   Float_t etamax_;
   std::string raw_corr_;
   bool pdf_aussi_;
+  bool logx_;
+  bool getBinLabels_;
 
   bool noStack_;
 
