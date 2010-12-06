@@ -12,6 +12,9 @@ do2ndLevel_PhotonJet: AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer
 do2ndLevel_PhotonJet_batch: AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJet.o do2ndLevel_PhotonJet_batch.cpp
 	$(CC) -Wall -o do2ndLevel_PhotonJet_batch do2ndLevel_PhotonJet_batch.cpp AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJet.o Utilities.o JetCorrectorParameters.o SimpleJetCorrector.o FactorizedJetCorrector.o $(ROOTFLAG)
 
+do2ndLevel_ZGamma_batch:  AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_ZGamma.o do2ndLevel_ZGamma_batch.cpp
+	$(CC) -Wall -o do2ndLevel_ZGamma_batch do2ndLevel_ZGamma_batch.cpp AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_ZGamma.o $(ROOTFLAG)
+
 do2ndLevel_HZZlljj: AnalysisJet.o TreeAnalyzer.o TreeAnalyzer_HZZlljj.o
 	$(CC) -Wall -o do2ndLevel_HZZlljj do2ndLevel_HZZlljj.cpp AnalysisJet.o TreeAnalyzer.o TreeAnalyzer_HZZlljj.o $(ROOTFLAG)
 
@@ -39,20 +42,26 @@ TreeAnalyzer_DiJet.o: TreeAnalyzer_DiJet.C
 TreeAnalyzer_HZZlljj.o: TreeAnalyzer_HZZlljj.C
 	$(CC) $(CFLAGS) TreeAnalyzer_HZZlljj.C $(ROOTFLAG)
 
+TreeAnalyzer_ZGamma.o: TreeAnalyzer_ZGamma.C
+	$(CC) $(CFLAGS) TreeAnalyzer_ZGamma.C $(ROOTFLAG)
+
 drawPhotonJet: fitTools.o DrawBase.o
 	$(CC) -Wall -o drawPhotonJet drawPhotonJet.C fitTools.o DrawBase.o $(ROOTFLAG)
 
 drawPhotonJet_2bkg: fitTools.o DrawBase.o
-	$(CC) -Wall -o drawPhotonJet_2bkg drawPhotonJet_2bkg.C fitTools.o DrawBase.o $(ROOTFLAG)
+	$(CC) -Wall  -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o drawPhotonJet_2bkg drawPhotonJet_2bkg.C fitTools.o DrawBase.o $(ROOTFLAG)
+
+merge_and_setWeights_PhotonJet: merge_and_setWeights_PhotonJet.cpp
+	$(CC) -Wall -o merge_and_setWeights_PhotonJet merge_and_setWeights_PhotonJet.cpp $(ROOTFLAG)
 
 drawMinBias: fitTools.o DrawBase.o
 	$(CC) -Wall -o drawMinBias drawMinBias.cpp fitTools.o DrawBase.o $(ROOTFLAG)
 
-DrawBase.o: DrawBase.C
-	$(CC) $(CFLAGS) DrawBase.C $(ROOTFLAG)
+DrawBase.o: $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/DrawBase.C
+	$(CC) -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools $(CFLAGS) $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/DrawBase.C $(ROOTFLAG)
 
-fitTools.o: fitTools.C
-	$(CC) $(CFLAGS) fitTools.C $(ROOTFLAG)
+fitTools.o: $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/fitTools.C
+	$(CC) -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools $(CFLAGS) $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/fitTools.C $(ROOTFLAG)
 
 
 clean:
