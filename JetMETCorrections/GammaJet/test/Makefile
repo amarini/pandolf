@@ -15,6 +15,9 @@ do2ndLevel_PhotonJet_batch: AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAn
 do2ndLevel_HZZlljj: AnalysisJet.o TreeAnalyzer.o TreeAnalyzer_HZZlljj.o
 	$(CC) -Wall -o do2ndLevel_HZZlljj do2ndLevel_HZZlljj.cpp AnalysisJet.o TreeAnalyzer.o TreeAnalyzer_HZZlljj.o $(ROOTFLAG)
 
+merge_and_setWeights_PhotonJet: merge_and_setWeights_PhotonJet.cpp
+	$(CC) -Wall -o merge_and_setWeights_PhotonJet merge_and_setWeights_PhotonJet.cpp $(ROOTFLAG)
+
 prova: AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJet.o
 	$(CC) -Wall -o prova prova_TreeAnalyzer_Photon.cpp AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJet.o $(ROOTFLAG)
 
