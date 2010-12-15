@@ -34,18 +34,20 @@ TChain* tree;
 Double_t totalLumi=0.;
 
 
-void addInput(const std::string& dataset);
+void addInput(const std::string& dataset, bool genjets=false);
 std::vector<TH1F*> getResponseHistos(const std::string& name);
-std::vector< std::vector< TH1D* > > getExtrapHistoVector(const std::string& name, const std::string& abs_rel, Int_t nPoints, bool is_pt=false);
+std::vector< std::vector< TH1D* > > getExtrapHistoVector(const std::string& name, const std::string& abs_rel, Int_t nPoints, bool isL2L3=false, bool is_pt=false);
 void deleteExtrapHistoVector(std::vector< std::vector< TH1D* > > histoVector, int nPoints);
 
 
 
 
-void finalize(const std::string& dataset, std::string recoType, std::string jetAlgo="akt5", float secondJetThreshold=0.1, std::string partType="", bool useGenJets=false) {
+void finalize(const std::string& dataset, std::string recoType, std::string jetAlgo="akt5", std::string photonID="medium", bool useGenJets=false, std::string partType="") {
 
 //if( dataset=="PhotonJet_Summer1036X" )
 //  MCassoc_ = true;
+
+  float secondJetThreshold=0.1;
 
   bool noJetSelection = ( secondJetThreshold < 0. );
 
@@ -59,6 +61,11 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   PARTTYPE_ = partType;
 
   std::string infileName, treeName;
+
+  if( photonID!="medium" && photonID!="loose" && photonID!="clusterOK") {
+    std::cout << "Photon ID: '" << photonID << "' currently not implemented. Exiting." << std::endl;
+    exit(11);
+  }
 
   suffix = "_"+ALGOTYPE_;
   if( useGenJets ) suffix = suffix + "_GENJETS";
@@ -124,6 +131,8 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     addInput( "PhotonJet_Summer1036X_Pt80to120" );
     addInput( "PhotonJet_Summer1036X_Pt120to170" );
     addInput( "PhotonJet_Summer1036X_Pt170to300" );
+    addInput( "PhotonJet_Summer1036X_Pt300to500" );
+    addInput( "PhotonJet_Summer1036X_Pt500toInf" );
 
   } else if( dataset=="QCD_Spring10" ) {
 
@@ -154,6 +163,82 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     addInput( "QCD_Spring10_Pt170" );
     addInput( "QCD_Spring10_Pt300" );
 
+  } else if( dataset=="G_TuneZ2_7TeV_pythia6" ) {
+
+  //addInput( "G_Pt_0to15_TuneZ2_7TeV_pythia6" );
+    addInput( "G_Pt_15to30_TuneZ2_7TeV_pythia6" );
+    addInput( "G_Pt_30to50_TuneZ2_7TeV_pythia6" );
+    addInput( "G_Pt_50to80_TuneZ2_7TeV_pythia6" );
+    addInput( "G_Pt_80to120_TuneZ2_7TeV_pythia6" );
+    addInput( "G_Pt_120to170_TuneZ2_7TeV_pythia6" );
+    addInput( "G_Pt_170to300_TuneZ2_7TeV_pythia6" );
+    addInput( "G_Pt_300to470_TuneZ2_7TeV_pythia6" );
+    addInput( "G_Pt_470to800_TuneZ2_7TeV_pythia6" );
+  //addInput( "G_Pt_800to1400_TuneZ2_7TeV_pythia6" );
+  //addInput( "G_Pt_1400to1800_TuneZ2_7TeV_pythia6" );
+
+  } else if( dataset=="QCD_TuneZ2_7TeV_pythia6" ) {
+
+    addInput( "QCD_Pt_15to30_TuneZ2_7TeV_pythia6" );
+    addInput( "QCD_Pt_30to50_TuneZ2_7TeV_pythia6" );
+    addInput( "QCD_Pt_50to80_TuneZ2_7TeV_pythia6" );
+    addInput( "QCD_Pt_80to120_TuneZ2_7TeV_pythia6" );
+    addInput( "QCD_Pt_120to170_TuneZ2_7TeV_pythia6" );
+    addInput( "QCD_Pt_170to300_TuneZ2_7TeV_pythia6" );
+    addInput( "QCD_Pt_300to470_TuneZ2_7TeV_pythia6" );
+    addInput( "QCD_Pt_470to600_TuneZ2_7TeV_pythia6" );
+    addInput( "QCD_Pt_600to800_TuneZ2_7TeV_pythia6" );
+    addInput( "QCD_Pt_800to1000_TuneZ2_7TeV_pythia6" );
+    addInput( "QCD_Pt_1000to1400_TuneZ2_7TeV_pythia6" );
+    addInput( "QCD_Pt_1400to1800_TuneZ2_7TeV_pythia6" );
+
+  } else if( dataset=="G_QCD_TuneZ2_7TeV_pythia6" ) {
+
+    //addInput( "G_Pt_0to15_TuneZ2_7TeV_pythia6" );
+    addInput( "G_Pt_15to30_TuneZ2_7TeV_pythia6" );
+    addInput( "G_Pt_30to50_TuneZ2_7TeV_pythia6" );
+    addInput( "G_Pt_50to80_TuneZ2_7TeV_pythia6" );
+    addInput( "G_Pt_80to120_TuneZ2_7TeV_pythia6" );
+    addInput( "G_Pt_120to170_TuneZ2_7TeV_pythia6" );
+    addInput( "G_Pt_170to300_TuneZ2_7TeV_pythia6" );
+    addInput( "G_Pt_300to470_TuneZ2_7TeV_pythia6" );
+    addInput( "G_Pt_470to800_TuneZ2_7TeV_pythia6" );
+    addInput( "QCD_Pt_15to30_TuneZ2_7TeV_pythia6" );
+    addInput( "QCD_Pt_30to50_TuneZ2_7TeV_pythia6" );
+    addInput( "QCD_Pt_50to80_TuneZ2_7TeV_pythia6" );
+    addInput( "QCD_Pt_80to120_TuneZ2_7TeV_pythia6" );
+    addInput( "QCD_Pt_120to170_TuneZ2_7TeV_pythia6" );
+    addInput( "QCD_Pt_170to300_TuneZ2_7TeV_pythia6" );
+    addInput( "QCD_Pt_300to470_TuneZ2_7TeV_pythia6" );
+    addInput( "QCD_Pt_470to600_TuneZ2_7TeV_pythia6" );
+    addInput( "QCD_Pt_600to800_TuneZ2_7TeV_pythia6" );
+    addInput( "QCD_Pt_800to1000_TuneZ2_7TeV_pythia6" );
+    addInput( "QCD_Pt_1000to1400_TuneZ2_7TeV_pythia6" );
+    addInput( "QCD_Pt_1400to1800_TuneZ2_7TeV_pythia6" );
+
+  } else if( dataset=="G_QCD_TuneZ2_7TeV_pythia6_GENJETS" ) {
+
+    //addInput( "G_Pt_0to15_TuneZ2_7TeV_pythia6" );
+    addInput( "G_Pt_15to30_TuneZ2_7TeV_pythia6" );
+    addInput( "G_Pt_30to50_TuneZ2_7TeV_pythia6" );
+    addInput( "G_Pt_50to80_TuneZ2_7TeV_pythia6" );
+    addInput( "G_Pt_80to120_TuneZ2_7TeV_pythia6" );
+    addInput( "G_Pt_120to170_TuneZ2_7TeV_pythia6" );
+    addInput( "G_Pt_170to300_TuneZ2_7TeV_pythia6" );
+    addInput( "G_Pt_300to470_TuneZ2_7TeV_pythia6" );
+    addInput( "G_Pt_470to800_TuneZ2_7TeV_pythia6" );
+    addInput( "QCD_Pt_15to30_TuneZ2_7TeV_pythia6", (bool)true );
+    addInput( "QCD_Pt_30to50_TuneZ2_7TeV_pythia6", (bool)true );
+    addInput( "QCD_Pt_50to80_TuneZ2_7TeV_pythia6", (bool)true );
+    addInput( "QCD_Pt_80to120_TuneZ2_7TeV_pythia6", (bool)true );
+    addInput( "QCD_Pt_120to170_TuneZ2_7TeV_pythia6", (bool)true );
+    addInput( "QCD_Pt_170to300_TuneZ2_7TeV_pythia6", (bool)true );
+    addInput( "QCD_Pt_300to470_TuneZ2_7TeV_pythia6", (bool)true );
+    addInput( "QCD_Pt_470to600_TuneZ2_7TeV_pythia6", (bool)true );
+    addInput( "QCD_Pt_600to800_TuneZ2_7TeV_pythia6", (bool)true );
+    addInput( "QCD_Pt_800to1000_TuneZ2_7TeV_pythia6", (bool)true );
+    addInput( "QCD_Pt_1000to1400_TuneZ2_7TeV_pythia6", (bool)true );
+    addInput( "QCD_Pt_1400to1800_TuneZ2_7TeV_pythia6", (bool)true );
 
   } else if( dataset=="DATA_EG_35X" ) {
 
@@ -180,8 +265,13 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     addInput( "EG_Run2010A-PromptReco-v4" );
     addInput( "EG_Run2010A-PromptReco-v4_runs143337-144114" );
 
+  } else if( dataset=="DATA_Nov4ReReco" ) {
+
+    addInput( "EG_Run2010A-Nov4ReReco_v1" );
+    addInput( "Photon_Run2010B_Nov4ReReco" );
+
   } else {
-  
+
     addInput( dataset );
 
   }
@@ -200,9 +290,9 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   for( unsigned i=0; i<nBins_photBinning; ++i)
     ptPhot_binning_array[i] = ptPhot_binning[i];
 
-  TH1D* h1_ptPhot = new TH1D("ptPhot", "", nBins_photBinning-1, ptPhot_binning_array);
-  //TH1D* h1_ptPhot = new TH1D("ptPhot", "", 10, ptPhot_binning[0], ptMax);
-  h1_ptPhot->Sumw2();
+//TH1D* h1_ptPhot = new TH1D("ptPhot", "", nBins_photBinning-1, ptPhot_binning_array);
+////TH1D* h1_ptPhot = new TH1D("ptPhot", "", 10, ptPhot_binning[0], ptMax);
+//h1_ptPhot->Sumw2();
   TH1D* h1_ptJetReco = new TH1D("ptJetReco", "", 10, 0., ptMax);
   h1_ptJetReco->Sumw2();
   TH1D* h1_pt2ndJetReco = new TH1D("pt2ndJetReco", "", 10, 5., ptMax);
@@ -216,50 +306,49 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   TH1D* h1_ptSecondJetRel_Nm1 = new TH1D("ptSecondJetRel_Nm1", "", 15, 0., 1.5);
   h1_ptSecondJetRel_Nm1->Sumw2();
 
-  TH1D* h1_deltaPhi_2ndJet_medium = new TH1D("deltaPhi_2ndJet_medium", "", 15, 0., 3.1416 );
-  h1_deltaPhi_2ndJet_medium->Sumw2();
-  TH1D* h1_deltaPhi_2ndJet_loose = new TH1D("deltaPhi_2ndJet_loose", "", 15, 0., 3.1416 );
-  h1_deltaPhi_2ndJet_loose->Sumw2();
+  TH1D* h1_deltaPhi_2ndJet = new TH1D("deltaPhi_2ndJet", "", 15, 0., 3.1416 );
+  h1_deltaPhi_2ndJet->Sumw2();
+//TH1D* h1_deltaPhi_2ndJet_loose = new TH1D("deltaPhi_2ndJet_loose", "", 15, 0., 3.1416 );
+//h1_deltaPhi_2ndJet_loose->Sumw2();
 
-  TH1D* h1_ptPhot_loose = new TH1D("ptPhot_loose", "", nBins_photBinning-1, ptPhot_binning_array);
-  //TH1D* h1_ptPhot_loose = new TH1D("ptPhot_loose", "", 10, ptPhot_binning[0], ptMax);
-  h1_ptPhot_loose->Sumw2();
-  TH1D* h1_etaPhot_loose = new TH1D("etaPhot_loose", "", 15, -1.3, 1.3);
-  h1_etaPhot_loose->Sumw2();
-  TH1D* h1_phiPhot_loose = new TH1D("phiPhot_loose", "", 15, -3.1416, 3.1416);
-  h1_phiPhot_loose->Sumw2();
+//TH1D* h1_ptPhot_loose = new TH1D("ptPhot_loose", "", nBins_photBinning-1, ptPhot_binning_array);
+////TH1D* h1_ptPhot_loose = new TH1D("ptPhot_loose", "", 10, ptPhot_binning[0], ptMax);
+//h1_ptPhot_loose->Sumw2();
+//TH1D* h1_etaPhot_loose = new TH1D("etaPhot_loose", "", 15, -1.3, 1.3);
+//h1_etaPhot_loose->Sumw2();
+//TH1D* h1_phiPhot_loose = new TH1D("phiPhot_loose", "", 15, -3.1416, 3.1416);
+//h1_phiPhot_loose->Sumw2();
 
-  TH1D* h1_met_loose = new TH1D("met_loose", "", 100., 0., 500.);
-  h1_met_loose->Sumw2();
-  TH1D* h1_met_medium = new TH1D("met_medium", "", 100., 0., 500.);
-  h1_met_medium->Sumw2();
+//TH1D* h1_met_loose = new TH1D("met_loose", "", 100., 0., 500.);
+//h1_met_loose->Sumw2();
+  TH1D* h1_met = new TH1D("met", "", 100., 0., 500.);
+  h1_met->Sumw2();
 
-  TH1D* h1_deltaPhi_phot_met_loose = new TH1D("deltaPhi_phot_met_loose", "", 15, -3.1416, 3.1416);
-  h1_deltaPhi_phot_met_loose->Sumw2();
-  TH1D* h1_deltaPhi_phot_met_medium = new TH1D("deltaPhi_phot_met_medium", "", 15, -3.1416, 3.1416);
-  h1_deltaPhi_phot_met_medium->Sumw2();
+//TH1D* h1_deltaPhi_phot_met_loose = new TH1D("deltaPhi_phot_met_loose", "", 15, -3.1416, 3.1416);
+//h1_deltaPhi_phot_met_loose->Sumw2();
+  TH1D* h1_deltaPhi_phot_met = new TH1D("deltaPhi_phot_met", "", 15, -3.1416, 3.1416);
+  h1_deltaPhi_phot_met->Sumw2();
 
-  //TH1D* h1_ptPhot_medium = new TH1D("ptPhot_medium", "", 10, ptPhot_binning[0], ptMax);
-  TH1D* h1_ptPhot_medium = new TH1D("ptPhot_medium", "", nBins_photBinning-1, ptPhot_binning_array);
-  h1_ptPhot_medium->Sumw2();
+  TH1D* h1_ptPhot = new TH1D("ptPhot", "", nBins_photBinning-1, ptPhot_binning_array);
+  h1_ptPhot->Sumw2();
 
   //TH1D* h1_ptPhot_clusterOK = new TH1D("ptPhot_clusterOK", "", 10, ptPhot_binning[0], ptMax);
-  TH1D* h1_ptPhot_clusterOK = new TH1D("ptPhot_clusterOK", "", nBins_photBinning-1, ptPhot_binning_array);
-  h1_ptPhot_clusterOK->Sumw2();
-  TH1D* h1_etaPhot_clusterOK = new TH1D("etaPhot_clusterOK", "", 15, -1.3, 1.3);
-  h1_etaPhot_clusterOK->Sumw2();
-  TH1D* h1_phiPhot_clusterOK = new TH1D("phiPhot_clusterOK", "", 15, -3.1416, 3.1416);
-  h1_phiPhot_clusterOK->Sumw2();
-  TH1D* h1_deltaPhi_clusterOK = new TH1D("deltaPhi_clusterOK", "", 15, 3.1416/2., 3.1416);
-  h1_deltaPhi_clusterOK->Sumw2();
+//TH1D* h1_ptPhot_clusterOK = new TH1D("ptPhot_clusterOK", "", nBins_photBinning-1, ptPhot_binning_array);
+//h1_ptPhot_clusterOK->Sumw2();
+//TH1D* h1_etaPhot_clusterOK = new TH1D("etaPhot_clusterOK", "", 15, -1.3, 1.3);
+//h1_etaPhot_clusterOK->Sumw2();
+//TH1D* h1_phiPhot_clusterOK = new TH1D("phiPhot_clusterOK", "", 15, -3.1416, 3.1416);
+//h1_phiPhot_clusterOK->Sumw2();
+//TH1D* h1_deltaPhi_clusterOK = new TH1D("deltaPhi_clusterOK", "", 15, 3.1416/2., 3.1416);
+//h1_deltaPhi_clusterOK->Sumw2();
 
-  //TH1D* h1_ptPhot_clusterOK_isolated = new TH1D("ptPhot_clusterOK_isolated", "", 28, ptPhot_binning[0], ptMax);
-  TH1D* h1_ptPhot_clusterOK_isolated = new TH1D("ptPhot_clusterOK_isolated", "", nBins_photBinning-1, ptPhot_binning_array);
-  h1_ptPhot_clusterOK_isolated->Sumw2();
-  TH1D* h1_etaPhot_clusterOK_isolated = new TH1D("etaPhot_clusterOK_isolated", "", 15, -1.3, 1.3);
-  h1_etaPhot_clusterOK_isolated->Sumw2();
-  TH1D* h1_phiPhot_clusterOK_isolated = new TH1D("phiPhot_clusterOK_isolated", "", 15, -3.1416, 3.1416);
-  h1_phiPhot_clusterOK_isolated->Sumw2();
+  //TH1D* h1_ptPhot_passedID = new TH1D("ptPhot_passedID", "", 28, ptPhot_binning[0], ptMax);
+  TH1D* h1_ptPhot_passedID = new TH1D("ptPhot_passedID", "", nBins_photBinning-1, ptPhot_binning_array);
+  h1_ptPhot_passedID->Sumw2();
+  TH1D* h1_etaPhot_passedID = new TH1D("etaPhot_passedID", "", 15, -1.3, 1.3);
+  h1_etaPhot_passedID->Sumw2();
+  TH1D* h1_phiPhot_passedID = new TH1D("phiPhot_passedID", "", 15, -3.1416, 3.1416);
+  h1_phiPhot_passedID->Sumw2();
 
   TH1D* h1_hcalIsoPhotReco_Nm1 = new TH1D("hcalIsoPhotReco_Nm1", "", 10, 0., 0.5);
   h1_hcalIsoPhotReco_Nm1->Sumw2();
@@ -278,33 +367,33 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   TH1D* h1_clusterMinPhotReco_Nm1 = new TH1D("clusterMinPhotReco_Nm1", "", 50, 0., 0.6);
   h1_clusterMinPhotReco_Nm1->Sumw2();
 
-  TH1D* h1_hcalIsoPhotReco_clusterOK = new TH1D("hcalIsoPhotReco_clusterOK", "", 10, 0., 0.5);
-  h1_hcalIsoPhotReco_clusterOK->Sumw2();
-  TH1D* h1_hcalIsoEnergyPhotReco_clusterOK = new TH1D("hcalIsoEnergyPhotReco_clusterOK", "", 10, 0., 15.);
-  h1_hcalIsoEnergyPhotReco_clusterOK->Sumw2();
-  TH1D* h1_ecalIsoPhotReco_clusterOK = new TH1D("ecalIsoPhotReco_clusterOK", "", 20, 0., 1.);
-  h1_ecalIsoPhotReco_clusterOK->Sumw2();
-  TH1D* h1_ecalIsoEnergyPhotReco_clusterOK = new TH1D("ecalIsoEnergyPhotReco_clusterOK", "", 20, 0., 30.);
-  h1_ecalIsoEnergyPhotReco_clusterOK->Sumw2();
-  TH1D* h1_ptTrkIsoPhotReco_clusterOK = new TH1D("ptTrkIsoPhotReco_clusterOK", "", 20, 0., 1.);
-  h1_ptTrkIsoPhotReco_clusterOK->Sumw2();
-  TH1D* h1_nTrkIsoPhotReco_clusterOK = new TH1D("nTrkIsoPhotReco_clusterOK", "", 11, -0.5, 10.5);
-  h1_nTrkIsoPhotReco_clusterOK->Sumw2();
+//TH1D* h1_hcalIsoPhotReco_clusterOK = new TH1D("hcalIsoPhotReco_clusterOK", "", 10, 0., 0.5);
+//h1_hcalIsoPhotReco_clusterOK->Sumw2();
+//TH1D* h1_hcalIsoEnergyPhotReco_clusterOK = new TH1D("hcalIsoEnergyPhotReco_clusterOK", "", 10, 0., 15.);
+//h1_hcalIsoEnergyPhotReco_clusterOK->Sumw2();
+//TH1D* h1_ecalIsoPhotReco_clusterOK = new TH1D("ecalIsoPhotReco_clusterOK", "", 20, 0., 1.);
+//h1_ecalIsoPhotReco_clusterOK->Sumw2();
+//TH1D* h1_ecalIsoEnergyPhotReco_clusterOK = new TH1D("ecalIsoEnergyPhotReco_clusterOK", "", 20, 0., 30.);
+//h1_ecalIsoEnergyPhotReco_clusterOK->Sumw2();
+//TH1D* h1_ptTrkIsoPhotReco_clusterOK = new TH1D("ptTrkIsoPhotReco_clusterOK", "", 20, 0., 1.);
+//h1_ptTrkIsoPhotReco_clusterOK->Sumw2();
+//TH1D* h1_nTrkIsoPhotReco_clusterOK = new TH1D("nTrkIsoPhotReco_clusterOK", "", 11, -0.5, 10.5);
+//h1_nTrkIsoPhotReco_clusterOK->Sumw2();
 
-  TH1D* h1_clusterMajPhotReco_isolated = new TH1D("clusterMajPhotReco_isolated", "", 30, 0., 1.5);
-  h1_clusterMajPhotReco_isolated->Sumw2();
-  TH1D* h1_clusterMinPhotReco_isolated = new TH1D("clusterMinPhotReco_isolated", "", 20, 0., 0.6);
-  h1_clusterMinPhotReco_isolated->Sumw2();
+//TH1D* h1_clusterMajPhotReco_isolated = new TH1D("clusterMajPhotReco_isolated", "", 30, 0., 1.5);
+//h1_clusterMajPhotReco_isolated->Sumw2();
+//TH1D* h1_clusterMinPhotReco_isolated = new TH1D("clusterMinPhotReco_isolated", "", 20, 0., 0.6);
+//h1_clusterMinPhotReco_isolated->Sumw2();
 
   TH1D* h1_clusterMajPhotReco= new TH1D("clusterMajPhotReco", "", 30, 0., 1.5);
   h1_clusterMajPhotReco->Sumw2();
   TH1D* h1_clusterMinPhotReco= new TH1D("clusterMinPhotReco", "", 20, 0., 0.6);
   h1_clusterMinPhotReco->Sumw2();
 
-  TH1D* h1_deltaPhi_clusterOK_isolated = new TH1D("deltaPhi_clusterOK_isolated", "", 15, 3.1416/2., 3.1416);
-  h1_deltaPhi_clusterOK_isolated->Sumw2();
-  TH1D* h1_ptSecondJetRel_clusterOK_isolated = new TH1D("ptSecondJetRel_clusterOK_isolated", "", 15, 0., 1.5);
-  h1_ptSecondJetRel_clusterOK_isolated->Sumw2();
+  TH1D* h1_deltaPhi_passedID = new TH1D("deltaPhi_passedID", "", 15, 3.1416/2., 3.1416);
+  h1_deltaPhi_passedID->Sumw2();
+  TH1D* h1_ptSecondJetRel_passedID = new TH1D("ptSecondJetRel_passedID", "", 15, 0., 1.5);
+  h1_ptSecondJetRel_passedID->Sumw2();
 
 
   Double_t ptPhotBinning_array[200]; //ugly! no more than 200 pt bins supported
@@ -312,35 +401,134 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     ptPhotBinning_array[i] = ptPhot_binning[i];
 
 
-  TProfile* hp_ptJetGenMean = new TProfile("ptJetGenMean", "", ptPhot_binning.size()-1, ptPhotBinning_array);
-  TProfile* hp_ptJetGenMean_loose = new TProfile("ptJetGenMean_loose", "", ptPhot_binning.size()-1, ptPhotBinning_array);
-  TProfile* hp_ptJetGenMean_clusterOK = new TProfile("ptJetGenMean_clusterOK", "", ptPhot_binning.size()-1, ptPhotBinning_array);
-  TProfile* hp_ptPhotMean = new TProfile("ptPhotMean", "", ptPhot_binning.size()-1, ptPhotBinning_array);
-  TH2D* hp_ptPhotMean_no2ndJet = new TH2D("ptPhotMean_no2ndJet", "", ptPhot_binning.size()-1, ptPhotBinning_array, (int)floor(ptPhot_binning[ptPhot_binning.size()-1]), 0., ptPhot_binning[ptPhot_binning.size()-1]);
-  TProfile* hp_ptPhotMean_loose = new TProfile("ptPhotMean_loose", "", ptPhot_binning.size()-1, ptPhotBinning_array);
-  TProfile* hp_ptPhotMean_clusterOK = new TProfile("ptPhotMean_clusterOK", "", ptPhot_binning.size()-1, ptPhotBinning_array);
+//TProfile* hp_ptJetGenMean = new TProfile("ptJetGenMean", "", ptPhot_binning.size()-1, ptPhotBinning_array);
+//TProfile* hp_ptJetGenMean_loose = new TProfile("ptJetGenMean_loose", "", ptPhot_binning.size()-1, ptPhotBinning_array);
+//TProfile* hp_ptJetGenMean_clusterOK = new TProfile("ptJetGenMean_clusterOK", "", ptPhot_binning.size()-1, ptPhotBinning_array);
+  TProfile* hp_ptPhotMean = new TProfile("prof_ptPhotMean", "", ptPhot_binning.size()-1, ptPhotBinning_array);
+//TH2D* hp_ptPhotMean_no2ndJet = new TH2D("ptPhotMean_no2ndJet", "", ptPhot_binning.size()-1, ptPhotBinning_array, (int)floor(ptPhot_binning[ptPhot_binning.size()-1]), 0., ptPhot_binning[ptPhot_binning.size()-1]);
+//TProfile* hp_ptPhotMean_loose = new TProfile("ptPhotMean_loose", "", ptPhot_binning.size()-1, ptPhotBinning_array);
+//TProfile* hp_ptPhotMean_clusterOK = new TProfile("ptPhotMean_clusterOK", "", ptPhot_binning.size()-1, ptPhotBinning_array);
 
-  std::vector<TH1F*> h1_response              = getResponseHistos("response");
-  std::vector<TH1F*> h1_responseGEN           = getResponseHistos("responseGEN");
+  TH2D* h2_ptPhotMean_eta013 = new TH2D("ptPhotMean_eta013", "", ptPhot_binning.size()-1, ptPhotBinning_array, 3000, 0., 3000.);
+  h2_ptPhotMean_eta013->Sumw2();
+  TH2D* h2_ptPhotMean_eta1524 = new TH2D("ptPhotMean_eta1524", "", ptPhot_binning.size()-1, ptPhotBinning_array, 3000, 0., 3000.);
+  h2_ptPhotMean_eta1524->Sumw2();
+  TH2D* h2_ptPhotMean_eta243 = new TH2D("ptPhotMean_eta243", "", ptPhot_binning.size()-1, ptPhotBinning_array, 3000, 0., 3000.);
+  h2_ptPhotMean_eta243->Sumw2();
+  TH2D* h2_ptPhotMean_eta35 = new TH2D("ptPhotMean_eta35", "", ptPhot_binning.size()-1, ptPhotBinning_array, 3000, 0., 3000.);
+  h2_ptPhotMean_eta35->Sumw2();
+
+  TH2D* h2_ptJetGenMean_eta013 = new TH2D("ptJetGenMean_eta013", "", ptPhot_binning.size()-1, ptPhotBinning_array, 3000, 0., 3000.);
+  h2_ptJetGenMean_eta013->Sumw2();
+  TH2D* h2_ptJetGenMean_eta1524 = new TH2D("ptJetGenMean_eta1524", "", ptPhot_binning.size()-1, ptPhotBinning_array, 3000, 0., 3000.);
+  h2_ptJetGenMean_eta1524->Sumw2();
+  TH2D* h2_ptJetGenMean_eta243 = new TH2D("ptJetGenMean_eta243", "", ptPhot_binning.size()-1, ptPhotBinning_array, 3000, 0., 3000.);
+  h2_ptJetGenMean_eta243->Sumw2();
+  TH2D* h2_ptJetGenMean_eta35 = new TH2D("ptJetGenMean_eta35", "", ptPhot_binning.size()-1, ptPhotBinning_array, 3000, 0., 3000.);
+  h2_ptJetGenMean_eta35->Sumw2();
+
+  TH2D* h2_ptPhotMean_no2ndJet_eta013 = new TH2D("ptPhotMean_no2ndJet_eta013", "", ptPhot_binning.size()-1, ptPhotBinning_array, 3000, 0., 3000.);
+  h2_ptPhotMean_no2ndJet_eta013->Sumw2();
+  TH2D* h2_ptPhotMean_no2ndJet_eta1524 = new TH2D("ptPhotMean_no2ndJet_eta1524", "", ptPhot_binning.size()-1, ptPhotBinning_array, 3000, 0., 3000.);
+  h2_ptPhotMean_no2ndJet_eta1524->Sumw2();
+  TH2D* h2_ptPhotMean_no2ndJet_eta243 = new TH2D("ptPhotMean_no2ndJet_eta243", "", ptPhot_binning.size()-1, ptPhotBinning_array, 3000, 0., 3000.);
+  h2_ptPhotMean_no2ndJet_eta243->Sumw2();
+  TH2D* h2_ptPhotMean_no2ndJet_eta35 = new TH2D("ptPhotMean_no2ndJet_eta35", "", ptPhot_binning.size()-1, ptPhotBinning_array, 3000, 0., 3000.);
+  h2_ptPhotMean_no2ndJet_eta35->Sumw2();
+
+//TH2D* h2_ptJetGenMean_loose = new TH2D("ptJetGenMean_loose", "", ptPhot_binning.size()-1, ptPhotBinning_array, 3000, 0., 3000.);
+//h2_ptJetGenMean_loose->Sumw2();
+//TH2D* h2_ptJetGenMean_clusterOK = new TH2D("ptJetGenMean_clusterOK", "", ptPhot_binning.size()-1, ptPhotBinning_array, 3000, 0., 3000.);
+//h2_ptJetGenMean_clusterOK->Sumw2();
+//TH2D* h2_ptPhotMean_loose = new TH2D("ptPhotMean_loose", "", ptPhot_binning.size()-1, ptPhotBinning_array, 3000, 0., 3000.);
+//h2_ptPhotMean_loose->Sumw2();
+//TH2D* h2_ptPhotMean_clusterOK = new TH2D("ptPhotMean_clusterOK", "", ptPhot_binning.size()-1, ptPhotBinning_array, 3000, 0., 3000.);
+//h2_ptPhotMean_clusterOK->Sumw2();
+
+  std::vector<TH1F*> h1_response_eta013              = getResponseHistos("response_eta013");
+  std::vector<TH1F*> h1_responseMPF_eta013           = getResponseHistos("responseMPF_eta013");
+  std::vector<TH1F*> h1_response_L2L3_eta013         = getResponseHistos("response_L2L3_eta013");
+  std::vector<TH1F*> h1_responseMPF_L2L3_eta013      = getResponseHistos("responseMPF_L2L3_eta013");
+  std::vector<TH1F*> h1_responseGEN_eta013           = getResponseHistos("responseGEN_eta013");
+  std::vector<TH1F*> h1_responseGEN_L2L3_eta013      = getResponseHistos("responseGEN_L2L3_eta013");
+
+  std::vector<TH1F*> h1_response_eta1524              = getResponseHistos("response_eta1524");
+  std::vector<TH1F*> h1_responseMPF_eta1524           = getResponseHistos("responseMPF_eta1524");
+  std::vector<TH1F*> h1_response_L2L3_eta1524         = getResponseHistos("response_L2L3_eta1524");
+  std::vector<TH1F*> h1_responseMPF_L2L3_eta1524      = getResponseHistos("responseMPF_L2L3_eta1524");
+  std::vector<TH1F*> h1_responseGEN_eta1524           = getResponseHistos("responseGEN_eta1524");
+  std::vector<TH1F*> h1_responseGEN_L2L3_eta1524      = getResponseHistos("responseGEN_L2L3_eta1524");
+
+  std::vector<TH1F*> h1_response_eta243              = getResponseHistos("response_eta243");
+  std::vector<TH1F*> h1_responseMPF_eta243           = getResponseHistos("responseMPF_eta243");
+  std::vector<TH1F*> h1_response_L2L3_eta243         = getResponseHistos("response_L2L3_eta243");
+  std::vector<TH1F*> h1_responseMPF_L2L3_eta243      = getResponseHistos("responseMPF_L2L3_eta243");
+  std::vector<TH1F*> h1_responseGEN_eta243           = getResponseHistos("responseGEN_eta243");
+  std::vector<TH1F*> h1_responseGEN_L2L3_eta243      = getResponseHistos("responseGEN_L2L3_eta243");
+
+  std::vector<TH1F*> h1_response_eta35              = getResponseHistos("response_eta35");
+  std::vector<TH1F*> h1_responseMPF_eta35           = getResponseHistos("responseMPF_eta35");
+  std::vector<TH1F*> h1_response_L2L3_eta35         = getResponseHistos("response_L2L3_eta35");
+  std::vector<TH1F*> h1_responseMPF_L2L3_eta35      = getResponseHistos("responseMPF_L2L3_eta35");
+  std::vector<TH1F*> h1_responseGEN_eta35           = getResponseHistos("responseGEN_eta35");
+  std::vector<TH1F*> h1_responseGEN_L2L3_eta35      = getResponseHistos("responseGEN_L2L3_eta35");
+
   std::vector<TH1F*> h1_responsePART          = getResponseHistos("responsePART");
-  std::vector<TH1F*> h1_responseMPF           = getResponseHistos("responseMPF");
 
-  std::vector<TH1F*> h1_response_clusterOK    = getResponseHistos("response_clusterOK");
-  std::vector<TH1F*> h1_responseGEN_clusterOK = getResponseHistos("responseGEN_clusterOK");
-  std::vector<TH1F*> h1_responsePART_clusterOK= getResponseHistos("responsePART_clusterOK");
+//std::vector<TH1F*> h1_response_clusterOK    = getResponseHistos("response_clusterOK");
+//std::vector<TH1F*> h1_responseGEN_clusterOK = getResponseHistos("responseGEN_clusterOK");
+//std::vector<TH1F*> h1_responsePART_clusterOK= getResponseHistos("responsePART_clusterOK");
 
-  std::vector<TH1F*> h1_response_loose        = getResponseHistos("response_loose");
-  std::vector<TH1F*> h1_responseGEN_loose     = getResponseHistos("responseGEN_loose");
-  std::vector<TH1F*> h1_responsePART_loose    = getResponseHistos("responsePART_loose");
-  std::vector<TH1F*> h1_responseMPF_loose     = getResponseHistos("responseMPF_loose");
+//std::vector<TH1F*> h1_response_loose        = getResponseHistos("response_loose");
+//std::vector<TH1F*> h1_response_loose_L2L3   = getResponseHistos("response_loose_L2L3");
+//std::vector<TH1F*> h1_responseMPF_loose     = getResponseHistos("responseMPF_loose");
+//std::vector<TH1F*> h1_responseMPF_loose_L2L3= getResponseHistos("responseMPF_loose_L2L3");
+//std::vector<TH1F*> h1_responseGEN_loose     = getResponseHistos("responseGEN_loose");
+//std::vector<TH1F*> h1_responsePART_loose    = getResponseHistos("responsePART_loose");
 
 
   // and now allocate histograms for 2nd jet pt extrapolation:
+  bool isL2L3 = true;
   int nPoints = 5;
-  std::vector< std::vector< TH1D* > > h1_RecoPhot_vs_recoRel = getExtrapHistoVector("RecoPhot_vs_RecoRel", "rel", nPoints);
-  std::vector< std::vector< TH1D* > > h1_RecoGen_vs_recoRel  = getExtrapHistoVector("RecoGen_vs_RecoRel",  "rel", nPoints);
-  std::vector< std::vector< TH1D* > > h1_GenPhot_vs_recoRel  = getExtrapHistoVector("GenPhot_vs_RecoRel",  "rel", nPoints);
-  std::vector< std::vector< TH1D* > > h1_pt2ndJetRecoRelMean = getExtrapHistoVector("pt2ndJetRecoRelMean", "rel", nPoints, (bool)true);
+  std::vector< std::vector< TH1D* > > h1_RecoPhot_vs_recoRel_eta013 = getExtrapHistoVector("RecoPhot_vs_RecoRel_eta013", "rel", nPoints);
+  std::vector< std::vector< TH1D* > > h1_RecoGen_vs_recoRel_eta013  = getExtrapHistoVector("RecoGen_vs_RecoRel_eta013",  "rel", nPoints);
+  std::vector< std::vector< TH1D* > > h1_GenPhot_vs_recoRel_eta013  = getExtrapHistoVector("GenPhot_vs_RecoRel_eta013",  "rel", nPoints);
+  std::vector< std::vector< TH1D* > > h1_pt2ndJetRecoRelMean_eta013 = getExtrapHistoVector("pt2ndJetRecoRelMean_eta013", "rel", nPoints, !isL2L3, (bool)true);
+
+  std::vector< std::vector< TH1D* > > h1_RecoPhotL2L3_vs_recoRel_eta013 = getExtrapHistoVector("RecoPhotL2L3_vs_RecoRel_eta013", "rel", nPoints, isL2L3);
+  std::vector< std::vector< TH1D* > > h1_RecoGenL2L3_vs_recoRel_eta013  = getExtrapHistoVector("RecoGenL2L3_vs_RecoRel_eta013",  "rel", nPoints, isL2L3);
+  std::vector< std::vector< TH1D* > > h1_GenPhotL2L3_vs_recoRel_eta013  = getExtrapHistoVector("GenPhotL2L3_vs_RecoRel_eta013",  "rel", nPoints, isL2L3);
+  std::vector< std::vector< TH1D* > > h1_pt2ndJetL2L3RecoRelMean_eta013 = getExtrapHistoVector("pt2ndJetL2L3RecoRelMean_eta013", "rel", nPoints, isL2L3, (bool)true);
+
+  std::vector< std::vector< TH1D* > > h1_RecoPhot_vs_recoRel_eta1524 = getExtrapHistoVector("RecoPhot_vs_RecoRel_eta1524", "rel", nPoints);
+  std::vector< std::vector< TH1D* > > h1_RecoGen_vs_recoRel_eta1524  = getExtrapHistoVector("RecoGen_vs_RecoRel_eta1524",  "rel", nPoints);
+  std::vector< std::vector< TH1D* > > h1_GenPhot_vs_recoRel_eta1524  = getExtrapHistoVector("GenPhot_vs_RecoRel_eta1524",  "rel", nPoints);
+  std::vector< std::vector< TH1D* > > h1_pt2ndJetRecoRelMean_eta1524 = getExtrapHistoVector("pt2ndJetRecoRelMean_eta1524", "rel", nPoints, !isL2L3, (bool)true);
+
+  std::vector< std::vector< TH1D* > > h1_RecoPhotL2L3_vs_recoRel_eta1524 = getExtrapHistoVector("RecoPhotL2L3_vs_RecoRel_eta1524", "rel", nPoints, isL2L3);
+  std::vector< std::vector< TH1D* > > h1_RecoGenL2L3_vs_recoRel_eta1524  = getExtrapHistoVector("RecoGenL2L3_vs_RecoRel_eta1524",  "rel", nPoints, isL2L3);
+  std::vector< std::vector< TH1D* > > h1_GenPhotL2L3_vs_recoRel_eta1524  = getExtrapHistoVector("GenPhotL2L3_vs_RecoRel_eta1524",  "rel", nPoints, isL2L3);
+  std::vector< std::vector< TH1D* > > h1_pt2ndJetL2L3RecoRelMean_eta1524 = getExtrapHistoVector("pt2ndJetL2L3RecoRelMean_eta1524", "rel", nPoints, isL2L3, (bool)true);
+
+  std::vector< std::vector< TH1D* > > h1_RecoPhot_vs_recoRel_eta243 = getExtrapHistoVector("RecoPhot_vs_RecoRel_eta243", "rel", nPoints);
+  std::vector< std::vector< TH1D* > > h1_RecoGen_vs_recoRel_eta243  = getExtrapHistoVector("RecoGen_vs_RecoRel_eta243",  "rel", nPoints);
+  std::vector< std::vector< TH1D* > > h1_GenPhot_vs_recoRel_eta243  = getExtrapHistoVector("GenPhot_vs_RecoRel_eta243",  "rel", nPoints);
+  std::vector< std::vector< TH1D* > > h1_pt2ndJetRecoRelMean_eta243 = getExtrapHistoVector("pt2ndJetRecoRelMean_eta243", "rel", nPoints, !isL2L3, (bool)true);
+
+  std::vector< std::vector< TH1D* > > h1_RecoPhotL2L3_vs_recoRel_eta243 = getExtrapHistoVector("RecoPhotL2L3_vs_RecoRel_eta243", "rel", nPoints, isL2L3);
+  std::vector< std::vector< TH1D* > > h1_RecoGenL2L3_vs_recoRel_eta243  = getExtrapHistoVector("RecoGenL2L3_vs_RecoRel_eta243",  "rel", nPoints, isL2L3);
+  std::vector< std::vector< TH1D* > > h1_GenPhotL2L3_vs_recoRel_eta243  = getExtrapHistoVector("GenPhotL2L3_vs_RecoRel_eta243",  "rel", nPoints, isL2L3);
+  std::vector< std::vector< TH1D* > > h1_pt2ndJetL2L3RecoRelMean_eta243 = getExtrapHistoVector("pt2ndJetL2L3RecoRelMean_eta243", "rel", nPoints, isL2L3, (bool)true);
+
+  std::vector< std::vector< TH1D* > > h1_RecoPhot_vs_recoRel_eta35 = getExtrapHistoVector("RecoPhot_vs_RecoRel_eta35", "rel", nPoints);
+  std::vector< std::vector< TH1D* > > h1_RecoGen_vs_recoRel_eta35  = getExtrapHistoVector("RecoGen_vs_RecoRel_eta35",  "rel", nPoints);
+  std::vector< std::vector< TH1D* > > h1_GenPhot_vs_recoRel_eta35  = getExtrapHistoVector("GenPhot_vs_RecoRel_eta35",  "rel", nPoints);
+  std::vector< std::vector< TH1D* > > h1_pt2ndJetRecoRelMean_eta35 = getExtrapHistoVector("pt2ndJetRecoRelMean_eta35", "rel", nPoints, !isL2L3, (bool)true);
+
+  std::vector< std::vector< TH1D* > > h1_RecoPhotL2L3_vs_recoRel_eta35 = getExtrapHistoVector("RecoPhotL2L3_vs_RecoRel_eta35", "rel", nPoints, isL2L3);
+  std::vector< std::vector< TH1D* > > h1_RecoGenL2L3_vs_recoRel_eta35  = getExtrapHistoVector("RecoGenL2L3_vs_RecoRel_eta35",  "rel", nPoints, isL2L3);
+  std::vector< std::vector< TH1D* > > h1_GenPhotL2L3_vs_recoRel_eta35  = getExtrapHistoVector("GenPhotL2L3_vs_RecoRel_eta35",  "rel", nPoints, isL2L3);
+  std::vector< std::vector< TH1D* > > h1_pt2ndJetL2L3RecoRelMean_eta35 = getExtrapHistoVector("pt2ndJetL2L3RecoRelMean_eta35", "rel", nPoints, isL2L3, (bool)true);
 
 
   Int_t run;
@@ -351,12 +539,20 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   tree->SetBranchAddress("event", &event);
   Float_t eventWeight;
   tree->SetBranchAddress("eventWeight", &eventWeight);
-  Float_t eventWeight_loose;
-  if( useGenJets )
-    tree->SetBranchAddress("eventWeight_loose", &eventWeight_loose);
-  Float_t eventWeight_medium;
-  if( useGenJets )
-    tree->SetBranchAddress("eventWeight_medium", &eventWeight_medium);
+  Float_t eventWeight_genjets;
+  if( useGenJets ) {
+    if( photonID=="medium" )
+      tree->SetBranchAddress("eventWeight_medium", &eventWeight_genjets);
+    else if( photonID=="loose" )
+      tree->SetBranchAddress("eventWeight_loose", &eventWeight_genjets);
+    else {
+      std::cout << "Photon ID: '" << photonID << "' currently not implemented for GENJET technology. Exiting." << std::endl;
+      exit(12);
+    }
+  }
+//Float_t eventWeight_medium;
+//if( useGenJets )
+//  tree->SetBranchAddress("eventWeight_medium", &eventWeight_medium);
 
   Float_t eMet;
   Float_t phiMet;
@@ -443,6 +639,8 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   tree->SetBranchAddress("eJetReco", &eJetReco);
   Float_t ptJetReco;
   tree->SetBranchAddress("ptJetReco", &ptJetReco);
+  Float_t ptCorrJetReco;
+  tree->SetBranchAddress("ptCorrJetReco", &ptCorrJetReco);
   Float_t etaJetReco;
   tree->SetBranchAddress("etaJetReco", &etaJetReco);
   Float_t phiJetReco;
@@ -472,6 +670,8 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
   Float_t pt2ndJetReco;
   tree->SetBranchAddress("pt2ndJetReco", &pt2ndJetReco);
+  Float_t ptCorr2ndJetReco;
+  tree->SetBranchAddress("ptCorr2ndJetReco", &ptCorr2ndJetReco);
   Float_t eta2ndJetReco;
   tree->SetBranchAddress("eta2ndJetReco", &eta2ndJetReco);
   Float_t phi2ndJetReco;
@@ -489,6 +689,27 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   Float_t ptSecondaryJetsGen;
   tree->SetBranchAddress("ptSecondaryJetsGen", &ptSecondaryJetsGen);
 
+  Bool_t passed_Photon10;
+  tree->SetBranchAddress("passed_Photon10", &passed_Photon10);
+  Bool_t passed_Photon15;
+  tree->SetBranchAddress("passed_Photon15", &passed_Photon15);
+  Bool_t passed_Photon20;
+  tree->SetBranchAddress("passed_Photon20", &passed_Photon20);
+  Bool_t passed_Photon25;
+  tree->SetBranchAddress("passed_Photon25", &passed_Photon25);
+//Bool_t passed_Photon30;
+//tree->SetBranchAddress("passed_Photon30", &passed_Photon30);
+//Bool_t passed_Photon35;
+//tree->SetBranchAddress("passed_Photon35", &passed_Photon35);
+//Bool_t passed_Photon40;
+//tree->SetBranchAddress("passed_Photon40", &passed_Photon40);
+//Bool_t passed_Photon50;
+//tree->SetBranchAddress("passed_Photon50", &passed_Photon50);
+//Bool_t passed_Photon60;
+//tree->SetBranchAddress("passed_Photon60", &passed_Photon60);
+//Bool_t passed_Photon70;
+//tree->SetBranchAddress("passed_Photon70", &passed_Photon70);
+
 
 
 
@@ -504,6 +725,7 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
 
     if( eventWeight <= 0. ) eventWeight = 1.;
+    Float_t correctWeight = (useGenJets) ? eventWeight_genjets : eventWeight;
 
 
     if( ONEVTX_ && dataset!="QCD_Spring10" ) {
@@ -517,6 +739,16 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     if( fabs(etaPhotReco)>1.3 ) continue;
     if( clusterMinPhotReco<0.15 && !MCassoc_ && !useGenJets ) continue; //protection vs EB spikes
 
+
+    // trigger selection, only on data, to solve bias in response:
+    bool isMC = run<5;
+    if( !isMC ) {
+
+      if( ptPhotReco<22. && !passed_Photon15 && !passed_Photon10 ) continue;
+      else if( ptPhotReco<32. && !passed_Photon15 && !passed_Photon10 && !passed_Photon20 && !passed_Photon25 ) continue;
+    //if( ptPhotReco<32. && !passed_Photon15 && !passed_Photon10 && !passed_Photon20 && !passed_Photon25 ) continue;
+
+    }
 
     //first find correct photon pt bin:
     int theBin = hp_ptPhotMean->FindBin( ptPhotReco );
@@ -554,107 +786,128 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     if( NO2ndJETABS )
       secondJetOK = ( pt2ndJetReco < secondJetThreshold*ptPhotReco );
     else
+      //secondJetOK = ( ptCorr2ndJetReco < secondJetThreshold*ptPhotReco || pt2ndJetReco < 5. );
       secondJetOK = ( pt2ndJetReco < secondJetThreshold*ptPhotReco || pt2ndJetReco < 5. );
 
 
     // do them by hand just to be sure:
-    Bool_t isIsolated_hcal_loose = ( hcalIsoPhotReco<0.1 || hcalIsoPhotReco*ePhotReco<4. );
-    Bool_t isIsolated_ecal_loose = ( ecalIsoPhotReco<0.1  || ecalIsoPhotReco*ePhotReco<4.5 );
-    Bool_t isIsolated_ptTracks_loose = ( ptTrkIsoPhotReco<0.2 );
-    Bool_t isIsolated_nTracks_loose = (nTrkIsoPhotReco < 5 );
-    Bool_t clusterMajOK_loose = ( clusterMajPhotReco>0.15 && clusterMajPhotReco<0.35 );
-    Bool_t clusterMinOK_loose = ( clusterMinPhotReco>0.15 && clusterMinPhotReco<0.3 );
+    Bool_t isIsolated_hcal;
+    Bool_t isIsolated_ecal;
+    Bool_t isIsolated_ptTracks;
+    Bool_t isIsolated_nTracks;
+    Bool_t clusterMajOK;
+    Bool_t clusterMinOK;
 
-    Bool_t isIsolated_hcal_medium = ( hcalIsoPhotReco<0.05 || hcalIsoPhotReco*ePhotReco<2.4 );
-    Bool_t isIsolated_ecal_medium = ( ecalIsoPhotReco<0.05  || ecalIsoPhotReco*ePhotReco<3. );
-    Bool_t isIsolated_ptTracks_medium = ( ptTrkIsoPhotReco<0.1 );
-    Bool_t isIsolated_nTracks_medium = (nTrkIsoPhotReco < 3 );
-    Bool_t clusterMajOK_medium = ( clusterMajPhotReco>0.15 && clusterMajPhotReco<0.35 );
-    Bool_t clusterMinOK_medium = ( clusterMinPhotReco>0.15 && clusterMinPhotReco<0.3 );
+    if( photonID=="medium" ) {
 
-  ////temporary fix:
-    isIsolated_ecal_loose  = ( ecalIsoPhotReco<0.1  || ecalIsoPhotReco*ePhotReco<4.5 );
-    isIsolated_ecal_medium = ( ecalIsoPhotReco<0.05 || ecalIsoPhotReco*ePhotReco<3.  );
-  //isIsolated_ecal_loose  = ( ecalIsoPhotReco<0.1  || ecalIsoPhotReco*ePhotReco<3. );
-  //isIsolated_ecal_medium = ( ecalIsoPhotReco<0.05 || ecalIsoPhotReco*ePhotReco<1.7  );
+      isIsolated_hcal = ( hcalIsoPhotReco<0.05 || hcalIsoPhotReco*ePhotReco<2.4 );
+      isIsolated_ecal = ( ecalIsoPhotReco<0.05  || ecalIsoPhotReco*ePhotReco<3. );
+      isIsolated_ptTracks = ( ptTrkIsoPhotReco<0.1 );
+      isIsolated_nTracks = (nTrkIsoPhotReco < 3 );
+      clusterMajOK = ( clusterMajPhotReco>0.15 && clusterMajPhotReco<0.35 );
+      clusterMinOK = ( clusterMinPhotReco>0.15 && clusterMinPhotReco<0.3 );
+
+    } else if( photonID=="loose" ) {
+
+      isIsolated_hcal = ( hcalIsoPhotReco<0.1 || hcalIsoPhotReco*ePhotReco<4. );
+      isIsolated_ecal = ( ecalIsoPhotReco<0.1  || ecalIsoPhotReco*ePhotReco<4.5 );
+      isIsolated_ptTracks = ( ptTrkIsoPhotReco<0.2 );
+      isIsolated_nTracks = (nTrkIsoPhotReco < 5 );
+      clusterMajOK = ( clusterMajPhotReco>0.15 && clusterMajPhotReco<0.35 );
+      clusterMinOK = ( clusterMinPhotReco>0.15 && clusterMinPhotReco<0.3 );
+
+    } else if( photonID=="clusterOK" ) {
+
+      isIsolated_hcal = true;
+      isIsolated_ecal = true;
+      isIsolated_ptTracks = true;
+      isIsolated_nTracks = true;
+      clusterMajOK = ( clusterMajPhotReco>0.15 && clusterMajPhotReco<0.35 );
+      clusterMinOK = ( clusterMinPhotReco>0.15 && clusterMinPhotReco<0.3 );
+
+    }
+
   
 
     //before selection fill N-1 isolation plots (no event topology for isolation variables):
-    if(                           isIsolated_ecal_medium  && isIsolated_ptTracks_medium && isIsolated_nTracks_medium && clusterMajOK_medium && clusterMinOK_medium  ) h1_hcalIsoPhotReco_Nm1->Fill( hcalIsoPhotReco, eventWeight);
-    if(                           isIsolated_ecal_medium  && isIsolated_ptTracks_medium && isIsolated_nTracks_medium && clusterMajOK_medium && clusterMinOK_medium  ) h1_hcalIsoEnergyPhotReco_Nm1->Fill( hcalIsoPhotReco*ePhotReco, eventWeight);
-    if( isIsolated_hcal_medium                           && isIsolated_ptTracks_medium && isIsolated_nTracks_medium && clusterMajOK_medium && clusterMinOK_medium  ) h1_ecalIsoPhotReco_Nm1->Fill( ecalIsoPhotReco, eventWeight);
-    if( isIsolated_hcal_medium                           && isIsolated_ptTracks_medium && isIsolated_nTracks_medium && clusterMajOK_medium && clusterMinOK_medium  ) h1_ecalIsoEnergyPhotReco_Nm1->Fill( ecalIsoPhotReco*ePhotReco, eventWeight);
-    if( isIsolated_hcal_medium && isIsolated_ecal_medium                                && isIsolated_nTracks_medium && clusterMajOK_medium && clusterMinOK_medium  ) h1_ptTrkIsoPhotReco_Nm1->Fill( ptTrkIsoPhotReco, eventWeight);
-    if( isIsolated_hcal_medium && isIsolated_ecal_medium  && isIsolated_ptTracks_medium                              && clusterMajOK_medium && clusterMinOK_medium  ) h1_nTrkIsoPhotReco_Nm1->Fill( nTrkIsoPhotReco, eventWeight);
+    if(                    isIsolated_ecal  && isIsolated_ptTracks && isIsolated_nTracks && clusterMajOK && clusterMinOK  ) h1_hcalIsoPhotReco_Nm1->Fill( hcalIsoPhotReco, correctWeight);
+    if(                    isIsolated_ecal  && isIsolated_ptTracks && isIsolated_nTracks && clusterMajOK && clusterMinOK  ) h1_hcalIsoEnergyPhotReco_Nm1->Fill( hcalIsoPhotReco*ePhotReco, correctWeight);
+    if( isIsolated_hcal                     && isIsolated_ptTracks && isIsolated_nTracks && clusterMajOK && clusterMinOK  ) h1_ecalIsoPhotReco_Nm1->Fill( ecalIsoPhotReco, correctWeight);
+    if( isIsolated_hcal                     && isIsolated_ptTracks && isIsolated_nTracks && clusterMajOK && clusterMinOK  ) h1_ecalIsoEnergyPhotReco_Nm1->Fill( ecalIsoPhotReco*ePhotReco, correctWeight);
+    if( isIsolated_hcal && isIsolated_ecal                         && isIsolated_nTracks && clusterMajOK && clusterMinOK  ) h1_ptTrkIsoPhotReco_Nm1->Fill( ptTrkIsoPhotReco, correctWeight);
+    if( isIsolated_hcal && isIsolated_ecal  && isIsolated_ptTracks                       && clusterMajOK && clusterMinOK  ) h1_nTrkIsoPhotReco_Nm1->Fill( nTrkIsoPhotReco, correctWeight);
     //no cluster cuts on cluster N-1's:
-    if( isIsolated_hcal_medium && isIsolated_ecal_medium  && isIsolated_ptTracks_medium && isIsolated_nTracks_medium   ) h1_clusterMajPhotReco_Nm1->Fill( clusterMajPhotReco, eventWeight);
-    if( isIsolated_hcal_medium && isIsolated_ecal_medium  && isIsolated_ptTracks_medium && isIsolated_nTracks_medium   ) h1_clusterMinPhotReco_Nm1->Fill( clusterMinPhotReco, eventWeight);
+    if( isIsolated_hcal && isIsolated_ecal  && isIsolated_ptTracks && isIsolated_nTracks                                  ) h1_clusterMajPhotReco_Nm1->Fill( clusterMajPhotReco, correctWeight);
+    if( isIsolated_hcal && isIsolated_ecal  && isIsolated_ptTracks && isIsolated_nTracks                                  ) h1_clusterMinPhotReco_Nm1->Fill( clusterMinPhotReco, correctWeight);
     // yes topology for topology variables:
-    if( isIsolated_hcal_medium && isIsolated_ecal_medium  && isIsolated_ptTracks_medium && isIsolated_nTracks_medium && clusterMajOK_medium && clusterMinOK_medium              && secondJetOK && jetInBarrel) h1_deltaPhi_Nm1->Fill( deltaPhi_jet, eventWeight);
-    if( isIsolated_hcal_medium && isIsolated_ecal_medium  && isIsolated_ptTracks_medium && isIsolated_nTracks_medium && clusterMajOK_medium && clusterMinOK_medium && back2back                && jetInBarrel) h1_ptSecondJetRel_Nm1->Fill( pt2ndJetReco/ptPhotReco, eventWeight);
+    if( isIsolated_hcal && isIsolated_ecal  && isIsolated_ptTracks && isIsolated_nTracks && clusterMajOK && clusterMinOK              && secondJetOK && jetInBarrel) h1_deltaPhi_Nm1->Fill( deltaPhi_jet, correctWeight);
+    if( isIsolated_hcal && isIsolated_ecal  && isIsolated_ptTracks && isIsolated_nTracks && clusterMajOK && clusterMinOK && back2back                && jetInBarrel) h1_ptSecondJetRel_Nm1->Fill( pt2ndJetReco/ptPhotReco, correctWeight);
 
 
-    bool isIsolated_loose = (isIsolated_hcal_loose && isIsolated_ecal_loose && isIsolated_ptTracks_loose && isIsolated_nTracks_loose);
-    bool isIsolated_medium = (isIsolated_hcal_medium && isIsolated_ecal_medium && isIsolated_ptTracks_medium && isIsolated_nTracks_medium);
-    bool clusterShapeOK_medium = (clusterMajOK_medium && clusterMinOK_medium );
+//    bool isIsolated_loose = (isIsolated_hcal_loose && isIsolated_ecal_loose && isIsolated_ptTracks_loose && isIsolated_nTracks_loose);
+    bool isIsolated = (isIsolated_hcal && isIsolated_ecal && isIsolated_ptTracks && isIsolated_nTracks);
+    bool clusterShapeOK = (clusterMajOK && clusterMinOK );
 
     if( MCassoc_ && matchedToMC ) {
-      isIsolated_loose = true;
-      isIsolated_medium = true;
-      clusterShapeOK_medium = true;
+      isIsolated = true;
+      //isIsolated_medium = true;
+      clusterShapeOK= true;
     }
 
+
+/*
     //////////////////////////////////////////////
     /////      CLUSTER SHAPE ONLY SELECTION 
     //////////////////////////////////////////////
 
 
-    if( clusterShapeOK_medium ) {
-      h1_hcalIsoPhotReco_clusterOK->Fill( hcalIsoPhotReco, eventWeight);
-      h1_hcalIsoEnergyPhotReco_clusterOK->Fill( hcalIsoPhotReco*ePhotReco, eventWeight);
-      h1_ecalIsoPhotReco_clusterOK->Fill( ecalIsoPhotReco, eventWeight);
-      h1_ecalIsoEnergyPhotReco_clusterOK->Fill( ecalIsoPhotReco*ePhotReco, eventWeight);
-      h1_ptTrkIsoPhotReco_clusterOK->Fill( ptTrkIsoPhotReco, eventWeight);
-      h1_nTrkIsoPhotReco_clusterOK->Fill( nTrkIsoPhotReco, eventWeight);
-      h1_deltaPhi_clusterOK->Fill( deltaPhi_jet, eventWeight);
+    if( clusterShapeOK ) {
+      h1_hcalIsoPhotReco_clusterOK->Fill( hcalIsoPhotReco, correctWeight);
+      h1_hcalIsoEnergyPhotReco_clusterOK->Fill( hcalIsoPhotReco*ePhotReco, correctWeight);
+      h1_ecalIsoPhotReco_clusterOK->Fill( ecalIsoPhotReco, correctWeight);
+      h1_ecalIsoEnergyPhotReco_clusterOK->Fill( ecalIsoPhotReco*ePhotReco, correctWeight);
+      h1_ptTrkIsoPhotReco_clusterOK->Fill( ptTrkIsoPhotReco, correctWeight);
+      h1_nTrkIsoPhotReco_clusterOK->Fill( nTrkIsoPhotReco, correctWeight);
+      h1_deltaPhi_clusterOK->Fill( deltaPhi_jet, correctWeight);
 
-      if( isIsolated_medium ) {
-        h1_deltaPhi_clusterOK_isolated->Fill( deltaPhi_jet, eventWeight);
-        h1_ptSecondJetRel_clusterOK_isolated->Fill( pt2ndJetReco/ptPhotReco, eventWeight);
-        h1_phiPhot_clusterOK_isolated->Fill( phiPhotReco, eventWeight );
-        h1_etaPhot_clusterOK_isolated->Fill( etaPhotReco, eventWeight );
-        h1_ptPhot_clusterOK_isolated->Fill( ptPhotReco, eventWeight );
+      if( isIsolated ) {
+        h1_deltaPhi_passedID->Fill( deltaPhi_jet, correctWeight);
+        h1_ptSecondJetRel_passedID->Fill( pt2ndJetReco/ptPhotReco, correctWeight);
+        h1_phiPhot_passedID->Fill( phiPhotReco, correctWeight );
+        h1_etaPhot_passedID->Fill( etaPhotReco, correctWeight );
+        h1_ptPhot_passedID->Fill( ptPhotReco, correctWeight );
       }
 
       if( (back2back && secondJetOK && jetInBarrel) || noJetSelection ) {
-        h1_ptPhot_clusterOK->Fill( ptPhotReco, eventWeight );
-        h1_phiPhot_clusterOK->Fill( phiPhotReco, eventWeight );
-        h1_etaPhot_clusterOK->Fill( etaPhotReco, eventWeight );
-        h1_response_clusterOK[theBin]->Fill( ptJetReco/ptPhotReco, eventWeight );
-        hp_ptPhotMean_clusterOK->Fill( ptJetReco, ptJetReco, eventWeight );
+        h1_ptPhot_clusterOK->Fill( ptPhotReco, correctWeight );
+        h1_phiPhot_clusterOK->Fill( phiPhotReco, correctWeight );
+        h1_etaPhot_clusterOK->Fill( etaPhotReco, correctWeight );
+        h1_response_clusterOK[theBin]->Fill( ptJetReco/ptPhotReco, correctWeight );
+        h2_ptPhotMean_clusterOK->Fill( ptJetReco, ptJetReco, correctWeight );
         if( ptJetGen>ptPhot_binning[0] ) {
-          h1_responseGEN_clusterOK[theBinGEN]->Fill( ptJetReco/ptJetGen, eventWeight );
-          h1_responsePART_clusterOK[theBinGEN]->Fill( ptJetGen/ptPart, eventWeight );
-          hp_ptJetGenMean_clusterOK->Fill( ptJetGen, ptJetGen, eventWeight );
+          h1_responseGEN_clusterOK[theBinGEN]->Fill( ptJetReco/ptJetGen, correctWeight );
+          h1_responsePART_clusterOK[theBinGEN]->Fill( ptJetGen/ptPart, correctWeight );
+          h2_ptJetGenMean_clusterOK->Fill( ptJetGen, ptJetGen, correctWeight );
         }
       } //if back2back
     }
 
-    if( isIsolated_medium ) {
-      h1_clusterMajPhotReco_isolated->Fill( clusterMajPhotReco, eventWeight );
-      h1_clusterMinPhotReco_isolated->Fill( clusterMinPhotReco, eventWeight );
+    if( isIsolated ) {
+      h1_clusterMajPhotReco_isolated->Fill( clusterMajPhotReco, correctWeight );
+      h1_clusterMinPhotReco_isolated->Fill( clusterMinPhotReco, correctWeight );
     }
 
-    h1_clusterMajPhotReco->Fill( clusterMajPhotReco, eventWeight );
-    h1_clusterMinPhotReco->Fill( clusterMinPhotReco, eventWeight );
+    h1_clusterMajPhotReco->Fill( clusterMajPhotReco, correctWeight );
+    h1_clusterMinPhotReco->Fill( clusterMinPhotReco, correctWeight );
 
 
-    bool photonOK_medium = (isIsolated_medium && clusterShapeOK_medium) || MCassoc_ || useGenJets;
-    bool photonOK_loose  = (isIsolated_loose  && clusterShapeOK_medium) || MCassoc_ || useGenJets;
+//    bool photonOK_loose  = (isIsolated_loose  && clusterShapeOK_medium) || MCassoc_ || useGenJets;
 
 
     // compute response:
     float response = ptJetReco/ptPhotReco;
+    float responseL2L3 = ptCorrJetReco/ptPhotReco;
+
     if( ADD12_ && abs(deltaPhi_2ndJet) > pi/2. ) { //add first and second jet
 
       float px1 = ptJetReco*cos(phiJetReco);
@@ -670,29 +923,202 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
     }
 
-    // compute mpf :
-    Float_t phi_Phot_Met = fitTools::delta_phi( phiPhotReco, phiMet );
-    Float_t mpfResponse = 1. + eMet*ptPhotReco*cos( phi_Phot_Met ) / (ptPhotReco*ptPhotReco);
-
+*/
     
 
   
     //////////////////////////////////////////////
-    /////      EVENT SELECTION: MEDIUM ID
+    /////      EVENT SELECTION
     //////////////////////////////////////////////
 
-    bool passedMedium_no2ndJet = photonOK_medium && ( (back2back && jetInBarrel) || noJetSelection );
-    bool passedMedium_FULL     = passedMedium_no2ndJet && (secondJetOK || noJetSelection);
+    // compute mpf :
+    Float_t phi_Phot_Met = fitTools::delta_phi( phiPhotReco, phiMet );
+    Float_t mpfResponse = 1. + eMet*ptPhotReco*cos( phi_Phot_Met ) / (ptPhotReco*ptPhotReco);
+
+    //bool passedMedium_no2ndJet = photonOK_medium && ( (back2back && jetInBarrel) || noJetSelection );
+    bool photonOK = (isIsolated && clusterShapeOK) || MCassoc_ || useGenJets;
+    bool passedID_no2ndJet = photonOK && ( back2back || noJetSelection );
+    bool passedID_FULL     = passedID_no2ndJet && (secondJetOK || noJetSelection);
 
 
-    if( passedMedium_no2ndJet ) {
+    if( passedID_no2ndJet ) {
 
-      Float_t correctWeight = (useGenJets) ? eventWeight_medium : eventWeight;
+      h1_deltaPhi_passedID->Fill( deltaPhi_jet, correctWeight);
+      h1_ptSecondJetRel_passedID->Fill( pt2ndJetReco/ptPhotReco, correctWeight);
+      h1_phiPhot_passedID->Fill( phiPhotReco, correctWeight );
+      h1_etaPhot_passedID->Fill( etaPhotReco, correctWeight );
+      h1_ptPhot_passedID->Fill( ptPhotReco, correctWeight );
+
 
       // --------------------------------------
       // BEGIN  extrapolation to pt(2ndjet)->0:
       // --------------------------------------
-      hp_ptPhotMean_no2ndJet->Fill( ptPhotReco, ptPhotReco, eventWeight );
+      Float_t minPerc = h1_pt2ndJetRecoRelMean_eta013[theBin][0]->GetXaxis()->GetXmin();
+      Float_t percStep = h1_pt2ndJetRecoRelMean_eta013[theBin][0]->GetXaxis()->GetXmax()  - minPerc;
+      Float_t minPercL2L3 = h1_pt2ndJetL2L3RecoRelMean_eta013[theBin][0]->GetXaxis()->GetXmin();
+      Float_t percStepL2L3 = h1_pt2ndJetL2L3RecoRelMean_eta013[theBin][0]->GetXaxis()->GetXmax()  - minPercL2L3;
+      Double_t pt2ndJetRecoRel = 100.*pt2ndJetReco/ptPhotReco; //in percentage
+      int iRecoRel = (int)floor((pt2ndJetRecoRel-minPerc)/percStep);
+      Double_t ptCorr2ndJetRecoRel = 100.*ptCorr2ndJetReco/ptPhotReco; //in percentage
+      int iRecoRelL2L3 = (int)floor((ptCorr2ndJetRecoRel-minPercL2L3)/percStepL2L3);
+    
+      Float_t r_RecoPhot = ptJetReco/ptPhotReco;
+      Float_t r_RecoGen  = ptJetReco/ptJetGen;
+      Float_t r_RecoL2L3Phot = ptCorrJetReco/ptPhotReco;
+      Float_t r_RecoL2L3Gen  = ptCorrJetReco/ptJetGen;
+      Float_t r_GenPhot  = ptJetGen/ptPhotReco;
+
+
+      if( fabs(etaJetReco) < 1.3 ) {
+
+        h2_ptPhotMean_no2ndJet_eta013->Fill( ptPhotReco, ptPhotReco, correctWeight );
+
+        if( (iRecoRel>=0)&&(iRecoRel<5) ) {
+          if(r_RecoPhot!=0.) h1_RecoPhot_vs_recoRel_eta013[theBin][iRecoRel]->Fill(r_RecoPhot, correctWeight);
+          if(r_RecoGen!=0.)  h1_RecoGen_vs_recoRel_eta013[theBin][iRecoRel]->Fill(r_RecoGen, correctWeight);
+          if(r_GenPhot!=0.)  h1_GenPhot_vs_recoRel_eta013[theBin][iRecoRel]->Fill(r_GenPhot, correctWeight);
+          h1_pt2ndJetRecoRelMean_eta013[theBin][iRecoRel]->Fill(pt2ndJetRecoRel, correctWeight);
+        } 
+
+        if( (iRecoRelL2L3>=0)&&(iRecoRelL2L3<5) ) {
+          if(r_RecoL2L3Phot!=0.) h1_RecoPhotL2L3_vs_recoRel_eta013[theBin][iRecoRelL2L3]->Fill(r_RecoL2L3Phot, correctWeight);
+          if(r_RecoL2L3Gen!=0.)  h1_RecoGenL2L3_vs_recoRel_eta013[theBin][iRecoRelL2L3]->Fill(r_RecoL2L3Gen, correctWeight);
+          if(r_GenPhot!=0.)      h1_GenPhotL2L3_vs_recoRel_eta013[theBin][iRecoRelL2L3]->Fill(r_GenPhot, correctWeight);
+          h1_pt2ndJetL2L3RecoRelMean_eta013[theBin][iRecoRelL2L3]->Fill(ptCorr2ndJetRecoRel, correctWeight);
+        } 
+
+      } else if( fabs(etaJetReco)<2. ) {
+
+        h2_ptPhotMean_no2ndJet_eta1524->Fill( ptPhotReco, ptPhotReco, correctWeight );
+
+        if( (iRecoRel>=0)&&(iRecoRel<5) ) {
+          if(r_RecoPhot!=0.) h1_RecoPhot_vs_recoRel_eta1524[theBin][iRecoRel]->Fill(r_RecoPhot, correctWeight);
+          if(r_RecoGen!=0.)  h1_RecoGen_vs_recoRel_eta1524[theBin][iRecoRel]->Fill(r_RecoGen, correctWeight);
+          if(r_GenPhot!=0.)  h1_GenPhot_vs_recoRel_eta1524[theBin][iRecoRel]->Fill(r_GenPhot, correctWeight);
+          h1_pt2ndJetRecoRelMean_eta1524[theBin][iRecoRel]->Fill(pt2ndJetRecoRel, correctWeight);
+        } 
+
+        if( (iRecoRelL2L3>=0)&&(iRecoRelL2L3<5) ) {
+          if(r_RecoL2L3Phot!=0.) h1_RecoPhotL2L3_vs_recoRel_eta1524[theBin][iRecoRelL2L3]->Fill(r_RecoL2L3Phot, correctWeight);
+          if(r_RecoL2L3Gen!=0.)  h1_RecoGenL2L3_vs_recoRel_eta1524[theBin][iRecoRelL2L3]->Fill(r_RecoL2L3Gen, correctWeight);
+          if(r_GenPhot!=0.)      h1_GenPhotL2L3_vs_recoRel_eta1524[theBin][iRecoRelL2L3]->Fill(r_GenPhot, correctWeight);
+          h1_pt2ndJetL2L3RecoRelMean_eta1524[theBin][iRecoRelL2L3]->Fill(ptCorr2ndJetRecoRel, correctWeight);
+        } 
+
+      } else if( fabs(etaJetReco)<3. ) {
+
+        h2_ptPhotMean_no2ndJet_eta243->Fill( ptPhotReco, ptPhotReco, correctWeight );
+
+        if( (iRecoRel>=0)&&(iRecoRel<5) ) {
+          if(r_RecoPhot!=0.) h1_RecoPhot_vs_recoRel_eta243[theBin][iRecoRel]->Fill(r_RecoPhot, correctWeight);
+          if(r_RecoGen!=0.)  h1_RecoGen_vs_recoRel_eta243[theBin][iRecoRel]->Fill(r_RecoGen, correctWeight);
+          if(r_GenPhot!=0.)  h1_GenPhot_vs_recoRel_eta243[theBin][iRecoRel]->Fill(r_GenPhot, correctWeight);
+          h1_pt2ndJetRecoRelMean_eta243[theBin][iRecoRel]->Fill(pt2ndJetRecoRel, correctWeight);
+        } 
+
+        if( (iRecoRelL2L3>=0)&&(iRecoRelL2L3<5) ) {
+          if(r_RecoL2L3Phot!=0.) h1_RecoPhotL2L3_vs_recoRel_eta243[theBin][iRecoRelL2L3]->Fill(r_RecoL2L3Phot, correctWeight);
+          if(r_RecoL2L3Gen!=0.)  h1_RecoGenL2L3_vs_recoRel_eta243[theBin][iRecoRelL2L3]->Fill(r_RecoL2L3Gen, correctWeight);
+          if(r_GenPhot!=0.)      h1_GenPhotL2L3_vs_recoRel_eta243[theBin][iRecoRelL2L3]->Fill(r_GenPhot, correctWeight);
+          h1_pt2ndJetL2L3RecoRelMean_eta243[theBin][iRecoRelL2L3]->Fill(ptCorr2ndJetRecoRel, correctWeight);
+        } 
+
+      } else if( fabs(etaJetReco)<5. ) {
+
+        h2_ptPhotMean_no2ndJet_eta35->Fill( ptPhotReco, ptPhotReco, correctWeight );
+
+        if( (iRecoRel>=0)&&(iRecoRel<5) ) {
+          if(r_RecoPhot!=0.) h1_RecoPhot_vs_recoRel_eta35[theBin][iRecoRel]->Fill(r_RecoPhot, correctWeight);
+          if(r_RecoGen!=0.)  h1_RecoGen_vs_recoRel_eta35[theBin][iRecoRel]->Fill(r_RecoGen, correctWeight);
+          if(r_GenPhot!=0.)  h1_GenPhot_vs_recoRel_eta35[theBin][iRecoRel]->Fill(r_GenPhot, correctWeight);
+          h1_pt2ndJetRecoRelMean_eta35[theBin][iRecoRel]->Fill(pt2ndJetRecoRel, correctWeight);
+        } 
+
+        if( (iRecoRelL2L3>=0)&&(iRecoRelL2L3<5) ) {
+          if(r_RecoL2L3Phot!=0.) h1_RecoPhotL2L3_vs_recoRel_eta35[theBin][iRecoRelL2L3]->Fill(r_RecoL2L3Phot, correctWeight);
+          if(r_RecoL2L3Gen!=0.)  h1_RecoGenL2L3_vs_recoRel_eta35[theBin][iRecoRelL2L3]->Fill(r_RecoL2L3Gen, correctWeight);
+          if(r_GenPhot!=0.)      h1_GenPhotL2L3_vs_recoRel_eta35[theBin][iRecoRelL2L3]->Fill(r_GenPhot, correctWeight);
+          h1_pt2ndJetL2L3RecoRelMean_eta35[theBin][iRecoRelL2L3]->Fill(ptCorr2ndJetRecoRel, correctWeight);
+        } 
+
+      }
+
+      // --------------------------------------
+      // END  extrapolation to pt(2ndjet)->0:
+      // --------------------------------------
+
+
+      
+      if( passedID_FULL ) {
+
+        h1_ptPhot->Fill( ptPhotReco, correctWeight );
+
+        h1_deltaPhi_2ndJet->Fill( deltaPhi_2ndJet, correctWeight );
+        
+        if( ptJetGen>ptPhot_binning[0] ) {
+          h1_responsePART[theBinGEN]->Fill( ptJetGen/ptPart, correctWeight );
+        }
+
+        h1_phiPhot->Fill( phiPhotReco, correctWeight );
+        h1_etaPhot->Fill( etaPhotReco, correctWeight );
+        h1_ptPhot->Fill( ptPhotReco, correctWeight );
+        h1_ptJetReco->Fill( ptJetReco, correctWeight );
+        h1_pt2ndJetReco->Fill( pt2ndJetReco, correctWeight );
+
+        h1_deltaPhi_phot_met->Fill( phi_Phot_Met, correctWeight );
+        h1_met->Fill( eMet, correctWeight );
+
+        if( fabs(etaJetReco)<1.3 ) {
+          h2_ptPhotMean_eta013->Fill( ptPhotReco, ptPhotReco, correctWeight );
+          h1_response_eta013[theBin]->Fill( r_RecoPhot, correctWeight );
+          h1_response_L2L3_eta013[theBin]->Fill( r_RecoL2L3Phot, correctWeight );
+          h1_responseMPF_eta013[theBin]->Fill( mpfResponse, correctWeight );
+          //h1_responseMPF_L2L3_eta013[theBin]->Fill( mpfResponseL2L3, correctWeight );
+          if( ptJetGen>ptPhot_binning[0] ) {
+            h1_responseGEN_eta013[theBinGEN]->Fill( r_RecoGen, correctWeight );
+            h1_responseGEN_L2L3_eta013[theBinGEN]->Fill( r_RecoL2L3Gen, correctWeight );
+            h2_ptJetGenMean_eta013->Fill( ptJetGen, ptJetGen, correctWeight );
+          }
+        } else if( fabs(etaJetReco)>1.5 && fabs(etaJetReco)<2.4 ) {
+          h2_ptPhotMean_eta1524->Fill( ptPhotReco, ptPhotReco, correctWeight );
+          h1_response_eta1524[theBin]->Fill( r_RecoPhot, correctWeight );
+          h1_response_L2L3_eta1524[theBin]->Fill( r_RecoL2L3Phot, correctWeight );
+          h1_responseMPF_eta1524[theBin]->Fill( mpfResponse, correctWeight );
+          //h1_responseMPF_L2L3_eta1524[theBin]->Fill( mpfResponseL2L3, correctWeight );
+          if( ptJetGen>ptPhot_binning[0] ) {
+            h1_responseGEN_eta1524[theBinGEN]->Fill( r_RecoGen, correctWeight );
+            h1_responseGEN_L2L3_eta1524[theBinGEN]->Fill( r_RecoL2L3Gen, correctWeight );
+            h2_ptJetGenMean_eta1524->Fill( ptJetGen, ptJetGen, correctWeight );
+          }
+        } else if( fabs(etaJetReco)>2.4 && fabs(etaJetReco)<3. ) {
+          h2_ptPhotMean_eta243->Fill( ptPhotReco, ptPhotReco, correctWeight );
+          h1_response_eta243[theBin]->Fill( r_RecoPhot, correctWeight );
+          h1_response_L2L3_eta243[theBin]->Fill( r_RecoL2L3Phot, correctWeight );
+          h1_responseMPF_eta243[theBin]->Fill( mpfResponse, correctWeight );
+          //h1_responseMPF_L2L3_eta243[theBin]->Fill( mpfResponseL2L3, correctWeight );
+          if( ptJetGen>ptPhot_binning[0] ) {
+            h1_responseGEN_eta243[theBinGEN]->Fill( r_RecoGen, correctWeight );
+            h1_responseGEN_L2L3_eta243[theBinGEN]->Fill( r_RecoL2L3Gen, correctWeight );
+            h2_ptJetGenMean_eta243->Fill( ptJetGen, ptJetGen, correctWeight );
+          }
+        } else if( fabs(etaJetReco)<5. ) {
+          h2_ptPhotMean_eta35->Fill( ptPhotReco, ptPhotReco, correctWeight );
+          h1_response_eta35[theBin]->Fill( r_RecoPhot, correctWeight );
+          h1_response_L2L3_eta35[theBin]->Fill( r_RecoL2L3Phot, correctWeight );
+          h1_responseMPF_eta35[theBin]->Fill( mpfResponse, correctWeight );
+          //h1_responseMPF_L2L3_eta35[theBin]->Fill( mpfResponseL2L3, correctWeight );
+          if( ptJetGen>ptPhot_binning[0] ) {
+            h1_responseGEN_eta35[theBinGEN]->Fill( r_RecoGen, correctWeight );
+            h1_responseGEN_L2L3_eta35[theBinGEN]->Fill( r_RecoL2L3Gen, correctWeight );
+            h2_ptJetGenMean_eta35->Fill( ptJetGen, ptJetGen, correctWeight );
+          }
+        }
+          
+/*
+      // --------------------------------------
+      // BEGIN  extrapolation to pt(2ndjet)->0:
+      // --------------------------------------
+      h2_ptPhotMean_no2ndJet->Fill( ptPhotReco, ptPhotReco, correctWeight );
       Float_t minPerc = h1_pt2ndJetRecoRelMean[theBin][0]->GetXaxis()->GetXmin();
       Float_t percStep = h1_pt2ndJetRecoRelMean[theBin][0]->GetXaxis()->GetXmax()  - minPerc;
       Double_t pt2ndJetRecoRel = 100.*pt2ndJetReco/ptPhotReco; //in percentage
@@ -703,10 +1129,10 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
       Float_t r_GenPhot  = ptJetGen/ptPhotReco;
 
       if( (iRecoRel>=0)&&(iRecoRel<5) ) {
-        if(r_RecoPhot!=0.) h1_RecoPhot_vs_recoRel[theBin][iRecoRel]->Fill(r_RecoPhot, eventWeight);
-        if(r_RecoGen!=0.)  h1_RecoGen_vs_recoRel[theBin][iRecoRel]->Fill(r_RecoGen, eventWeight);
-        if(r_GenPhot!=0.)  h1_GenPhot_vs_recoRel[theBin][iRecoRel]->Fill(r_GenPhot, eventWeight);
-        h1_pt2ndJetRecoRelMean[theBin][iRecoRel]->Fill(pt2ndJetRecoRel, eventWeight);
+        if(r_RecoPhot!=0.) h1_RecoPhot_vs_recoRel[theBin][iRecoRel]->Fill(r_RecoPhot, correctWeight);
+        if(r_RecoGen!=0.)  h1_RecoGen_vs_recoRel[theBin][iRecoRel]->Fill(r_RecoGen, correctWeight);
+        if(r_GenPhot!=0.)  h1_GenPhot_vs_recoRel[theBin][iRecoRel]->Fill(r_GenPhot, correctWeight);
+        h1_pt2ndJetRecoRelMean[theBin][iRecoRel]->Fill(pt2ndJetRecoRel, correctWeight);
       } 
       // --------------------------------------
       // END  extrapolation to pt(2ndjet)->0:
@@ -721,9 +1147,9 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
         h1_deltaPhi_2ndJet_medium->Fill( deltaPhi_2ndJet, correctWeight );
         
         if( ptJetGen>ptPhot_binning[0] ) {
-          h1_responseGEN[theBinGEN]->Fill( ptJetReco/ptJetGen, eventWeight );
-          h1_responsePART[theBinGEN]->Fill( ptJetGen/ptPart, eventWeight );
-          hp_ptJetGenMean->Fill( ptJetGen, ptJetGen, eventWeight );
+          h1_responseGEN[theBinGEN]->Fill( ptJetReco/ptJetGen, correctWeight );
+          h1_responsePART[theBinGEN]->Fill( ptJetGen/ptPart, correctWeight );
+          h2_ptJetGenMean->Fill( ptJetGen, ptJetGen, correctWeight );
         }
 
         h1_phiPhot->Fill( phiPhotReco, correctWeight );
@@ -731,18 +1157,20 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
         h1_ptPhot->Fill( ptPhotReco, correctWeight );
         h1_ptJetReco->Fill( ptJetReco, correctWeight );
         h1_pt2ndJetReco->Fill( pt2ndJetReco, correctWeight );
-        hp_ptPhotMean->Fill( ptPhotReco, ptPhotReco, correctWeight );
+        h2_ptPhotMean->Fill( ptPhotReco, ptPhotReco, correctWeight );
         h1_response[theBin]->Fill( response, correctWeight );
 
         h1_deltaPhi_phot_met_medium->Fill( phi_Phot_Met, correctWeight );
         h1_met_medium->Fill( eMet, correctWeight );
         h1_responseMPF[theBin]->Fill( mpfResponse, correctWeight );
           
+*/
       } //if second jet ok
 
     } 
 
 
+/*
     //////////////////////////////////////////////
     /////      EVENT SELECTION: LOOSE ID
     //////////////////////////////////////////////
@@ -762,7 +1190,7 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
         if( ptJetGen>ptPhot_binning[0] ) {
           h1_responseGEN_loose[theBinGEN]->Fill( ptJetReco/ptJetGen, correctWeight );
           h1_responsePART_loose[theBinGEN]->Fill( ptJetGen/ptPart, correctWeight );
-          hp_ptJetGenMean->Fill( ptJetGen, ptJetGen, eventWeight );
+          h2_ptJetGenMean_loose->Fill( ptJetGen, ptJetGen, correctWeight );
         }
 
         h1_ptPhot_loose->Fill( ptPhotReco, correctWeight );
@@ -771,7 +1199,7 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
         h1_deltaPhi_2ndJet_loose->Fill( deltaPhi_2ndJet, correctWeight );
 
-        hp_ptPhotMean_loose->Fill( ptPhotReco, ptPhotReco, correctWeight );
+        h2_ptPhotMean_loose->Fill( ptPhotReco, ptPhotReco, correctWeight );
         h1_response_loose[theBin]->Fill( response, correctWeight );
 
         h1_deltaPhi_phot_met_loose->Fill( phi_Phot_Met, correctWeight );
@@ -782,6 +1210,7 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
     } //if loose
 
+*/
 
   } //for entries
 
@@ -797,8 +1226,9 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
   outfileName = outfileName + suffix;
   if( noJetSelection ) outfileName = outfileName + "_NOJETSEL";
+  if( photonID!="medium" ) outfileName = outfileName + "_" + photonID;
   if( MCassoc_ ) outfileName = outfileName + "_MCassoc";
-  if( useGenJets ) outfileName = outfileName + "_GENJETS";
+  //if( useGenJets ) outfileName = outfileName + "_GENJETS";
   if( PARTTYPE_!="" ) outfileName = outfileName + "_" + PARTTYPE_;
   if( BINNINGFINO_ ) outfileName = outfileName + "_BINNINGFINO";
   if( ONEVTX_ ) outfileName = outfileName + "_ONEVTX";
@@ -831,34 +1261,34 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   h1_ptJetReco->Write();
   h1_pt2ndJetReco->Write();
 
-  h1_ptPhot_loose->Write();
-  h1_phiPhot_loose->Write();
-  h1_etaPhot_loose->Write();
+//h1_ptPhot_loose->Write();
+//h1_phiPhot_loose->Write();
+//h1_etaPhot_loose->Write();
 
-  h1_ptPhot_medium->Write();
+  h1_ptPhot->Write();
 
-  h1_ptPhot_clusterOK->Write();
-  h1_phiPhot_clusterOK->Write();
-  h1_etaPhot_clusterOK->Write();
+//h1_ptPhot_clusterOK->Write();
+//h1_phiPhot_clusterOK->Write();
+//h1_etaPhot_clusterOK->Write();
 
-  h1_ptPhot_clusterOK_isolated->Write();
-  h1_phiPhot_clusterOK_isolated->Write();
-  h1_etaPhot_clusterOK_isolated->Write();
+  h1_ptPhot_passedID->Write();
+  h1_phiPhot_passedID->Write();
+  h1_etaPhot_passedID->Write();
   
-  h1_met_loose->Write();
-  h1_met_medium->Write();
+//h1_met_loose->Write();
+  h1_met->Write();
 
-  h1_deltaPhi_phot_met_loose->Write();
-  h1_deltaPhi_phot_met_medium->Write();
+//h1_deltaPhi_phot_met_loose->Write();
+  h1_deltaPhi_phot_met->Write();
 
   h1_deltaPhi_Nm1->Write();
   h1_ptSecondJetRel_Nm1->Write();
 
-  h1_deltaPhi_clusterOK_isolated->Write();
-  h1_ptSecondJetRel_clusterOK_isolated->Write();
+  h1_deltaPhi_passedID->Write();
+  h1_ptSecondJetRel_passedID->Write();
 
-  h1_deltaPhi_2ndJet_medium->Write();
-  h1_deltaPhi_2ndJet_loose->Write();
+//h1_deltaPhi_2ndJet_medium->Write();
+  h1_deltaPhi_2ndJet->Write();
 
   h1_hcalIsoPhotReco_Nm1->Write();
   h1_hcalIsoEnergyPhotReco_Nm1->Write();
@@ -869,42 +1299,79 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   h1_clusterMajPhotReco_Nm1->Write();
   h1_clusterMinPhotReco_Nm1->Write();
 
-  h1_hcalIsoPhotReco_clusterOK->Write();
-  h1_hcalIsoEnergyPhotReco_clusterOK->Write();
-  h1_ecalIsoPhotReco_clusterOK->Write();
-  h1_ecalIsoEnergyPhotReco_clusterOK->Write();
-  h1_ptTrkIsoPhotReco_clusterOK->Write();
-  h1_nTrkIsoPhotReco_clusterOK->Write();
-  h1_deltaPhi_clusterOK->Write();
+//h1_hcalIsoPhotReco_clusterOK->Write();
+//h1_hcalIsoEnergyPhotReco_clusterOK->Write();
+//h1_ecalIsoPhotReco_clusterOK->Write();
+//h1_ecalIsoEnergyPhotReco_clusterOK->Write();
+//h1_ptTrkIsoPhotReco_clusterOK->Write();
+//h1_nTrkIsoPhotReco_clusterOK->Write();
+//h1_deltaPhi_clusterOK->Write();
 
-  h1_clusterMajPhotReco_isolated->Write();
-  h1_clusterMinPhotReco_isolated->Write();
+//h1_clusterMajPhotReco_isolated->Write();
+//h1_clusterMinPhotReco_isolated->Write();
 
   h1_clusterMajPhotReco->Write();
   h1_clusterMinPhotReco->Write();
 
-  hp_ptJetGenMean->Write();
-  hp_ptJetGenMean_loose->Write();
-  hp_ptJetGenMean_clusterOK->Write();
-  hp_ptPhotMean->Write();
-  hp_ptPhotMean_no2ndJet->Write();
-  hp_ptPhotMean_loose->Write();
-  hp_ptPhotMean_clusterOK->Write();
+  h2_ptPhotMean_eta013->Write();
+  h2_ptPhotMean_eta1524->Write();
+  h2_ptPhotMean_eta243->Write();
+  h2_ptPhotMean_eta35->Write();
 
-  for( unsigned i=0; i<h1_response.size(); ++i ) {
+  h2_ptJetGenMean_eta013->Write();
+  h2_ptJetGenMean_eta1524->Write();
+  h2_ptJetGenMean_eta243->Write();
+  h2_ptJetGenMean_eta35->Write();
+
+  h2_ptPhotMean_no2ndJet_eta013->Write();
+  h2_ptPhotMean_no2ndJet_eta1524->Write();
+  h2_ptPhotMean_no2ndJet_eta243->Write();
+  h2_ptPhotMean_no2ndJet_eta35->Write();
+
+//h2_ptJetGenMean_loose->Write();
+//h2_ptJetGenMean_clusterOK->Write();
+//h2_ptPhotMean_loose->Write();
+//h2_ptPhotMean_clusterOK->Write();
+
+  for( unsigned i=0; i<h1_response_eta013.size(); ++i ) {
 
     outFile->cd();
 
-    h1_response[i]->Write();
-    h1_responseGEN[i]->Write();
+    h1_response_eta013[i]->Write();
+    h1_response_L2L3_eta013[i]->Write();
+    h1_responseGEN_eta013[i]->Write();
+    h1_responseGEN_L2L3_eta013[i]->Write();
+    h1_responseMPF_eta013[i]->Write();
+    h1_responseMPF_L2L3_eta013[i]->Write();
+
+    h1_response_eta1524[i]->Write();
+    h1_response_L2L3_eta1524[i]->Write();
+    h1_responseGEN_eta1524[i]->Write();
+    h1_responseGEN_L2L3_eta1524[i]->Write();
+    h1_responseMPF_eta1524[i]->Write();
+    h1_responseMPF_L2L3_eta1524[i]->Write();
+
+    h1_response_eta243[i]->Write();
+    h1_response_L2L3_eta243[i]->Write();
+    h1_responseGEN_eta243[i]->Write();
+    h1_responseGEN_L2L3_eta243[i]->Write();
+    h1_responseMPF_eta243[i]->Write();
+    h1_responseMPF_L2L3_eta243[i]->Write();
+
+    h1_response_eta35[i]->Write();
+    h1_response_L2L3_eta35[i]->Write();
+    h1_responseGEN_eta35[i]->Write();
+    h1_responseGEN_L2L3_eta35[i]->Write();
+    h1_responseMPF_eta35[i]->Write();
+    h1_responseMPF_L2L3_eta35[i]->Write();
+
     h1_responsePART[i]->Write();
-    h1_response_loose[i]->Write();
-    h1_responseGEN_loose[i]->Write();
-    h1_responsePART_loose[i]->Write();
-    h1_response_clusterOK[i]->Write();
-    h1_responsePART_clusterOK[i]->Write();
-    h1_responseMPF[i]->Write();
-    h1_responseMPF_loose[i]->Write();
+  //h1_response_loose[i]->Write();
+  //h1_responseGEN_loose[i]->Write();
+  //h1_responsePART_loose[i]->Write();
+  //h1_response_clusterOK[i]->Write();
+  //h1_responsePART_clusterOK[i]->Write();
+  //h1_responseMPF_loose[i]->Write();
 
     TF1* gaussian = new TF1("gaussian", "gaus");
     Float_t nSigma = 2.5;
@@ -916,13 +1383,69 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
     for( int ip=0; ip<nPoints; ++ip) {
       
-      fitTools::fitProjection(h1_RecoPhot_vs_recoRel[i][ip], gaussian, nSigma, "QR");
-      h1_RecoPhot_vs_recoRel[i][ip]->Write();
-      fitTools::fitProjection(h1_RecoGen_vs_recoRel[i][ip], gaussian, nSigma, "QR");
-      h1_RecoGen_vs_recoRel[i][ip]->Write();
-      fitTools::fitProjection(h1_GenPhot_vs_recoRel[i][ip], gaussian, nSigma, "QR");
-      h1_GenPhot_vs_recoRel[i][ip]->Write();
-      h1_pt2ndJetRecoRelMean[i][ip]->Write();
+      fitTools::fitProjection(h1_RecoPhot_vs_recoRel_eta013[i][ip], gaussian, nSigma, "QR");
+      h1_RecoPhot_vs_recoRel_eta013[i][ip]->Write();
+      fitTools::fitProjection(h1_RecoGen_vs_recoRel_eta013[i][ip], gaussian, nSigma, "QR");
+      h1_RecoGen_vs_recoRel_eta013[i][ip]->Write();
+      fitTools::fitProjection(h1_GenPhot_vs_recoRel_eta013[i][ip], gaussian, nSigma, "QR");
+      h1_GenPhot_vs_recoRel_eta013[i][ip]->Write();
+      h1_pt2ndJetRecoRelMean_eta013[i][ip]->Write();
+     
+      fitTools::fitProjection(h1_RecoPhotL2L3_vs_recoRel_eta013[i][ip], gaussian, nSigma, "QR");
+      h1_RecoPhotL2L3_vs_recoRel_eta013[i][ip]->Write();
+      fitTools::fitProjection(h1_RecoGenL2L3_vs_recoRel_eta013[i][ip], gaussian, nSigma, "QR");
+      h1_RecoGenL2L3_vs_recoRel_eta013[i][ip]->Write();
+      fitTools::fitProjection(h1_GenPhotL2L3_vs_recoRel_eta013[i][ip], gaussian, nSigma, "QR");
+      h1_GenPhotL2L3_vs_recoRel_eta013[i][ip]->Write();
+      h1_pt2ndJetL2L3RecoRelMean_eta013[i][ip]->Write();
+     
+      fitTools::fitProjection(h1_RecoPhot_vs_recoRel_eta1524[i][ip], gaussian, nSigma, "QR");
+      h1_RecoPhot_vs_recoRel_eta1524[i][ip]->Write();
+      fitTools::fitProjection(h1_RecoGen_vs_recoRel_eta1524[i][ip], gaussian, nSigma, "QR");
+      h1_RecoGen_vs_recoRel_eta1524[i][ip]->Write();
+      fitTools::fitProjection(h1_GenPhot_vs_recoRel_eta1524[i][ip], gaussian, nSigma, "QR");
+      h1_GenPhot_vs_recoRel_eta1524[i][ip]->Write();
+      h1_pt2ndJetRecoRelMean_eta1524[i][ip]->Write();
+     
+      fitTools::fitProjection(h1_RecoPhotL2L3_vs_recoRel_eta1524[i][ip], gaussian, nSigma, "QR");
+      h1_RecoPhotL2L3_vs_recoRel_eta1524[i][ip]->Write();
+      fitTools::fitProjection(h1_RecoGenL2L3_vs_recoRel_eta1524[i][ip], gaussian, nSigma, "QR");
+      h1_RecoGenL2L3_vs_recoRel_eta1524[i][ip]->Write();
+      fitTools::fitProjection(h1_GenPhotL2L3_vs_recoRel_eta1524[i][ip], gaussian, nSigma, "QR");
+      h1_GenPhotL2L3_vs_recoRel_eta1524[i][ip]->Write();
+      h1_pt2ndJetL2L3RecoRelMean_eta1524[i][ip]->Write();
+     
+      fitTools::fitProjection(h1_RecoPhot_vs_recoRel_eta243[i][ip], gaussian, nSigma, "QR");
+      h1_RecoPhot_vs_recoRel_eta243[i][ip]->Write();
+      fitTools::fitProjection(h1_RecoGen_vs_recoRel_eta243[i][ip], gaussian, nSigma, "QR");
+      h1_RecoGen_vs_recoRel_eta243[i][ip]->Write();
+      fitTools::fitProjection(h1_GenPhot_vs_recoRel_eta243[i][ip], gaussian, nSigma, "QR");
+      h1_GenPhot_vs_recoRel_eta243[i][ip]->Write();
+      h1_pt2ndJetRecoRelMean_eta243[i][ip]->Write();
+     
+      fitTools::fitProjection(h1_RecoPhotL2L3_vs_recoRel_eta243[i][ip], gaussian, nSigma, "QR");
+      h1_RecoPhotL2L3_vs_recoRel_eta243[i][ip]->Write();
+      fitTools::fitProjection(h1_RecoGenL2L3_vs_recoRel_eta243[i][ip], gaussian, nSigma, "QR");
+      h1_RecoGenL2L3_vs_recoRel_eta243[i][ip]->Write();
+      fitTools::fitProjection(h1_GenPhotL2L3_vs_recoRel_eta243[i][ip], gaussian, nSigma, "QR");
+      h1_GenPhotL2L3_vs_recoRel_eta243[i][ip]->Write();
+      h1_pt2ndJetL2L3RecoRelMean_eta243[i][ip]->Write();
+     
+      fitTools::fitProjection(h1_RecoPhot_vs_recoRel_eta35[i][ip], gaussian, nSigma, "QR");
+      h1_RecoPhot_vs_recoRel_eta35[i][ip]->Write();
+      fitTools::fitProjection(h1_RecoGen_vs_recoRel_eta35[i][ip], gaussian, nSigma, "QR");
+      h1_RecoGen_vs_recoRel_eta35[i][ip]->Write();
+      fitTools::fitProjection(h1_GenPhot_vs_recoRel_eta35[i][ip], gaussian, nSigma, "QR");
+      h1_GenPhot_vs_recoRel_eta35[i][ip]->Write();
+      h1_pt2ndJetRecoRelMean_eta35[i][ip]->Write();
+     
+      fitTools::fitProjection(h1_RecoPhotL2L3_vs_recoRel_eta35[i][ip], gaussian, nSigma, "QR");
+      h1_RecoPhotL2L3_vs_recoRel_eta35[i][ip]->Write();
+      fitTools::fitProjection(h1_RecoGenL2L3_vs_recoRel_eta35[i][ip], gaussian, nSigma, "QR");
+      h1_RecoGenL2L3_vs_recoRel_eta35[i][ip]->Write();
+      fitTools::fitProjection(h1_GenPhotL2L3_vs_recoRel_eta35[i][ip], gaussian, nSigma, "QR");
+      h1_GenPhotL2L3_vs_recoRel_eta35[i][ip]->Write();
+      h1_pt2ndJetL2L3RecoRelMean_eta35[i][ip]->Write();
      
     } //for npoints
   }
@@ -961,117 +1484,220 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   delete h1_ptSecondJetRel_Nm1;
   h1_ptSecondJetRel_Nm1 = 0;
 
-  delete h1_ptPhot_loose;
-  h1_ptPhot_loose = 0;
-  delete h1_etaPhot_loose;
-  h1_etaPhot_loose = 0;
-  delete h1_phiPhot_loose;
-  h1_phiPhot_loose = 0;
+//delete h1_ptPhot_loose;
+//h1_ptPhot_loose = 0;
+//delete h1_etaPhot_loose;
+//h1_etaPhot_loose = 0;
+//delete h1_phiPhot_loose;
+//h1_phiPhot_loose = 0;
 
-  delete h1_ptPhot_medium;
-  h1_ptPhot_medium = 0;
+//delete h1_ptPhot_medium;
+//h1_ptPhot_medium = 0;
 
-  delete h1_hcalIsoPhotReco_clusterOK;
-  h1_hcalIsoPhotReco_clusterOK = 0;
-  delete h1_hcalIsoEnergyPhotReco_clusterOK;
-  h1_hcalIsoEnergyPhotReco_clusterOK = 0;
-  delete h1_ecalIsoPhotReco_clusterOK;
-  h1_ecalIsoPhotReco_clusterOK = 0;
-  delete h1_ecalIsoEnergyPhotReco_clusterOK;
-  h1_ecalIsoEnergyPhotReco_clusterOK = 0;
-  delete h1_ptTrkIsoPhotReco_clusterOK;
-  h1_ptTrkIsoPhotReco_clusterOK = 0;
-  delete h1_nTrkIsoPhotReco_clusterOK;
-  h1_nTrkIsoPhotReco_clusterOK = 0;
+//delete h1_hcalIsoPhotReco_clusterOK;
+//h1_hcalIsoPhotReco_clusterOK = 0;
+//delete h1_hcalIsoEnergyPhotReco_clusterOK;
+//h1_hcalIsoEnergyPhotReco_clusterOK = 0;
+//delete h1_ecalIsoPhotReco_clusterOK;
+//h1_ecalIsoPhotReco_clusterOK = 0;
+//delete h1_ecalIsoEnergyPhotReco_clusterOK;
+//h1_ecalIsoEnergyPhotReco_clusterOK = 0;
+//delete h1_ptTrkIsoPhotReco_clusterOK;
+//h1_ptTrkIsoPhotReco_clusterOK = 0;
+//delete h1_nTrkIsoPhotReco_clusterOK;
+//h1_nTrkIsoPhotReco_clusterOK = 0;
 
-  delete h1_clusterMajPhotReco_isolated;
-  h1_clusterMajPhotReco_isolated = 0;
-  delete h1_clusterMinPhotReco_isolated;
-  h1_clusterMinPhotReco_isolated = 0;
+//delete h1_clusterMajPhotReco_isolated;
+//h1_clusterMajPhotReco_isolated = 0;
+//delete h1_clusterMinPhotReco_isolated;
+//h1_clusterMinPhotReco_isolated = 0;
 
   delete h1_totalLumi;
   h1_totalLumi = 0;
-  delete h1_deltaPhi_2ndJet_medium;
-  h1_deltaPhi_2ndJet_medium= 0;
-  delete h1_deltaPhi_2ndJet_loose;
-  h1_deltaPhi_2ndJet_loose= 0;
-  delete h1_met_loose;
-  h1_met_loose= 0;
-  delete h1_met_medium;
-  h1_met_medium = 0;
-  delete h1_deltaPhi_phot_met_loose;
-  h1_deltaPhi_phot_met_loose = 0;
-  delete h1_deltaPhi_phot_met_medium;
-  h1_deltaPhi_phot_met_medium = 0;
-  delete h1_ptPhot_clusterOK;
-  h1_ptPhot_clusterOK = 0;
-  delete h1_etaPhot_clusterOK;
-  h1_etaPhot_clusterOK = 0;
-  delete h1_phiPhot_clusterOK;
-  h1_phiPhot_clusterOK = 0;
-  delete h1_deltaPhi_clusterOK;
-  h1_deltaPhi_clusterOK = 0;
-  delete h1_ptPhot_clusterOK_isolated;
-  h1_ptPhot_clusterOK_isolated = 0;
-  delete h1_etaPhot_clusterOK_isolated;
-  h1_etaPhot_clusterOK_isolated = 0;
-  delete h1_phiPhot_clusterOK_isolated;
-  h1_phiPhot_clusterOK_isolated = 0;
-  delete h1_clusterMajPhotReco;
-  h1_clusterMajPhotReco = 0;
-  delete h1_clusterMinPhotReco;
-  h1_clusterMinPhotReco = 0;
-  delete h1_deltaPhi_clusterOK_isolated;
-  h1_deltaPhi_clusterOK_isolated = 0;
-  delete h1_ptSecondJetRel_clusterOK_isolated;
-  h1_ptSecondJetRel_clusterOK_isolated = 0;
-  delete hp_ptJetGenMean;
-  hp_ptJetGenMean = 0;
-  delete hp_ptJetGenMean_loose;
-  hp_ptJetGenMean_loose = 0;
-  delete hp_ptJetGenMean_clusterOK;
-  hp_ptJetGenMean_clusterOK = 0;
-  delete hp_ptPhotMean;
-  hp_ptPhotMean = 0;
-  delete hp_ptPhotMean_no2ndJet;
-  hp_ptPhotMean_no2ndJet = 0;
-  delete hp_ptPhotMean_loose;
-  hp_ptPhotMean_loose = 0;
-  delete hp_ptPhotMean_clusterOK;
-  hp_ptPhotMean_clusterOK = 0;
+  delete h1_deltaPhi_2ndJet;
+  h1_deltaPhi_2ndJet= 0;
+//delete h1_deltaPhi_2ndJet_loose;
+//h1_deltaPhi_2ndJet_loose= 0;
+//delete h1_met_loose;
+//h1_met_loose= 0;
+//delete h1_met_medium;
+//h1_met_medium = 0;
+//delete h1_deltaPhi_phot_met_loose;
+//h1_deltaPhi_phot_met_loose = 0;
+//delete h1_deltaPhi_phot_met_medium;
+//h1_deltaPhi_phot_met_medium = 0;
+//delete h1_ptPhot_clusterOK;
+//h1_ptPhot_clusterOK = 0;
+//delete h1_etaPhot_clusterOK;
+//h1_etaPhot_clusterOK = 0;
+//delete h1_phiPhot_clusterOK;
+//h1_phiPhot_clusterOK = 0;
+//delete h1_deltaPhi_clusterOK;
+//h1_deltaPhi_clusterOK = 0;
+  delete h1_ptPhot_passedID;
+  h1_ptPhot_passedID = 0;
+  delete h1_etaPhot_passedID;
+  h1_etaPhot_passedID = 0;
+  delete h1_phiPhot_passedID;
+  h1_phiPhot_passedID = 0;
+//delete h1_clusterMajPhotReco;
+//h1_clusterMajPhotReco = 0;
+//delete h1_clusterMinPhotReco;
+//h1_clusterMinPhotReco = 0;
+  delete h1_deltaPhi_passedID;
+  h1_deltaPhi_passedID = 0;
+  delete h1_ptSecondJetRel_passedID;
+  h1_ptSecondJetRel_passedID = 0;
 
-  for( unsigned i=0; i< h1_response.size(); ++i) {
-    delete h1_response[i];
-    h1_response[i]=0;
-    delete h1_responseGEN[i];
-    h1_responseGEN[i]=0;
+  delete h2_ptPhotMean_eta013;
+  h2_ptPhotMean_eta013 = 0;
+  delete h2_ptPhotMean_eta1524;
+  h2_ptPhotMean_eta1524 = 0;
+  delete h2_ptPhotMean_eta243;
+  h2_ptPhotMean_eta243 = 0;
+  delete h2_ptPhotMean_eta35;
+  h2_ptPhotMean_eta35 = 0;
+
+  delete h2_ptJetGenMean_eta013;
+  h2_ptJetGenMean_eta013 = 0;
+  delete h2_ptJetGenMean_eta1524;
+  h2_ptJetGenMean_eta1524 = 0;
+  delete h2_ptJetGenMean_eta243;
+  h2_ptJetGenMean_eta243 = 0;
+  delete h2_ptJetGenMean_eta35;
+  h2_ptJetGenMean_eta35 = 0;
+
+  delete h2_ptPhotMean_no2ndJet_eta013;
+  h2_ptPhotMean_no2ndJet_eta013 = 0;
+  delete h2_ptPhotMean_no2ndJet_eta1524;
+  h2_ptPhotMean_no2ndJet_eta1524 = 0;
+  delete h2_ptPhotMean_no2ndJet_eta243;
+  h2_ptPhotMean_no2ndJet_eta243 = 0;
+  delete h2_ptPhotMean_no2ndJet_eta35;
+  h2_ptPhotMean_no2ndJet_eta35 = 0;
+
+//delete h2_ptJetGenMean_loose;
+//h2_ptJetGenMean_loose = 0;
+//delete h2_ptJetGenMean_clusterOK;
+//h2_ptJetGenMean_clusterOK = 0;
+//delete h2_ptPhotMean_loose;
+//h2_ptPhotMean_loose = 0;
+//delete h2_ptPhotMean_clusterOK;
+//h2_ptPhotMean_clusterOK = 0;
+
+  for( unsigned i=0; i< h1_response_eta013.size(); ++i) {
+
+    delete h1_response_eta013[i];
+    h1_response_eta013[i]=0;
+    delete h1_response_L2L3_eta013[i];
+    h1_response_L2L3_eta013[i]=0;
+    delete h1_responseGEN_eta013[i];
+    h1_responseGEN_eta013[i]=0;
+    delete h1_responseGEN_L2L3_eta013[i];
+    h1_responseGEN_L2L3_eta013[i]=0;
+    delete h1_responseMPF_eta013[i];
+    h1_responseMPF_eta013[i]=0;
+    delete h1_responseMPF_L2L3_eta013[i];
+    h1_responseMPF_L2L3_eta013[i]=0;
+
+    delete h1_response_eta1524[i];
+    h1_response_eta1524[i]=0;
+    delete h1_response_L2L3_eta1524[i];
+    h1_response_L2L3_eta1524[i]=0;
+    delete h1_responseGEN_eta1524[i];
+    h1_responseGEN_eta1524[i]=0;
+    delete h1_responseGEN_L2L3_eta1524[i];
+    h1_responseGEN_L2L3_eta1524[i]=0;
+    delete h1_responseMPF_eta1524[i];
+    h1_responseMPF_eta1524[i]=0;
+    delete h1_responseMPF_L2L3_eta1524[i];
+    h1_responseMPF_L2L3_eta1524[i]=0;
+
+    delete h1_response_eta243[i];
+    h1_response_eta243[i]=0;
+    delete h1_response_L2L3_eta243[i];
+    h1_response_L2L3_eta243[i]=0;
+    delete h1_responseGEN_eta243[i];
+    h1_responseGEN_eta243[i]=0;
+    delete h1_responseGEN_L2L3_eta243[i];
+    h1_responseGEN_L2L3_eta243[i]=0;
+    delete h1_responseMPF_eta243[i];
+    h1_responseMPF_eta243[i]=0;
+    delete h1_responseMPF_L2L3_eta243[i];
+    h1_responseMPF_L2L3_eta243[i]=0;
+
+    delete h1_response_eta35[i];
+    h1_response_eta35[i]=0;
+    delete h1_response_L2L3_eta35[i];
+    h1_response_L2L3_eta35[i]=0;
+    delete h1_responseGEN_eta35[i];
+    h1_responseGEN_eta35[i]=0;
+    delete h1_responseGEN_L2L3_eta35[i];
+    h1_responseGEN_L2L3_eta35[i]=0;
+    delete h1_responseMPF_eta35[i];
+    h1_responseMPF_eta35[i]=0;
+    delete h1_responseMPF_L2L3_eta35[i];
+    h1_responseMPF_L2L3_eta35[i]=0;
+
     delete h1_responsePART[i];
     h1_responsePART[i]=0;
-    delete h1_responseMPF[i];
-    h1_responseMPF[i]=0;
+  //delete h1_response_clusterOK[i];
+  //h1_response_clusterOK[i]=0;
+  //delete h1_responseGEN_clusterOK[i];
+  //h1_responseGEN_clusterOK[i]=0;
+  //delete h1_responsePART_clusterOK[i];
+  //h1_responsePART_clusterOK[i]=0;
 
-    delete h1_response_clusterOK[i];
-    h1_response_clusterOK[i]=0;
-    delete h1_responseGEN_clusterOK[i];
-    h1_responseGEN_clusterOK[i]=0;
-    delete h1_responsePART_clusterOK[i];
-    h1_responsePART_clusterOK[i]=0;
-
-    delete h1_response_loose[i];
-    h1_response_loose[i]=0;
-    delete h1_responseGEN_loose[i];
-    h1_responseGEN_loose[i]=0;
-    delete h1_responsePART_loose[i];
-    h1_responsePART_loose[i]=0;
-    delete h1_responseMPF_loose[i];
-    h1_responseMPF_loose[i]=0;
+  //delete h1_response_loose[i];
+  //h1_response_loose[i]=0;
+  //delete h1_responseGEN_loose[i];
+  //h1_responseGEN_loose[i]=0;
+  //delete h1_responsePART_loose[i];
+  //h1_responsePART_loose[i]=0;
+  //delete h1_responseMPF_loose[i];
+  //h1_responseMPF_loose[i]=0;
   }
 
 
-  deleteExtrapHistoVector(h1_RecoPhot_vs_recoRel, nPoints);
-  deleteExtrapHistoVector(h1_RecoGen_vs_recoRel, nPoints);
-  deleteExtrapHistoVector(h1_GenPhot_vs_recoRel, nPoints);
-  deleteExtrapHistoVector(h1_pt2ndJetRecoRelMean, nPoints);
+  deleteExtrapHistoVector(h1_RecoPhot_vs_recoRel_eta013, nPoints);
+  deleteExtrapHistoVector(h1_RecoGen_vs_recoRel_eta013, nPoints);
+  deleteExtrapHistoVector(h1_GenPhot_vs_recoRel_eta013, nPoints);
+  deleteExtrapHistoVector(h1_pt2ndJetRecoRelMean_eta013, nPoints);
+
+  deleteExtrapHistoVector(h1_RecoPhotL2L3_vs_recoRel_eta013, nPoints);
+  deleteExtrapHistoVector(h1_RecoGenL2L3_vs_recoRel_eta013, nPoints);
+  deleteExtrapHistoVector(h1_GenPhotL2L3_vs_recoRel_eta013, nPoints);
+  deleteExtrapHistoVector(h1_pt2ndJetL2L3RecoRelMean_eta013, nPoints);
+
+  deleteExtrapHistoVector(h1_RecoPhot_vs_recoRel_eta1524, nPoints);
+  deleteExtrapHistoVector(h1_RecoGen_vs_recoRel_eta1524, nPoints);
+  deleteExtrapHistoVector(h1_GenPhot_vs_recoRel_eta1524, nPoints);
+  deleteExtrapHistoVector(h1_pt2ndJetRecoRelMean_eta1524, nPoints);
+
+  deleteExtrapHistoVector(h1_RecoPhotL2L3_vs_recoRel_eta1524, nPoints);
+  deleteExtrapHistoVector(h1_RecoGenL2L3_vs_recoRel_eta1524, nPoints);
+  deleteExtrapHistoVector(h1_GenPhotL2L3_vs_recoRel_eta1524, nPoints);
+  deleteExtrapHistoVector(h1_pt2ndJetL2L3RecoRelMean_eta1524, nPoints);
+
+  deleteExtrapHistoVector(h1_RecoPhot_vs_recoRel_eta243, nPoints);
+  deleteExtrapHistoVector(h1_RecoGen_vs_recoRel_eta243, nPoints);
+  deleteExtrapHistoVector(h1_GenPhot_vs_recoRel_eta243, nPoints);
+  deleteExtrapHistoVector(h1_pt2ndJetRecoRelMean_eta243, nPoints);
+
+  deleteExtrapHistoVector(h1_RecoPhotL2L3_vs_recoRel_eta243, nPoints);
+  deleteExtrapHistoVector(h1_RecoGenL2L3_vs_recoRel_eta243, nPoints);
+  deleteExtrapHistoVector(h1_GenPhotL2L3_vs_recoRel_eta243, nPoints);
+  deleteExtrapHistoVector(h1_pt2ndJetL2L3RecoRelMean_eta243, nPoints);
+
+  deleteExtrapHistoVector(h1_RecoPhot_vs_recoRel_eta35, nPoints);
+  deleteExtrapHistoVector(h1_RecoGen_vs_recoRel_eta35, nPoints);
+  deleteExtrapHistoVector(h1_GenPhot_vs_recoRel_eta35, nPoints);
+  deleteExtrapHistoVector(h1_pt2ndJetRecoRelMean_eta35, nPoints);
+
+  deleteExtrapHistoVector(h1_RecoPhotL2L3_vs_recoRel_eta35, nPoints);
+  deleteExtrapHistoVector(h1_RecoGenL2L3_vs_recoRel_eta35, nPoints);
+  deleteExtrapHistoVector(h1_GenPhotL2L3_vs_recoRel_eta35, nPoints);
+  deleteExtrapHistoVector(h1_pt2ndJetL2L3RecoRelMean_eta35, nPoints);
 
   delete tree;
   tree = 0;
@@ -1081,7 +1707,7 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 }
 
 
-void addInput( const std::string& dataset ) {
+void addInput( const std::string& dataset, bool genjets ) {
 
 
   // opening from filelist now deprecated (files have to be merged with merge_and_setWeights
@@ -1092,7 +1718,9 @@ void addInput( const std::string& dataset ) {
   //FILE* iff = fopen(infileName.c_str(),"r");
   //if(iff == 0) {
     //std::cout << "cannot open input file '" << infileName << "' ... adding single file." << std::endl;
-    std::string infileName = "PhotonJet_2ndLevelTreeW_" + dataset + suffix + ".root";
+    std::string infileName = "PhotonJet_2ndLevelTreeW_" + dataset + suffix;
+    if( genjets ) infileName += "_GENJETS";
+    infileName += ".root";
     TFile* infile = TFile::Open(infileName.c_str(), "read");
     if( infile==0 ) {
       std::cout << "Didn't find file '" << infileName << "'. Did you forget to finalize (i.e. the \"W\")?" << std::endl;
@@ -1148,7 +1776,7 @@ std::vector<TH1F*> getResponseHistos(const std::string& name) {
   for( unsigned i=0; i<(ptPhot_binning.size()-1); ++i ) {
     char histoName[100];
     sprintf( histoName, "%s_ptPhot_%.0f_%.0f", name.c_str(), ptPhot_binning[i], ptPhot_binning[i+1]);
-    int nbins = (BINNINGFINO_) ? 1000 : 14;
+    int nbins = (BINNINGFINO_) ? 1000 : 140;
     float xmin = (BINNINGFINO_) ? -5. : 0.1;
     float xmax = (BINNINGFINO_) ? 10. : 2.;
     //TH1F* newHisto = new TH1F(histoName, "", 15, 0., 2.);
@@ -1162,7 +1790,7 @@ std::vector<TH1F*> getResponseHistos(const std::string& name) {
 }
 
 
-std::vector< std::vector< TH1D* > > getExtrapHistoVector(const std::string& name, const std::string& abs_rel, Int_t nPoints, bool is_pt) {
+std::vector< std::vector< TH1D* > > getExtrapHistoVector(const std::string& name, const std::string& abs_rel, Int_t nPoints, bool isL2L3, bool is_pt) {
 
 
   std::vector< std::vector< TH1D* > > returnVector;
@@ -1193,6 +1821,7 @@ std::vector< std::vector< TH1D* > > getExtrapHistoVector(const std::string& name
           minPt = 2.;
           ptStep = 2.;
         }
+        if( isL2L3 && ptPhot_binning[i_ptBin]<=40. ) minPt+=ptStep;
       } else { //is calo
         if( ptPhot_binning[i_ptBin]<=80.) {
           minPt = 8.;
