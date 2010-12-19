@@ -191,6 +191,15 @@ void TreeAnalyzer::LoadInput() {
      chain->Add(treePath);
    }
      
+
+   if( chain->GetEntries()==0 ) {
+     std::cout << "-> Looking for a list file..." << std::endl;
+     std::string fileListName = "files_PhotonJet_" + dataset_ + ".txt";
+     this->LoadInputFromFile( fileListName );
+     return;
+   }
+
+
    TTree* tree = chain;
    std::cout << "-> Tree has " << tree->GetEntries() << " entries." << std::endl;
    //std::cout << "-> Added " << nFiles << " files. Tree has " << tree->GetEntries() << " entries." << std::endl;
