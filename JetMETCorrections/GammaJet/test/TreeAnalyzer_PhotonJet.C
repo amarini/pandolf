@@ -232,19 +232,6 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
      if( !isGoodLS() ) continue; //this takes care also of integrated luminosity
 
-     //trigger:
-     //if( !useGenJets_ && maybe this gives bias?
-//   if( !HLTResults[0] &&  //this is HLT_Photon10_L1R
-//       !HLTResults[2] &&  //this is HLT_Photon15_L1R
-//       !HLTResults[3] &&  //this is HLT_Photon20_LooseEcalIso_TrackIso_L1R
-//       !HLTResults[4] )   //this is HLT_Photon25_L1R
-//      continue; 
-
-     if( isMC ) {
-       if( !HLTResults[0] &&  //this is HLT_Photon10_L1R
-           !HLTResults[2] )   //this is HLT_Photon15_L1R
-         continue;  
-     } // for now trigger on ly on MC (data is EG so ptPhot>15 should use only these triggers anyway)
  
      if( isMC )
        if( (ptHat_ > ptHatMax_) || (ptHat_ < ptHatMin_) ) continue;
