@@ -521,7 +521,7 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
        Float_t deltaPhi = foundPhot.phi - thisJet.phiReco;
        Float_t deltaR = sqrt( deltaEta*deltaEta + deltaPhi*deltaPhi );
 
-       float deltaR_thresh = (jetAlgo_=="akt7") ? 0.35 : 0.25;
+       float deltaR_thresh = (jetAlgo_=="akt7") ? 0.7 : 0.5;
        if( deltaR > deltaR_thresh ) { //far away from photon
     
          pxSumReco += thisJet.pxReco();
