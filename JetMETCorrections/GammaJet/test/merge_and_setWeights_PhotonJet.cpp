@@ -8,6 +8,7 @@
 
 
 TChain* tree = 0;
+TH1F* h1_eff_vs_pt = 0;
 
 struct EventsAndLumi {
   int nTotalEvents;
@@ -45,12 +46,15 @@ int main( int argc, char* argv[] ) {
   tree = new TChain("jetTree");
 
   EventsAndLumi evlu;
-  evlu = addInput( dataset, algoName, jetAlgo );
+  evlu = addInput( dataset, algoName, flags );
 
   float weight = getWeight( dataset, evlu.nTotalEvents );
 
   // and now set the weights
   tree->SetBranchStatus( "eventWeight", 0 );
+
+  Float_t ptPhotReco;
+  tree->SetBranchAddress( "ptPhotReco", &ptPhotReco );
 
   std::string outfilename;
   if( flags!="" )
@@ -65,6 +69,7 @@ int main( int argc, char* argv[] ) {
   h1_lumi->SetBinContent(1, evlu.totalLumi);
 
   TTree* newTree = tree->CloneTree(0);
+  newTree->SetMaxTreeSize(100000000000ULL); //setting max tree size to 100 GB
   Float_t newWeight;
   newTree->Branch( "eventWeight", &newWeight, "newWeight/F" );
 
@@ -73,9 +78,14 @@ int main( int argc, char* argv[] ) {
 
     tree->GetEntry(ientry);
 
-    if( (ientry % 10000) ==0 ) std::cout << "Entry: " << ientry << " /" << nentries << std::endl;
+    if( (ientry % 100000) ==0 ) std::cout << "Entry: " << ientry << " /" << nentries << std::endl;
 
     newWeight = weight;
+
+    if( flags=="GENJETS" && h1_eff_vs_pt!=0 ) {
+      Int_t iBin = h1_eff_vs_pt->FindBin( ptPhotReco );
+      newWeight *= h1_eff_vs_pt->GetBinContent(iBin);
+    }
 
     newTree->Fill();
 
@@ -84,6 +94,9 @@ int main( int argc, char* argv[] ) {
   h1_lumi->Write();
   newTree->Write();
   outfile->Write();
+  if( h1_eff_vs_pt!= 0 )
+    h1_eff_vs_pt->Write();
+
   outfile->Close();
 
   return 0;
@@ -93,11 +106,13 @@ int main( int argc, char* argv[] ) {
 
 EventsAndLumi addInput( const std::string& dataset, const std::string& algoName, const std::string& flags ) {
 
+  TH1::AddDirectory(kFALSE);
+
   std::string infileName;
   if( flags!="" )
-    infileName = "files_PhotonJet_2ndLevel_" + dataset + "_" + algoName + ".txt";
-  else
     infileName = "files_PhotonJet_2ndLevel_" + dataset + "_" + algoName + "_" + flags + ".txt";
+  else
+    infileName = "files_PhotonJet_2ndLevel_" + dataset + "_" + algoName + ".txt";
   
   TH1F* h1_lumi;
   TH1F* h1_nCounter;
@@ -135,6 +150,11 @@ EventsAndLumi addInput( const std::string& dataset, const std::string& algoName,
 
     char singleLine[500];
 
+    std::cout << "-> Opened file: '" << infileName << std::endl;
+    bool firstFile = true;
+    TH1F* h1_eff_num_vs_pt=0;
+    TH1F* h1_eff_denom_vs_pt=0;
+
     while( fscanf(iff, "%s", singleLine) !=EOF ) {
 
       std::string rootfilename(singleLine);
@@ -155,10 +175,31 @@ EventsAndLumi addInput( const std::string& dataset, const std::string& algoName,
       } else {
         std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
       }
+
+      TH1F* h1_eff_num_vs_pt_tmp = (TH1F*)infile->Get("eff_num_medium_vs_pt"); //medium is default
+      TH1F* h1_eff_denom_vs_pt_tmp = (TH1F*)infile->Get("eff_denom_vs_pt"); //medium is default
+      if( h1_eff_num_vs_pt_tmp!=0 && h1_eff_denom_vs_pt_tmp!=0 ) { //genjets case
+        if( firstFile ) {
+          h1_eff_num_vs_pt = new TH1F(*h1_eff_num_vs_pt_tmp);
+          h1_eff_denom_vs_pt = new TH1F(*h1_eff_denom_vs_pt_tmp);
+          firstFile = false;
+        } else {
+          h1_eff_num_vs_pt->Add(h1_eff_num_vs_pt_tmp);
+          h1_eff_denom_vs_pt->Add(h1_eff_denom_vs_pt_tmp);
+        }
+      } else {
+        if( flags=="GENJETS" ) std::cout << "GENJETS but didnt find eff histos!!" << std::endl;
+      }
       infile->Close();
 
     }
+
     fclose(iff);
+
+    if( h1_eff_num_vs_pt!=0 && h1_eff_denom_vs_pt!=0 ) {
+      h1_eff_vs_pt = new TH1F(*h1_eff_num_vs_pt);
+      h1_eff_vs_pt->Divide(h1_eff_denom_vs_pt);
+    }
 
   }
 
@@ -211,6 +252,75 @@ float getWeight( const std::string& dataset, int nEvents ) {
     xSection = 2.18608-0.0112233;
   } else if( dataset=="QCD_Spring10_Pt1400" ) {
     xSection = 0.0112233;
+  } else if( dataset=="G_Pt_0to15_TuneZ2_7TeV_pythia6" || dataset=="G_Pt_0to15_TuneZ2_7TeV_pythia6_CORR" ) {
+    xSection = 8.420e+07;
+  } else if( dataset=="G_Pt_15to30_TuneZ2_7TeV_pythia6" || dataset=="G_Pt_15to30_TuneZ2_7TeV_pythia6_CORR" ) {
+    xSection = 1.717e+05;
+  } else if( dataset=="G_Pt_30to50_TuneZ2_7TeV_pythia6" || dataset=="G_Pt_30to50_TuneZ2_7TeV_pythia6_CORR" ) {
+    xSection = 1.669e+04;
+  } else if( dataset=="G_Pt_50to80_TuneZ2_7TeV_pythia6" || dataset=="G_Pt_50to80_TuneZ2_7TeV_pythia6_CORR") {
+    xSection = 2.722e+03;
+  } else if( dataset=="G_Pt_80to120_TuneZ2_7TeV_pythia6" || dataset=="G_Pt_80to120_TuneZ2_7TeV_pythia6_CORR" ) {
+    xSection = 4.472e+02;
+  } else if( dataset=="G_Pt_120to170_TuneZ2_7TeV_pythia6" || dataset=="G_Pt_120to170_TuneZ2_7TeV_pythia6_CORR") {
+    xSection = 8.417e+01;
+  } else if( dataset=="G_Pt_170to300_TuneZ2_7TeV_pythia6" || dataset=="G_Pt_170to300_TuneZ2_7TeV_pythia6_CORR") {
+    xSection = 2.264e+01;
+  } else if( dataset=="G_Pt_300to470_TuneZ2_7TeV_pythia6" || dataset=="G_Pt_300to470_TuneZ2_7TeV_pythia6_CORR") {
+    xSection = 1.493e+00;
+  } else if( dataset=="G_Pt_470to800_TuneZ2_7TeV_pythia6" || dataset=="G_Pt_470to800_TuneZ2_7TeV_pythia6_CORR") {
+    xSection = 1.323e-01;
+  } else if( dataset=="G_Pt_800to1400_TuneZ2_7TeV_pythia6" || dataset=="G_Pt_800to1400_TuneZ2_7TeV_pythia6_CORR") {
+    xSection = 3.481e-03;
+  } else if( dataset=="G_Pt_1400to1800_TuneZ2_7TeV_pythia6" || dataset=="G_Pt_1400to1800_TuneZ2_7TeV_pythia6_CORR") {
+    xSection = 1.270e-05;
+  } else if( dataset=="G_Pt_1800toInf_TuneZ2_7TeV_pythia6" || dataset=="G_Pt_1800toInf_TuneZ2_7TeV_pythia6_CORR") {
+    xSection = 2.936e-07;
+  } else if( dataset=="QCD_Pt_15to30_TuneZ2_7TeV_pythia6" ) {
+    xSection = 8.159e+08;
+  } else if( dataset=="QCD_Pt_30to50_TuneZ2_7TeV_pythia6" ) {
+    xSection = 5.312e+07;
+  } else if( dataset=="QCD_Pt_50to80_TuneZ2_7TeV_pythia6" ) {
+    xSection = 6.359e+06;
+  } else if( dataset=="QCD_Pt_80to120_TuneZ2_7TeV_pythia6" ) {
+    xSection = 7.843e+05;
+  } else if( dataset=="QCD_Pt_120to170_TuneZ2_7TeV_pythia6" ) {
+    xSection = 1.151e+05;
+  } else if( dataset=="QCD_Pt_170to300_TuneZ2_7TeV_pythia6" ) {
+    xSection = 2.426e+04;
+  } else if( dataset=="QCD_Pt_300to470_TuneZ2_7TeV_pythia6" ) {
+    xSection = 1.168e+03;
+  } else if( dataset=="QCD_Pt_470to600_TuneZ2_7TeV_pythia6" ) {
+    xSection = 7.022e+01;
+  } else if( dataset=="QCD_Pt_600to800_TuneZ2_7TeV_pythia6" ) {
+    xSection = 1.555e+01;
+  } else if( dataset=="QCD_Pt_800to1000_TuneZ2_7TeV_pythia6" ) {
+    xSection = 1.844e+00;
+  } else if( dataset=="QCD_Pt_1000to1400_TuneZ2_7TeV_pythia6" ) {
+    xSection = 3.321e-01;
+  } else if( dataset=="QCD_Pt_1400to1800_TuneZ2_7TeV_pythia6" ) {
+    xSection = 1.087e-02;
+  } else if( dataset=="PhotonJet_Summer1036X_Pt5to15" ) {
+    xSection = 4030000.;
+  } else if( dataset=="PhotonJet_Summer1036X_Pt15to20" ) {
+    xSection = 114700.;
+  } else if( dataset=="PhotonJet_Summer1036X_Pt20to30" ) {
+    xSection = 57180.;
+  } else if( dataset=="PhotonJet_Summer1036X_Pt30to50" ) {
+    xSection = 16520.;
+  } else if( dataset=="PhotonJet_Summer1036X_Pt50to80" ) {
+    xSection = 2723.;
+  } else if( dataset=="PhotonJet_Summer1036X_Pt80to120" ) {
+    xSection = 446.2;
+  } else if( dataset=="PhotonJet_Summer1036X_Pt120to170" ) {
+    xSection = 84.43;
+  } else if( dataset=="PhotonJet_Summer1036X_Pt170to300" ) {
+    xSection = 22.55;
+  } else if( dataset=="PhotonJet_Summer1036X_Pt300to500" ) {
+    xSection = 1.545;
+  } else if( dataset=="PhotonJet_Summer1036X_Pt500toInf" ) {
+    xSection = 0.0923;
+
   } else {
     std::cout << std::endl;
     std::cout << "-> WARNING!! Dataset: '" << dataset << "' not present in database. Cross section unknown." << std::endl;

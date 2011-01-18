@@ -4,6 +4,7 @@
 
 
 bool useMCassoc_ = true;
+bool NOQ=true;
 
 
 
@@ -23,6 +24,7 @@ int main(int argc, char* argv[]) {
   if( argc==7 ) {
     std::string flags_str(argv[6]);
     flags = flags_str;
+    std::cout << "flags set." << std::endl;
   }
 
 
@@ -35,16 +37,18 @@ int main(int argc, char* argv[]) {
   
 
 
-  DrawExtrap* db = new DrawExtrap("PhotonJet", recoType, jetAlgo);
+  DrawExtrap* db = new DrawExtrap("PhotonJet", recoType, jetAlgo, flags);
   db->set_pdf_aussi((bool)false);
 
   db->set_FITRMS(FIT_RMS);
 
+  std::string NOQtext = (NOQ) ? "_NOQ" : "";
+
   char outputdir_char[200];
   if( flags!="" ) {
-    sprintf( outputdir_char, "PhotonJetExtrapPlots_%s_vs_%s_%s_%s_%s", data_dataset.c_str(), mc_dataset.c_str(), algoType.c_str(), flags.c_str(), FIT_RMS.c_str());
+    sprintf( outputdir_char, "PhotonJetExtrapPlots_%s_vs_%s_%s_%s_%s%s", data_dataset.c_str(), mc_dataset.c_str(), algoType.c_str(), flags.c_str(), FIT_RMS.c_str(), NOQtext.c_str());
   } else {
-    sprintf( outputdir_char, "PhotonJetExtrapPlots_%s_vs_%s_%s_%s", data_dataset.c_str(), mc_dataset.c_str(), algoType.c_str(), FIT_RMS.c_str());
+    sprintf( outputdir_char, "PhotonJetExtrapPlots_%s_vs_%s_%s_%s%s", data_dataset.c_str(), mc_dataset.c_str(), algoType.c_str(), FIT_RMS.c_str(), NOQtext.c_str());
   }
   std::string outputdir_str(outputdir_char);
 
@@ -61,7 +65,7 @@ int main(int argc, char* argv[]) {
   TFile* dataFile = TFile::Open(dataFileName);
   std::cout << "Opened data file '" << dataFileName << "'." << std::endl;
 
-  db->add_dataFile( dataFile, "EG_3pb" );
+  db->add_dataFile( dataFile, data_dataset );
 
 
   char mcFileName[150];
@@ -76,13 +80,21 @@ int main(int argc, char* argv[]) {
   db->add_mcFile( mcFile, mc_dataset.c_str(), "#gamma+jet + QCD MC", 46);
 
 
-  db->set_shapeNormalization();
+  //db->set_shapeNormalization();
+  db->set_lumiNormalization(33.8);
 
 
   bool log = true;
 
+  db->set_NOQ( NOQ );
  
-  db->drawResponseExtrap();
+  db->drawResponseExtrap("eta011");
+  db->drawResponseExtrap("eta011", (bool)true);
+  db->drawResponseExtrap("eta1524");
+  db->drawResponseExtrap("eta1524", (bool)true);
+  db->drawResponseExtrap("eta243");
+  db->drawResponseExtrap("eta243", (bool)true);
+  db->drawResponseExtrap("eta35");
 
 
   delete db;

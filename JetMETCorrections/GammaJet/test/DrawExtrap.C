@@ -7,7 +7,7 @@
 
 
 
-DrawExtrap::DrawExtrap( const std::string& analysisType, const std::string& recoType, const std::string& jetAlgo ) : DrawBase( analysisType, recoType, jetAlgo ) {
+DrawExtrap::DrawExtrap( const std::string& analysisType, const std::string& recoType, const std::string& jetAlgo, const std::string& flags ) : DrawBase( analysisType, recoType, jetAlgo, flags ) {
 
   FIT_RMS_ = "FIT";
   NOQ_ = false;
@@ -17,7 +17,18 @@ DrawExtrap::DrawExtrap( const std::string& analysisType, const std::string& reco
 
 
 
-void DrawExtrap::drawResponseExtrap( const std::string& recoGen ) const {
+void DrawExtrap::drawResponseExtrap( const std::string& etaRegion, bool corrected, const std::string& recoGen ) const {
+
+  std::string etaRegion_str;
+  if( etaRegion=="eta013" ) etaRegion_str = "|#eta| < 1.3";
+  else if( etaRegion=="eta011" ) etaRegion_str = "|#eta| < 1.1";
+  else if( etaRegion=="eta009" ) etaRegion_str = "|#eta| < 0.9";
+  else if( etaRegion=="eta132" ) etaRegion_str = "1.3 < |#eta| < 2";
+  else if( etaRegion=="eta1524" ) etaRegion_str = "1.5 < |#eta| < 2.4";
+  else if( etaRegion=="eta23" ) etaRegion_str = "2 < |#eta| < 3";
+  else if( etaRegion=="eta243" ) etaRegion_str = "2.4 < |#eta| < 3";
+  else if( etaRegion=="eta35" ) etaRegion_str = "3 < |#eta| < 5";
+  else etaRegion_str = "[unknown eta region]";
 
   std::vector<float> ptPhot_binning = fitTools::getPtPhot_binning();
 
@@ -107,14 +118,18 @@ void DrawExtrap::drawResponseExtrap( const std::string& recoGen ) const {
   gr_imbalance_vs_pt->SetMarkerSize(1.5);
 
 
-  TH2D* h2_ptPhotReco_vs_pt = (TH2D*)(get_mcFile(0))->Get("ptPhotMean_no2ndJet");
-  TH2D* h2_ptPhotReco_vs_ptDATA = (get_dataFile()==0) ? 0 : (TH2D*)(get_dataFile())->Get("ptPhotMean_no2ndJet");
+  std::string ptPhotReco_vs_pt_name = "ptPhotMean_no2ndJet";
+  if( etaRegion!="" ) ptPhotReco_vs_pt_name += "_" + etaRegion;
+  TH2D* h2_ptPhotReco_vs_pt = (TH2D*)(get_mcFile(0))->Get(ptPhotReco_vs_pt_name.c_str());
+  TH2D* h2_ptPhotReco_vs_ptDATA = (get_dataFile(0)==0) ? 0 : (TH2D*)(get_dataFile(0))->Get(ptPhotReco_vs_pt_name.c_str());
 
+
+  std::string L2L3_text = (corrected) ? "L2L3" : "";
 
   for( int iPtBin=0; iPtBin<(ptPhot_binning.size()-3); //-3 instead of -1 (extrap reaches up to ~2 less bins in pt wrt balancing)
        ++iPtBin) {
 
-    char projName[50];
+    char projName[100];
     sprintf(projName, "projection_%d",iPtBin);
 
     TH1D* h1_proj = h2_ptPhotReco_vs_pt->ProjectionY(projName, iPtBin+1, iPtBin+1);
@@ -133,8 +148,11 @@ void DrawExtrap::drawResponseExtrap( const std::string& recoGen ) const {
    
     Int_t nPoints = 5;
 
-    char xHistoName[90];
-    sprintf( xHistoName, "extrap_ptBin_%d_%d/pt2ndJet%sMean_%d", (int)ptMin, (int)ptMax, recoGen.c_str(), iPtBin);
+    char xHistoName[300];
+    if( etaRegion!="" )
+      sprintf( xHistoName, "extrap_ptBin_%d_%d/pt2ndJet%s%sMean_%s_%d", (int)ptMin, (int)ptMax, L2L3_text.c_str(), recoGen.c_str(), etaRegion.c_str(), iPtBin);
+    else
+      sprintf( xHistoName, "extrap_ptBin_%d_%d/pt2ndJet%s%sMean_%d", (int)ptMin, (int)ptMax, L2L3_text.c_str(), recoGen.c_str(), iPtBin);
 
     Float_t x[nPoints];
     Float_t x_err[nPoints];
@@ -142,7 +160,7 @@ void DrawExtrap::drawResponseExtrap( const std::string& recoGen ) const {
 
     Float_t xDATA[nPoints];
     Float_t x_errDATA[nPoints];
-    getXPoints( get_dataFile(), xHistoName, nPoints, xDATA, x_errDATA);
+    getXPoints( get_dataFile(0), xHistoName, nPoints, xDATA, x_errDATA);
 
     Float_t y_resp_DATA[nPoints];
     Float_t y_resp_err_DATA[nPoints];
@@ -168,14 +186,29 @@ void DrawExtrap::drawResponseExtrap( const std::string& recoGen ) const {
     Float_t y_reso_recoGen[nPoints];
     Float_t y_reso_recoGen_err[nPoints];
 
-    char yHistoName[100];
-    sprintf( yHistoName, "extrap_ptBin_%d_%d/r_RecoPhot_vs_%s_%d", (int)ptMin, (int)ptMax, recoGen.c_str(), iPtBin);
-    getYPoints( get_dataFile(), yHistoName, nPoints, y_resp_DATA, y_resp_err_DATA,  y_reso_DATA, y_reso_err_DATA);
-    sprintf( yHistoName, "extrap_ptBin_%d_%d/r_RecoPhot_vs_%s_%d", (int)ptMin, (int)ptMax, recoGen.c_str(), iPtBin);
+    char yHistoName[200];
+    if( etaRegion!="" )
+      sprintf( yHistoName, "extrap_ptBin_%d_%d/r_RecoPhot%s_vs_%s_%s_%d", (int)ptMin, (int)ptMax, L2L3_text.c_str(), recoGen.c_str(), etaRegion.c_str(), iPtBin);
+    else
+      sprintf( yHistoName, "extrap_ptBin_%d_%d/r_RecoPhot%s_vs_%s_%d", (int)ptMin, (int)ptMax, L2L3_text.c_str(), recoGen.c_str(), iPtBin);
+    getYPoints( get_dataFile(0), yHistoName, nPoints, y_resp_DATA, y_resp_err_DATA,  y_reso_DATA, y_reso_err_DATA);
+
+    if( etaRegion!="" )
+      sprintf( yHistoName, "extrap_ptBin_%d_%d/r_RecoPhot%s_vs_%s_%s_%d", (int)ptMin, (int)ptMax, L2L3_text.c_str(), recoGen.c_str(), etaRegion.c_str(), iPtBin);
+    else
+      sprintf( yHistoName, "extrap_ptBin_%d_%d/r_RecoPhot%s_vs_%s_%d", (int)ptMin, (int)ptMax, L2L3_text.c_str(), recoGen.c_str(), iPtBin);
     getYPoints( get_mcFile(0), yHistoName, nPoints, y_resp_recoPhot, y_resp_recoPhot_err,  y_reso_recoPhot, y_reso_recoPhot_err);
-    sprintf( yHistoName, "extrap_ptBin_%d_%d/r_GenPhot_vs_%s_%d", (int)ptMin, (int)ptMax, recoGen.c_str(), iPtBin);
+
+    if( etaRegion!="" )
+      sprintf( yHistoName, "extrap_ptBin_%d_%d/r_GenPhot%s_vs_%s_%s_%d", (int)ptMin, (int)ptMax, L2L3_text.c_str(), recoGen.c_str(), etaRegion.c_str(), iPtBin);
+    else
+      sprintf( yHistoName, "extrap_ptBin_%d_%d/r_GenPhot%s_vs_%s_%d", (int)ptMin, (int)ptMax, L2L3_text.c_str(), recoGen.c_str(), iPtBin);
     getYPoints( get_mcFile(0), yHistoName, nPoints, y_resp_genPhot, y_resp_genPhot_err,  y_reso_genPhot, y_reso_genPhot_err);
-    sprintf( yHistoName, "extrap_ptBin_%d_%d/r_RecoGen_vs_%s_%d", (int)ptMin, (int)ptMax, recoGen.c_str(), iPtBin);
+
+    if( etaRegion!="" )
+      sprintf( yHistoName, "extrap_ptBin_%d_%d/r_RecoGen%s_vs_%s_%s_%d", (int)ptMin, (int)ptMax, L2L3_text.c_str(), recoGen.c_str(), etaRegion.c_str(), iPtBin);
+    else
+      sprintf( yHistoName, "extrap_ptBin_%d_%d/r_RecoGen%s_vs_%s_%d", (int)ptMin, (int)ptMax, L2L3_text.c_str(), recoGen.c_str(), iPtBin);
     getYPoints( get_mcFile(0), yHistoName, nPoints, y_resp_recoGen, y_resp_recoGen_err,  y_reso_recoGen, y_reso_recoGen_err);
 
    
@@ -250,27 +283,34 @@ void DrawExtrap::drawResponseExtrap( const std::string& recoGen ) const {
     total_resp->SetRange(0., xMax_fit);
     total_resp->SetLineColor(kGray+2);
 
+    float q_resp = fit_resp_genPhot->GetParameter(0);
    
     fitFunct_name = "[0]*[1] - x*x*[2]";
     TF1* fit_respParabola = new TF1("fit_respParabola", fitFunct_name.c_str());
     fit_respParabola->SetRange(0., xMax_fit);
-    if( NOQ_ ) //to evaluate syst
-      fit_respParabola->FixParameter(1, 0.5*fit_resp_genPhot->GetParameter(0));
-    else
+    if( NOQ_ ) { //to evaluate syst
+      float delta_q_resp = fabs( (1.-q_resp)/2. );
+      if( q_resp>1. ) fit_respParabola->FixParameter(1, 1.+delta_q_resp);
+      else            fit_respParabola->FixParameter(1, 1.-delta_q_resp);
+    } else {
       fit_respParabola->FixParameter(1, fit_resp_genPhot->GetParameter(0));
+    }
     fit_respParabola->SetLineColor(2);
     fit_respParabola->SetLineColor(kRed);
+    fit_respParabola->SetLineStyle(2);
     fit_respParabola->SetLineWidth(0.5);
     gr_resp_recoPhot->Fit( fit_respParabola, "RQ" );
 
     TF1* fit_respParabola_DATA = new TF1("fit_respParabola_DATA", fitFunct_name.c_str());
     fit_respParabola_DATA->SetRange(0., xMax_fit);
-    if( NOQ_ ) //to evaluate syst
-      fit_respParabola_DATA->FixParameter(1, 0.5*fit_resp_genPhot->GetParameter(0));
-    else
+    if( NOQ_ ) { //to evaluate syst
+      float delta_q_resp = fabs( (1.-q_resp)/2. );
+      if( q_resp>1. ) fit_respParabola_DATA->FixParameter(1, 1.+delta_q_resp);
+      else            fit_respParabola_DATA->FixParameter(1, 1.-delta_q_resp);
+    } else {
       fit_respParabola_DATA->FixParameter(1, fit_resp_genPhot->GetParameter(0));
+    }
     fit_respParabola_DATA->SetLineColor(kRed);
-    fit_respParabola_DATA->SetLineWidth(3);
     fit_respParabola_DATA->SetLineWidth(0.5);
     gr_resp_DATA->Fit( fit_respParabola_DATA, "RQ" );
 
@@ -302,15 +342,27 @@ void DrawExtrap::drawResponseExtrap( const std::string& recoGen ) const {
     gr_trueResp_vs_pt->SetPointError( iPtBin, ptPhotReco_err_thisBin, trueResp_err );
 
 
-    Float_t yMin_axis = (ptPhot_binning[iPtBin]<50.) ? 0.7 : 0.8;
-    if( ptPhot_binning[iPtBin]<20. ) yMin_axis = 0.6;
-    TH2D* h2_axes_resp = new TH2D("axes_resp", "", 10, 0., xMax_axis, 10, yMin_axis, 1.1);
+    Float_t yMin_axis;
+    if( this->get_recoType()=="calo" ) {
+      yMin_axis = (ptPhot_binning[iPtBin]<80.) ? 0.3 : 0.5;
+      if( ptPhot_binning[iPtBin]<20. ) yMin_axis = 0.2;
+    } else {
+      yMin_axis = (ptPhot_binning[iPtBin]<80.) ? 0.7 : 0.7;
+      if( ptPhot_binning[iPtBin]<20. ) yMin_axis = 0.6;
+    }
+    if( etaRegion=="eta1524" || etaRegion=="eta243") yMin_axis -= 0.1;
+
+    TH2D* h2_axes_resp = new TH2D("axes_resp", "", 10, 0., xMax_axis, 10, yMin_axis, 1.2);
     h2_axes_resp->SetXTitle(xTitle.c_str());
     h2_axes_resp->GetXaxis()->SetTitleOffset(1.1);
     h2_axes_resp->SetYTitle("Response");
     h2_axes_resp->GetYaxis()->SetTitleOffset(1.2);
 
-    TLegend* legend_resp = new TLegend(0.6, 0.65, 0.88, 0.88);
+    TLegend* legend_resp;
+    if( etaRegion_str!="" )
+      legend_resp = new TLegend(0.6, 0.61, 0.88, 0.88, etaRegion_str.c_str());
+    else
+      legend_resp = new TLegend(0.6, 0.65, 0.88, 0.88);
     legend_resp->SetTextSize(0.04);
     legend_resp->SetFillStyle(0);
     legend_resp->SetFillColor(kWhite);
@@ -318,7 +370,7 @@ void DrawExtrap::drawResponseExtrap( const std::string& recoGen ) const {
     legend_resp->AddEntry(gr_resp_genPhot, "MC Imbalance", "P");
     legend_resp->AddEntry(total_resp, "Intr #oplus Imb", "L");
     legend_resp->AddEntry(gr_resp_recoPhot, "MC (#gamma + jet)", "P");
-    legend_resp->AddEntry(gr_resp_DATA, "DATA (#gamma + jet)", "P");
+    legend_resp->AddEntry(gr_resp_DATA, "DATA ( #gamma + jet)", "P");
 
     char labeltext[50];
     sprintf(labeltext, "%d < p_{T}^{#gamma} < %d GeV/c", (int)ptMin, (int)ptMax);  
@@ -327,28 +379,66 @@ void DrawExtrap::drawResponseExtrap( const std::string& recoGen ) const {
     label_resp->SetTextSize(0.035);
     label_resp->AddText(labeltext);
 
+    TPaveText* label_algo = this->get_labelAlgo(4);
+
+    TPaveText* label_cms = this->get_labelCMS(2);
+    TPaveText* label_sqrt = this->get_labelSqrt(2);
+
     TCanvas* c1_resp = new TCanvas("c1_resp", "c1_resp", 800, 600);
     c1_resp->cd();
     h2_axes_resp->Draw();
     total_resp->Draw("same");
     gr_resp_recoGen->Draw("Psame");
     gr_resp_genPhot->Draw("Psame");
-    gr_resp_recoPhot->Draw("Psame");
-    gr_resp_DATA->Draw("Psame");
     legend_resp->Draw("same");
     label_resp->Draw("same");
+    label_cms->Draw("same");
+    label_sqrt->Draw("same");
+    label_algo->Draw("same");
+    // save one propaganda plot with no data to explain method:
+    if( ptMin==47. || ptMin==70. ) {
+      char canvasName_resp_eps_NODATA[250];
+      char canvasName_resp_png_NODATA[250];
+      if( etaRegion!="" ) {
+        sprintf(canvasName_resp_eps_NODATA, "%s/response%s_%s_ptBin_%d_%d_%s_NODATANOMC.eps", get_outputdir().c_str(), L2L3_text.c_str(), etaRegion.c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
+        sprintf(canvasName_resp_png_NODATA, "%s/response%s_%s_ptBin_%d_%d_%s_NODATANOMC.png", get_outputdir().c_str(), L2L3_text.c_str(), etaRegion.c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
+      } else {
+        sprintf(canvasName_resp_eps_NODATA, "%s/response%s_ptBin_%d_%d_%s_NODATANOMC.eps", get_outputdir().c_str(), L2L3_text.c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
+        sprintf(canvasName_resp_png_NODATA, "%s/response%s_ptBin_%d_%d_%s_NODATANOMC.png", get_outputdir().c_str(), L2L3_text.c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
+      }
+      c1_resp->SaveAs(canvasName_resp_eps_NODATA);
+      c1_resp->SaveAs(canvasName_resp_png_NODATA);
+    }
+    gr_resp_recoPhot->Draw("Psame");
+    if( ptMin==47. || ptMin==70. ) {
+      char canvasName_resp_eps_NODATA[250];
+      char canvasName_resp_png_NODATA[250];
+      if( etaRegion!="" ) {
+        sprintf(canvasName_resp_eps_NODATA, "%s/response%s_%s_ptBin_%d_%d_%s_NODATA.eps", get_outputdir().c_str(), L2L3_text.c_str(), etaRegion.c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
+        sprintf(canvasName_resp_png_NODATA, "%s/response%s_%s_ptBin_%d_%d_%s_NODATA.png", get_outputdir().c_str(), L2L3_text.c_str(), etaRegion.c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
+      } else {
+        sprintf(canvasName_resp_eps_NODATA, "%s/response%s_ptBin_%d_%d_%s_NODATA.eps", get_outputdir().c_str(), L2L3_text.c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
+        sprintf(canvasName_resp_png_NODATA, "%s/response%s_ptBin_%d_%d_%s_NODATA.png", get_outputdir().c_str(), L2L3_text.c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
+      }
+      c1_resp->SaveAs(canvasName_resp_eps_NODATA);
+      c1_resp->SaveAs(canvasName_resp_png_NODATA);
+    }
+    gr_resp_DATA->Draw("Psame");
 
     char canvasName_resp_eps[150];
     char canvasName_resp_png[150];
-    sprintf(canvasName_resp_eps, "%s/response_ptBin_%d_%d_%s.eps", get_outputdir().c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
-    sprintf(canvasName_resp_png, "%s/response_ptBin_%d_%d_%s.png", get_outputdir().c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
+    if( etaRegion!="" ) {
+      sprintf(canvasName_resp_eps, "%s/response%s_%s_ptBin_%d_%d_%s.eps", get_outputdir().c_str(), L2L3_text.c_str(), etaRegion.c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
+      sprintf(canvasName_resp_png, "%s/response%s_%s_ptBin_%d_%d_%s.png", get_outputdir().c_str(), L2L3_text.c_str(), etaRegion.c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
+    } else {
+      sprintf(canvasName_resp_eps, "%s/response%s_ptBin_%d_%d_%s.eps", get_outputdir().c_str(), L2L3_text.c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
+      sprintf(canvasName_resp_png, "%s/response%s_ptBin_%d_%d_%s.png", get_outputdir().c_str(), L2L3_text.c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
+    }
     c1_resp->SaveAs(canvasName_resp_eps);
     c1_resp->SaveAs(canvasName_resp_png);
 
     delete c1_resp;
     delete h2_axes_resp;
-    delete legend_resp;
-    delete label_resp;
 
 
 
@@ -421,6 +511,7 @@ void DrawExtrap::drawResponseExtrap( const std::string& recoGen ) const {
     //fit_extrapToZero_sqrt->SetParLimits(1, 0., 0.1);
     fit_extrapToZero_sqrt->SetParameter(2, m);
     fit_extrapToZero_sqrt->SetParLimits(2, 0., 0.05);
+    //fit_extrapToZero_sqrt->FixParameter(2, m);
     fit_extrapToZero_sqrt->SetLineStyle(2);
     fit_extrapToZero_sqrt->SetLineColor(kRed);
     fit_extrapToZero_sqrt->SetLineWidth(0.5);
@@ -428,7 +519,7 @@ void DrawExtrap::drawResponseExtrap( const std::string& recoGen ) const {
     TF1* fit_extrapToZero_sqrt_DATA = new TF1(*fit_extrapToZero_sqrt);
     fit_extrapToZero_sqrt_DATA->SetName("fit_extrapToZero_sqrt_DATA");
     fit_extrapToZero_sqrt_DATA->SetLineStyle(1);
-    fit_extrapToZero_sqrt_DATA->SetLineWidth(3);
+    fit_extrapToZero_sqrt_DATA->SetLineWidth(0.5);
 
     TF1* fit_extrapToZero_line = new TF1("fit_extrapToZero_line", "[0]+[1]*x");
     fit_extrapToZero_line->SetRange(0., xMax_fit);
@@ -459,23 +550,30 @@ void DrawExtrap::drawResponseExtrap( const std::string& recoGen ) const {
 
 
     Float_t ymax;
-    if( ptPhot_binning[iPtBin] < 40. ) ymax = (get_recoType()=="pf") ? 0.5 : 0.8;
-    else if( ptPhot_binning[iPtBin] < 80. ) ymax = (get_recoType()=="pf") ? 0.4 : 0.6;
-    else ymax = 0.3;
+    if( ptPhot_binning[iPtBin] < 40. ) ymax = (get_recoType()=="pf") ? 0.7 : 0.9;
+    else if( ptPhot_binning[iPtBin] < 80. ) ymax = (get_recoType()=="pf") ? 0.6 : 0.8;
+    else ymax = (get_recoType()=="pf") ? 0.4 : 0.6;
 
     TH2D* h2_axes_reso = new TH2D("axes_reso", "", 10, 0., xMax_axis, 10, 0., ymax);
     h2_axes_reso->SetXTitle(xTitle.c_str());
     h2_axes_reso->GetXaxis()->SetTitleOffset(1.1);
-    h2_axes_reso->SetYTitle("Resolution");
+    if( corrected )
+      h2_axes_reso->SetYTitle("L2L3 Resolution");
+    else 
+      h2_axes_reso->SetYTitle("Resolution");
     h2_axes_reso->GetYaxis()->SetTitleOffset(1.2);
 
-    TPaveText* label_reso = new TPaveText(0.67, 0.83, 0.8, 0.86, "brNDC");
-    label_reso->SetFillColor(kWhite);
-    label_reso->SetTextSize(0.035);
-    label_reso->AddText(labeltext);
+  //TPaveText* label_reso = new TPaveText(0.67, 0.83, 0.8, 0.86, "brNDC");
+  //label_reso->SetFillColor(kWhite);
+  //label_reso->SetTextSize(0.035);
+  //label_reso->AddText(labeltext);
 
     Float_t minLegend = 0.2;
-    TLegend* legend_reso = new TLegend(minLegend, 0.6, 0.45, 0.85);
+    TLegend* legend_reso;
+    if( etaRegion_str!="" )
+      legend_reso = new TLegend(minLegend, 0.6, 0.45, 0.85, etaRegion_str.c_str());
+    else
+      legend_reso = new TLegend(minLegend, 0.6, 0.45, 0.85);
     legend_reso->SetTextSize(0.04);
     legend_reso->SetFillStyle(0);
     legend_reso->SetFillColor(kWhite);
@@ -485,22 +583,65 @@ void DrawExtrap::drawResponseExtrap( const std::string& recoGen ) const {
     legend_reso->AddEntry(gr_reso_recoPhot, "MC (#gamma + jet)", "P");
     legend_reso->AddEntry(gr_reso_DATA, "DATA (#gamma + jet)", "P");
 
+    TPaveText* label_reso = new TPaveText(0.15, 0.6, 0.4, 0.65, "brNDC");
+    label_reso->SetFillColor(kWhite);
+    label_reso->SetTextSize(0.035);
+    label_reso->AddText(labeltext);
+
     TCanvas* c1_reso = new TCanvas("c1_reso", "c1_reso", 800, 600);
     c1_reso->cd();
     h2_axes_reso->Draw();
     sum->Draw("same");
-    gr_reso_recoPhot->Draw("Psame");
     gr_reso_recoGen->Draw("Psame");
     gr_reso_genPhot->Draw("Psame");
-    gr_reso_DATA->Draw("Psame");
-    legend_reso->Draw("same");
+    //legend_reso->Draw("same");
+    legend_resp->Draw("same");
+    //label_reso->Draw("same");
+    //label_resp->Draw("same");
     label_reso->Draw("same");
+    label_cms->Draw("same");
+    label_sqrt->Draw("same");
+    label_algo->Draw("same");
+    // save one propaganda plot with no data to explain method:
+    if( ptMin==47. ) {
+      char canvasName_reso_eps_NODATA[250];
+      char canvasName_reso_png_NODATA[250];
+      if( etaRegion!="" ) {
+        sprintf(canvasName_reso_eps_NODATA, "%s/resolution%s_%s_ptBin_%d_%d_%s_NODATANOMC.eps", get_outputdir().c_str(), L2L3_text.c_str(), etaRegion.c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
+        sprintf(canvasName_reso_png_NODATA, "%s/resolution%s_%s_ptBin_%d_%d_%s_NODATANOMC.png", get_outputdir().c_str(), L2L3_text.c_str(), etaRegion.c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
+      } else {
+        sprintf(canvasName_reso_eps_NODATA, "%s/resolution%s_ptBin_%d_%d_%s_NODATANOMC.eps", get_outputdir().c_str(), L2L3_text.c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
+        sprintf(canvasName_reso_png_NODATA, "%s/resolution%s_ptBin_%d_%d_%s_NODATANOMC.png", get_outputdir().c_str(), L2L3_text.c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
+      }
+      c1_reso->SaveAs(canvasName_reso_eps_NODATA);
+      c1_reso->SaveAs(canvasName_reso_png_NODATA);
+    }
+    gr_reso_recoPhot->Draw("Psame");
+    if( ptMin==47. ) {
+      char canvasName_reso_eps_NODATA[250];
+      char canvasName_reso_png_NODATA[250];
+      if( etaRegion!="" ) {
+        sprintf(canvasName_reso_eps_NODATA, "%s/resolution%s_%s_ptBin_%d_%d_%s_NODATA.eps", get_outputdir().c_str(), L2L3_text.c_str(), etaRegion.c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
+        sprintf(canvasName_reso_png_NODATA, "%s/resolution%s_%s_ptBin_%d_%d_%s_NODATA.png", get_outputdir().c_str(), L2L3_text.c_str(), etaRegion.c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
+      } else {
+        sprintf(canvasName_reso_eps_NODATA, "%s/resolution%s_ptBin_%d_%d_%s_NODATA.eps", get_outputdir().c_str(), L2L3_text.c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
+        sprintf(canvasName_reso_png_NODATA, "%s/resolution%s_ptBin_%d_%d_%s_NODATA.png", get_outputdir().c_str(), L2L3_text.c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
+      }
+      c1_reso->SaveAs(canvasName_reso_eps_NODATA);
+      c1_reso->SaveAs(canvasName_reso_png_NODATA);
+    }
+    gr_reso_DATA->Draw("Psame");
 
 
     char canvasName_reso_eps[150];
     char canvasName_reso_png[150];
-    sprintf(canvasName_reso_eps, "%s/resolution_ptBin_%d_%d_%s.eps", get_outputdir().c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
-    sprintf(canvasName_reso_png, "%s/resolution_ptBin_%d_%d_%s.png", get_outputdir().c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
+    if( etaRegion!="" ) {
+      sprintf(canvasName_reso_eps, "%s/resolution%s_%s_ptBin_%d_%d_%s.eps", get_outputdir().c_str(), L2L3_text.c_str(), etaRegion.c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
+      sprintf(canvasName_reso_png, "%s/resolution%s_%s_ptBin_%d_%d_%s.png", get_outputdir().c_str(), L2L3_text.c_str(), etaRegion.c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
+    } else {
+      sprintf(canvasName_reso_eps, "%s/resolution%s_ptBin_%d_%d_%s.eps", get_outputdir().c_str(), L2L3_text.c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
+      sprintf(canvasName_reso_png, "%s/resolution%s_ptBin_%d_%d_%s.png", get_outputdir().c_str(), L2L3_text.c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
+    }
     c1_reso->SaveAs(canvasName_reso_eps);
     c1_reso->SaveAs(canvasName_reso_png);
 
@@ -509,6 +650,8 @@ void DrawExtrap::drawResponseExtrap( const std::string& recoGen ) const {
     delete legend_reso;
     delete label_reso;
 
+    delete legend_resp;
+    delete label_resp;
 
     delete gr_resp_recoPhot;
     delete gr_resp_recoGen;
@@ -529,7 +672,13 @@ void DrawExtrap::drawResponseExtrap( const std::string& recoGen ) const {
 
 
   std::string suffix = get_fullSuffix();
-  std::string graphFileName = "PhotonJetExtrapGraphs_" + suffix + "_" + FIT_RMS_ + ".root";
+  std::string graphFileName;
+  if( etaRegion!="" )
+    graphFileName = "PhotonJetExtrapGraphs_" + suffix + "_" + etaRegion + L2L3_text + "_" + FIT_RMS_;
+  else
+    graphFileName = "PhotonJetExtrapGraphs_" + suffix + L2L3_text + "_" + FIT_RMS_;
+  if( NOQ_ ) graphFileName += "_NOQ";
+  graphFileName += ".root";
 
   TFile* graphFile = new TFile( graphFileName.c_str(), "recreate" );
   graphFile->cd();
@@ -596,6 +745,15 @@ void DrawExtrap::getYPoints( TFile * file, const char* yHistoName, Int_t nPoints
     //Float_t rms_err = (LUMI>0) ? rms/sqrt((Float_t)LUMI*h1_r->Integral()*(Float_t)INT_PERC/100.) : h1_r->GetRMSError();
     Float_t rms_err = h1_r->GetRMSError();
 
+    Float_t mean70, mean70_err, rms70, rms70_err;
+    fitTools::getTruncatedMeanAndRMS(h1_r, mean70, mean70_err, rms70, rms70_err, 0.70, 0.70);
+
+    Float_t mean95, mean95_err, rms95, rms95_err;
+    fitTools::getTruncatedMeanAndRMS(h1_r, mean95, mean95_err, rms95, rms95_err, 0.95, 0.95);
+
+    Float_t mean99, mean99_err, rms99, rms99_err;
+    fitTools::getTruncatedMeanAndRMS(h1_r, mean99, mean99_err, rms99, rms99_err, 0.99, 0.99);
+
     //Float_t mean, mean_err, rms, rms_err;
     //fitTools::getProjectionMeanAndRMS(h1_r, mean, mean_err, rms, rms_err, 1., 0.9);
 
@@ -630,6 +788,30 @@ void DrawExtrap::getYPoints( TFile * file, const char* yHistoName, Int_t nPoints
       
       y_reso[i] = rms/mean;
       y_reso_err[i] = sqrt( rms_err*rms_err/(mean*mean) + rms*rms*mean_err*mean_err/(mean*mean*mean*mean) ); 
+
+    } else if( FIT_RMS_ == "RMS70" ) {
+
+      y_resp[i] = mean70;
+      y_resp_err[i] = mean70_err;
+      
+      y_reso[i] = rms70/mean70;
+      y_reso_err[i] = sqrt( rms70_err*rms70_err/(mean70*mean70) + rms70*rms70*mean70_err*mean70_err/(mean70*mean70*mean70*mean70) ); 
+
+    } else if( FIT_RMS_ == "RMS95" ) {
+
+      y_resp[i] = mean95;
+      y_resp_err[i] = mean95_err;
+      
+      y_reso[i] = rms95/mean95;
+      y_reso_err[i] = sqrt( rms95_err*rms95_err/(mean95*mean95) + rms95*rms95*mean95_err*mean95_err/(mean95*mean95*mean95*mean95) ); 
+
+    } else if( FIT_RMS_ == "RMS99" ) {
+
+      y_resp[i] = mean99;
+      y_resp_err[i] = mean99_err;
+      
+      y_reso[i] = rms99/mean99;
+      y_reso_err[i] = sqrt( rms99_err*rms99_err/(mean99*mean99) + rms99*rms99*mean99_err*mean99_err/(mean99*mean99*mean99*mean99) ); 
 
     } else if( FIT_RMS_ == "MIX" ) {
 

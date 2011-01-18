@@ -8,11 +8,10 @@
 #include "fitTools.h"
 
 
-std::string FIT_RMS = "RMS";
 
 
 
-void draw_vs_pt_plots( DrawBase* db, bool correctedPt=false );
+void draw_vs_pt_plots( const std::string& resp_reso, const std::string& etaRegion, const std::string& FIT_RMS, DrawBase* db, bool correctedPt=false );
 
 
 int main( int argc, char* argv[] ) {
@@ -88,14 +87,48 @@ int main( int argc, char* argv[] ) {
 
 
 
-  db->set_shapeNormalization();
+  //db->set_lumi(33.8);
+  db->set_lumiNormalization(33.8);
+  //db->set_shapeNormalization();
 
   db->set_outputdir();
 
 
 
-  draw_vs_pt_plots(db);
-  draw_vs_pt_plots(db, (bool)true);
+  draw_vs_pt_plots("response",   "eta011", "RMS99", db);
+  draw_vs_pt_plots("resolution", "eta011", "RMS99", db);
+  draw_vs_pt_plots("response",   "eta011", "RMS99", db, (bool)true);
+  draw_vs_pt_plots("resolution", "eta011", "RMS99", db, (bool)true);
+//draw_vs_pt_plots("response",   "eta011", "RMS", db);
+//draw_vs_pt_plots("resolution", "eta011", "RMS", db);
+//draw_vs_pt_plots("response",   "eta011", "FIT", db);
+//draw_vs_pt_plots("resolution", "eta011", "FIT", db);
+//draw_vs_pt_plots("response",   "eta1524", "RMS99", db);
+//draw_vs_pt_plots("resolution", "eta1524", "RMS99", db);
+//draw_vs_pt_plots("response",   "eta1524", "RMS99", db, (bool)true);
+//draw_vs_pt_plots("resolution", "eta1524", "RMS99", db, (bool)true);
+//draw_vs_pt_plots("response",   "eta1524", "RMS95", db);
+//draw_vs_pt_plots("resolution", "eta1524", "RMS95", db);
+//draw_vs_pt_plots("response",   "eta1524", "RMS70", db);
+//draw_vs_pt_plots("resolution", "eta1524", "RMS70", db);
+//draw_vs_pt_plots("response",   "eta1524", "RMS", db);
+//draw_vs_pt_plots("resolution", "eta1524", "RMS", db);
+//draw_vs_pt_plots("response",   "eta1524", "FIT", db);
+//draw_vs_pt_plots("resolution", "eta1524", "FIT", db);
+//draw_vs_pt_plots("response",   "eta011", "RMS99", db, (bool)true);
+//draw_vs_pt_plots("resolution", "eta011", "RMS99", db, (bool)true);
+//draw_vs_pt_plots("response",   "eta132", "RMS99", db, (bool)true);
+//draw_vs_pt_plots("resolution", "eta23", "RMS99", db, (bool)true);
+  draw_vs_pt_plots("response",   "eta243", "RMS99", db);
+  draw_vs_pt_plots("resolution", "eta243", "RMS99", db);
+  draw_vs_pt_plots("response",   "eta243", "RMS99", db, (bool)true);
+  draw_vs_pt_plots("resolution", "eta243", "RMS99", db, (bool)true);
+//draw_vs_pt_plots("response",   "eta23", "RMS99", db, (bool)true);
+//draw_vs_pt_plots("resolution", "eta23", "RMS99", db, (bool)true);
+  draw_vs_pt_plots("response",   "eta35", "RMS99", db);
+  draw_vs_pt_plots("resolution", "eta35", "RMS99", db);
+//draw_vs_pt_plots("response",   "eta35", "RMS99", db, (bool)true);
+//draw_vs_pt_plots("resolution", "eta35", "RMS99", db, (bool)true);
 
   return 0;
 
@@ -105,34 +138,79 @@ int main( int argc, char* argv[] ) {
 
 
 
-void draw_vs_pt_plots( DrawBase* db, bool correctedPt ) {
+void draw_vs_pt_plots( const std::string& resp_reso, const std::string& etaRegion, const std::string& FIT_RMS, DrawBase* db, bool correctedPt ) {
+
+  std::string etaRegion_str;
+  if( etaRegion=="eta013" ) etaRegion_str = "|#eta| < 1.3";
+  else if( etaRegion=="eta011" ) etaRegion_str = "|#eta| < 1.1";
+  else if( etaRegion=="eta009" ) etaRegion_str = "|#eta| < 0.9";
+  else if( etaRegion=="eta132" ) etaRegion_str = "1.3 < |#eta| < 2";
+  else if( etaRegion=="eta1524" ) etaRegion_str = "1.5 < |#eta| < 2.4";
+  else if( etaRegion=="eta23" ) etaRegion_str = "2 < |#eta| < 3";
+  else if( etaRegion=="eta243" ) etaRegion_str = "2.4 < |#eta| < 3";
+  else if( etaRegion=="eta35" ) etaRegion_str = "3 < |#eta| < 5";
+  else etaRegion_str = "[unknown eta region]";
+
+  if( resp_reso!="response" && resp_reso!="resolution" ) {
+    std::cout << "Only 'Response' and 'Resolution' supported. Exiting." << std::endl;
+    exit(776);
+  } 
 
   std::string file_noextrap_name = "PhotonJetGraphs_" + db->get_fullSuffix() + ".root";
-  std::string file_extrap_name = "PhotonJetExtrapGraphs_" + db->get_fullSuffix() + "_" + FIT_RMS + ".root";
+  std::string file_extrap_name = "PhotonJetExtrapGraphs_" + db->get_fullSuffix();
+  if( etaRegion!="" ) file_extrap_name += "_" + etaRegion;
+  if( correctedPt ) file_extrap_name += "L2L3";
+  file_extrap_name += "_" + FIT_RMS + ".root";
 
   //now open graph files and plot them on on top of the other:
   TFile* file_noextrap = TFile::Open( file_noextrap_name.c_str(), "read");
   if( file_noextrap!=0 ) std::cout << "-> Opened file: '" << file_noextrap_name << "'" << std::endl;
+  else {
+    std::cout << "Didn't find file '" << file_noextrap_name << "'. Skipping." << std::endl;
+    return;
+  }
   TFile* file_extrap = TFile::Open( file_extrap_name.c_str(), "read");
   if( file_extrap!=0 ) std::cout << "-> Opened file: '" << file_extrap_name << "'" << std::endl;
+  else {
+    std::cout << "Didn't find file '" << file_extrap_name << "'. Skipping." << std::endl;
+    return;
+  }
 
 
   std::vector< float > ptPhot_binning = fitTools::getPtPhot_binning();
-  float xMin = ptPhot_binning[0];
-  float xMax = ptPhot_binning[ ptPhot_binning.size()-2 ];
+  float xMin = ptPhot_binning[1];
+  //if( db->get_recoType()=="calo" ) xMin = ptPhot_binning[1];
+  float xMax = ptPhot_binning[ ptPhot_binning.size()-3 ];
 
   int markerSize = 2.;
 
 
-  std::string responseGEN_name = (correctedPt) ? "GENresponse_L2L3_vs_pt" : "GENresponse_vs_pt";
-  TGraphErrors* gr_responseGEN_vs_pt = (TGraphErrors*)file_noextrap->Get(responseGEN_name.c_str());
+  std::string responseGEN_name = "GEN"+resp_reso;
+  if( correctedPt ) responseGEN_name += "_L2L3";
+  if( etaRegion!="" ) responseGEN_name += "_" + etaRegion;
+  responseGEN_name += "_vs_pt";
+  std::cout << "Looking for '" << responseGEN_name << "' in file '" << file_noextrap->GetName() << "." << std::endl;
+  //TGraphErrors* gr_responseGEN_vs_pt = (TGraphErrors*)file_noextrap->Get(responseGEN_name.c_str());
+  std::string intrName = "gr_intr";
+  if( resp_reso=="resp" ) intrName += "Resp";
+  else intrName += "Reso";
+  intrName += "_vs_pt";
+  TGraphErrors* gr_responseGEN_vs_pt = (TGraphErrors*)file_extrap->Get(intrName.c_str());
   gr_responseGEN_vs_pt->SetMarkerStyle(29);
+  std::cout << "Got it." << std::endl;
   gr_responseGEN_vs_pt->SetMarkerSize(markerSize);
   gr_responseGEN_vs_pt->SetMarkerColor(kBlack);
 
-  std::string funcType = (db->get_recoType()=="calo") ? "powerlaw" : "rpf";
+  std::string funcType;
+  if(resp_reso=="response" ){
+    funcType = (db->get_recoType()=="calo") ? "powerlaw" : "rpf";
+  } else {
+    funcType = (db->get_recoType()=="pf" || db->get_recoType()=="jpt") ? "NSCPF" : "NSC";
+  }
 
-  TF1* fit_responseGEN = fitTools::fitResponseGraph(gr_responseGEN_vs_pt, funcType, "responseGEN_vs_pt", "R");
+
+  TF1* fit_responseGEN = ( resp_reso=="response" ) ? fitTools::fitResponseGraph(gr_responseGEN_vs_pt, funcType, "f1_responseGEN", "RN", 1000.)
+                                                   : fitTools::fitResolutionGraph(gr_responseGEN_vs_pt, funcType, "f1_responseGEN", "RN", 1000.);
   fit_responseGEN->SetLineWidth(2.);
   fit_responseGEN->SetRange(xMin, xMax);
   // now get fit error band:
@@ -141,58 +219,91 @@ void draw_vs_pt_plots( DrawBase* db, bool correctedPt ) {
   band_responseGEN->SetLineWidth(2.);
 
 
-  std::string responseBALANCING_name = (correctedPt) ? "response_L2L3_vs_pt" : "response_vs_pt";
+  std::string responseBALANCING_name = resp_reso;
+  if( correctedPt ) responseBALANCING_name += "_L2L3";
+  if( etaRegion!="" ) responseBALANCING_name += "_" + etaRegion;
+  responseBALANCING_name += "_vs_pt";
+  std::cout << "Looking for '" << responseBALANCING_name << "'." << std::endl;
   TGraphErrors* gr_responseBALANCING_vs_pt = (TGraphErrors*)file_noextrap->Get(responseBALANCING_name.c_str());
   gr_responseBALANCING_vs_pt->SetMarkerStyle(21);
   gr_responseBALANCING_vs_pt->SetMarkerSize(markerSize);
   gr_responseBALANCING_vs_pt->SetMarkerColor(kGray+2);
+  std::cout << "Got it." << std::endl;
+std::cout << "responseBALANCING points: " << gr_responseBALANCING_vs_pt->GetN() << std::endl;
 
-  std::string responseBALANCINGMC_name = (correctedPt) ? "MCresponse_L2L3_vs_pt" : "MCresponse_vs_pt";
+  std::string responseBALANCINGMC_name = "MC"+resp_reso;
+  if( correctedPt ) responseBALANCINGMC_name += "_L2L3";
+  if( etaRegion!="" ) responseBALANCINGMC_name += "_" + etaRegion;
+  responseBALANCINGMC_name += "_vs_pt";
+  std::cout << "Looking for '" << responseBALANCINGMC_name << "'." << std::endl;
   TGraphErrors* gr_responseBALANCINGMC_vs_pt = (TGraphErrors*)file_noextrap->Get(responseBALANCINGMC_name.c_str());
   gr_responseBALANCINGMC_vs_pt->SetMarkerStyle(25);
   gr_responseBALANCINGMC_vs_pt->SetMarkerSize(markerSize);
   gr_responseBALANCINGMC_vs_pt->SetMarkerColor(kGray+2);
+  std::cout << "Got it." << std::endl;
+std::cout << "responseBALANCINGMC points: " << gr_responseBALANCINGMC_vs_pt->GetN() << std::endl;
 
 
-  TGraphErrors* gr_responseMPF_vs_pt = (TGraphErrors*)file_noextrap->Get("responseMPF_vs_pt");
+  std::string responseMPF_name = resp_reso+"MPF";
+  if( etaRegion!="" ) responseMPF_name += "_" + etaRegion;
+  responseMPF_name += "_vs_pt";
+  TGraphErrors* gr_responseMPF_vs_pt = (TGraphErrors*)file_noextrap->Get(responseMPF_name.c_str());
   gr_responseMPF_vs_pt->SetMarkerStyle(20);
   gr_responseMPF_vs_pt->SetMarkerSize(markerSize);
   gr_responseMPF_vs_pt->SetMarkerColor(38);
 
-  TGraphErrors* gr_responseMPFMC_vs_pt = (TGraphErrors*)file_noextrap->Get("MCresponseMPF_vs_pt");
+  std::string responseMPFMC_name = "MC"+responseMPF_name;
+  TGraphErrors* gr_responseMPFMC_vs_pt = (TGraphErrors*)file_noextrap->Get(responseMPFMC_name.c_str());
   gr_responseMPFMC_vs_pt->SetMarkerStyle(24);
   gr_responseMPFMC_vs_pt->SetMarkerSize(markerSize);
   gr_responseMPFMC_vs_pt->SetMarkerColor(38);
 
 
-  std::string responseEXTRAP_name = (correctedPt) ? "gr_DATARespL2L3_vs_pt" : "gr_DATAResp_vs_pt";
+  std::string resp_reso_short = (resp_reso=="response") ? "Resp" : "Reso";
+
+  //std::string responseEXTRAP_name = (correctedPt) ? "gr_DATA"+resp_reso_short+"L2L3_vs_pt" : "gr_DATA"+resp_reso_short+"_vs_pt";
+  std::string responseEXTRAP_name = "gr_DATA"+resp_reso_short+"_vs_pt";
   TGraphErrors* gr_responseEXTRAP_vs_pt = (TGraphErrors*)file_extrap->Get(responseEXTRAP_name.c_str());
   gr_responseEXTRAP_vs_pt->SetMarkerStyle(22);
   gr_responseEXTRAP_vs_pt->SetMarkerSize(markerSize);
   gr_responseEXTRAP_vs_pt->SetMarkerColor(46);
+  gr_responseEXTRAP_vs_pt->RemovePoint(0); //remove first point (cant extrapolate at such low pt)
+  if( (db->get_recoType()=="calo") )
+    gr_responseEXTRAP_vs_pt->RemovePoint(0); //remove also second point for calo
 
-  std::string responseEXTRAPMC_name = (correctedPt) ? "gr_extrapRespL2L3_vs_pt" : "gr_extrapResp_vs_pt";
+  //std::string responseEXTRAPMC_name = (correctedPt) ? "gr_extrap"+resp_reso_short+"L2L3_vs_pt" : "gr_extrap"+resp_reso_short+"_vs_pt";
+  std::string responseEXTRAPMC_name = "gr_extrap"+resp_reso_short+"_vs_pt";
   TGraphErrors* gr_responseEXTRAPMC_vs_pt = (TGraphErrors*)file_extrap->Get(responseEXTRAPMC_name.c_str());
   gr_responseEXTRAPMC_vs_pt->SetMarkerStyle(26);
   gr_responseEXTRAPMC_vs_pt->SetMarkerSize(markerSize);
   gr_responseEXTRAPMC_vs_pt->SetMarkerColor(46);
+  gr_responseEXTRAPMC_vs_pt->RemovePoint(0); //remove first point (cant extrapolate at such low pt)
+  if( (db->get_recoType()=="calo") )
+    gr_responseEXTRAPMC_vs_pt->RemovePoint(0); //remove also second point for calo
 
   
-  //db->drawObjects( graphs, "all_vs_pt", "Photon p_{T} [GeV/c]", xMin, xMax, "Response", 0.65, 1.1, (bool)true );
 
-  float ymin = (db->get_recoType()=="calo") ? 0.0 : 0.6;
-  float ymax = 1.1;
-  if( correctedPt ) {
-    ymin = 0.7;
-    ymax = 1.2;
+  float ymin, ymax;
+  if( resp_reso=="response" ) {
+    ymin = (db->get_recoType()=="calo") ? 0.0 : 0.6;
+    ymax = 1.1;
+    if( correctedPt ) {
+      ymin = (db->get_recoType()=="calo") ? 0.3 : 0.7;
+      ymax = (db->get_recoType()=="calo") ? 1.3 : 1.2;
+    }
+  } else {
+    ymin = 0.;
+    ymax = 0.45;
+    if( db->get_recoType()=="calo" && !correctedPt ) ymax = 0.6;
   }
+
+  std::string plotVarName = (resp_reso=="response") ? "Response" : "Resolution";
 
   TH2D* axes = new TH2D( "axes", "", 10, xMin, xMax, 10, ymin, ymax);
   axes->SetXTitle( "Photon p_{T} [GeV/c]" );
-  if( correctedPt )
-    axes->SetYTitle( "L2L3 Response" );
-  else
-    axes->SetYTitle( "Response" );
+  std::string yTitle = plotVarName;
+  if( correctedPt ) yTitle = "L2L3 " + yTitle;
+  axes->SetYTitle( yTitle.c_str() );
   axes->GetXaxis()->SetMoreLogLabels();
   axes->GetXaxis()->SetNoExponent();
   axes->GetXaxis()->SetTitleOffset(1.1);
@@ -201,18 +312,40 @@ void draw_vs_pt_plots( DrawBase* db, bool correctedPt ) {
 
   TLine* line_one = new TLine( xMin, 1., xMax, 1. );
 
+  float legend_xmin, legend_xmax, legend_ymin, legend_ymax;
+  if( resp_reso=="response" ) {
+    legend_xmin = 0.48;
+    legend_ymin = 0.15;
+    legend_xmax = 0.87;
+    legend_ymax = 0.45;
+  } else {
+    legend_xmin = 0.40;
+    legend_ymin = 0.515;
+    legend_xmax = 0.80;
+    legend_ymax = 0.73;
+  }
 
-  TLegend* legend = new TLegend( 0.48, 0.15, 0.87, 0.45, "  |#eta| < 1.3" );
+
+  std::string legendTitle = "  " + etaRegion_str;
+  TLegend* legend = new TLegend( legend_xmin, legend_ymin, legend_xmax, legend_ymax, legendTitle.c_str());
   legend->SetFillColor(kWhite);
   legend->SetFillStyle(0);
   legend->SetTextSize(0.033);
-  legend->AddEntry( gr_responseBALANCING_vs_pt, "#gamma+Jet Balancing", "P");
-  legend->AddEntry( gr_responseEXTRAP_vs_pt, "#gamma+Jet Extrapolation", "P");
-  if( !correctedPt ) {
-    legend->AddEntry( gr_responseMPF_vs_pt, "#gamma+Jet MPF", "P");
-    legend->AddEntry( gr_responseMPFMC_vs_pt, "#gamma+Jet MPF (MC)", "P");
+  if( resp_reso=="response" ) {
+    legend->AddEntry( gr_responseBALANCING_vs_pt, "#gamma+Jet Balancing", "P");
+    if( !correctedPt ) {
+      legend->AddEntry( gr_responseMPF_vs_pt, "#gamma+Jet MPF", "P");
+      //legend->AddEntry( gr_responseMPFMC_vs_pt, "#gamma+Jet MPF (MC)", "P");
+    }
   }
-  legend->AddEntry( band_responseGEN, "True Response", "FL");
+  legend->AddEntry( gr_responseEXTRAP_vs_pt, "#gamma+Jet Extrapolation", "P");
+  legend->AddEntry( gr_responseEXTRAPMC_vs_pt, "#gamma+Jet Extrap. (MC)", "P");
+  std::string legendTrue = "True " + plotVarName;
+  if( etaRegion=="eta011" || etaRegion=="eta011" || etaRegion=="eta009" || etaRegion=="eta1524" || resp_reso=="response" ) 
+    //legend->AddEntry( band_responseGEN, legendTrue.c_str(), "FL");
+    legend->AddEntry( fit_responseGEN, legendTrue.c_str(), "L");
+  else
+    legend->AddEntry( gr_responseGEN_vs_pt, legendTrue.c_str(), "P");
 
   TPaveText* label_cms = db->get_labelCMS();
   TPaveText* label_sqrt = db->get_labelSqrt();
@@ -231,25 +364,37 @@ void draw_vs_pt_plots( DrawBase* db, bool correctedPt ) {
   axes->Draw();
   if( correctedPt )
     line_one->Draw("same");
-  band_responseGEN->Draw("C e3 same");
-  fit_responseGEN->Draw("same");
-  if( db->get_recoType()=="jpt" )
+  if( etaRegion=="eta013" || etaRegion=="eta011" || etaRegion=="eta009" || etaRegion=="eta1524" || resp_reso=="response" ) {
+    //band_responseGEN->Draw("C e3 same");
+    fit_responseGEN->Draw("same");
+  } else {
     gr_responseGEN_vs_pt->Draw("psame");
-  gr_responseBALANCING_vs_pt->Draw("psame");
-  if( !correctedPt ) {
-    gr_responseMPF_vs_pt->Draw("psame");
-    gr_responseMPFMC_vs_pt->Draw("psame");
   }
+  //gr_responseGEN_vs_pt->Draw("psame");
+//if( db->get_recoType()=="jpt" )
+//  gr_responseGEN_vs_pt->Draw("psame");
+
+  if( resp_reso=="response" ) {
+    gr_responseBALANCING_vs_pt->Draw("psame");
+    if( !correctedPt ) {
+      gr_responseMPF_vs_pt->Draw("psame");
+      //gr_responseMPFMC_vs_pt->Draw("psame");
+    }
+  }
+  gr_responseEXTRAPMC_vs_pt->Draw("psame");
   gr_responseEXTRAP_vs_pt->Draw("psame");
-  legend->Draw("same");
-  label_cms->Draw("same");
-  label_sqrt->Draw("same");
-  label_algo->Draw("same");
+    legend->Draw("same");
+    label_cms->Draw("same");
+    label_sqrt->Draw("same");
+    label_algo->Draw("same");
 
   gPad->RedrawAxis();
 
-  std::string name_base = db->get_outputdir() + "/all_";
-  if( correctedPt ) name_base = name_base + "L2L3_";
+  std::string name_base = db->get_outputdir() + "/" + resp_reso;
+  name_base = name_base + FIT_RMS;
+  if( correctedPt ) name_base = name_base + "_L2L3";
+  if( etaRegion!="" ) name_base = name_base + "_" + etaRegion;
+  name_base = name_base + "_all_";
   std::string name_eps = name_base + "vs_pt.eps";
   std::string name_png = name_base + "vs_pt.png";
   c1->SaveAs( name_eps.c_str() );
@@ -259,7 +404,10 @@ void draw_vs_pt_plots( DrawBase* db, bool correctedPt ) {
   // and now data/MC comparisons:
 
   c1->Clear();
-  TH2D* axes2 = new TH2D( "axes2", "", 10, xMin, xMax, 10, 0.7, 1.2);
+  float dataMC_ymin = (resp_reso=="response") ? 0.6 : 0.;
+  float dataMC_ymax = (resp_reso=="response") ? 1.2 : 2.5;
+  //if( resp_reso=="resolution" && db->get_recoType()=="calo") dataMC_ymax=3.;
+  TH2D* axes2 = new TH2D( "axes2", "", 10, xMin, xMax, 10, dataMC_ymin, dataMC_ymax);
   axes2->SetXTitle( "Photon p_{T} [GeV/c]" );
   axes2->SetYTitle( "Data / MC" );
   axes2->GetXaxis()->SetMoreLogLabels();
@@ -280,55 +428,355 @@ void draw_vs_pt_plots( DrawBase* db, bool correctedPt ) {
   gr_dataMC_EXTRAP->SetMarkerStyle(22); 
   gr_dataMC_EXTRAP->SetMarkerSize(markerSize); 
   gr_dataMC_EXTRAP->SetMarkerColor(46);
+
+  // temporay fix!!!
+  if( db->get_recoType()=="calo" ) 
+    gr_dataMC_EXTRAP->RemovePoint(gr_dataMC_EXTRAP->GetN()-1);
   
-  TF1* f_const_BALANCING = new TF1("const_BALANCING", "[0]", xMin, xMax);
+  float xMax_fit = xMax;
+
+  TF1* f_const_BALANCING = new TF1("const_BALANCING", "[0]", xMin, xMax_fit);
   f_const_BALANCING->SetLineStyle(2);
   f_const_BALANCING->SetLineColor(kGray+2);
   gr_dataMC_BALANCING->Fit(f_const_BALANCING, "QR");
 
-  TF1* f_const_MPF = new TF1("const_MPF", "[0]", xMin, xMax);
+  TF1* f_const_MPF = new TF1("const_MPF", "[0]", xMin, xMax_fit);
   f_const_MPF->SetLineStyle(2);
   f_const_MPF->SetLineColor(38);
   gr_dataMC_MPF->Fit(f_const_MPF, "QR");
 
-  TF1* f_const_EXTRAP = new TF1("const_EXTRAP", "[0]", xMin, xMax);
+  if( etaRegion=="eta243"||etaRegion=="eta1524" ) xMax_fit = 200.;
+  TF1* f_const_EXTRAP = new TF1("const_EXTRAP", "[0]", xMin, xMax_fit);
+  //TF1* f_const_EXTRAP = new TF1("const_EXTRAP", "[0]", 20., 150.);
+  f_const_EXTRAP->SetParameter(0, 1.);
   f_const_EXTRAP->SetLineStyle(2);
   f_const_EXTRAP->SetLineColor(46);
   gr_dataMC_EXTRAP->Fit(f_const_EXTRAP, "QR");
 
-  char balancingText[200];
+
+  // get syst band from file:
+  std::string systFile_name = "totalSyst_";
+  if( resp_reso=="response") systFile_name += "resp";
+  else                       systFile_name += "reso";
+  systFile_name += ".root";
+  TFile* file_syst = TFile::Open(systFile_name.c_str());
+  TH1D* syst_band = (TH1D*)file_syst->Get("syst_total");
+  syst_band->SetFillColor(kYellow-9);
+  syst_band->SetFillStyle(1001);
+  syst_band->SetLineColor(kBlack);
+  syst_band->SetLineWidth(1);
+  for( unsigned ibin_syst=0; ibin_syst<syst_band->GetNbinsX(); ++ibin_syst ) {
+    syst_band->SetBinError( ibin_syst+1, syst_band->GetBinContent(ibin_syst+1)/100.); //not in percent
+    syst_band->SetBinContent( ibin_syst+1, 1. ); //put it around one
+  }
+
+  char balancingText[400];
   sprintf( balancingText, "Balancing (FIT = %.3lf #pm %.3lf, #chi^{2}/NDF = %.2lf/%d)", f_const_BALANCING->GetParameter(0), f_const_BALANCING->GetParError(0), f_const_BALANCING->GetChisquare(), f_const_BALANCING->GetNDF() );
-  char mpfText[200];
+  char mpfText[400];
   sprintf( mpfText, "MPF (FIT = %.3lf #pm %.3lf, #chi^{2}/NDF = %.2lf/%d)", f_const_MPF->GetParameter(0), f_const_MPF->GetParError(0), f_const_MPF->GetChisquare(), f_const_MPF->GetNDF() );
-  char extrapText[200];
+  char extrapText[400];
   sprintf( extrapText, "Extrapolation (FIT = %.3lf #pm %.3lf, #chi^{2}/NDF = %.2lf/%d)", f_const_EXTRAP->GetParameter(0), f_const_EXTRAP->GetParError(0), f_const_EXTRAP->GetChisquare(), f_const_EXTRAP->GetNDF() );
 
-  TLegend* legend2 = new TLegend( 0.14, 0.15, 0.7, 0.4, "   #gamma+Jet, |#eta| < 1.3" );
+  float legend_yMax2 = (resp_reso=="response") ? 0.4 : 0.25;
+
+  legendTitle = "   #gamma+Jet, " + etaRegion_str;
+  TLegend* legend2 = new TLegend( 0.14, 0.15, 0.7, 0.25, legendTitle.c_str());
   legend2->SetFillColor(kWhite);
   legend2->SetTextSize(0.028);
-  legend2->AddEntry( gr_dataMC_BALANCING, balancingText, "P");
-  legend2->AddEntry( gr_dataMC_MPF, mpfText, "P");
+  if( resp_reso=="response" ) {
+    legend2->AddEntry( gr_dataMC_BALANCING, balancingText, "P");
+    if( !correctedPt )
+      legend2->AddEntry( gr_dataMC_MPF, mpfText, "P");
+  }
   legend2->AddEntry( gr_dataMC_EXTRAP, extrapText, "P");
+
+  //TLegend* legend_syst = new TLegend( 0.53, 0.7, 0.88, 0.88, "Anti-k_{T} 0.5 PFJets");
+  TLegend* legend_syst = new TLegend( 0.35, 0.63, 0.65, 0.7, "");
+  legend_syst->SetFillColor(kWhite);
+  legend_syst->SetTextSize(0.034);
+  legend_syst->AddEntry(syst_band, "Syst. Uncertainty", "F");
 
 
   TPaveText* label_algo2 = db->get_labelAlgo(1);
   label_algo2->SetTextSize(0.032);
 
-  gr_dataMC_BALANCING->Draw("p same");
-  gr_dataMC_MPF->Draw("p same");
-  gr_dataMC_EXTRAP->Draw("p same");
+  if( resp_reso=="response" ) {
+    gr_dataMC_BALANCING->Draw("p same");
+    if( !correctedPt )
+      gr_dataMC_MPF->Draw("p same");
+  }
+  syst_band->Draw("c l e3 same");
   line_one->Draw("same");
   legend2->Draw("same");
+  legend_syst->Draw("same");
+  gr_dataMC_EXTRAP->Draw("p same");
   label_cms->Draw("same");
   label_sqrt->Draw("same");
   label_algo2->Draw("same");
+  gPad->RedrawAxis();
 
-  name_base = db->get_outputdir() + "/dataMC_";
-  if( correctedPt ) name_base = name_base + "L2L3_";
+  name_base = db->get_outputdir() + "/" + resp_reso;
+  name_base = name_base + FIT_RMS;
+  if( correctedPt ) name_base = name_base + "_L2L3";
+  if( etaRegion!="" ) name_base = name_base + "_" + etaRegion;
+  name_base = name_base + "_dataMC_";
   name_eps = name_base + "vs_pt.eps";
   name_png = name_base + "vs_pt.png";
   c1->SaveAs(name_eps.c_str());
   c1->SaveAs(name_png.c_str());
+
+
+
+  if( resp_reso=="resolution" ) {
+
+    // QUADRATURE DIFFERENCE BETWEEN DATA AND MC
+
+    TGraphErrors* gr_squareDiff_BALANCING = new TGraphErrors(0);
+    TGraphErrors* gr_squareDiff_MPF = new TGraphErrors(0);
+    TGraphErrors* gr_squareDiff_EXTRAP = new TGraphErrors(0);
+
+    for( unsigned iPoint=0; iPoint<gr_dataMC_BALANCING->GetN(); ++iPoint ) {
+
+      Double_t r_BALANCING, x_BALANCING;
+      gr_responseBALANCING_vs_pt->GetPoint(iPoint, x_BALANCING, r_BALANCING);
+      Double_t r_BALANCINGMC, x_BALANCINGMC;
+      gr_responseBALANCINGMC_vs_pt->GetPoint(iPoint, x_BALANCINGMC, r_BALANCINGMC);
+      Double_t squareDiff_BALANCING = sqrt( fabs(r_BALANCING*r_BALANCING - r_BALANCINGMC*r_BALANCINGMC) );
+      Double_t r_BALANCING_err = gr_responseBALANCING_vs_pt->GetErrorY(iPoint);
+      Double_t r_BALANCINGMC_err = gr_responseBALANCINGMC_vs_pt->GetErrorY(iPoint);
+      Double_t squareDiff_BALANCING_err = sqrt( r_BALANCING_err*r_BALANCING_err + r_BALANCINGMC_err*r_BALANCINGMC_err );
+      gr_squareDiff_BALANCING->SetPoint( iPoint, x_BALANCINGMC, squareDiff_BALANCING );
+      gr_squareDiff_BALANCING->SetPointError( iPoint, 0., squareDiff_BALANCING_err );
+
+      Double_t r_MPF, x_MPF;
+      gr_responseMPF_vs_pt->GetPoint(iPoint, x_MPF, r_MPF);
+      Double_t r_MPFMC, x_MPFMC;
+      gr_responseMPFMC_vs_pt->GetPoint(iPoint, x_MPFMC, r_MPFMC);
+      Double_t squareDiff_MPF = sqrt( fabs(r_MPF*r_MPF - r_MPFMC*r_MPFMC) );
+      Double_t r_MPF_err = gr_responseMPF_vs_pt->GetErrorY(iPoint);
+      Double_t r_MPFMC_err = gr_responseMPFMC_vs_pt->GetErrorY(iPoint);
+      Double_t squareDiff_MPF_err = sqrt( r_MPF_err*r_MPF_err + r_MPFMC_err*r_MPFMC_err );
+      gr_squareDiff_MPF->SetPoint( iPoint, x_MPFMC, squareDiff_MPF );
+      gr_squareDiff_MPF->SetPointError( iPoint, 0., squareDiff_MPF_err );
+
+      Double_t r_EXTRAP, x_EXTRAP;
+      gr_responseEXTRAP_vs_pt->GetPoint(iPoint, x_EXTRAP, r_EXTRAP);
+      Double_t r_EXTRAPMC, x_EXTRAPMC;
+      gr_responseEXTRAPMC_vs_pt->GetPoint(iPoint, x_EXTRAPMC, r_EXTRAPMC);
+      Double_t squareDiff_EXTRAP = sqrt( fabs(r_EXTRAP*r_EXTRAP - r_EXTRAPMC*r_EXTRAPMC) );
+      Double_t r_EXTRAP_err = gr_responseEXTRAP_vs_pt->GetErrorY(iPoint);
+      Double_t r_EXTRAPMC_err = gr_responseEXTRAPMC_vs_pt->GetErrorY(iPoint);
+      Double_t squareDiff_EXTRAP_err = sqrt( r_EXTRAP_err*r_EXTRAP_err + r_EXTRAPMC_err*r_EXTRAPMC_err );
+      gr_squareDiff_EXTRAP->SetPoint( iPoint, x_EXTRAPMC, squareDiff_EXTRAP );
+      gr_squareDiff_EXTRAP->SetPointError( iPoint, 0., squareDiff_EXTRAP_err );
+
+
+    }
+
+    gr_squareDiff_BALANCING->SetMarkerStyle(21); 
+    gr_squareDiff_BALANCING->SetMarkerSize(markerSize); 
+    gr_squareDiff_BALANCING->SetMarkerColor(kGray+2); 
+
+    gr_squareDiff_MPF->SetMarkerStyle(20); 
+    gr_squareDiff_MPF->SetMarkerSize(markerSize); 
+    gr_squareDiff_MPF->SetMarkerColor(38);
+
+    gr_squareDiff_EXTRAP->SetMarkerStyle(22); 
+    gr_squareDiff_EXTRAP->SetMarkerSize(markerSize); 
+    gr_squareDiff_EXTRAP->SetMarkerColor(46);
+
+  //gr_squareDiff_BALANCING->Fit(f_const_BALANCING, "QR");
+  //gr_squareDiff_MPF->Fit(f_const_MPF, "QR");
+  //gr_squareDiff_EXTRAP->Fit(f_const_EXTRAP, "QR");
+
+    TLegend* legend_squareDiff = new TLegend(0.5, 0.55, 0.85, 0.75);
+    legend_squareDiff->SetTextSize(0.035);
+    legend_squareDiff->SetFillColor(0);
+    legend_squareDiff->SetFillStyle(1);
+    legend_squareDiff->AddEntry( gr_squareDiff_BALANCING, "Balancing", "P" );
+    legend_squareDiff->AddEntry( gr_squareDiff_MPF, "MPF", "P" );
+    legend_squareDiff->AddEntry( gr_squareDiff_EXTRAP, "Extrapolation", "P" );
+
+    sprintf( balancingText, "Balancing (FIT = %.3lf #pm %.3lf, #chi^{2}/NDF = %.2lf/%d)", f_const_BALANCING->GetParameter(0), f_const_BALANCING->GetParError(0), f_const_BALANCING->GetChisquare(), f_const_BALANCING->GetNDF() );
+    sprintf( mpfText, "MPF (FIT = %.3lf #pm %.3lf, #chi^{2}/NDF = %.2lf/%d)", f_const_MPF->GetParameter(0), f_const_MPF->GetParError(0), f_const_MPF->GetChisquare(), f_const_MPF->GetNDF() );
+    sprintf( extrapText, "Extrapolation (FIT = %.3lf #pm %.3lf, #chi^{2}/NDF = %.2lf/%d)", f_const_EXTRAP->GetParameter(0), f_const_EXTRAP->GetParError(0), f_const_EXTRAP->GetChisquare(), f_const_EXTRAP->GetNDF() );
+
+    TLegend* legend3 = new TLegend( 0.14, 0.15, 0.7, 0.4, legendTitle.c_str());
+    legend3->SetFillColor(kWhite);
+    legend3->SetTextSize(0.028);
+    legend3->AddEntry( gr_squareDiff_BALANCING, balancingText, "P");
+    legend3->AddEntry( gr_squareDiff_MPF, mpfText, "P");
+    legend3->AddEntry( gr_squareDiff_EXTRAP, extrapText, "P");
+
+    TH2D* axes3 = new TH2D( "axes3", "", 10, xMin, xMax, 10, 0., 0.3);
+    axes3->SetXTitle( "Photon p_{T} [GeV/c]" );
+    axes3->SetYTitle( "#sqrt{Data^{2} - MC^{2}}" );
+    axes3->GetXaxis()->SetMoreLogLabels();
+    axes3->GetXaxis()->SetNoExponent();
+    axes3->GetXaxis()->SetTitleOffset(1.1);
+    axes3->GetYaxis()->SetTitleOffset(1.5);
+    axes3->Draw();
+
+    gr_squareDiff_BALANCING->Draw("p same");
+    gr_squareDiff_MPF->Draw("p same");
+    gr_squareDiff_EXTRAP->Draw("p same");
+    //legend3->Draw("same");
+    legend_squareDiff->Draw("same");
+    label_cms->Draw("same");
+    label_sqrt->Draw("same");
+    label_algo2->Draw("same");
+
+    name_base = db->get_outputdir() + "/" + resp_reso;
+    name_base = name_base + FIT_RMS;
+    if( correctedPt ) name_base = name_base + "L2L3_";
+    if( etaRegion!="" ) name_base = name_base + "_" + etaRegion;
+    name_base = name_base + "_squareDiff_";
+    name_eps = name_base + "vs_pt.eps";
+    name_png = name_base + "vs_pt.png";
+    c1->SaveAs(name_eps.c_str());
+    c1->SaveAs(name_png.c_str());
+
+
+
+    // compare NSC fit parameters:
+
+    c1->Clear();
+
+    axes->GetYaxis()->SetRangeUser(0., 0.35);
+    axes->Draw();
+
+    std::string reso_func_type = (db->get_recoType()=="calo") ? "NSC" : "NSCPF";
+
+    TF1* fit_responseGEN_2   = fitTools::fitResolutionGraph(gr_responseGEN_vs_pt, reso_func_type, "f1_responseGEN_2", "RN");
+    //fit_responseGEN_2->SetLineColor(46);
+    fit_responseGEN_2->SetLineWidth(1);
+    fit_responseGEN_2->SetLineStyle(2);
+
+    TF1* fit_responseEXTRAP   = fitTools::fitResolutionGraph(gr_responseEXTRAP_vs_pt, reso_func_type, "f1_responseEXTRAP", "RN", 1400., 20.);
+    fit_responseEXTRAP->SetLineColor(46);
+    fit_responseEXTRAP->SetLineWidth(2);
+    fit_responseEXTRAP->SetLineStyle(1);
+    TH1D* band_responseEXTRAP = fitTools::getBand(fit_responseEXTRAP, "band_responseEXTRAP");
+    band_responseEXTRAP->SetFillColor(kYellow-9);
+    band_responseEXTRAP->SetLineWidth(2.);
+
+
+    TF1* fit_responseEXTRAPMC = fitTools::fitResolutionGraph(gr_responseEXTRAPMC_vs_pt, reso_func_type, "f1_responseEXTRAPMC", "RN");
+    fit_responseEXTRAPMC->SetLineColor(46);
+    fit_responseEXTRAPMC->SetLineWidth(1);
+    fit_responseEXTRAPMC->SetLineStyle(2);
+
+    char labelText[200];
+
+    TPaveText* labelGEN = new TPaveText(0.15, 0.67, 0.5, 0.88, "brNDC");
+    labelGEN->SetTextSize(0.035);
+    labelGEN->AddText("MC Truth");
+    labelGEN->SetFillColor(0);
+    labelGEN->SetFillStyle(0);
+    sprintf( labelText, "N = %.4f #pm %.4f", fit_responseGEN_2->GetParameter(0), fit_responseGEN_2->GetParError(0) );
+    labelGEN->AddText(labelText);
+    sprintf( labelText, "S = %.4f #pm %.4f", fit_responseGEN_2->GetParameter(1), fit_responseGEN_2->GetParError(1) );
+    labelGEN->AddText(labelText);
+    sprintf( labelText, "C = %.4f #pm %.4f", fit_responseGEN_2->GetParameter(2), fit_responseGEN_2->GetParError(2) );
+    labelGEN->AddText(labelText);
+
+    TPaveText* labelEXTRAP = new TPaveText(0.51, 0.67, 0.88, 0.88, "brNDC");
+    labelEXTRAP->SetTextSize(0.035);
+    labelEXTRAP->SetTextColor(46);
+    labelEXTRAP->SetFillColor(0);
+    labelEXTRAP->SetFillStyle(0);
+    labelEXTRAP->AddText("Extrapolation Data");
+    sprintf( labelText, "N = %.3f #pm %.3f", fit_responseEXTRAP->GetParameter(0), fit_responseEXTRAP->GetParError(0) );
+    labelEXTRAP->AddText(labelText);
+    sprintf( labelText, "S = %.3f #pm %.3f", fit_responseEXTRAP->GetParameter(1), fit_responseEXTRAP->GetParError(1) );
+    labelEXTRAP->AddText(labelText);
+    sprintf( labelText, "C = %.3f #pm %.3f", fit_responseEXTRAP->GetParameter(2), fit_responseEXTRAP->GetParError(2) );
+    labelEXTRAP->AddText(labelText);
+
+    TPaveText* labelEXTRAPMC = new TPaveText(0.51, 0.46, 0.88, 0.66, "brNDC");
+    labelEXTRAPMC->SetTextSize(0.035);
+    labelEXTRAPMC->SetTextColor(46);
+    labelEXTRAPMC->SetFillColor(0);
+    labelEXTRAPMC->SetFillStyle(0);
+    labelEXTRAPMC->AddText("Extrapolation MC");
+    sprintf( labelText, "N = %.3f #pm %.3f", fit_responseEXTRAPMC->GetParameter(0), fit_responseEXTRAPMC->GetParError(0) );
+    labelEXTRAPMC->AddText(labelText);
+    sprintf( labelText, "S = %.3f #pm %.3f", fit_responseEXTRAPMC->GetParameter(1), fit_responseEXTRAPMC->GetParError(1) );
+    labelEXTRAPMC->AddText(labelText);
+    sprintf( labelText, "C = %.3f #pm %.3f", fit_responseEXTRAPMC->GetParameter(2), fit_responseEXTRAPMC->GetParError(2) );
+    labelEXTRAPMC->AddText(labelText);
+
+    gr_responseEXTRAP_vs_pt->Draw("Psame");
+    gr_responseEXTRAPMC_vs_pt->Draw("Psame");
+    gr_responseGEN_vs_pt->Draw("Psame");
+    fit_responseEXTRAP->Draw("Lsame");
+    fit_responseEXTRAPMC->Draw("Lsame");
+    fit_responseGEN_2->Draw("Lsame");
+    labelGEN->Draw("same");
+    labelEXTRAP->Draw("same");
+    labelEXTRAPMC->Draw("same");
+
+    name_base = db->get_outputdir() + "/" + resp_reso;
+    name_base = name_base + FIT_RMS;
+    if( correctedPt ) name_base = name_base + "L2L3_";
+    if( etaRegion!="" ) name_base = name_base + "_" + etaRegion;
+    name_base = name_base + "_NSC_";
+    name_eps = name_base + "vs_pt.eps";
+    name_png = name_base + "vs_pt.png";
+    c1->SaveAs(name_eps.c_str());
+    c1->SaveAs(name_png.c_str());
+
+
+    // draw stat component vs. pt
+    c1->Clear();
+
+    TH2D* axes4 = new TH2D( "axes4", "", 10, 20., 1400., 10, 0., 30.);
+    axes4->SetXTitle( "Photon p_{T} [GeV/c]" );
+    axes4->SetYTitle( "Relative Uncertainty [%]");
+    axes4->GetXaxis()->SetMoreLogLabels();
+    axes4->GetXaxis()->SetNoExponent();
+    axes4->GetXaxis()->SetTitleOffset(1.1);
+    axes4->GetYaxis()->SetTitleOffset(1.5);
+    axes4->Draw();
+
+    TH1D* stat_errorEXTRAP = new TH1D(*band_responseEXTRAP);
+    for( unsigned iBin=1; iBin<stat_errorEXTRAP->GetNbinsX(); ++iBin) {
+
+      float pt = stat_errorEXTRAP->GetBinCenter(iBin);
+      float reso_fit = fit_responseEXTRAP->Eval(pt);
+      float reso_fit_err = band_responseEXTRAP->GetBinError(iBin);
+
+      float syst_reso = 100.*reso_fit_err/reso_fit;
+
+//std::cout << std::endl << "pt: " << pt << std::endl;
+//std::cout << "reso_fit: " << reso_fit << std::endl;
+//std::cout << "reso_fit_err: " << reso_fit_err << std::endl;
+//std::cout << "syst_reso: " << syst_reso << std::endl;
+      stat_errorEXTRAP->SetBinContent( iBin, syst_reso );
+
+    }
+    stat_errorEXTRAP->SetLineColor(46);
+    stat_errorEXTRAP->SetLineWidth(2);
+    stat_errorEXTRAP->SetFillColor(46);
+    stat_errorEXTRAP->SetFillStyle(3004);
+    
+    axes4->Draw();
+    label_cms->Draw("same");
+    label_sqrt->Draw("same");
+    stat_errorEXTRAP->Draw("HC same");
+    gPad->RedrawAxis();
+
+    name_base = db->get_outputdir() + "/" + resp_reso;
+    name_base = name_base + FIT_RMS;
+    if( correctedPt ) name_base = name_base + "L2L3_";
+    if( etaRegion!="" ) name_base = name_base + "_" + etaRegion;
+    name_base = name_base + "_STAT_";
+    name_eps = name_base + "vs_pt.eps";
+    name_png = name_base + "vs_pt.png";
+    c1->SaveAs(name_eps.c_str());
+    c1->SaveAs(name_png.c_str());
+
+  }
 
   file_noextrap->Close();
   file_extrap->Close();
