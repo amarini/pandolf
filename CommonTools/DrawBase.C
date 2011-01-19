@@ -35,9 +35,12 @@ DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType
   yAxisMaxScale_ = 1.4;
   markerSize_ = 1.6;
   getBinLabels_ = false;
+  legendTitle_ = "";
 
   pdf_aussi_ = false;
   noStack_ = false;
+
+  additionalLabel_ = 0;
 
   // this is needed to avoid the same-histogram problem:
   TH1F::AddDirectory(kFALSE);
@@ -76,12 +79,13 @@ void DrawBase::set_lumiNormalization( float givenLumi) {
       exit(132);
     }
 
-    scaleFactor_ = lumi_/1000000.; //eventweights are set so that histos are number of expected evets @ 1 pb-1. lumi is in mub-1
+    //scaleFactor_ = lumi_/1000000.; //eventweights are set so that histos are number of expected evets @ 1 pb-1. lumi is in mub-1
+    scaleFactor_ = lumi_; //eventweights are set so that histos are number of expected evets @ 1 pb-1. lumi is now also in pb-1
 
   } else {
 
     scaleFactor_ = givenLumi; //this is set to normalize MC histograms to a given int luminosity (if plotted with no data)
-    lumi_ = givenLumi*1000000.; //givenlumi is in pb-1
+    lumi_ = givenLumi; //givenlumi is in pb-1
 
   }
 
@@ -151,17 +155,20 @@ void DrawBase::set_sameInstanceNormalization() {
 
 
 //void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion, const std::string& flags, const std::string& axisName, const std::string& units, int legendQuadrant, bool log_aussi) {
-void DrawBase::drawHisto( const std::string& name, const std::string& axisName, const std::string& units, const std::string& instanceName, bool log_aussi, int legendQuadrant, const std::string& labelText, const std::string& flags ) {
+void DrawBase::drawHisto( const std::string& name, const std::string& axisName, const std::string& units, const std::string& instanceName, bool log_aussi, int legendQuadrant, const std::string& flags, bool correctedResponse, const std::string& labelText ) {
 
+  std::string L2L3_text = (correctedResponse) ? "_L2L3" : "";
 
   std::vector<float> ptPhot_binning = fitTools::getPtPhot_binning();
 
   // if is a response variable, draw a histo per pt bin
   // and then the trend vs. pt
-  bool draw_vs_pt_graphs = ( name=="response" || name=="responseMPF" );
-//TString name_tstr(name);
-//TRegexp resp_regexp("response");
-//bool draw_vs_pt_graphs = name_tstr.Contains(resp_regexp); 
+  //bool draw_vs_pt_graphs = ( name=="response" || name=="responseMPF" );
+  TString name_tstr(name);
+  TRegexp resp_regexp("response");
+  bool draw_vs_pt_graphs = name_tstr.Contains(resp_regexp); 
+  TRegexp respMPF_regexp("responseMPF");
+  bool isMPF = name_tstr.Contains(respMPF_regexp);
 
   // if response will have to do a plot for each pt bin:
   int number_of_plots = (draw_vs_pt_graphs) ? (ptPhot_binning.size()-1) : 1;
@@ -169,22 +176,37 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
   std::string ptPhotMean_name = "ptPhotMean";
   if( flags!= "" ) ptPhotMean_name = ptPhotMean_name + "_" + flags;
 
-  TProfile* hp_ptPhot_data = 0;
-  TProfile* hp_ptPhot_mc = 0;
-  TProfile* hp_ptJetGen_mc = 0;
+  std::string ptJetGenMean_name = "ptJetGenMean";
+  if( flags!= "" ) ptJetGenMean_name = ptJetGenMean_name + "_" + flags;
+
+//TProfile* hp_ptPhot_data = 0;
+//TProfile* hp_ptPhot_mc = 0;
+//TProfile* hp_ptJetGen_mc = 0;
+
+  TH2D* h2_ptPhot_data = 0;
+  TH2D* h2_ptPhot_mc = 0;
+  TH2D* h2_ptJetGen_mc = 0;
 
   if( draw_vs_pt_graphs ) {
 
-    hp_ptPhot_data = (TProfile*)dataFiles_[0].file->Get(ptPhotMean_name.c_str());
-    hp_ptPhot_mc = (TProfile*)mcFiles_[0].file->Get(ptPhotMean_name.c_str());
-    hp_ptJetGen_mc = (TProfile*)mcFiles_[0].file->Get("ptJetGenMean");
+ // hp_ptPhot_data = (TProfile*)dataFiles_[0].file->Get(ptPhotMean_name.c_str());
+ // hp_ptPhot_mc = (TProfile*)mcFiles_[0].file->Get(ptPhotMean_name.c_str());
+ // hp_ptJetGen_mc = (TProfile*)mcFiles_[0].file->Get("ptJetGenMean");
+
+    h2_ptPhot_data = (TH2D*)dataFiles_[0].file->Get(ptPhotMean_name.c_str());
+    h2_ptPhot_mc = (TH2D*)mcFiles_[0].file->Get(ptPhotMean_name.c_str());
+    h2_ptJetGen_mc = (TH2D*)mcFiles_[0].file->Get(ptJetGenMean_name.c_str());
 
     if( mcFiles_.size() > 1 ) {
       for( unsigned i=1; i<mcFiles_.size(); ++i ) {
-        TProfile* hp_ptPhot_mc2 = (TProfile*)mcFiles_[i].file->Get(ptPhotMean_name.c_str());
-        TProfile* hp_ptJetGen_mc2 = (TProfile*)mcFiles_[i].file->Get("ptJetGenMean");
-        hp_ptPhot_mc->Add( hp_ptPhot_mc2 );
-        hp_ptJetGen_mc->Add( hp_ptJetGen_mc2 );
+      //TProfile* hp_ptPhot_mc2 = (TProfile*)mcFiles_[i].file->Get(ptPhotMean_name.c_str());
+      //TProfile* hp_ptJetGen_mc2 = (TProfile*)mcFiles_[i].file->Get("ptJetGenMean");
+        TH2D* h2_ptPhot_mc2 = (TH2D*)mcFiles_[i].file->Get(ptPhotMean_name.c_str());
+        TH2D* h2_ptJetGen_mc2 = (TH2D*)mcFiles_[i].file->Get(ptJetGenMean_name.c_str());
+      //hp_ptPhot_mc->Add( hp_ptPhot_mc2 );
+      //hp_ptJetGen_mc->Add( hp_ptJetGen_mc2 );
+        h2_ptPhot_mc->Add( h2_ptPhot_mc2 );
+        h2_ptJetGen_mc->Add( h2_ptJetGen_mc2 );
       }
     }
 
@@ -222,6 +244,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     noMC = false;
 
     std::string histoName = name;
+    if( correctedResponse ) histoName += L2L3_text;
     if( flags!="" ) histoName = histoName + "_" + flags;
 
     std::string ptRange_str; 
@@ -234,9 +257,9 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     }
 
     //TH1F* dataHisto = (dataFiles_.size()==0) ? 0 : (TH1F*)dataFile_.file->Get(histoName.c_str());
-    std::vector<TH1F*> dataHistos;
+    std::vector<TH1D*> dataHistos;
     for( unsigned int iData=0; iData<dataFiles_.size(); iData++ )
-      dataHistos.push_back( (TH1F*)dataFiles_[iData].file->Get(histoName.c_str()) );
+      dataHistos.push_back( (TH1D*)dataFiles_[iData].file->Get(histoName.c_str()) );
 
     if( dataHistos.size()==0 ) {
       //std::cout << "Didn't find DATA histo '" << histoName << "'. Continuing." << std::endl;
@@ -274,11 +297,10 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     }
 
 
-
-    std::vector<TH1F*> mcHistos;
-    TH1F* mcHisto0 = 0;
+    std::vector<TH1D*> mcHistos;
+    TH1D* mcHisto0 = 0;
     if( mcFiles_.size()> 0 && mcFiles_[0].file!=0) 
-      mcHisto0 = (TH1F*)mcFiles_[0].file->Get(histoName.c_str());
+      mcHisto0 = (TH1D*)mcFiles_[0].file->Get(histoName.c_str());
     if( mcHisto0==0 ) noMC = true;
 
     if( noDATA && noMC ) {
@@ -288,7 +310,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
 
 
     // SECOND: SET BASIC AESTHETICS FOR MC HISTO(S) and CREATE MC HISTO SUM
-    TH1F* mcHisto_sum = 0;
+    TH1D* mcHisto_sum = 0;
     float fillColor_default=1;
     float fillStyle_default=3004;
     if( !noMC ) {
@@ -319,20 +341,20 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
       mcHistos[0]->Rebin(rebin_);
       mcHistos[0]->Scale(mcFiles_[0].weight );
 
-      mcHisto_sum = new TH1F(*((TH1F*)mcHistos[0]->Clone()));
+      mcHisto_sum = new TH1D(*((TH1D*)mcHistos[0]->Clone()));
 
 
       if( mcFiles_.size()>1 ) {
         for( unsigned i=1; i<mcFiles_.size(); ++i ) {
           mcFiles_[i].file->cd();
-          mcHistos.push_back((TH1F*)(mcFiles_[i].file->Get(histoName.c_str())));
+          mcHistos.push_back((TH1D*)(mcFiles_[i].file->Get(histoName.c_str())));
           if( mcHistos[i]==0 ) {
             std::cout << "Didn't find MC histo '" << histoName << "'. Continuing." << std::endl;
             return;
           }
           mcHistos[i]->Rebin(rebin_);
           mcHistos[i]->Scale(mcFiles_[i].weight );
-          mcHisto_sum->Add( (TH1F*)(mcHistos[i]->Clone()) );
+          mcHisto_sum->Add( (TH1D*)(mcHistos[i]->Clone()) );
           if( mcFiles_[i].fillColor==-1 )
             mcHistos[i]->SetFillColor( fillColor_default++ ); //so that it changes at every histo
           else
@@ -412,10 +434,10 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     THStack* mcHisto_stack = new THStack();
     int nHistos = mcHistos.size();
     for( unsigned i=0; i<nHistos; ++i )
-      mcHisto_stack->Add( (TH1F*)(mcHistos[nHistos-i-1]->Clone()), "HISTO" );
+      mcHisto_stack->Add( (TH1D*)(mcHistos[nHistos-i-1]->Clone()), "HISTO" );
     mcHisto_stack->SetName("stack");
 
-    TH1F* refHisto = (noDATA) ? mcHistos[0] : dataHistos[0];
+    TH1D* refHisto = (noDATA) ? mcHistos[0] : dataHistos[0];
 
   //Float_t yAxisMaxScale_ = (name=="phiJet" || name=="etaJet" || name=="ptSecondJetRel" || name=="phiPhot" || name=="etaPhot" ) ? 1.8 : 1.6;
   //if( name=="phiPhot" || name=="etaPhot" ) yAxisMaxScale_=2.;
@@ -447,7 +469,11 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
       yAxis = "Normalized to Unity";
     } else {
       char yAxis_char[150];
-      if( units!="" ) {
+      bool equalBins=true;
+      for( unsigned ibin=1; ibin<refHisto->GetNbinsX(); ++ibin )
+        if( refHisto->GetBinWidth(ibin)!=refHisto->GetBinWidth(ibin+1) ) equalBins=false;
+
+      if( units!="" && equalBins ) {
         if( ((int)(10.*refHisto->GetBinWidth(1)) % 10) == 0 )
           sprintf( yAxis_char, "%s / (%.0f %s)", instanceName.c_str(), refHisto->GetBinWidth(1), units.c_str() );
         else
@@ -470,7 +496,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     }
 
 
-    TLegend* legend = new TLegend(lb.xMin, lb.yMin, lb.xMax, lb.yMax);
+    TLegend* legend = new TLegend(lb.xMin, lb.yMin, lb.xMax, lb.yMax, legendTitle_.c_str());
     legend->SetFillColor(kWhite);
     legend->SetTextSize(0.035);
     for( unsigned i=0; i<dataHistos.size(); ++i ) 
@@ -591,6 +617,9 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     label_bonus->SetTextFont(42);
     label_bonus->AddText(labelText.c_str());
 
+  //TPaveText* label_algo = new TPaveText(0.64, 0.6, 0.88, 0.65, "brNDC");
+  //label_bonus->SetFillColor(kWhite);
+  //label_bonus->SetTextSize(0.035);
 
     TCanvas* c1 = new TCanvas("c1", "c1", 800, 800);
     c1->cd();
@@ -632,32 +661,83 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
       label_cuts->Draw("same");
     if( labelText!="" )
       label_bonus->Draw("same");
+    if( additionalLabel_!=0 )
+      additionalLabel_->Draw("same");
 
     if( draw_vs_pt_graphs ) {  //store info for response vs. pt plots (to be done later)
 
-      Float_t dataResponse = (noDATA) ? 0. : dataHistos[0]->GetMean();
-      Float_t dataResponseErr = (noDATA) ? 0. : dataHistos[0]->GetMeanError();
-      Float_t dataRMS = (noDATA) ? 0. : dataHistos[0]->GetRMS();
-      Float_t dataRMSErr = (noDATA) ? 0. : dataHistos[0]->GetMeanError();
+      // draw pt phot cut label
+      char labelPtPhot_text[200];
+      sprintf( labelPtPhot_text, "%.0f < p_{T}^{#gamma} < %.0f GeV/c", ptPhot_binning[iplot], ptPhot_binning[iplot+1]);
+      TPaveText* label_ptPhot = new TPaveText(0.6, 0.45, 0.85, 0.55, "brNDC");
+      label_ptPhot->SetTextSize(0.035);
+      label_ptPhot->SetFillColor(0);
+      std::string jetAlgoText = get_algoName();
+      label_ptPhot->AddText(jetAlgoText.c_str());
+      label_ptPhot->AddText(labelPtPhot_text);
+      label_ptPhot->Draw("same");
+
+    //Float_t dataResponse = (noDATA) ? 0. : dataHistos[0]->GetMean();
+    //Float_t dataResponseErr = (noDATA) ? 0. : dataHistos[0]->GetMeanError();
+    //Float_t dataRMS = (noDATA) ? 0. : dataHistos[0]->GetRMS();
+    //Float_t dataRMSErr = (noDATA) ? 0. : dataHistos[0]->GetMeanError();
+
+      Float_t meanTruncFraction = 1.;
+      Float_t rmsTruncFraction = 1.;
+
+      Float_t dataResponse = 0.;
+      Float_t dataResponseErr = 0.;
+      Float_t dataRMS = 0.;
+      Float_t dataRMSErr = 0.;
+
+      if( !noDATA )
+        fitTools::getTruncatedMeanAndRMS(dataHistos[0], dataResponse, dataResponseErr, dataRMS, dataRMSErr, meanTruncFraction, rmsTruncFraction);
+
       Float_t dataResolution = (noDATA) ? 0. : dataRMS / dataResponse;
       Float_t dataResolutionErr = (noDATA) ? 0. : sqrt( dataRMSErr*dataRMSErr/(dataResponse*dataResponse) + dataResolution*dataResolution*dataResponseErr*dataResponseErr/(dataResponse*dataResponse*dataResponse*dataResponse) );
 
+
       if( !noDATA ) {
-        gr_response_vs_pt->SetPoint( iplot, hp_ptPhot_data->GetBinContent( iplot+1 ), dataResponse );
-        gr_response_vs_pt->SetPointError( iplot, hp_ptPhot_data->GetBinError( iplot+1 ), dataResponseErr );
+
+        TH1D* h1_thisPhotPt_data = (TH1D*)h2_ptPhot_data->ProjectionY( "proj_data", iplot+1, iplot+1 );
+        if( h1_thisPhotPt_data->GetEntries()>4 ) {
+          gr_response_vs_pt->SetPoint( iplot, h1_thisPhotPt_data->GetMean(), dataResponse );
+          gr_response_vs_pt->SetPointError( iplot, h1_thisPhotPt_data->GetMeanError(), dataResponseErr );
+        }
       
-        gr_resolution_vs_pt->SetPoint( iplot, hp_ptPhot_data->GetBinContent( iplot+1 ), dataResolution );
-        gr_resolution_vs_pt->SetPointError( iplot, hp_ptPhot_data->GetBinError( iplot+1 ), dataResolutionErr );
+        if( dataResolution > 0.0005 ) {
+          gr_resolution_vs_pt->SetPoint( iplot, h1_thisPhotPt_data->GetMean(), dataResolution );
+          gr_resolution_vs_pt->SetPointError( iplot, h1_thisPhotPt_data->GetMeanError(), dataResolutionErr );
+        }
+
+//      gr_response_vs_pt->SetPoint( iplot, hp_ptPhot_data->GetBinContent( iplot+1 ), dataResponse );
+//      gr_response_vs_pt->SetPointError( iplot, hp_ptPhot_data->GetBinError( iplot+1 ), dataResponseErr );
+//    
+//      gr_resolution_vs_pt->SetPoint( iplot, hp_ptPhot_data->GetBinContent( iplot+1 ), dataResolution );
+//      gr_resolution_vs_pt->SetPointError( iplot, hp_ptPhot_data->GetBinError( iplot+1 ), dataResolutionErr );
       }
 
       //weighted average of two MC pt's
-      Float_t ptMeanMC = (noMC) ? 0. : hp_ptPhot_mc->GetBinContent(iplot+1);
-      Float_t ptMeanErrMC = (noMC) ? 0. : hp_ptPhot_mc->GetBinError(iplot+1);
+      TH1D* h1_thisPhotPt_mc = (noMC) ? 0 : h2_ptPhot_mc->ProjectionY( "proj_mc", iplot+1, iplot+1 );
+
+      Float_t ptMeanMC = (noMC) ? 0. : h1_thisPhotPt_mc->GetMean();
+      Float_t ptMeanErrMC = (noMC) ? 0. : h1_thisPhotPt_mc->GetMeanError();
+    //Float_t ptMeanMC = (noMC) ? 0. : hp_ptPhot_mc->GetBinContent(iplot+1);
+    //Float_t ptMeanErrMC = (noMC) ? 0. : hp_ptPhot_mc->GetBinError(iplot+1);
      
-      Float_t mcResponse = (noMC) ? 0. : mcHisto_sum->GetMean();
-      Float_t mcResponseErr = (noMC) ? 0. : mcHisto_sum->GetMeanError();
-      Float_t mcRMS = (noMC) ? 0. : mcHisto_sum->GetRMS();
-      Float_t mcRMSErr = (noMC) ? 0. : mcHisto_sum->GetMeanError();
+    //Float_t mcResponse = (noMC) ? 0. : mcHisto_sum->GetMean();
+    //Float_t mcResponseErr = (noMC) ? 0. : mcHisto_sum->GetMeanError();
+    //Float_t mcRMS = (noMC) ? 0. : mcHisto_sum->GetRMS();
+    //Float_t mcRMSErr = (noMC) ? 0. : mcHisto_sum->GetMeanError();
+
+      Float_t mcResponse = 0.;
+      Float_t mcResponseErr = 0.;
+      Float_t mcRMS = 0.;
+      Float_t mcRMSErr = 0.;
+
+      if( !noMC )
+        fitTools::getTruncatedMeanAndRMS(mcHisto_sum, mcResponse, mcResponseErr, mcRMS, mcRMSErr, meanTruncFraction, rmsTruncFraction);
+
       Float_t mcResolution = (noMC) ? 0. : mcRMS / mcResponse;
       Float_t mcResolutionErr = (noMC) ? 0. : sqrt( mcRMSErr*mcRMSErr/(mcResponse*mcResponse) + mcResolution*mcResolution*mcResponseErr*mcResponseErr/(mcResponse*mcResponse*mcResponse*mcResponse) );
 
@@ -683,13 +763,16 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
         gr_purity_vs_pt->SetPoint( iplot, ptMeanMC, purity );
         gr_purity_vs_pt->SetPointError( iplot, ptMeanErrMC, purityErr );
    
-        char responseGEN_name[100];
-        sprintf( responseGEN_name, "responseGEN_%s", ptRange_str.c_str());
+        char responseGEN_name[150];
+        if( flags!="" )
+          sprintf( responseGEN_name, "responseGEN%s_%s_%s", L2L3_text.c_str(), flags.c_str(), ptRange_str.c_str());
+        else
+          sprintf( responseGEN_name, "responseGEN%s_%s", L2L3_text.c_str(), ptRange_str.c_str());
 
-        TH1F* responseGEN = (TH1F*)mcFiles_[0].file->Get(responseGEN_name);
+        TH1D* responseGEN = (TH1D*)mcFiles_[0].file->Get(responseGEN_name);
         if( mcFiles_.size()>1 ) {
           for( unsigned i=1; i<mcFiles_.size(); ++i ) {
-            TH1F* responseGEN2 = (TH1F*)mcFiles_[i].file->Get(responseGEN_name);
+            TH1D* responseGEN2 = (TH1D*)mcFiles_[i].file->Get(responseGEN_name);
             responseGEN->Add( responseGEN2 );
           }
         }
@@ -697,16 +780,22 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
         responseGEN->Scale(scaleFactor_);
         responseGEN->SetLineWidth(3);
     
+        Float_t genResponse = 0.;
+        Float_t genResponseErr = 0.;
+        Float_t genRMS = 0.;
+        Float_t genRMSErr = 0.;
+      
+        fitTools::getTruncatedMeanAndRMS(responseGEN, genResponse, genResponseErr, genRMS, genRMSErr, meanTruncFraction, rmsTruncFraction);
 
-        Float_t genResponse;
-        Float_t genResponseErr;
-        Float_t genRMS;
-        Float_t genRMSErr;
+      //Float_t genResponse;
+      //Float_t genResponseErr;
+      //Float_t genRMS;
+      //Float_t genRMSErr;
 
-        genResponse = responseGEN->GetMean();
-        genResponseErr = responseGEN->GetMeanError();
-        genRMS = responseGEN->GetRMS();
-        genRMSErr = responseGEN->GetMeanError();
+      //genResponse = responseGEN->GetMean();
+      //genResponseErr = responseGEN->GetMeanError();
+      //genRMS = responseGEN->GetRMS();
+      //genRMSErr = responseGEN->GetMeanError();
 
       ////compute responseGEN only from QCD BG:
       //Float_t genResponse = responseGEN->GetMean();
@@ -728,8 +817,14 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
       //Float_t denomgen = ( (1./errgen1) + (1./errgen2) );
       //Float_t ptMeanGEN = ( (xgen1/errgen1) + (xgen2/errgen2) ) / denomgen;
       //Float_t ptMeanErrGEN = 1./denomgen;
-        Float_t ptMeanGEN = hp_ptJetGen_mc->GetBinContent(iplot+1);
-        Float_t ptMeanErrGEN = hp_ptJetGen_mc->GetBinError(iplot+1);
+
+        TH1D* h1_thisPtJetGen = (TH1D*)h2_ptJetGen_mc->ProjectionY( "thisPtJetGen", iplot+1, iplot+1 );
+
+        Float_t ptMeanGEN = h1_thisPtJetGen->GetMean();
+        Float_t ptMeanErrGEN = h1_thisPtJetGen->GetMeanError();
+        
+      //Float_t ptMeanGEN = hp_ptJetGen_mc->GetBinContent(iplot+1);
+      //Float_t ptMeanErrGEN = hp_ptJetGen_mc->GetBinError(iplot+1);
         
         gr_responseGEN_vs_pt->SetPoint( iplot, ptMeanGEN, genResponse );
         gr_responseGEN_vs_pt->SetPointError( iplot, ptMeanErrGEN, genResponseErr );
@@ -745,6 +840,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
       
     if( outputdir_=="" ) this->set_outputdir();
     std::string canvasName = outputdir_ + "/" + name;
+    if( correctedResponse ) canvasName += "_L2L3";
     if( flags!="" )
       canvasName = canvasName + "_" + flags;
 
@@ -834,6 +930,8 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
         label_cuts->Draw("same");
       if( labelText!="" )
         label_bonus->Draw("same");
+      if( additionalLabel_!=0 )
+        additionalLabel_->Draw("same");
       std::string canvasName_log = canvasName + "_log";
       canvasName_eps = canvasName_log + ".eps";
       c1->SaveAs(canvasName_eps.c_str());
@@ -859,6 +957,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     TFile* graphFile = TFile::Open(graphFileName.c_str(), "update");
     graphFile->cd();
     std::string varName = name;
+    varName += L2L3_text;
     if( flags!="" )  varName += ("_" + flags);
     std::string graphName = varName + "_vs_pt";
     gr_response_vs_pt->SetName(graphName.c_str());
@@ -872,6 +971,19 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     graphName = "purity_" + varName;
     gr_purity_vs_pt->SetName(graphName.c_str());
     gr_purity_vs_pt->Write();
+    std::string varName_reso = "resolution";
+    if( isMPF ) varName_reso += "MPF";
+    varName_reso += L2L3_text;
+    if( flags!="" )  varName_reso += ("_" + flags);
+    graphName = varName_reso + "_vs_pt";
+    gr_resolution_vs_pt->SetName(graphName.c_str());
+    gr_resolution_vs_pt->Write();
+    graphName = "MC" + varName_reso + "_vs_pt";
+    gr_resolutionMC_vs_pt->SetName(graphName.c_str());
+    gr_resolutionMC_vs_pt->Write();
+    graphName = "GEN" + varName_reso + "_vs_pt";
+    gr_resolutionGEN_vs_pt->SetName(graphName.c_str());
+    gr_resolutionGEN_vs_pt->Write();
     graphFile->Close();
 
     gStyle->SetPadTickX(1);
@@ -979,7 +1091,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     label_algo->SetTextSize(labelTextSize);
     label_algo->AddText(jetAlgoName.c_str());
 
-    TLegend* legend = new TLegend(0.5, 0.06, 0.85, 0.3, "|#eta^{Jet}| < 1.3");
+    TLegend* legend = new TLegend(0.5, 0.06, 0.85, 0.3, legendTitle_.c_str());
     legend->SetFillColor(kWhite);
     legend->SetFillStyle(0);
     legend->SetTextSize(labelTextSize);
@@ -988,7 +1100,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
         legend->AddEntry( gr_response_vs_pt, "Data (#gamma+Jet)", "P");
       if( !noMC )
         legend->AddEntry( gr_responseMC_vs_pt, "Simulation (#gamma+Jet)", "P");
-    } else if( name=="responseMPF" ) {
+    } else if( isMPF ) {
       if( !noDATA )
         legend->AddEntry( gr_response_vs_pt, "Data (MPF)", "P");
       if( !noMC )
@@ -1041,7 +1153,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
 
     gPad->RedrawAxis();
 
-    std::string mpf = (name=="responseMPF") ? "MPF" : "";
+    std::string mpf = (isMPF) ? "MPF" : "";
 
     std::string canvName;
     if( flags!="" )
@@ -1123,14 +1235,14 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
       line_one->Draw("same");
 
       TLine* line_plus_reso = new TLine( ptPhot_binning[0], 1.+2.*scale_uncert, ptPhotMax, 1.+2.*scale_uncert );
-      line_plus_reso->SetLineColor(46);
-      line_plus_reso->SetLineWidth(2);
+      //line_plus_reso->SetLineColor(46);
+      //line_plus_reso->SetLineWidth(2);
       line_plus_reso->SetLineStyle(2);
       line_plus_reso->Draw("same");
       
       TLine* line_minus_reso = new TLine( ptPhot_binning[0], 1.-2.*scale_uncert, ptPhotMax, 1.-2.*scale_uncert );
-      line_minus_reso->SetLineColor(46);
-      line_minus_reso->SetLineWidth(2);
+      //line_minus_reso->SetLineColor(46);
+      //line_minus_reso->SetLineWidth(2);
       line_minus_reso->SetLineStyle(2);
       line_minus_reso->Draw("same");
       
@@ -1139,6 +1251,28 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
       gr_reso_ratio->SetMarkerStyle(20);
       gr_reso_ratio->SetMarkerSize(1.8);
       gr_reso_ratio->Draw("P");
+
+      TF1* constline = new TF1("constline", "[0]", ptPhot_binning[0], ptPhotMax);
+      constline->SetParameter(0, 1.);
+      //constline->SetLineColor(8);
+      //constline->SetLineColor(38);
+      constline->SetLineColor(46);
+      //constline->SetLineStyle(3);
+      constline->SetLineWidth(3);
+      gr_reso_ratio->Fit( constline, "R" );
+      std::cout << "-> ChiSquare: " << constline->GetChisquare() << "   NDF: " << constline->GetNDF() << std::endl;
+
+      TPaveText* fitlabel = new TPaveText(0.55, 0.4, 0.88, 0.45, "brNDC");
+      fitlabel->SetTextSize(0.08);
+      fitlabel->SetFillColor(0);
+      char fitLabelText[150];
+      sprintf( fitLabelText, "FIT: %.3f #pm %.3f", constline->GetParameter(0), constline->GetParError(0) );
+      fitlabel->AddText( fitLabelText );
+      fitlabel->Draw("same");
+      //line_plus_resp->Draw("same");
+      constline->Draw("same");
+      gr_reso_ratio->Draw("P same");
+      gPad->RedrawAxis();
 
       pad_hi->cd();
 
@@ -1176,7 +1310,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
 //  label_algo2->SetTextSize(labelTextSize);
 //  label_algo2->AddText(jetAlgoName.c_str());
 
-    TLegend* legend2 = new TLegend(0.5, 0.5, 0.85, 0.73, "|#eta^{Jet}| < 1.3");
+    TLegend* legend2 = new TLegend(0.5, 0.5, 0.85, 0.73, legendTitle_.c_str());
     legend2->SetFillColor(kWhite);
     legend2->SetFillStyle(0);
     legend2->SetTextSize(labelTextSize);
@@ -1185,7 +1319,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
         legend2->AddEntry( gr_resolution_vs_pt, "Data (#gamma+Jet)", "P");
       if( !noMC )
         legend2->AddEntry( gr_resolutionMC_vs_pt, "Simulation (#gamma+Jet)", "P");
-    } else if( name == "responseMPF" ) {
+    } else if( isMPF ) {
       if( !noDATA )
         legend2->AddEntry( gr_resolution_vs_pt, "Data (MPF)", "P");
       if( !noMC )
@@ -1232,6 +1366,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     canvName_png = canvName + ".png";
     c1->SaveAs(canvName_png.c_str());
 
+ 
     delete h2_axes;
     h2_axes = 0;
     delete h2_axes2;
@@ -1761,7 +1896,7 @@ void DrawBase::compareDifferentHistos_singleFile( InputFile infile, const std::v
 
   LegendBox lb = get_legendBox(legendQuadrant, &legendNames);
 
-  TLegend* legend = new TLegend( lb.xMin, lb.yMin, lb.xMax, lb.yMax );
+  TLegend* legend = new TLegend( lb.xMin, lb.yMin, lb.xMax, lb.yMax, legendTitle_.c_str() );
   legend->SetFillColor(0);
   legend->SetTextSize(0.035);
 
@@ -2106,6 +2241,7 @@ LegendBox DrawBase::get_legendBox( int legendQuadrant, const std::vector<std::st
     }
 
     int nNames_total = 0;
+    if( legendTitle_ != "" ) nNames_total+=1;
     if( legendNames!=0 ) {
       nNames_total += legendNames->size();
     } else {
@@ -2148,6 +2284,7 @@ LegendBox DrawBase::get_legendBox( int legendQuadrant, const std::vector<std::st
     }
 
     bool widen = false;
+    if( legendTitle_.size()>13 ) widen=true;
     if( legendNames!=0 ) {
       for( unsigned i=0;i<legendNames->size(); ++i )
         if( legendNames->at(i).length() > 13 ) widen=true;
@@ -2175,6 +2312,7 @@ std::string DrawBase::get_sqrtText() const {
     return std::string("#sqrt{s} = 7 TeV");
   }
   float lumi4Text(lumi_);
+  lumi4Text *= 1000000.; // in mub-1
   bool onlyOneDecimal=false;
   std::string units = "#mub ^{-1}";
   if( lumi4Text > 10. ) {
@@ -2310,13 +2448,14 @@ TPaveText* DrawBase::get_labelSqrt( int legendQuadrant ) const {
 
 TPaveText* DrawBase::get_labelAlgo( int legendQuadrant ) const {
 
-  if( legendQuadrant!=2 && legendQuadrant!=3 ) {
-    std::cout << "WARNING! Legend quadrant '" << legendQuadrant << "' not yet implemented for Algo label. Using 3." << std::endl;
-    legendQuadrant = 3;
-  }
 
   float x1, y1, x2, y2;
-  if( legendQuadrant==2 ) {
+  if( legendQuadrant==1 ) {
+    x1 = 0.7;
+    y1 = 0.82;
+    x2 = 0.75;
+    y2 = 0.86;
+  } else if( legendQuadrant==2 ) {
     x1 = 0.27;
     y1 = 0.82;
     x2 = 0.32;
@@ -2326,10 +2465,21 @@ TPaveText* DrawBase::get_labelAlgo( int legendQuadrant ) const {
     y1 = 0.15;
     x2 = 0.32;
     y2 = 0.2;
+  } else if( legendQuadrant==4 ) {
+    x1 = 0.7;
+    y1 = 0.15;
+    x2 = 0.75;
+    y2 = 0.2;
+  } else {
+    std::cout << "WARNING! Legend quadrant '" << legendQuadrant << "' not yet implemented for Algo label. Using 3." << std::endl;
+    x1 = 0.27;
+    y1 = 0.15;
+    x2 = 0.32;
+    y2 = 0.2;
   }
 
   Float_t labelTextSize = 0.035;
-  std::string jetAlgoName = get_algoName();
+  std::string jetAlgoName = (recoType_!="" && jetAlgo_!="") ? get_algoName() : "";
   TPaveText* label_algo = new TPaveText(x1,y1,x2,y2, "brNDC");
   label_algo->SetFillColor(kWhite);
   label_algo->SetTextSize(labelTextSize);
@@ -2422,4 +2572,23 @@ TGraphErrors* DrawBase::get_graphRatio( TGraphErrors* gr_data, TGraphErrors* gr_
   return gr_ratio;
 
 }
+
+
+void DrawBase::add_label( const std::string& text, float xmin, float ymin, float xmax, float ymax ) {
+
+  additionalLabel_ = new TPaveText( xmin, ymin, xmax, ymax, "brNDC" );
+  additionalLabel_->SetTextSize(0.035);
+  additionalLabel_->SetFillColor(0);
+  additionalLabel_->AddText(text.c_str());
+
+}
+
+void DrawBase::delete_label() {
+
+  delete additionalLabel_;
+  additionalLabel_ = 0;
+
+}
+
+
 

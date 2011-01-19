@@ -4,6 +4,8 @@
 
 
 Double_t rpf(Double_t *x, Double_t *p);
+Double_t NSC(Double_t *x, Double_t *p);
+Double_t NSCPF(Double_t *x, Double_t *p);
 Double_t powerlaw(Double_t *x, Double_t *p);
 
 
@@ -352,7 +354,7 @@ void fitTools::getTruncatedMeanAndRMS(TH1D* h1_projection, Float_t& mean, Float_
    } else {
      TF1* gaussian = new TF1("gaussian", "gaus");
      gaussian->SetLineColor(kGreen);
-     fitProjection(h1_projection, gaussian, 1.5, "RQ+");
+     fitProjection(h1_projection, gaussian, 1.5, "RQN");
      maxBin = (Int_t)ceil((gaussian->GetParameter(1)-xMin)/binWidth);
      delete gaussian;
    }
@@ -1002,13 +1004,13 @@ TGraphAsymmErrors* fitTools::getEfficiencyGraph(const std::string& name, TH1F* h
 
 
 
-TF1* fitTools::fitResponseGraph( TGraphErrors* graph, std::string funcType, std::string funcName, const std::string& option, float rangeMax) {
+TF1* fitTools::fitResponseGraph( TGraphErrors* graph, std::string funcType, std::string funcName, const std::string& option, float rangeMax, float rangeMin) {
 
   
   TF1* fitFunction;
 
   if( funcType=="rpf" ) {
-    fitFunction = new TF1(funcName.c_str(), rpf, 10., rangeMax, 6); //will have to fix the range issue!
+    fitFunction = new TF1(funcName.c_str(), rpf, rangeMin, rangeMax, 6); //will have to fix the range issue!
     fitFunction->SetParameters(100,0.85,4.2,80,250,1.);
     fitFunction->SetParLimits(1,0.5,1.0);
     fitFunction->SetParLimits(2,1.,10.);
@@ -1026,6 +1028,40 @@ TF1* fitTools::fitResponseGraph( TGraphErrors* graph, std::string funcType, std:
     fitFunction->SetParameters(1., 1., 0.3, 1.);
   } else {
     std::cout << "Function '" << funcType << "' not implemented yet for fitResponseGraph. Exiting." << std::endl;
+    exit(119);
+  }
+
+  graph->Fit(fitFunction, option.c_str());
+
+  return fitFunction;
+
+}
+
+
+
+TF1* fitTools::fitResolutionGraph( TGraphErrors* graph, std::string funcType, std::string funcName, const std::string& option, float rangeMax, float rangeMin) {
+
+  
+  TF1* fitFunction;
+
+  if( funcType=="NSC" ) {
+    fitFunction = new TF1(funcName.c_str(), NSC, rangeMin, rangeMax, 3); //will have to fix the range issue!
+    fitFunction->SetParameters( 0., 1., 0.05);
+    fitFunction->SetParLimits( 0, 0., 2.);
+    fitFunction->SetParLimits( 1, 0., 2.);
+    fitFunction->SetParLimits( 2, 0., 0.2 );
+  } else if( funcType=="NSCPF" ) {
+    fitFunction = new TF1(funcName.c_str(), NSCPF, rangeMin, rangeMax, 4); //will have to fix the range issue!
+    //fitFunction = new TF1(funcName.c_str(), NSCPF, rangeMin, rangeMax, 2); //will have to fix the range issue!
+    fitFunction->SetParameters( 0., 1., 0.05, 0.);
+    fitFunction->SetParLimits( 0, -2., 1.);
+    fitFunction->SetParLimits( 1, 0., 1.1);
+    fitFunction->SetParLimits( 2, 0., 0.12 );
+    fitFunction->SetParLimits( 3, 0., 1.);
+  //fitFunction->SetParLimits( 0, 0.7, 1.1);
+  //fitFunction->SetParLimits( 1, 0., 0.12 );
+  } else {
+    std::cout << "Function '" << funcType << "' not implemented yet for fitResolutionGraph. Exiting." << std::endl;
     exit(119);
   }
 
@@ -1064,6 +1100,39 @@ Double_t rpf(Double_t *x, Double_t *p) {
   if (w>1.) w = 1.;
 
   return ((1.-w)*(r_inf-f) + w*(r_inf-r*f));
+
+}
+
+
+Double_t NSC(Double_t *x, Double_t *p) {
+
+  double pt = x[0];
+  double N = p[0];
+  double S = p[1];
+  double C = p[2];
+
+  return sqrt( N*N/pt/pt + S*S/pt + C*C );
+
+}
+
+Double_t NSCPF(Double_t *x, Double_t *p) {
+
+/*
+  double pt = x[0];
+  double N = 0.;
+  double S = p[0];
+  double C = p[1];
+
+  return sqrt( N*N/pt/pt + S*S/pt + C*C );
+*/
+
+  double pt = x[0];
+  double N = p[0];
+  double S = p[1];
+  double C = p[2];
+  double m = p[3];
+
+  return sqrt( N*fabs(N)/pt/pt + S*S*pow(pt, m-1.) + C*C );
 
 }
 
@@ -1186,8 +1255,9 @@ TH1D* fitTools::getBand(TF1 *f, TMatrixD const& m, std::string name, bool getRel
 TGraphErrors* fitTools::get_graphRatio( TGraphErrors* gr_data, TGraphErrors* gr_MC ) {
 
   TGraphErrors* gr_ratio = new TGraphErrors(0);
+  
 
-  for( unsigned i= 0; i<gr_MC->GetN(); ++i ) {
+  for( unsigned i= 0; i<gr_data->GetN(); ++i ) {
 
     Double_t datax, datay;
     gr_data->GetPoint( i, datax, datay );
@@ -1202,12 +1272,14 @@ TGraphErrors* fitTools::get_graphRatio( TGraphErrors* gr_data, TGraphErrors* gr_
     Double_t ratiox = mcx;
     Double_t ratioxerr = mcxerr;
 
-    Double_t ratioy = datay / mcy;
-    Double_t ratioyerr = sqrt( datayerr*datayerr/(mcy*mcy) + datay*datay*mcyerr*mcyerr/(mcy*mcy*mcy*mcy) );
+    Double_t ratioy = (mcy>0.) ? datay / mcy : 0.;
+    Double_t ratioyerr = (mcy>0.) ? sqrt( datayerr*datayerr/(mcy*mcy) + datay*datay*mcyerr*mcyerr/(mcy*mcy*mcy*mcy) ) : 0.;
 
 
-    gr_ratio->SetPoint( i, ratiox, ratioy );
-    gr_ratio->SetPointError( i, ratioxerr, ratioyerr );
+    if( ratioxerr>0. && ratioyerr>0. ) {
+      gr_ratio->SetPoint( i, ratiox, ratioy );
+      gr_ratio->SetPointError( i, ratioxerr, ratioyerr );
+    }
 
   } //for points
 

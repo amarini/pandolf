@@ -65,7 +65,7 @@ class DrawBase {
   void set_sameInstanceNormalization();
 
   //void drawHisto( const std::string& name, const std::string& etaRegion, const std::string& flags, const std::string& axisName="", const std::string& units="", int legendQuadrant=1, bool log_aussi=false);
-  void drawHisto( const std::string& name, const std::string& axisName, const std::string& units="", const std::string& instanceName="Entries", bool log_aussi=false, int legendQuadrant=1, const std::string& labelText="", const std::string& flags="" );
+  void drawHisto( const std::string& name, const std::string& axisName, const std::string& units="", const std::string& instanceName="Entries", bool log_aussi=false, int legendQuadrant=1, const std::string& flags="", bool correctedResponse=false, const std::string& labelText="" );
   void drawProfile( const std::string& yVar, const std::string& xVar, int legendQuadrant=1);
   void drawStack(const std::string& varY, const std::string& varX, const std::string& RECO_GEN, bool isData) const { this->drawStack( varY, varX, "", RECO_GEN, isData); };
   void drawStack(const std::string& varY, const std::string& varX, const std::string& etaRegion, const std::string& RECO_GEN, bool isData) const;
@@ -81,6 +81,7 @@ class DrawBase {
   void add_mcFile( TFile* mcFile, const std::string& datasetName, const std::string& legendName, int fillColor=-1, int fillStyle=-1, int markerStyle=-1, int lineColor=-1, int lineWidth=-1 );
   // in the following function weight must be cross_section(in pb) / Nevents:
   void add_mcFile( TFile* mcFile, float weight, const std::string& datasetName, const std::string& legendName, int fillColor=-1, int fillStyle=-1, int markerStyle=-1, int lineColor=-1, int lineWidth=-1 );
+  void set_lumi( float lumi ) { lumi_ = lumi; };
   void set_outputdir( const std::string& outputdir="" ); //if "" is passed, default outputdir is set
   void set_flags( const std::string& flags ) { flags_ = flags; };
   void set_pt_thresh( Int_t pt_thresh ) { pt_thresh_ = pt_thresh; };
@@ -95,6 +96,9 @@ class DrawBase {
   void set_mcMarkers( bool set=true );
   void set_markerSize( float markerSize ) { markerSize_ = markerSize; };
   void set_getBinLabels( bool getBinL=true ) { getBinLabels_ = getBinL; };
+  void set_legendTitle( const std::string& title ) { legendTitle_ = title; };
+  void add_label( const std::string& text, float xmin, float ymin, float xmax, float ymax );
+  void delete_label();
 
   LegendBox get_legendBox( int legendQuadrant=1, const std::vector<std::string>* legendNames=0 ) const;
   TPaveText* get_labelCMS( int legendQuadrant=2 ) const;
@@ -104,6 +108,7 @@ class DrawBase {
   std::string get_analysisType() const { return analysisType_; };
   std::string get_recoType() const { return recoType_; };
   std::string get_flags() const { return flags_; };
+  std::string get_legendTitle() const { return legendTitle_; };
   TFile* get_dataFile( int i ) const { return dataFiles_[i].file; };
   TFile* get_mcFile( int i ) const { return mcFiles_[i].file; };
   std::string get_outputdir() const { return outputdir_; };
@@ -147,6 +152,9 @@ class DrawBase {
   bool pdf_aussi_;
   bool logx_;
   bool getBinLabels_;
+  std::string legendTitle_;
+
+  TPaveText* additionalLabel_;
 
   bool noStack_;
 
