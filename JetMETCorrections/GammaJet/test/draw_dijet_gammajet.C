@@ -48,10 +48,14 @@ int main( int argc, char* argv[]) {
 
   DrawBase* db = new DrawBase("Dijet_Gammajet", recoType, "akt5");
 
-  std::string dijetFileName = "dj_resolution_17012011/data_"+jetalgo_dijet+"_final.root";
+  //std::string dijetFileName = "dj_resolution_17012011/data_"+jetalgo_dijet+"_final.root";
+  std::string dijetFileName = "dj_resolution_10022011_NEW/data_"+jetalgo_dijet+"_final.scaled.root";
   TFile* file_dijet = TFile::Open(dijetFileName.c_str());
-  std::string gammajetFileName = "PhotonJetExtrapGraphs_DATA_Nov4ReReco_vs_G_TuneZ2_7TeV_pythia6_"+jetalgo_gammajet+"_LUMI_2ndJet10_eta011L2L3_RMS99.root";
+  std::cout << "-> Opened file '" << dijetFileName << "'." << std::endl;
+  std::string gammajetFileName = "PhotonJetExtrapGraphs_DATA_Nov4ReReco_vs_G_TuneZ2_7TeV_pythia6_CORR_"+jetalgo_gammajet+"_LUMI_2ndJet10_eta011L2L3Raw_RMS99.root";
+  //std::string gammajetFileName = "PhotonJetExtrapGraphs_DATA_Nov4ReReco_vs_G_TuneZ2_7TeV_pythia6_CORR_"+jetalgo_gammajet+"_LUMI_2ndJet10_eta011L2L3_RMS99.root";
   TFile* file_gammajet = TFile::Open(gammajetFileName.c_str());
+  std::cout << "-> Opened file '" << gammajetFileName << "'." << std::endl;
 
   db->add_dataFile(file_dijet, "DiJets");
   db->add_dataFile(file_gammajet, "GammaJets");
@@ -63,7 +67,12 @@ int main( int argc, char* argv[]) {
   TGraphErrors* graph_gammajet = (TGraphErrors*)file_gammajet->Get("gr_DATAReso_vs_pt");
   TGraphErrors* graph_intrinsic = (TGraphErrors*)file_gammajet->Get("gr_intrReso_vs_pt");
 
-  graph_gammajet->RemovePoint(0);
+  if( recoType=="calo" ) {
+    graph_gammajet->RemovePoint(graph_gammajet->GetN()-1);
+    graph_gammajet->RemovePoint(0);
+    graph_gammajet->RemovePoint(0);
+    graph_gammajet->RemovePoint(0);
+  }
 
   graph_dijet->SetMarkerStyle(20);
   graph_dijet->SetMarkerSize(1.8);
@@ -73,7 +82,7 @@ int main( int argc, char* argv[]) {
   graph_gammajet->SetMarkerSize(1.8);
   graph_gammajet->SetMarkerColor(46);
 
-  float xMin = 22.;
+  float xMin = 32.;
   float xMax = 600.;
 
   TF1* fit_intrReso = fitTools::fitResolutionGraph(graph_intrinsic, "NSCPF", "fit_intrReso", "NR", xMax, xMin);
@@ -91,7 +100,7 @@ int main( int argc, char* argv[]) {
   axes->GetXaxis()->SetTitleOffset(1.1);
   axes->GetYaxis()->SetTitleOffset(1.5);
   axes->SetXTitle("Transverse Momentum [GeV/c]");
-  axes->SetYTitle("Jet Resolution");
+  axes->SetYTitle("Jet p_{T} Resolution");
   axes->GetXaxis()->SetMoreLogLabels();
   axes->GetXaxis()->SetNoExponent();
 

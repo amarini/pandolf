@@ -63,6 +63,12 @@ draw_PhotonJet_vs_QCD_vs_pt: fitTools.o DrawBase.o draw_PhotonJet_vs_QCD_vs_pt.C
 drawSystPhotonJetExtrap: fitTools.o drawSystPhotonJetExtrap.C
 	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o drawSystPhotonJetExtrap drawSystPhotonJetExtrap.C fitTools.o $(ROOTFLAG) -lMinuit
 
+draw_dijet_gammajet: fitTools.o DrawBase.o draw_dijet_gammajet.C
+	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o draw_dijet_gammajet draw_dijet_gammajet.C fitTools.o DrawBase.o $(ROOTFLAG) -lMinuit
+
+drawResoBreakdown: fitTools.o DrawBase.o drawResoBreakdown.C
+	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o drawResoBreakdown drawResoBreakdown.C fitTools.o DrawBase.o $(ROOTFLAG) -lMinuit
+
 drawMinBias: fitTools.o DrawBase.o
 	$(CC) -Wall -o drawMinBias drawMinBias.cpp fitTools.o DrawBase.o $(ROOTFLAG) -lMinuit
 

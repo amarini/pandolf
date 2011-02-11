@@ -19,18 +19,24 @@ struct TwoHistos {
   TH1D* h1_reso;
 };
 
+struct TwoFunctions {
+  TF1* f1_resp;
+  TF1* f1_reso;
+};
+
 
 bool MCASSOC_ = false;
 bool NOHEMISPHERE_ = false;
 std::string FITRMS_ = "FIT";
 std::string JETALGO_;
+std::string RECOTYPE_;
 
 
 
 TwoHistos getSyst_q();
 TwoHistos getSyst_flavor();
 TwoHistos getSyst_QCD();
-TF1* getSyst_photonScale();
+TwoFunctions getSyst_photonScale();
 TwoHistos getStat();
 TGraphErrors* getGraph(std::string fileName, std::string graphName);
 //void drawTotalError( std::string resp_reso, TH1D* syst_q, TH1D* syst_flavor, TH1D* syst_QCD, TF1* syst_photonScale, TH1D* stat );
@@ -59,6 +65,7 @@ int main( int argc, char* argv[]) {
     std::cout << "Unknown recoType '" << recoType_str << "'. Exiting." << std::endl;
     exit(878);
   }
+  RECOTYPE_ = recoType_str;
 
 
   TStyle *simpleStyle = new TStyle("simpleStyle","");
@@ -76,9 +83,11 @@ int main( int argc, char* argv[]) {
   //syst:
   TwoHistos histos_q = getSyst_q();
   TwoHistos histos_flavor = getSyst_flavor();
-  TwoHistos histos_QCD = getSyst_QCD();
+  //TwoHistos histos_QCD = getSyst_QCD();
 
-  TF1* syst_photonScale = getSyst_photonScale();
+  TwoFunctions tf = getSyst_photonScale();
+  TF1* syst_photonScale_resp = tf.f1_resp; 
+  TF1* syst_photonScale_reso = tf.f1_reso; 
 
   //stat:
   TwoHistos histos_stat = getStat();
@@ -86,8 +95,8 @@ int main( int argc, char* argv[]) {
   //total:
 //drawTotalError( "resp", histos_q.h1_resp, histos_flavor.h1_resp, histos_QCD.h1_resp, syst_photonScale, histos_stat.h1_resp );
 //drawTotalError( "reso", histos_q.h1_reso, histos_flavor.h1_reso, histos_QCD.h1_reso, syst_photonScale, histos_stat.h1_reso );
-  drawTotalError( "resp", histos_q.h1_resp, histos_flavor.h1_resp, syst_photonScale, histos_stat.h1_resp );
-  drawTotalError( "reso", histos_q.h1_reso, histos_flavor.h1_reso, syst_photonScale, histos_stat.h1_reso );
+  drawTotalError( "resp", histos_q.h1_resp, histos_flavor.h1_resp, syst_photonScale_resp, histos_stat.h1_resp );
+  drawTotalError( "reso", histos_q.h1_reso, histos_flavor.h1_reso, syst_photonScale_reso, histos_stat.h1_reso );
 
 
 
@@ -117,46 +126,64 @@ TwoHistos getSyst_q() {
 
 
   bool q15 = false;
+  //std::string funcType_resp = (RECOTYPE_=="pf") ? "rpf" : "powerlawL2L3";
+  std::string funcType_resp = "powerlawL2L3";
+  std::string funcType_reso = (RECOTYPE_=="pf") ? "NSCPF" : "NSC";
+  //std::string funcType = "NSC";
 
-  std::string fileName_reso = "PhotonJetExtrapGraphs_DATA_Nov4ReReco_vs_G_TuneZ2_7TeV_pythia6_"+JETALGO_+"_LUMI_2ndJet10_eta013L2L3_RMS99.root";
-  TGraphErrors* gr_extrapReso_q = getGraph(fileName_reso, "gr_extrapReso_vs_pt");
-  TF1* fit_extrapReso_q= fitTools::fitResolutionGraph(gr_extrapReso_q, "NSCPF", "fit_extrapReso_q");
+  std::string graphName = "gr_extrapReso_vs_pt";
 
-  std::string fileName_resp = "PhotonJetExtrapGraphs_DATA_Nov4ReReco_vs_G_TuneZ2_7TeV_pythia6_"+JETALGO_+"_LUMI_2ndJet10_eta013L2L3_RMS99.root";
+  std::string fileName_reso = "PhotonJetExtrapGraphs_DATA_Nov4ReReco_vs_G_TuneZ2_7TeV_pythia6_CORR_"+JETALGO_+"_LUMI_2ndJet10_eta011L2L3Raw_RMS99.root";
+  if( RECOTYPE_=="pf" ) fileName_reso = "PhotonJetExtrapGraphs_DATA_Nov4ReReco_vs_G_TuneZ2_7TeV_pythia6_CORR_"+JETALGO_+"_LUMI_2ndJet10_eta011L2L3_RMS99.root";
+  TGraphErrors* gr_extrapReso_q = getGraph(fileName_reso, graphName);
+  /*if( RECOTYPE_!="pf" )*/ gr_extrapReso_q->RemovePoint(0);
+  if( RECOTYPE_=="calo" ) gr_extrapReso_q->RemovePoint(0);
+  TF1* fit_extrapReso_q= fitTools::fitResolutionGraph(gr_extrapReso_q, funcType_reso, "fit_extrapReso_q", "RN");
+  fit_extrapReso_q->SetLineColor(kRed);
+
+  std::string fileName_resp = "PhotonJetExtrapGraphs_DATA_Nov4ReReco_vs_G_TuneZ2_7TeV_pythia6_CORR_"+JETALGO_+"_LUMI_2ndJet10_eta011L2L3Raw_RMS99.root";
   TGraphErrors* gr_extrapResp_q = getGraph(fileName_resp, "gr_extrapResp_vs_pt");
-  TF1* fit_extrapResp_q= fitTools::fitResponseGraph(gr_extrapResp_q, "rpf", "fit_extrapResp_q");
+  TF1* fit_extrapResp_q= fitTools::fitResponseGraph(gr_extrapResp_q, funcType_resp, "fit_extrapResp_q", "RN");
+  fit_extrapResp_q->SetLineColor(kRed);
 
 
-  if( q15 ) {
-    fileName_resp = "PhotonJetExtrapGraphs_DATA_Nov4ReReco_vs_G_TuneZ2_7TeV_pythia6_"+JETALGO_+"_LUMI_2ndJet10_eta013L2L3_RMS99_NOQ.root";
-    fileName_reso = "PhotonJetExtrapGraphs_DATA_Nov4ReReco_vs_G_TuneZ2_7TeV_pythia6_"+JETALGO_+"_LUMI_2ndJet10_eta013L2L3_RMS99_NOQ.root";
-  } else {
-    fileName_resp = "PhotonJetExtrapGraphs_DATA_Nov4ReReco_vs_G_TuneZ2_7TeV_pythia6_"+JETALGO_+"_LUMI_2ndJet10_eta013L2L3_RMS99_NOQ.root";
-    fileName_reso = "PhotonJetExtrapGraphs_DATA_Nov4ReReco_vs_G_TuneZ2_7TeV_pythia6_"+JETALGO_+"_LUMI_2ndJet10_eta013L2L3_RMS99_NOQ.root";
-  }
+  fileName_resp = "PhotonJetExtrapGraphs_DATA_Nov4ReReco_vs_G_TuneZ2_7TeV_pythia6_CORR_"+JETALGO_+"_LUMI_2ndJet10_eta011L2L3Raw_RMS99_NOQ.root";
+  fileName_reso = "PhotonJetExtrapGraphs_DATA_Nov4ReReco_vs_G_TuneZ2_7TeV_pythia6_CORR_"+JETALGO_+"_LUMI_2ndJet10_eta011L2L3Raw_RMS99_NOQ.root";
+  if( RECOTYPE_=="pf" ) fileName_reso = "PhotonJetExtrapGraphs_DATA_Nov4ReReco_vs_G_TuneZ2_7TeV_pythia6_CORR_"+JETALGO_+"_LUMI_2ndJet10_eta011L2L3_RMS99_NOQ.root";
 
-  TGraphErrors* gr_extrapReso_noq = getGraph(fileName_reso, "gr_extrapReso_vs_pt");
-  TF1* fit_extrapReso_noq = fitTools::fitResolutionGraph(gr_extrapReso_noq, "NSCPF", "fit_extrapReso_noq");
-  fit_extrapReso_noq->SetLineColor(kRed);
+
+  TGraphErrors* gr_extrapReso_noq = getGraph(fileName_reso, graphName);
+  /*if( RECOTYPE_!="pf" )*/ gr_extrapReso_noq->RemovePoint(0);
+  if( RECOTYPE_=="calo" ) gr_extrapReso_noq->RemovePoint(0);
+  TF1* fit_extrapReso_noq = fitTools::fitResolutionGraph(gr_extrapReso_noq, funcType_reso, "fit_extrapReso_noq", "RN");
+  fit_extrapReso_noq->SetLineColor(kBlue);
 
   TGraphErrors* gr_extrapResp_noq = getGraph(fileName_resp, "gr_extrapResp_vs_pt");
-  TF1* fit_extrapResp_noq = fitTools::fitResponseGraph(gr_extrapResp_noq, "rpf", "fit_extrapResp_noq");
-  fit_extrapResp_noq->SetLineColor(kRed);
+  TF1* fit_extrapResp_noq = fitTools::fitResponseGraph(gr_extrapResp_noq, funcType_resp, "fit_extrapResp_noq", "RN");
+  fit_extrapResp_noq->SetLineColor(kBlue);
 
   TH1D* band_resp_q = fitTools::getBand(fit_extrapResp_q, "band_resp_q");
   TH1D* band_resp_noq = fitTools::getBand(fit_extrapResp_noq, "band_resp_noq");
 
+  TH1D* band_reso_q = fitTools::getBand(fit_extrapReso_q, "band_reso_q");
+  TH1D* band_reso_noq = fitTools::getBand(fit_extrapReso_noq, "band_reso_noq");
 
 
   for( unsigned iBin=0; iBin<99; ++iBin ) {
 
     Double_t binCenter = 0.5*(xvec[iBin+1]+xvec[iBin]);
 
-    Double_t syst_reso_value = 100.*fabs( fit_extrapReso_q->Eval(binCenter) - fit_extrapReso_noq->Eval(binCenter) )/fit_extrapReso_q->Eval(binCenter);
-    syst_q_reso->SetBinContent( iBin+1, syst_reso_value );
-
     Double_t syst_resp_value = 100.*fabs( fit_extrapResp_q->Eval(binCenter) - fit_extrapResp_noq->Eval(binCenter) )/fit_extrapResp_q->Eval(binCenter);
     syst_q_resp->SetBinContent( iBin+1, syst_resp_value );
+
+    Double_t syst_reso_value = 100.*fabs( fit_extrapReso_q->Eval(binCenter) - fit_extrapReso_noq->Eval(binCenter) )/fit_extrapReso_q->Eval(binCenter);
+    Double_t err_reso = 100.*sqrt( band_reso_q->GetBinError(iBin+1)*band_reso_q->GetBinError(iBin+1) + band_reso_noq->GetBinError(iBin+1)*band_reso_noq->GetBinError(iBin+1) );
+      syst_q_reso->SetBinContent( iBin+1, syst_reso_value );
+  //if( syst_reso_value > err_reso ) {
+  //  syst_q_reso->SetBinContent( iBin+1, syst_reso_value );
+  //} else {
+  //  syst_q_reso->SetBinContent( iBin+1, err_reso );
+  //}
 
   }
 
@@ -170,27 +197,35 @@ TwoHistos getSyst_q() {
   cSyst_q->Clear();
   cSyst_q->SetLogx();
   axesreso->Draw();
+  //band_reso_noq->Draw("c e3 same");
+  //band_reso_q->Draw("c e3 same");
+  fit_extrapReso_noq->Draw("same");
+  fit_extrapReso_q->Draw("same");
   gr_extrapReso_q->SetMarkerStyle(20);
   gr_extrapReso_noq->SetMarkerStyle(20);
   gr_extrapReso_q->SetMarkerColor(kRed);
   gr_extrapReso_noq->SetMarkerColor(kBlue);
   gr_extrapReso_q->Draw("p same");
   gr_extrapReso_noq->Draw("p same");
-  std::string canvName = "syst_resp_q_"+JETALGO_+".eps";
+  std::string canvName = "syst_reso_q_"+JETALGO_+".eps";
   cSyst_q->SaveAs(canvName.c_str());
 
-  TH2D* axesresp = new TH2D("axesresp", "", 10, 20., 1400., 10, 0.5, 1.3);
+  TH2D* axesresp = new TH2D("axesresp", "", 10, 20., 1400., 10, 0., 1.3);
   cSyst_q->cd();
   cSyst_q->Clear();
   cSyst_q->SetLogx();
   axesresp->Draw();
+  band_resp_noq->Draw("c e3 same");
+  band_resp_q->Draw("c e3 same");
+  fit_extrapResp_noq->Draw("same");
+  fit_extrapResp_q->Draw("same");
   gr_extrapResp_q->SetMarkerStyle(20);
   gr_extrapResp_noq->SetMarkerStyle(20);
   gr_extrapResp_q->SetMarkerColor(kRed);
   gr_extrapResp_noq->SetMarkerColor(kBlue);
   gr_extrapResp_q->Draw("p same");
   gr_extrapResp_noq->Draw("p same");
-  canvName = "syst_reso_q_"+JETALGO_+".eps";
+  canvName = "syst_resp_q_"+JETALGO_+".eps";
   cSyst_q->SaveAs(canvName.c_str());
 
   delete axesresp;
@@ -214,33 +249,56 @@ TwoHistos getSyst_flavor() {
 
   std::string fileName_resp, fileName_reso;
 
-  fileName_resp = "PhotonJetGraphs_DATA_Nov4ReReco_vs_G_TuneZ2_7TeV_pythia6_"+JETALGO_+"_LUMI_GLUON_2ndJet10.root";
-  fileName_reso = "PhotonJetGraphs_DATA_Nov4ReReco_vs_G_TuneZ2_7TeV_pythia6_"+JETALGO_+"_LUMI_GLUON_2ndJet10.root";
-  TGraphErrors* gr_intrReso_gluon = getGraph(fileName_reso, "GENresolution_L2L3_eta013_vs_pt");
-  //TGraphErrors* gr_intrReso_gluon = getGraph(fileName_reso, "GENresolution_eta013_vs_pt");
+  fileName_resp = "PhotonJetGraphs_DATA_Nov4ReReco_vs_G_TuneZ2_7TeV_pythia6_CORR_"+JETALGO_+"_LUMI_GLUON_2ndJet10.root";
+  fileName_reso = "PhotonJetGraphs_DATA_Nov4ReReco_vs_G_TuneZ2_7TeV_pythia6_CORR_"+JETALGO_+"_LUMI_GLUON_2ndJet10.root";
+  TGraphErrors* gr_intrReso_gluon = getGraph(fileName_reso, "GENresolution_L2L3_eta011_vs_pt");
+  //TGraphErrors* gr_intrReso_gluon = getGraph(fileName_reso, "GENresolution_eta011_vs_pt");
+  TF1* fit_intrReso_gluon_NSC = fitTools::fitResolutionGraph(gr_intrReso_gluon, "NSC", "fit_intrReso_gluon_NSC");
   TF1* fit_intrReso_gluon = fitTools::fitResolutionGraph(gr_intrReso_gluon, "NSCPF", "fit_intrReso_gluon");
-  TGraphErrors* gr_intrResp_gluon = getGraph(fileName_resp, "GENresponse_L2L3_eta013_vs_pt");
-  //TGraphErrors* gr_intrResp_gluon = getGraph(fileName_resp, "GENresponse_eta013_vs_pt");
+  TGraphErrors* gr_intrResp_gluon = getGraph(fileName_resp, "GENresponse_L2L3_eta011_vs_pt");
+  //TGraphErrors* gr_intrResp_gluon = getGraph(fileName_resp, "GENresponse_eta011_vs_pt");
   //TF1* fit_intrResp_gluon = fitTools::fitResponseGraph(gr_intrResp_gluon, "rpf", "fit_intrResp_gluon");
-  TF1* fit_intrResp_gluon= fitTools::fitResponseGraph(gr_intrResp_gluon, "powerlaw", "fit_intrResp_gluon");
+  TF1* fit_intrResp_gluon= fitTools::fitResponseGraph(gr_intrResp_gluon, "powerlaw", "fit_intrResp_gluon", "RN", 800.);
 
-  fileName_resp = "PhotonJetGraphs_DATA_Nov4ReReco_vs_G_TuneZ2_7TeV_pythia6_"+JETALGO_+"_LUMI_QUARK_2ndJet10.root";
-  fileName_reso = "PhotonJetGraphs_DATA_Nov4ReReco_vs_G_TuneZ2_7TeV_pythia6_"+JETALGO_+"_LUMI_QUARK_2ndJet10.root";
-  TGraphErrors* gr_intrReso_quark = getGraph(fileName_reso, "GENresolution_L2L3_eta013_vs_pt");
-  //TGraphErrors* gr_intrReso_quark = getGraph(fileName_reso, "GENresolution_eta013_vs_pt");
+  fileName_resp = "PhotonJetGraphs_DATA_Nov4ReReco_vs_G_TuneZ2_7TeV_pythia6_CORR_"+JETALGO_+"_LUMI_QUARK_2ndJet10.root";
+  fileName_reso = "PhotonJetGraphs_DATA_Nov4ReReco_vs_G_TuneZ2_7TeV_pythia6_CORR_"+JETALGO_+"_LUMI_QUARK_2ndJet10.root";
+  TGraphErrors* gr_intrReso_quark = getGraph(fileName_reso, "GENresolution_L2L3_eta011_vs_pt");
+  //TGraphErrors* gr_intrReso_quark = getGraph(fileName_reso, "GENresolution_eta011_vs_pt");
+  TF1* fit_intrReso_quark_NSC = fitTools::fitResolutionGraph(gr_intrReso_quark, "NSC", "fit_intrReso_quark_NSC");
   TF1* fit_intrReso_quark = fitTools::fitResolutionGraph(gr_intrReso_quark, "NSCPF", "fit_intrReso_quark");
-  TGraphErrors* gr_intrResp_quark = getGraph(fileName_resp, "GENresponse_L2L3_eta013_vs_pt");
-  //TGraphErrors* gr_intrResp_quark = getGraph(fileName_resp, "GENresponse_eta013_vs_pt");
+  TGraphErrors* gr_intrResp_quark = getGraph(fileName_resp, "GENresponse_L2L3_eta011_vs_pt");
+  //TGraphErrors* gr_intrResp_quark = getGraph(fileName_resp, "GENresponse_eta011_vs_pt");
   //TF1* fit_intrResp_quark = fitTools::fitResponseGraph(gr_intrResp_quark, "rpf", "fit_intrResp_quark");
-  TF1* fit_intrResp_quark= fitTools::fitResponseGraph(gr_intrResp_quark, "powerlaw", "fit_intrResp_gluon");
+  TF1* fit_intrResp_quark= fitTools::fitResponseGraph(gr_intrResp_quark, "powerlaw", "fit_intrResp_quark", "RN", 800.);
+
+  TH1D* band_reso_quark = fitTools::getBand(fit_intrReso_quark_NSC, "band_intrReso_quark");
+  TH1D* band_resp_quark = fitTools::getBand(fit_intrResp_quark, "band_intrResp_quark");
+  TH1D* band_reso_gluon = fitTools::getBand(fit_intrReso_gluon_NSC, "band_intrReso_gluon");
+  TH1D* band_resp_gluon = fitTools::getBand(fit_intrResp_gluon, "band_intrResp_gluon");
+
+//std::cout << std::endl << std::endl;
+//std::cout << "AFTER: " << band_reso_quark->GetName() << std::endl;
+//for( unsigned ibin=1; ibin<band_reso_quark->GetNbinsX()+1; ++ibin)
+//std::cout << band_reso_quark->GetBinContent(ibin) << "   " << band_reso_quark->GetBinError(ibin) << std::endl;
+
+  band_reso_quark->SetFillColor(kYellow-9);
+  band_resp_quark->SetFillColor(kYellow-9);
+  band_reso_gluon->SetFillColor(kYellow-9);
+  band_resp_gluon->SetFillColor(kYellow-9);
 
 
   for( unsigned iBin=0; iBin<99; ++iBin ) {
 
     Double_t binCenter = 0.5*(xvec[iBin+1]+xvec[iBin]);
 
-    Double_t syst_reso_value = 100.*fabs( fit_intrReso_quark->Eval(binCenter) - fit_intrReso_gluon->Eval(binCenter) )/(0.5*(fit_intrReso_quark->Eval(binCenter)+fit_intrReso_gluon->Eval(binCenter)));
-    syst_flavor_reso->SetBinContent( iBin+1, syst_reso_value );
+    Double_t denom = 0.5*(fit_intrReso_quark->Eval(binCenter)+fit_intrReso_gluon->Eval(binCenter));
+    Double_t syst_reso_value = 100.*fabs( fit_intrReso_quark->Eval(binCenter) - fit_intrReso_gluon->Eval(binCenter) )/denom;
+    Double_t err_reso = 100.*sqrt( band_reso_quark->GetBinError(iBin+1)*band_reso_quark->GetBinError(iBin+1) + band_reso_gluon->GetBinError(iBin+1)*band_reso_gluon->GetBinError(iBin+1) );
+    if( syst_reso_value > err_reso ) {
+      syst_flavor_reso->SetBinContent( iBin+1, syst_reso_value );
+    } else {
+      syst_flavor_reso->SetBinContent( iBin+1, err_reso );
+    }
 
     Double_t syst_resp_value = 100.*fabs( fit_intrResp_quark->Eval(binCenter) - fit_intrResp_gluon->Eval(binCenter))/(0.5*(fit_intrResp_quark->Eval(binCenter)+fit_intrResp_gluon->Eval(binCenter)));
     syst_flavor_resp->SetBinContent( iBin+1, syst_resp_value );
@@ -251,22 +309,26 @@ TwoHistos getSyst_flavor() {
   TCanvas* cSyst_q = new TCanvas("cSyst_q", "errorGraph", 600, 600);
   cSyst_q->cd();
   cSyst_q->Clear();
-  cSyst_q->SetLogy();
   cSyst_q->SetLogx();
+  cSyst_q->SetLogy();
   axesreso->Draw();
+  band_reso_quark->Draw("c e3 same");
+  band_reso_gluon->Draw("c e3 same");
   gr_intrReso_quark->SetMarkerStyle(20);
   gr_intrReso_gluon->SetMarkerStyle(20);
   gr_intrReso_quark->SetMarkerColor(kRed);
   gr_intrReso_gluon->SetMarkerColor(kBlue);
   gr_intrReso_quark->Draw("p same");
   gr_intrReso_gluon->Draw("p same");
-  std::string canvName = "syst_resp_flavor_"+JETALGO_+".eps";
+  fit_intrReso_quark->Draw("same");
+  fit_intrReso_gluon->Draw("same");
+  std::string canvName = "syst_reso_flavor_"+JETALGO_+".eps";
   cSyst_q->SaveAs(canvName.c_str());
 
   TH2D* axesresp = new TH2D("axesresp", "", 10, 20., 1400., 10, 0.7, 1.3);
   cSyst_q->cd();
   cSyst_q->Clear();
-  cSyst_q->SetLogx();
+  cSyst_q->SetLogy(0);
   axesresp->Draw();
   gr_intrResp_quark->SetMarkerStyle(20);
   gr_intrResp_gluon->SetMarkerStyle(20);
@@ -274,7 +336,9 @@ TwoHistos getSyst_flavor() {
   gr_intrResp_gluon->SetMarkerColor(kBlue);
   gr_intrResp_quark->Draw("p same");
   gr_intrResp_gluon->Draw("p same");
-  canvName = "syst_reso_flavor_"+JETALGO_+".eps";
+  fit_intrResp_quark->Draw("same");
+  fit_intrResp_gluon->Draw("same");
+  canvName = "syst_resp_flavor_"+JETALGO_+".eps";
   cSyst_q->SaveAs(canvName.c_str());
 
   TwoHistos th;
@@ -298,15 +362,15 @@ TwoHistos getSyst_QCD() {
 
   std::string fileName_resp, fileName_reso;
 
-  fileName_resp = "PhotonJetExtrapGraphs_DATA_Nov4ReReco_vs_G_TuneZ2_7TeV_pythia6_"+JETALGO_+"_LUMI_2ndJet10_eta013_RMS99.root";
-  fileName_reso = "PhotonJetExtrapGraphs_DATA_Nov4ReReco_vs_G_TuneZ2_7TeV_pythia6_"+JETALGO_+"_LUMI_2ndJet10_eta013_RMS99.root";
+  fileName_resp = "PhotonJetExtrapGraphs_DATA_Nov4ReReco_vs_G_TuneZ2_7TeV_pythia6_CORR_"+JETALGO_+"_LUMI_2ndJet10_eta011_RMS99.root";
+  fileName_reso = "PhotonJetExtrapGraphs_DATA_Nov4ReReco_vs_G_TuneZ2_7TeV_pythia6_CORR_"+JETALGO_+"_LUMI_2ndJet10_eta011_RMS99.root";
   TGraphErrors* gr_extrapResp_s = getGraph(fileName_resp, "gr_extrapResp_vs_pt");
   TF1* fit_extrapResp_s= fitTools::fitResponseGraph(gr_extrapResp_s, "rpf", "fit_extrapResp_s");
   TGraphErrors* gr_extrapReso_s = getGraph(fileName_reso, "gr_extrapReso_vs_pt");
   TF1* fit_extrapReso_s= fitTools::fitResolutionGraph(gr_extrapReso_s, "NSCPF", "fit_extrapReso_s");
 
-  fileName_resp = "PhotonJetExtrapGraphs_DATA_Nov4ReReco_vs_G_QCD_TuneZ2_7TeV_pythia6_"+JETALGO_+"_LUMI_2ndJet10_eta013_RMS99.root";
-  fileName_reso = "PhotonJetExtrapGraphs_DATA_Nov4ReReco_vs_G_QCD_TuneZ2_7TeV_pythia6_"+JETALGO_+"_LUMI_2ndJet10_eta013_RMS99.root";
+  fileName_resp = "PhotonJetExtrapGraphs_DATA_Nov4ReReco_vs_G_QCD_TuneZ2_7TeV_pythia6_"+JETALGO_+"_LUMI_2ndJet10_eta011_RMS99.root";
+  fileName_reso = "PhotonJetExtrapGraphs_DATA_Nov4ReReco_vs_G_QCD_TuneZ2_7TeV_pythia6_"+JETALGO_+"_LUMI_2ndJet10_eta011_RMS99.root";
   TGraphErrors* gr_extrapResp_sb = getGraph(fileName_resp, "gr_extrapResp_vs_pt");
   TF1* fit_extrapResp_sb= fitTools::fitResponseGraph(gr_extrapResp_sb, "rpf", "fit_extrapResp_sb");
   TGraphErrors* gr_extrapReso_sb = getGraph(fileName_reso, "gr_extrapReso_vs_pt");
@@ -351,7 +415,7 @@ TwoHistos getSyst_QCD() {
   gr_extrapResp_sb->SetMarkerColor(kBlue);
   gr_extrapResp_s->Draw("p same");
   gr_extrapResp_sb->Draw("p same");
-  canvName = "syst_reso_flavor_"+JETALGO_+".eps";
+  canvName = "syst_reso_QCD_"+JETALGO_+".eps";
   cSyst_q->SaveAs(canvName.c_str());
 
   TwoHistos th;
@@ -364,12 +428,19 @@ TwoHistos getSyst_QCD() {
 
 
 
-TF1* getSyst_photonScale() {
+TwoFunctions getSyst_photonScale() {
 
-  TF1* syst_photonScale = new TF1("syst_photonScale", "[0]", 20., 1400.);
-  syst_photonScale->SetParameter(0, 1.);
+  TF1* syst_photonScale_resp = new TF1("syst_photonScale_resp", "[0]", 20., 1400.);
+  syst_photonScale_resp->SetParameter(0, 1.);
 
-  return syst_photonScale;
+  TF1* syst_photonScale_reso = new TF1("syst_photonScale_reso", "[0]", 20., 1400.);
+  syst_photonScale_reso->SetParameter(0, 2.);
+
+  TwoFunctions tf;
+  tf.f1_resp = syst_photonScale_resp; 
+  tf.f1_reso = syst_photonScale_reso; 
+
+  return tf;
 
 }
 
@@ -378,7 +449,7 @@ TF1* getSyst_photonScale() {
 TwoHistos getStat() {
 
 
-  std::string fileName = "PhotonJetExtrapGraphs_DATA_Nov4ReReco_vs_G_TuneZ2_7TeV_pythia6_"+JETALGO_+"_LUMI_2ndJet10_eta013L2L3_RMS99.root";
+  std::string fileName = "PhotonJetExtrapGraphs_DATA_Nov4ReReco_vs_G_TuneZ2_7TeV_pythia6_CORR_"+JETALGO_+"_LUMI_2ndJet10_eta011L2L3Raw_RMS99.root";
   TFile* fileDATA = TFile::Open(fileName.c_str());
 
   TGraphErrors* gr_respDATA = (TGraphErrors*)fileDATA->Get("gr_DATAResp_vs_pt");
@@ -488,11 +559,12 @@ void drawTotalError( std::string resp_reso, TH1D* syst_q, TH1D* syst_flavor, TF1
 
   TH1D* syst_total = new TH1D("syst_total", "", 100, xvec);
   for( unsigned iBin=0; iBin<100; ++iBin) {
+    Double_t binCenter = 0.5*(xvec[iBin+1]+xvec[iBin]);
     Double_t squareBinValue = syst_q->GetBinContent(iBin+1)*syst_q->GetBinContent(iBin+1) + 
                         syst_flavor->GetBinContent(iBin+1)*syst_flavor->GetBinContent(iBin+1) + 
 //                        syst_QCD->GetBinContent(iBin+1)*syst_QCD->GetBinContent(iBin+1) + 
-                        syst_photonScale->Eval(xvec[iBin])*syst_photonScale->Eval(xvec[iBin]);
-    syst_total->SetBinContent(iBin, sqrt(squareBinValue));
+                        syst_photonScale->Eval(binCenter)*syst_photonScale->Eval(binCenter);
+    syst_total->SetBinContent(iBin+1, sqrt(squareBinValue));
   }
   syst_total->SetLineColor(kGray);
   syst_total->SetLineWidth(0.);
@@ -508,15 +580,28 @@ void drawTotalError( std::string resp_reso, TH1D* syst_q, TH1D* syst_flavor, TF1
   label_cms->SetFillColor(kWhite);
   label_cms->SetTextSize(0.038);
   label_cms->SetTextFont(62);
-  label_cms->AddText("CMS Preliminary 2010");
+  //label_cms->AddText("CMS Preliminary 2010");
+  label_cms->AddText("CMS Simulation 2010");
 
   TPaveText* label_sqrt = new TPaveText( 0.22, 0.78, 0.42, 0.82, "brNDC" );
   label_sqrt->SetFillColor(kWhite);
   label_sqrt->SetTextSize(0.038);
   label_sqrt->SetTextFont(42);
-  label_sqrt->AddText("#sqrt{s} = 7 TeV, L = 34 pb^{-1}");
+  //label_sqrt->AddText("#sqrt{s} = 7 TeV, L = 34 pb^{-1}");
+  label_sqrt->AddText("#sqrt{s} = 7 TeV");
 
-  TLegend* legend = new TLegend(0.57, 0.6, 0.85, 0.88, "Anti-k_{T} 0.5 PFJets");
+  std::string legendTitleText;
+  if( JETALGO_=="pfakt5" )
+    legendTitleText="Anti-k_{T} 0.5 PFJets";
+  else if( JETALGO_=="akt5" )
+    legendTitleText="Anti-k_{T} 0.5 CaloJets";
+  else if( JETALGO_=="jptak5" )
+    legendTitleText="Anti-k_{T} 0.5 JPTJets";
+  else 
+    legendTitleText="[Unknown jet algo]";
+   
+
+  TLegend* legend = new TLegend(0.57, 0.6, 0.85, 0.88, legendTitleText.c_str());
   legend->SetFillColor(kWhite);
   //legend->SetFillStyle(0);
   legend->SetTextSize(0.035);
@@ -528,12 +613,10 @@ void drawTotalError( std::string resp_reso, TH1D* syst_q, TH1D* syst_flavor, TF1
   else
     legend->AddEntry( syst_photonScale, "Photon", "L");
   legend->AddEntry( syst_total, "Total Syst.", "F");
-  if( resp_reso=="resp" )
-    legend->AddEntry( stat, "Stat. (34 pb^{-1})", "F");
-  if( resp_reso=="reso" )
-    legend->AddEntry( stat, "Stat. (34 pb^{-1})", "F");
+  //legend->AddEntry( stat, "Stat. (34 pb^{-1})", "F");
 
-  Float_t yaxis_max = (resp_reso=="resp") ? 10. : 35.;
+  Float_t yaxis_max = (resp_reso=="resp") ? 10. : 50.;
+  if( resp_reso=="resp" && RECOTYPE_=="calo" ) yaxis_max = 20.;
 
   TH2D* axes = new TH2D("axes", "", 10, 20., 500., 10, 0., yaxis_max);
   axes->GetXaxis()->SetTitleOffset(1.1);
@@ -553,7 +636,7 @@ void drawTotalError( std::string resp_reso, TH1D* syst_q, TH1D* syst_flavor, TF1
   syst_photonScale->Draw("L same");
   syst_flavor->Draw("L same");
   //syst_QCD->Draw("L same");
-  stat->Draw("csame");
+  //stat->Draw("csame");
   gPad->RedrawAxis();
   legend->Draw("same");
   label_cms->Draw("same");

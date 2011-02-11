@@ -22,6 +22,8 @@ bool DEBUG_ = false;
 bool MCassoc_ = false;
 bool BINNINGFINO_ = false;
 bool ONEVTX_ = false;
+bool ONEVTX_2232_ = false;
+bool ONEVTX_2247_ = false;
 bool NO2ndJETABS = false;
 bool ADD12_ = false;
 bool HEMISPHERE_ = false;
@@ -305,9 +307,6 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   for( unsigned i=0; i<nBins_photBinning; ++i)
     ptPhot_binning_array[i] = ptPhot_binning[i];
 
-//TH1D* h1_ptPhot = new TH1D("ptPhot", "", nBins_photBinning-1, ptPhot_binning_array);
-////TH1D* h1_ptPhot = new TH1D("ptPhot", "", 10, ptPhot_binning[0], ptMax);
-//h1_ptPhot->Sumw2();
   TH1D* h1_ptJetReco = new TH1D("ptJetReco", "", 10, 0., ptMax);
   h1_ptJetReco->Sumw2();
   TH1D* h1_pt2ndJetReco = new TH1D("pt2ndJetReco", "", 10, 5., ptMax);
@@ -323,41 +322,19 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
   TH1D* h1_deltaPhi_2ndJet = new TH1D("deltaPhi_2ndJet", "", 15, 0., 3.1416 );
   h1_deltaPhi_2ndJet->Sumw2();
-//TH1D* h1_deltaPhi_2ndJet_loose = new TH1D("deltaPhi_2ndJet_loose", "", 15, 0., 3.1416 );
-//h1_deltaPhi_2ndJet_loose->Sumw2();
-
-//TH1D* h1_ptPhot_loose = new TH1D("ptPhot_loose", "", nBins_photBinning-1, ptPhot_binning_array);
-////TH1D* h1_ptPhot_loose = new TH1D("ptPhot_loose", "", 10, ptPhot_binning[0], ptMax);
-//h1_ptPhot_loose->Sumw2();
-//TH1D* h1_etaPhot_loose = new TH1D("etaPhot_loose", "", 15, -1.3, 1.3);
-//h1_etaPhot_loose->Sumw2();
-//TH1D* h1_phiPhot_loose = new TH1D("phiPhot_loose", "", 15, -3.1416, 3.1416);
-//h1_phiPhot_loose->Sumw2();
-
-//TH1D* h1_met_loose = new TH1D("met_loose", "", 100., 0., 500.);
-//h1_met_loose->Sumw2();
-  TH1D* h1_met = new TH1D("met", "", 100., 0., 500.);
+  TH1D* h1_met = new TH1D("met", "", 50, 0., 300.);
   h1_met->Sumw2();
+  TH1D* h1_met_noSmaj = new TH1D("met_noSmaj", "", 50, 0., 300.);
+  h1_met_noSmaj->Sumw2();
 
-//TH1D* h1_deltaPhi_phot_met_loose = new TH1D("deltaPhi_phot_met_loose", "", 15, -3.1416, 3.1416);
-//h1_deltaPhi_phot_met_loose->Sumw2();
   TH1D* h1_deltaPhi_phot_met = new TH1D("deltaPhi_phot_met", "", 15, -3.1416, 3.1416);
   h1_deltaPhi_phot_met->Sumw2();
 
   TH1D* h1_ptPhot = new TH1D("ptPhot", "", nBins_photBinning-1, ptPhot_binning_array);
   h1_ptPhot->Sumw2();
+  TH1D* h1_ptPhot_noSmaj = new TH1D("ptPhot_noSmaj", "", nBins_photBinning-1, ptPhot_binning_array);
+  h1_ptPhot_noSmaj->Sumw2();
 
-  //TH1D* h1_ptPhot_clusterOK = new TH1D("ptPhot_clusterOK", "", 10, ptPhot_binning[0], ptMax);
-//TH1D* h1_ptPhot_clusterOK = new TH1D("ptPhot_clusterOK", "", nBins_photBinning-1, ptPhot_binning_array);
-//h1_ptPhot_clusterOK->Sumw2();
-//TH1D* h1_etaPhot_clusterOK = new TH1D("etaPhot_clusterOK", "", 15, -1.3, 1.3);
-//h1_etaPhot_clusterOK->Sumw2();
-//TH1D* h1_phiPhot_clusterOK = new TH1D("phiPhot_clusterOK", "", 15, -3.1416, 3.1416);
-//h1_phiPhot_clusterOK->Sumw2();
-//TH1D* h1_deltaPhi_clusterOK = new TH1D("deltaPhi_clusterOK", "", 15, 3.1416/2., 3.1416);
-//h1_deltaPhi_clusterOK->Sumw2();
-
-  //TH1D* h1_ptPhot_passedID = new TH1D("ptPhot_passedID", "", 28, ptPhot_binning[0], ptMax);
   TH1D* h1_ptPhot_passedID = new TH1D("ptPhot_passedID", "", nBins_photBinning-1, ptPhot_binning_array);
   h1_ptPhot_passedID->Sumw2();
   TH1D* h1_etaPhot_passedID = new TH1D("etaPhot_passedID", "", 15, -1.3, 1.3);
@@ -488,7 +465,9 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   std::vector<TH1F*> h1_responseGEN_eta35           = getResponseHistos("responseGEN_eta35");
   std::vector<TH1F*> h1_responseGEN_L2L3_eta35      = getResponseHistos("responseGEN_L2L3_eta35");
 
-  std::vector<TH1F*> h1_responsePART          = getResponseHistos("responsePART");
+//std::vector<TH1F*> h1_response_genpart_eta011     = getResponseHistos("response_genpart_eta011");
+//std::vector<TH1F*> h1_response_partgamma_eta011   = getResponseHistos("response_partgamma_eta011");
+//std::vector<TH1F*> h1_response_photgamma_eta011   = getResponseHistos("response_photgamma_eta011");
 
 //std::vector<TH1F*> h1_response_clusterOK    = getResponseHistos("response_clusterOK");
 //std::vector<TH1F*> h1_responseGEN_clusterOK = getResponseHistos("responseGEN_clusterOK");
@@ -501,6 +480,14 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 //std::vector<TH1F*> h1_responseGEN_loose     = getResponseHistos("responseGEN_loose");
 //std::vector<TH1F*> h1_responsePART_loose    = getResponseHistos("responsePART_loose");
 
+  std::vector<TH2D*> corr_genPart_partGamma;
+  for( unsigned i=0; i<(ptPhot_binning.size()-1); ++i ) {
+    char histoName[200];
+    sprintf( histoName, "corr_genPart_partGamma_ptPhot_%.0f_%.0f", ptPhot_binning[i], ptPhot_binning[i+1]);
+    TH2D* newHisto = new TH2D(histoName, "", 100, 0., 2., 100, 0., 2.);
+    newHisto->Sumw2();
+    corr_genPart_partGamma.push_back(newHisto);
+  }
 
   // and now allocate histograms for 2nd jet pt extrapolation:
   bool isL2L3 = true;
@@ -513,7 +500,14 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   std::vector< std::vector< TH1D* > > h1_RecoPhotL2L3_vs_recoRel_eta011 = getExtrapHistoVector("RecoPhotL2L3_vs_RecoRel_eta011", "rel", nPoints, isL2L3);
   std::vector< std::vector< TH1D* > > h1_RecoGenL2L3_vs_recoRel_eta011  = getExtrapHistoVector("RecoGenL2L3_vs_RecoRel_eta011",  "rel", nPoints, isL2L3);
   std::vector< std::vector< TH1D* > > h1_GenPhotL2L3_vs_recoRel_eta011  = getExtrapHistoVector("GenPhotL2L3_vs_RecoRel_eta011",  "rel", nPoints, isL2L3);
+  std::vector< std::vector< TH1D* > > h1_GenPartL2L3_vs_recoRel_eta011  = getExtrapHistoVector("GenPartL2L3_vs_RecoRel_eta011",  "rel", nPoints);
+  std::vector< std::vector< TH1D* > > h1_GenGammaL2L3_vs_recoRel_eta011  = getExtrapHistoVector("GenGammaL2L3_vs_RecoRel_eta011",  "rel", nPoints);
+  std::vector< std::vector< TH1D* > > h1_PartGammaL2L3_vs_recoRel_eta011  = getExtrapHistoVector("PartGammaL2L3_vs_RecoRel_eta011",  "rel", nPoints);
+  std::vector< std::vector< TH1D* > > h1_PhotGammaL2L3_vs_recoRel_eta011  = getExtrapHistoVector("PhotGammaL2L3_vs_RecoRel_eta011",  "rel", nPoints);
   std::vector< std::vector< TH1D* > > h1_pt2ndJetL2L3RecoRelMean_eta011 = getExtrapHistoVector("pt2ndJetL2L3RecoRelMean_eta011", "rel", nPoints, isL2L3, (bool)true);
+  std::vector< std::vector< TH1D* > > h1_RecoPhotL2L3_vs_recoRelRaw_eta011 = getExtrapHistoVector("RecoPhotL2L3_vs_RecoRelRaw_eta011", "rel", nPoints);
+  std::vector< std::vector< TH1D* > > h1_RecoGenL2L3_vs_recoRelRaw_eta011  = getExtrapHistoVector("RecoGenL2L3_vs_RecoRelRaw_eta011",  "rel", nPoints);
+  std::vector< std::vector< TH1D* > > h1_GenPhotL2L3_vs_recoRelRaw_eta011  = getExtrapHistoVector("GenPhotL2L3_vs_RecoRelRaw_eta011",  "rel", nPoints);
 
   std::vector< std::vector< TH1D* > > h1_RecoPhot_vs_recoRel_eta1524 = getExtrapHistoVector("RecoPhot_vs_RecoRel_eta1524", "rel", nPoints);
   std::vector< std::vector< TH1D* > > h1_RecoGen_vs_recoRel_eta1524  = getExtrapHistoVector("RecoGen_vs_RecoRel_eta1524",  "rel", nPoints);
@@ -759,9 +753,16 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     bool isMC = run<5;
     if( !isMC ) {
 
-      if( ptPhotReco<22. && !passed_Photon15 && !passed_Photon10 ) continue;
-      else if( ptPhotReco<32. && !passed_Photon15 && !passed_Photon10 && !passed_Photon20 && !passed_Photon25 ) continue;
-    //if( ptPhotReco<32. && !passed_Photon15 && !passed_Photon10 && !passed_Photon20 && !passed_Photon25 ) continue;
+      if( ptPhotReco<22. ) {
+        if( !passed_Photon15 && !passed_Photon10 ) continue;
+      } else if( ptPhotReco<32. ) {
+        if( !passed_Photon20 && !passed_Photon25 ) continue;
+      } else if( ptPhotReco<47. ) {
+        if( !passed_Photon30 /*&& !passed_Photon35*/ ) continue;
+      }
+
+      if( ONEVTX_2232_ ) if( ptPhotReco>22. && ptPhotReco<32. && nvertex>1 ) continue;
+      if( ONEVTX_2247_ ) if( ptPhotReco>22. && ptPhotReco<47. && nvertex>1 ) continue;
 
     //// select only Run2010A for first bins to avoid trigger prescale related issues:
     //if( ptPhotReco < 47. && run>145000. ) continue;
@@ -872,78 +873,6 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
       clusterShapeOK= true;
     }
 
-
-/*
-    //////////////////////////////////////////////
-    /////      CLUSTER SHAPE ONLY SELECTION 
-    //////////////////////////////////////////////
-
-
-    if( clusterShapeOK ) {
-      h1_hcalIsoPhotReco_clusterOK->Fill( hcalIsoPhotReco, correctWeight);
-      h1_hcalIsoEnergyPhotReco_clusterOK->Fill( hcalIsoPhotReco*ePhotReco, correctWeight);
-      h1_ecalIsoPhotReco_clusterOK->Fill( ecalIsoPhotReco, correctWeight);
-      h1_ecalIsoEnergyPhotReco_clusterOK->Fill( ecalIsoPhotReco*ePhotReco, correctWeight);
-      h1_ptTrkIsoPhotReco_clusterOK->Fill( ptTrkIsoPhotReco, correctWeight);
-      h1_nTrkIsoPhotReco_clusterOK->Fill( nTrkIsoPhotReco, correctWeight);
-      h1_deltaPhi_clusterOK->Fill( deltaPhi_jet, correctWeight);
-
-      if( isIsolated ) {
-        h1_deltaPhi_passedID->Fill( deltaPhi_jet, correctWeight);
-        h1_ptSecondJetRel_passedID->Fill( pt2ndJetReco/ptPhotReco, correctWeight);
-        h1_phiPhot_passedID->Fill( phiPhotReco, correctWeight );
-        h1_etaPhot_passedID->Fill( etaPhotReco, correctWeight );
-        h1_ptPhot_passedID->Fill( ptPhotReco, correctWeight );
-      }
-
-      if( (back2back && secondJetOK && jetInBarrel) || noJetSelection ) {
-        h1_ptPhot_clusterOK->Fill( ptPhotReco, correctWeight );
-        h1_phiPhot_clusterOK->Fill( phiPhotReco, correctWeight );
-        h1_etaPhot_clusterOK->Fill( etaPhotReco, correctWeight );
-        h1_response_clusterOK[theBin]->Fill( ptJetReco/ptPhotReco, correctWeight );
-        h2_ptPhotMean_clusterOK->Fill( ptJetReco, ptJetReco, correctWeight );
-        if( ptJetGen>ptPhot_binning[0] ) {
-          h1_responseGEN_clusterOK[theBinGEN]->Fill( ptJetReco/ptJetGen, correctWeight );
-          h1_responsePART_clusterOK[theBinGEN]->Fill( ptJetGen/ptPart, correctWeight );
-          h2_ptJetGenMean_clusterOK->Fill( ptJetGen, ptJetGen, correctWeight );
-        }
-      } //if back2back
-    }
-
-    if( isIsolated ) {
-      h1_clusterMajPhotReco_isolated->Fill( clusterMajPhotReco, correctWeight );
-      h1_clusterMinPhotReco_isolated->Fill( clusterMinPhotReco, correctWeight );
-    }
-
-    h1_clusterMajPhotReco->Fill( clusterMajPhotReco, correctWeight );
-    h1_clusterMinPhotReco->Fill( clusterMinPhotReco, correctWeight );
-
-
-//    bool photonOK_loose  = (isIsolated_loose  && clusterShapeOK_medium) || MCassoc_ || useGenJets;
-
-
-    // compute response:
-    float response = ptJetReco/ptPhotReco;
-    float responseL2L3 = ptCorrJetReco/ptPhotReco;
-
-    if( ADD12_ && abs(deltaPhi_2ndJet) > pi/2. ) { //add first and second jet
-
-      float px1 = ptJetReco*cos(phiJetReco);
-      float py1 = ptJetReco*sin(phiJetReco);
-      float px2 = pt2ndJetReco*cos(phi2ndJetReco);
-      float py2 = pt2ndJetReco*sin(phi2ndJetReco);
-
-      float pxSum = px1 + px2;
-      float pySum = py1 + py2;
-      float ptSum = sqrt( pxSum*pxSum + pySum*pySum );
-
-      response = ptSum/ptPhotReco;
-
-    }
-
-*/
-    
-
   
     //////////////////////////////////////////////
     /////      EVENT SELECTION
@@ -957,6 +886,12 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     bool photonOK = (isIsolated && clusterShapeOK) || MCassoc_ || useGenJets;
     bool passedID_no2ndJet = photonOK && ( back2back || noJetSelection );
     bool passedID_FULL     = passedID_no2ndJet && (secondJetOK || noJetSelection);
+    bool passedID_noSmaj     = isIsolated && clusterMinOK && (secondJetOK || noJetSelection);
+
+    if( passedID_noSmaj ) {
+      h1_met_noSmaj->Fill( eMet, correctWeight );
+      h1_ptPhot_noSmaj->Fill( ptPhotReco, correctWeight );
+    }
 
 
     if( passedID_no2ndJet ) {
@@ -990,6 +925,10 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
       Float_t r_RecoL2L3Phot = ptCorrJetReco/ptPhotReco;
       Float_t r_RecoL2L3Gen  = ptCorrJetReco/ptJetGen;
       Float_t r_GenPhot  = ptJetGen/ptPhotReco;
+      Float_t r_GenPart  = ptJetGen/ptPart;
+      Float_t r_GenGamma  = ptJetGen/ptPhotGen;
+      Float_t r_PartGamma  = ptPart/ptPhotGen;
+      Float_t r_PhotGamma  = ptPhotReco/ptPhotGen;
 
       float etaThresh = 1.1;
 
@@ -1001,6 +940,9 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
           if(r_RecoPhot!=0.) h1_RecoPhot_vs_recoRel_eta011[theBin][iRecoRel]->Fill(r_RecoPhot, correctWeight);
           if(r_RecoGen!=0.)  h1_RecoGen_vs_recoRel_eta011[theBin][iRecoRel]->Fill(r_RecoGen, correctWeight);
           if(r_GenPhot!=0.)  h1_GenPhot_vs_recoRel_eta011[theBin][iRecoRel]->Fill(r_GenPhot, correctWeight);
+          if(r_RecoL2L3Phot!=0.) h1_RecoPhotL2L3_vs_recoRelRaw_eta011[theBin][iRecoRel]->Fill(r_RecoL2L3Phot, correctWeight);
+          if(r_RecoL2L3Gen!=0.)  h1_RecoGenL2L3_vs_recoRelRaw_eta011[theBin][iRecoRel]->Fill(r_RecoL2L3Gen, correctWeight);
+          if(r_GenPhot!=0.)      h1_GenPhotL2L3_vs_recoRelRaw_eta011[theBin][iRecoRel]->Fill(r_GenPhot, correctWeight);
           h1_pt2ndJetRecoRelMean_eta011[theBin][iRecoRel]->Fill(pt2ndJetRecoRel, correctWeight);
         } 
 
@@ -1008,6 +950,10 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
           if(r_RecoL2L3Phot!=0.) h1_RecoPhotL2L3_vs_recoRel_eta011[theBin][iRecoRelL2L3]->Fill(r_RecoL2L3Phot, correctWeight);
           if(r_RecoL2L3Gen!=0.)  h1_RecoGenL2L3_vs_recoRel_eta011[theBin][iRecoRelL2L3]->Fill(r_RecoL2L3Gen, correctWeight);
           if(r_GenPhot!=0.)      h1_GenPhotL2L3_vs_recoRel_eta011[theBin][iRecoRelL2L3]->Fill(r_GenPhot, correctWeight);
+          if(r_GenPart!=0.)      h1_GenPartL2L3_vs_recoRel_eta011[theBin][iRecoRelL2L3]->Fill(r_GenPart, correctWeight);
+          if(r_GenGamma!=0.)     h1_GenGammaL2L3_vs_recoRel_eta011[theBin][iRecoRelL2L3]->Fill(r_GenGamma, correctWeight);
+          if(r_PartGamma!=0.)    h1_PartGammaL2L3_vs_recoRel_eta011[theBin][iRecoRelL2L3]->Fill(r_PartGamma, correctWeight);
+          if(r_PhotGamma!=0.)    h1_PhotGammaL2L3_vs_recoRel_eta011[theBin][iRecoRelL2L3]->Fill(r_PhotGamma, correctWeight);
           h1_pt2ndJetL2L3RecoRelMean_eta011[theBin][iRecoRelL2L3]->Fill(ptCorr2ndJetRecoRel, correctWeight);
         } 
 
@@ -1079,9 +1025,6 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
         h1_deltaPhi_2ndJet->Fill( deltaPhi_2ndJet, correctWeight );
         
-        if( ptJetGen>ptPhot_binning[0] ) {
-          h1_responsePART[theBinGEN]->Fill( ptJetGen/ptPart, correctWeight );
-        }
 
         h1_phiPhot->Fill( phiPhotReco, correctWeight );
         h1_etaPhot->Fill( etaPhotReco, correctWeight );
@@ -1102,6 +1045,10 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
             h1_responseGEN_eta011[theBinGEN]->Fill( r_RecoGen, correctWeight );
             h1_responseGEN_L2L3_eta011[theBinGEN]->Fill( r_RecoL2L3Gen, correctWeight );
             h2_ptJetGenMean_eta011->Fill( ptJetGen, ptJetGen, correctWeight );
+          corr_genPart_partGamma[theBinGEN]->Fill( r_PartGamma, r_GenPart, correctWeight );
+          //h1_response_genpart_eta011[theBinGEN]->Fill( ptJetGen/ptPart, correctWeight );
+          //h1_response_partgamma_eta011[theBinGEN]->Fill( ptPart/ptPhotGen, correctWeight );
+          //h1_response_photgamma_eta011[theBinGEN]->Fill( ptPhotReco/ptPhotGen, correctWeight );
           }
         } else if( fabs(etaJetReco)>1.5 && fabs(etaJetReco)<2.4 ) {
           h2_ptPhotMean_eta1524->Fill( ptPhotReco, ptPhotReco, correctWeight );
@@ -1256,6 +1203,8 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   if( PARTTYPE_!="" ) outfileName = outfileName + "_" + PARTTYPE_;
   if( BINNINGFINO_ ) outfileName = outfileName + "_BINNINGFINO";
   if( ONEVTX_ ) outfileName = outfileName + "_ONEVTX";
+  if( ONEVTX_2232_ ) outfileName = outfileName + "_ONEVTX2232";
+  if( ONEVTX_2247_ ) outfileName = outfileName + "_ONEVTX2247";
   if( DELTAPHI_ != 1. ) {
     char outfileName_char[300];
     sprintf( outfileName_char, "%s_DPHI%d", outfileName.c_str(), (int)(10.*DELTAPHI_));
@@ -1286,24 +1235,15 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   h1_ptJetReco->Write();
   h1_pt2ndJetReco->Write();
 
-//h1_ptPhot_loose->Write();
-//h1_phiPhot_loose->Write();
-//h1_etaPhot_loose->Write();
-
-  h1_ptPhot->Write();
-
-//h1_ptPhot_clusterOK->Write();
-//h1_phiPhot_clusterOK->Write();
-//h1_etaPhot_clusterOK->Write();
+  h1_ptPhot_noSmaj->Write();
 
   h1_ptPhot_passedID->Write();
   h1_phiPhot_passedID->Write();
   h1_etaPhot_passedID->Write();
   
-//h1_met_loose->Write();
   h1_met->Write();
+  h1_met_noSmaj->Write();
 
-//h1_deltaPhi_phot_met_loose->Write();
   h1_deltaPhi_phot_met->Write();
 
   h1_deltaPhi_Nm1->Write();
@@ -1312,7 +1252,6 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   h1_deltaPhi_passedID->Write();
   h1_ptSecondJetRel_passedID->Write();
 
-//h1_deltaPhi_2ndJet_medium->Write();
   h1_deltaPhi_2ndJet->Write();
 
   h1_hcalIsoPhotReco_Nm1->Write();
@@ -1323,17 +1262,6 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   h1_nTrkIsoPhotReco_Nm1->Write();
   h1_clusterMajPhotReco_Nm1->Write();
   h1_clusterMinPhotReco_Nm1->Write();
-
-//h1_hcalIsoPhotReco_clusterOK->Write();
-//h1_hcalIsoEnergyPhotReco_clusterOK->Write();
-//h1_ecalIsoPhotReco_clusterOK->Write();
-//h1_ecalIsoEnergyPhotReco_clusterOK->Write();
-//h1_ptTrkIsoPhotReco_clusterOK->Write();
-//h1_nTrkIsoPhotReco_clusterOK->Write();
-//h1_deltaPhi_clusterOK->Write();
-
-//h1_clusterMajPhotReco_isolated->Write();
-//h1_clusterMinPhotReco_isolated->Write();
 
   h1_clusterMajPhotReco->Write();
   h1_clusterMinPhotReco->Write();
@@ -1353,10 +1281,6 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   h2_ptPhotMean_no2ndJet_eta243->Write();
   h2_ptPhotMean_no2ndJet_eta35->Write();
 
-//h2_ptJetGenMean_loose->Write();
-//h2_ptJetGenMean_clusterOK->Write();
-//h2_ptPhotMean_loose->Write();
-//h2_ptPhotMean_clusterOK->Write();
 
   for( unsigned i=0; i<h1_response_eta011.size(); ++i ) {
 
@@ -1390,13 +1314,7 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     h1_responseMPF_eta35[i]->Write();
     h1_responseMPF_L2L3_eta35[i]->Write();
 
-    h1_responsePART[i]->Write();
-  //h1_response_loose[i]->Write();
-  //h1_responseGEN_loose[i]->Write();
-  //h1_responsePART_loose[i]->Write();
-  //h1_response_clusterOK[i]->Write();
-  //h1_responsePART_clusterOK[i]->Write();
-  //h1_responseMPF_loose[i]->Write();
+    corr_genPart_partGamma[i]->Write();
 
     TF1* gaussian = new TF1("gaussian", "gaus");
     Float_t nSigma = 2.5;
@@ -1422,7 +1340,21 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
       h1_RecoGenL2L3_vs_recoRel_eta011[i][ip]->Write();
       fitTools::fitProjection(h1_GenPhotL2L3_vs_recoRel_eta011[i][ip], gaussian, nSigma, "QR");
       h1_GenPhotL2L3_vs_recoRel_eta011[i][ip]->Write();
+      fitTools::fitProjection(h1_GenPartL2L3_vs_recoRel_eta011[i][ip], gaussian, nSigma, "QR");
+      h1_GenPartL2L3_vs_recoRel_eta011[i][ip]->Write();
+      fitTools::fitProjection(h1_GenGammaL2L3_vs_recoRel_eta011[i][ip], gaussian, nSigma, "QR");
+      h1_GenGammaL2L3_vs_recoRel_eta011[i][ip]->Write();
+      fitTools::fitProjection(h1_PartGammaL2L3_vs_recoRel_eta011[i][ip], gaussian, nSigma, "QR");
+      h1_PartGammaL2L3_vs_recoRel_eta011[i][ip]->Write();
+      fitTools::fitProjection(h1_PhotGammaL2L3_vs_recoRel_eta011[i][ip], gaussian, nSigma, "QR");
+      h1_PhotGammaL2L3_vs_recoRel_eta011[i][ip]->Write();
       h1_pt2ndJetL2L3RecoRelMean_eta011[i][ip]->Write();
+      fitTools::fitProjection(h1_RecoPhotL2L3_vs_recoRelRaw_eta011[i][ip], gaussian, nSigma, "QR");
+      h1_RecoPhotL2L3_vs_recoRelRaw_eta011[i][ip]->Write();
+      fitTools::fitProjection(h1_RecoGenL2L3_vs_recoRelRaw_eta011[i][ip], gaussian, nSigma, "QR");
+      h1_RecoGenL2L3_vs_recoRelRaw_eta011[i][ip]->Write();
+      fitTools::fitProjection(h1_GenPhotL2L3_vs_recoRelRaw_eta011[i][ip], gaussian, nSigma, "QR");
+      h1_GenPhotL2L3_vs_recoRelRaw_eta011[i][ip]->Write();
      
       fitTools::fitProjection(h1_RecoPhot_vs_recoRel_eta1524[i][ip], gaussian, nSigma, "QR");
       h1_RecoPhot_vs_recoRel_eta1524[i][ip]->Write();
@@ -1509,66 +1441,16 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   delete h1_ptSecondJetRel_Nm1;
   h1_ptSecondJetRel_Nm1 = 0;
 
-//delete h1_ptPhot_loose;
-//h1_ptPhot_loose = 0;
-//delete h1_etaPhot_loose;
-//h1_etaPhot_loose = 0;
-//delete h1_phiPhot_loose;
-//h1_phiPhot_loose = 0;
-
-//delete h1_ptPhot_medium;
-//h1_ptPhot_medium = 0;
-
-//delete h1_hcalIsoPhotReco_clusterOK;
-//h1_hcalIsoPhotReco_clusterOK = 0;
-//delete h1_hcalIsoEnergyPhotReco_clusterOK;
-//h1_hcalIsoEnergyPhotReco_clusterOK = 0;
-//delete h1_ecalIsoPhotReco_clusterOK;
-//h1_ecalIsoPhotReco_clusterOK = 0;
-//delete h1_ecalIsoEnergyPhotReco_clusterOK;
-//h1_ecalIsoEnergyPhotReco_clusterOK = 0;
-//delete h1_ptTrkIsoPhotReco_clusterOK;
-//h1_ptTrkIsoPhotReco_clusterOK = 0;
-//delete h1_nTrkIsoPhotReco_clusterOK;
-//h1_nTrkIsoPhotReco_clusterOK = 0;
-
-//delete h1_clusterMajPhotReco_isolated;
-//h1_clusterMajPhotReco_isolated = 0;
-//delete h1_clusterMinPhotReco_isolated;
-//h1_clusterMinPhotReco_isolated = 0;
-
   delete h1_totalLumi;
   h1_totalLumi = 0;
   delete h1_deltaPhi_2ndJet;
   h1_deltaPhi_2ndJet= 0;
-//delete h1_deltaPhi_2ndJet_loose;
-//h1_deltaPhi_2ndJet_loose= 0;
-//delete h1_met_loose;
-//h1_met_loose= 0;
-//delete h1_met_medium;
-//h1_met_medium = 0;
-//delete h1_deltaPhi_phot_met_loose;
-//h1_deltaPhi_phot_met_loose = 0;
-//delete h1_deltaPhi_phot_met_medium;
-//h1_deltaPhi_phot_met_medium = 0;
-//delete h1_ptPhot_clusterOK;
-//h1_ptPhot_clusterOK = 0;
-//delete h1_etaPhot_clusterOK;
-//h1_etaPhot_clusterOK = 0;
-//delete h1_phiPhot_clusterOK;
-//h1_phiPhot_clusterOK = 0;
-//delete h1_deltaPhi_clusterOK;
-//h1_deltaPhi_clusterOK = 0;
   delete h1_ptPhot_passedID;
   h1_ptPhot_passedID = 0;
   delete h1_etaPhot_passedID;
   h1_etaPhot_passedID = 0;
   delete h1_phiPhot_passedID;
   h1_phiPhot_passedID = 0;
-//delete h1_clusterMajPhotReco;
-//h1_clusterMajPhotReco = 0;
-//delete h1_clusterMinPhotReco;
-//h1_clusterMinPhotReco = 0;
   delete h1_deltaPhi_passedID;
   h1_deltaPhi_passedID = 0;
   delete h1_ptSecondJetRel_passedID;
@@ -1600,15 +1482,6 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   h2_ptPhotMean_no2ndJet_eta243 = 0;
   delete h2_ptPhotMean_no2ndJet_eta35;
   h2_ptPhotMean_no2ndJet_eta35 = 0;
-
-//delete h2_ptJetGenMean_loose;
-//h2_ptJetGenMean_loose = 0;
-//delete h2_ptJetGenMean_clusterOK;
-//h2_ptJetGenMean_clusterOK = 0;
-//delete h2_ptPhotMean_loose;
-//h2_ptPhotMean_loose = 0;
-//delete h2_ptPhotMean_clusterOK;
-//h2_ptPhotMean_clusterOK = 0;
 
   for( unsigned i=0; i< h1_response_eta011.size(); ++i) {
 
@@ -1664,23 +1537,6 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     delete h1_responseMPF_L2L3_eta35[i];
     h1_responseMPF_L2L3_eta35[i]=0;
 
-    delete h1_responsePART[i];
-    h1_responsePART[i]=0;
-  //delete h1_response_clusterOK[i];
-  //h1_response_clusterOK[i]=0;
-  //delete h1_responseGEN_clusterOK[i];
-  //h1_responseGEN_clusterOK[i]=0;
-  //delete h1_responsePART_clusterOK[i];
-  //h1_responsePART_clusterOK[i]=0;
-
-  //delete h1_response_loose[i];
-  //h1_response_loose[i]=0;
-  //delete h1_responseGEN_loose[i];
-  //h1_responseGEN_loose[i]=0;
-  //delete h1_responsePART_loose[i];
-  //h1_responsePART_loose[i]=0;
-  //delete h1_responseMPF_loose[i];
-  //h1_responseMPF_loose[i]=0;
   }
 
 
@@ -1692,7 +1548,14 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   deleteExtrapHistoVector(h1_RecoPhotL2L3_vs_recoRel_eta011, nPoints);
   deleteExtrapHistoVector(h1_RecoGenL2L3_vs_recoRel_eta011, nPoints);
   deleteExtrapHistoVector(h1_GenPhotL2L3_vs_recoRel_eta011, nPoints);
+  deleteExtrapHistoVector(h1_GenPartL2L3_vs_recoRel_eta011, nPoints);
+  deleteExtrapHistoVector(h1_GenGammaL2L3_vs_recoRel_eta011, nPoints);
+  deleteExtrapHistoVector(h1_PartGammaL2L3_vs_recoRel_eta011, nPoints);
+  deleteExtrapHistoVector(h1_PhotGammaL2L3_vs_recoRel_eta011, nPoints);
   deleteExtrapHistoVector(h1_pt2ndJetL2L3RecoRelMean_eta011, nPoints);
+  deleteExtrapHistoVector(h1_RecoPhotL2L3_vs_recoRelRaw_eta011, nPoints);
+  deleteExtrapHistoVector(h1_RecoGenL2L3_vs_recoRelRaw_eta011, nPoints);
+  deleteExtrapHistoVector(h1_GenPhotL2L3_vs_recoRelRaw_eta011, nPoints);
 
   deleteExtrapHistoVector(h1_RecoPhot_vs_recoRel_eta1524, nPoints);
   deleteExtrapHistoVector(h1_RecoGen_vs_recoRel_eta1524, nPoints);
@@ -1846,7 +1709,7 @@ std::vector< std::vector< TH1D* > > getExtrapHistoVector(const std::string& name
           minPt = 2.;
           ptStep = 2.;
         }
-        if( isL2L3 && ptPhot_binning[i_ptBin]<=40. ) minPt+=ptStep;
+        if( isL2L3 && ptPhot_binning[i_ptBin]<=40. ) minPt+=2.*ptStep;
       } else { //is calo
         if( ptPhot_binning[i_ptBin]<=80.) {
           minPt = 8.;

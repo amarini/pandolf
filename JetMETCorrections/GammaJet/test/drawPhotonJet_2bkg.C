@@ -183,21 +183,29 @@ std::cout << "outputdir set." << std::endl;
 ////db->drawHisto_onlyData( "deltaPhi", "", "clusterOK_isolated", "", 1);
 
 //db->drawHisto( "response_loose", "Response", "", "Events", log);
+  std::string metName;
+  if( recoType=="pf" ) metName = "PF Missing E_{T}";
+  if( recoType=="calo" ) metName = "PF Missing E_{T}";
+  if( recoType=="jpt" ) metName = "PF Missing E_{T}";
+   
+  db->drawHisto( "met", metName, "GeV", "Events", log, 1, "");
+  db->drawHisto( "met_noSmaj", (std::string)(metName+" (no cut on S_{maj})"), "GeV", "Events", log, 1, "");
+
   db->set_rebin(10);
   db->set_legendTitle("|#eta| < 1.1");
-  db->drawHisto( "response", "Response", "", "Events", log, 1, "eta011");
-  db->drawHisto( "response", "Response", "", "Events", log, 1, "eta011", (bool)true);
+  db->drawHisto( "response", "p_{T}/p_{T}^{#gamma} Response", "", "Events", log, 1, "eta011");
+  db->drawHisto( "response", "p_{T}/p_{T}^{#gamma} Response", "", "Events", log, 1, "eta011", (bool)true);
   db->drawHisto( "responseMPF", "MPF Response", "", "Events", log, 1, "eta011");
   db->set_legendTitle("1.5 < |#eta| < 2.4");
-  db->drawHisto( "response", "Response", "", "Events", log, 1, "eta1524");
-  db->drawHisto( "response", "Response", "", "Events", log, 1, "eta1524", (bool)true);
+  db->drawHisto( "response", "p_{T}/p_{T}^{#gamma} Response", "", "Events", log, 1, "eta1524");
+  db->drawHisto( "response", "p_{T}/p_{T}^{#gamma} Response", "", "Events", log, 1, "eta1524", (bool)true);
   db->drawHisto( "responseMPF", "MPF Response", "", "Events", log, 1, "eta1524");
   db->set_legendTitle("2.4 < |#eta| < 3");
-  db->drawHisto( "response", "Response", "", "Events", log, 1, "eta243");
-  db->drawHisto( "response", "Response", "", "Events", log, 1, "eta243", (bool)true);
+  db->drawHisto( "response", "p_{T}/p_{T}^{#gamma} Response", "", "Events", log, 1, "eta243");
+  db->drawHisto( "response", "p_{T}/p_{T}^{#gamma} Response", "", "Events", log, 1, "eta243", (bool)true);
   db->drawHisto( "responseMPF", "MPF Response", "", "Events", log, 1, "eta243");
   db->set_legendTitle("3 < |#eta| < 5");
-  db->drawHisto( "response", "Response", "", "Events", log, 1, "eta35");
+  db->drawHisto( "response", "p_{T}/p_{T}^{#gamma} Response", "", "Events", log, 1, "eta35");
   db->drawHisto( "responseMPF", "MPF Response", "", "Events", log, 1, "eta35");
 
   delete db;
