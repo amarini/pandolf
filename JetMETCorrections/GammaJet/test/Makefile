@@ -6,14 +6,19 @@ ROOTFLAG = `${ROOTSYS}/bin/root-config --cflags --libs`
 do2ndLevel_DiJet: AnalysisJet.o TreeAnalyzer.o TreeAnalyzer_DiJet.o
 	$(CC) -Wall -o do2ndLevel_DiJet do2ndLevel_DiJet.cpp AnalysisJet.o TreeAnalyzer.o TreeAnalyzer_DiJet.o $(ROOTFLAG)
 
-do2ndLevel_PhotonJet: AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJet.o
-	$(CC) -Wall -o do2ndLevel_PhotonJet do2ndLevel_PhotonJet.cpp AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJet.o $(ROOTFLAG) -lMinuit
+do2ndLevel_PhotonJet: AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJet.o do2ndLevel_PhotonJet.cpp fitTools.o
+	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o do2ndLevel_PhotonJet do2ndLevel_PhotonJet.cpp AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJet.o fitTools.o $(ROOTFLAG) -lMinuit
+
+do2ndLevel_PhotonJet_batch: AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJet.o Utilities.o JetCorrectorParameters.o SimpleJetCorrector.o FactorizedJetCorrector.o fitTools.o do2ndLevel_PhotonJet_batch.cpp
+	$(CC) -Wall -o do2ndLevel_PhotonJet_batch do2ndLevel_PhotonJet_batch.cpp AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJet.o Utilities.o JetCorrectorParameters.o SimpleJetCorrector.o FactorizedJetCorrector.o fitTools.o $(ROOTFLAG) -lMinuit
+
+
+do2ndLevel_Calo_vs_PF_batch: AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_Calo_vs_PF.o do2ndLevel_Calo_vs_PF_batch.cpp fitTools.o
+	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o do2ndLevel_Calo_vs_PF_batch do2ndLevel_Calo_vs_PF_batch.cpp AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_Calo_vs_PF.o fitTools.o $(ROOTFLAG) -lMinuit
 
 do2ndLevel_ZGamma:  TreeAnalyzer.o TreeAnalyzer_ZGamma.o
 	$(CC) -Wall -o do2ndLevel_ZGamma do2ndLevel_ZGamma.cpp TreeAnalyzer.o TreeAnalyzer_ZGamma.o $(ROOTFLAG)
 
-do2ndLevel_Calo_vs_PF:  TreeAnalyzer_Calo_vs_PF.o
-	$(CC) -Wall -o do2ndLevel_Calo_vs_PF do2ndLevel_Calo_vs_PF.cpp TreeAnalyzer_Calo_vs_PF.o $(ROOTFLAG)
 
 prova: AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJet.o
 	$(CC) -Wall -o prova prova_TreeAnalyzer_Photon.cpp AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJet.o $(ROOTFLAG)
@@ -27,11 +32,11 @@ AnalysisPhoton.o: AnalysisPhoton.C
 TreeAnalyzer.o: TreeAnalyzer.C
 	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools TreeAnalyzer.C $(ROOTFLAG)
 
-TreeAnalyzer_PhotonJet.o: TreeAnalyzer_PhotonJet.C
-	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools TreeAnalyzer_PhotonJet.C $(ROOTFLAG)
+TreeAnalyzer_PhotonJet.o: TreeAnalyzer_PhotonJet.C fitTools.o
+	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools fitTools.o TreeAnalyzer_PhotonJet.C $(ROOTFLAG)
 
-TreeAnalyzer_Calo_vs_PF.o: TreeAnalyzer_Calo_vs_PF.C
-	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools TreeAnalyzer_Calo_vs_PF.C $(ROOTFLAG)
+TreeAnalyzer_Calo_vs_PF.o: TreeAnalyzer_Calo_vs_PF.C fitTools.o
+	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools fitTools.o TreeAnalyzer_Calo_vs_PF.C $(ROOTFLAG)
 
 TreeAnalyzer_ZGamma.o: TreeAnalyzer_ZGamma.C
 	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools TreeAnalyzer_ZGamma.C $(ROOTFLAG)
@@ -86,6 +91,19 @@ merge_and_setWeights_PhotonJet: merge_and_setWeights_PhotonJet.cpp
 
 merge_and_setWeights_Calo_vs_PF: merge_and_setWeights_Calo_vs_PF.cpp
 	$(CC) -Wall -o merge_and_setWeights_Calo_vs_PF merge_and_setWeights_Calo_vs_PF.cpp $(ROOTFLAG)
+
+
+Utilities.o: CondFormats/JetMETObjects/src/Utilities.cc
+	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/JetMETCorrections/GammaJet/test/ CondFormats/JetMETObjects/src/Utilities.cc $(ROOTFLAG)
+
+JetCorrectorParameters.o: CondFormats/JetMETObjects/src/JetCorrectorParameters.cc
+	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/JetMETCorrections/GammaJet/test/ CondFormats/JetMETObjects/src/JetCorrectorParameters.cc $(ROOTFLAG)
+
+FactorizedJetCorrector.o: CondFormats/JetMETObjects/src/FactorizedJetCorrector.cc
+	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/JetMETCorrections/GammaJet/test/ CondFormats/JetMETObjects/src/FactorizedJetCorrector.cc $(ROOTFLAG)
+
+SimpleJetCorrector.o: CondFormats/JetMETObjects/src/SimpleJetCorrector.cc
+	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/JetMETCorrections/GammaJet/test/ CondFormats/JetMETObjects/src/SimpleJetCorrector.cc $(ROOTFLAG)
 
 
 clean:
