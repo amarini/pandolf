@@ -37,11 +37,13 @@ int main(int argc, char* argv[]) {
     if( useGenJets_str=="true" ) useGenJets = true;
   }
 
-  TRegexp eg("EG_Run2010A");
+  TRegexp run2010("Run2010");
   TRegexp minbias("MinimumBias_Commissioning10");
+  TRegexp nov4("Nov4ReReco");
+  TRegexp dec22("Dec22ReReco");
   TString dataset_str(dataset);
   
-  if( dataset_str.Contains(eg) || dataset_str.Contains(minbias) ) { // then it's data
+  if( dataset_str.Contains(run2010) || dataset_str.Contains(minbias) || dataset_str.Contains(nov4) || dataset_str.Contains(dec22) ) { // then it's data
     doSingleLoop(inputFileList, dataset, recoType, jetAlgo, flags, (bool)true, (bool)false);
   } else {
     doSingleLoop(inputFileList, dataset, recoType, jetAlgo, flags, (bool)false, useGenJets);
@@ -57,8 +59,8 @@ void doSingleLoop(std::string fileName, std::string name, std::string recoType, 
   TreeAnalyzer_PhotonJet* t = new TreeAnalyzer_PhotonJet(name.c_str(), recoType, jetAlgo, flags, useGenJets);
   t->LoadInputFromFile(fileName);
   if( useJSON ) {
-    t->ReadJSONFile("Cert_143337-144114_7TeV_StreamExpress_Collisions10_CMSSWConfig.txt");
-    t->ReadCSVFile("csv_runs143337_144114.txt");
+    t->ReadJSONFile("Cert_136033-149442_7TeV_Nov4ReReco_Collisions10_CMSSWConfig.txt");
+  //t->ReadCSVFile("csv_runs143337_144114.txt");
   //t->ReadJSONFile("Cert_132440-143336_7TeV_StreamExpress_Collisions10_CMSSWConfig_v2.txt");
   //t->ReadCSVFile("csvfile_upto143336.txt");
   }
