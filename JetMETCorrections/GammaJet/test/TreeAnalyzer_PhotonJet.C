@@ -7,7 +7,7 @@
 #include "AnalysisJet.h"
 #include "TRandom3.h"
 #include "TVector2.h"
-#include "fitTools.C"
+#include "fitTools.h"
 
 
 //#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
