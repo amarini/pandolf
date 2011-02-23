@@ -75,6 +75,7 @@ class TreeAnalyzer_PhotonJet : public TreeAnalyzer {
    Float_t ptTrkIsoPhotReco_;
    Float_t clusterMajPhotReco_;
    Float_t clusterMinPhotReco_;
+   Int_t   hasPixelSeedPhotReco_;
 
    Float_t ePhotGen_;
    Float_t ptPhotGen_;

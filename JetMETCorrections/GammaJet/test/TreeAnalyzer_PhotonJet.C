@@ -108,6 +108,7 @@ void TreeAnalyzer_PhotonJet::CreateOutputFile() {
   jetTree_->Branch("ptTrkIsoPhotReco",  &ptTrkIsoPhotReco_,  "ptTrkIsoPhotReco_/F");
   jetTree_->Branch("clusterMajPhotReco",  &clusterMajPhotReco_,  "clusterMajPhotReco_/F");
   jetTree_->Branch("clusterMinPhotReco",  &clusterMinPhotReco_,  "clusterMinPhotReco_/F");
+  jetTree_->Branch("hasPixelSeedPhotReco",  &hasPixelSeedPhotReco_,  "hasPixelSeedPhotReco_/I");
 
   jetTree_->Branch("ePhotGen",  &ePhotGen_,  "ePhotGen_/F");
   jetTree_->Branch("ptPhotGen",  &ptPhotGen_,  "ptPhotGen_/F");
@@ -271,6 +272,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        thisPhot.ptTrkIso = ptiso035Phot[iPhot]/thisPhot.pt;
        thisPhot.clusterMaj = sMajMajPhot[iPhot];
        thisPhot.clusterMin = sMinMinPhot[iPhot];
+       thisPhot.hasPixelSeed = hasPixelSeedPhot[iPhot];
 
        //if( thisPhot.pt < 10. ) continue;
 
@@ -354,6 +356,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        foundPhot.ptTrkIso = 0.;
        foundPhot.clusterMaj = 0.;
        foundPhot.clusterMin = 0.;
+       foundPhot.hasPixelSeed = 0;
        foundPhot.eGen = foundGenJet.eGen;
        foundPhot.ptGen = foundGenJet.ptGen;
        foundPhot.etaGen = foundGenJet.etaGen;
@@ -419,6 +422,7 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
      ptTrkIsoPhotReco_ = foundPhot.ptTrkIso;
      clusterMajPhotReco_ = foundPhot.clusterMaj;
      clusterMinPhotReco_ = foundPhot.clusterMin;
+     hasPixelSeedPhotReco_ = foundPhot.hasPixelSeed;
      ePhotGen_ = foundPhot.eGen;
      ptPhotGen_ = foundPhot.ptGen;
      etaPhotGen_ = foundPhot.etaGen;

@@ -35,6 +35,7 @@ class AnalysisPhoton {
   Float_t ptTrkIso;
   Float_t clusterMaj;
   Float_t clusterMin;
+  Int_t hasPixelSeed;
 
 };
 
