@@ -92,6 +92,7 @@ class DrawBase {
   void set_scaleFactor( float scaleFactor ) { scaleFactor_ = scaleFactor;};
   void set_yAxisMaxScale( float yAxisMaxScale ) { yAxisMaxScale_ = yAxisMaxScale;};
   void set_noStack( bool set=true ) { noStack_ = set; };
+  void set_isCMSArticle( bool set=true ) { isCMSArticle_ = set; };
   void set_rebin( int rebin ) { rebin_ = rebin; };
   void set_mcMarkers( bool set=true );
   void set_markerSize( float markerSize ) { markerSize_ = markerSize; };
@@ -119,7 +120,9 @@ class DrawBase {
 
   std::string get_etaRangeText( const std::string& etaRegion ) const;
   std::string get_sqrtText() const;
+  std::string get_lumiText() const;
   std::string get_algoName() const;
+  std::string get_algoType() const;
   std::string get_axisName(std::string name);
   std::string get_outputSuffix() const;
   std::string get_fullSuffix() const;
@@ -157,6 +160,8 @@ class DrawBase {
   TPaveText* additionalLabel_;
 
   bool noStack_;
+
+  bool isCMSArticle_;
 
 };
 
