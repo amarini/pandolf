@@ -21,6 +21,7 @@
 #include "TStyle.h"
 #include "TLegend.h"
 #include "TPaveText.h"
+//#include "TLatex.h"
 
 
 struct InputFile {
@@ -92,7 +93,7 @@ class DrawBase {
   void set_scaleFactor( float scaleFactor ) { scaleFactor_ = scaleFactor;};
   void set_yAxisMaxScale( float yAxisMaxScale ) { yAxisMaxScale_ = yAxisMaxScale;};
   void set_noStack( bool set=true ) { noStack_ = set; };
-  void set_isCMSArticle( bool set=true ) { isCMSArticle_ = set; };
+  void set_isCMSArticle( bool set=true );
   void set_rebin( int rebin ) { rebin_ = rebin; };
   void set_mcMarkers( bool set=true );
   void set_markerSize( float markerSize ) { markerSize_ = markerSize; };
@@ -102,8 +103,9 @@ class DrawBase {
   void delete_label();
 
   LegendBox get_legendBox( int legendQuadrant=1, const std::vector<std::string>* legendNames=0 ) const;
-  TPaveText* get_labelCMS( int legendQuadrant=2 ) const;
-  TPaveText* get_labelSqrt( int legendQuadrant=2 ) const;
+  TPaveText* get_labelCMS( int legendQuadrant=0 ) const;
+  TPaveText* get_labelCMStop( bool wide=false ) const;
+  TPaveText* get_labelSqrt( int legendQuadrant=0 ) const;
   TPaveText* get_labelAlgo( int legendQuadrant=3 ) const;
   std::string get_CMSText() const;
   std::string get_analysisType() const { return analysisType_; };
@@ -131,6 +133,8 @@ class DrawBase {
 
   TGraphErrors* get_graphRatio( TGraphErrors* gr_data, TGraphErrors* gr_MC);
 
+  
+  TStyle* style_;
 
   std::string analysisType_;
   std::string recoType_;

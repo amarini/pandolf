@@ -9,166 +9,159 @@
 
 DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType, const std::string& jetAlgo, const std::string& flags ) {
 
-  if( isCMSArticle_ ) {
-
-    TStyle *tdrStyle = new TStyle("tdrStyle","Style for P-TDR");
+  style_ = new TStyle("DrawBaseStyle", "");
+  style_->SetCanvasColor(0);
+  style_->SetPadColor(0);
+  style_->SetFrameFillColor(0);
+  style_->SetStatColor(0);
+  style_->SetOptStat(0);
+  style_->SetTitleFillColor(0);
+  style_->SetCanvasBorderMode(0);
+  style_->SetPadBorderMode(0);
+  style_->SetFrameBorderMode(0);
+  style_->SetPadBottomMargin(0.12);
+  style_->SetPadLeftMargin(0.12);
+  style_->cd();
 
   // For the canvas:
-    tdrStyle->SetCanvasBorderMode(0);
-    tdrStyle->SetCanvasColor(kWhite);
-    tdrStyle->SetCanvasDefH(600); //Height of canvas
-    tdrStyle->SetCanvasDefW(600); //Width of canvas
-    tdrStyle->SetCanvasDefX(0);   //POsition on screen
-    tdrStyle->SetCanvasDefY(0);
+    style_->SetCanvasBorderMode(0);
+    style_->SetCanvasColor(kWhite);
+    style_->SetCanvasDefH(600); //Height of canvas
+    style_->SetCanvasDefW(600); //Width of canvas
+    style_->SetCanvasDefX(0);   //POsition on screen
+    style_->SetCanvasDefY(0);
 
   // For the Pad:
-    tdrStyle->SetPadBorderMode(0);
-    // tdrStyle->SetPadBorderSize(Width_t size = 1);
-    tdrStyle->SetPadColor(kWhite);
-    tdrStyle->SetPadGridX(false);
-    tdrStyle->SetPadGridY(false);
-    tdrStyle->SetGridColor(0);
-    tdrStyle->SetGridStyle(3);
-    tdrStyle->SetGridWidth(1);
+    style_->SetPadBorderMode(0);
+    // style_->SetPadBorderSize(Width_t size = 1);
+    style_->SetPadColor(kWhite);
+    style_->SetPadGridX(false);
+    style_->SetPadGridY(false);
+    style_->SetGridColor(0);
+    style_->SetGridStyle(3);
+    style_->SetGridWidth(1);
 
   // For the frame:
-    tdrStyle->SetFrameBorderMode(0);
-    tdrStyle->SetFrameBorderSize(1);
-    tdrStyle->SetFrameFillColor(0);
-    tdrStyle->SetFrameFillStyle(0);
-    tdrStyle->SetFrameLineColor(1);
-    tdrStyle->SetFrameLineStyle(1);
-    tdrStyle->SetFrameLineWidth(1);
+    style_->SetFrameBorderMode(0);
+    style_->SetFrameBorderSize(1);
+    style_->SetFrameFillColor(0);
+    style_->SetFrameFillStyle(0);
+    style_->SetFrameLineColor(1);
+    style_->SetFrameLineStyle(1);
+    style_->SetFrameLineWidth(1);
 
-  // For the histo:
-    // tdrStyle->SetHistFillColor(1);
-    // tdrStyle->SetHistFillStyle(0);
-    tdrStyle->SetHistLineColor(1);
-    tdrStyle->SetHistLineStyle(0);
-    tdrStyle->SetHistLineWidth(1);
-    // tdrStyle->SetLegoInnerR(Float_t rad = 0.5);
-    // tdrStyle->SetNumberContours(Int_t number = 20);
+//// For the histo:
+//  // style_->SetHistFillColor(1);
+//  // style_->SetHistFillStyle(0);
+//  style_->SetHistLineColor(1);
+//  style_->SetHistLineStyle(0);
+//  style_->SetHistLineWidth(1);
+//  // style_->SetLegoInnerR(Float_t rad = 0.5);
+//  // style_->SetNumberContours(Int_t number = 20);
 
-    tdrStyle->SetEndErrorSize(2);
-  //  tdrStyle->SetErrorMarker(20);
-    tdrStyle->SetErrorX(0.);
-    
-    tdrStyle->SetMarkerStyle(20);
+//  style_->SetEndErrorSize(2);
+////  style_->SetErrorMarker(20);
+//  style_->SetErrorX(0.);
+//  
+//  style_->SetMarkerStyle(20);
 
-  //For the fit/function:
-    tdrStyle->SetOptFit(1);
-    tdrStyle->SetFitFormat("5.4g");
-    tdrStyle->SetFuncColor(2);
-    tdrStyle->SetFuncStyle(1);
-    tdrStyle->SetFuncWidth(1);
+////For the fit/function:
+//  style_->SetOptFit(1);
+//  style_->SetFitFormat("5.4g");
+//  style_->SetFuncColor(2);
+//  style_->SetFuncStyle(1);
+//  style_->SetFuncWidth(1);
 
-  //For the date:
-    tdrStyle->SetOptDate(0);
-    // tdrStyle->SetDateX(Float_t x = 0.01);
-    // tdrStyle->SetDateY(Float_t y = 0.01);
+////For the date:
+//  style_->SetOptDate(0);
+//  // style_->SetDateX(Float_t x = 0.01);
+//  // style_->SetDateY(Float_t y = 0.01);
 
-  // For the statistics box:
-    tdrStyle->SetOptFile(0);
-    tdrStyle->SetOptStat(0); // To display the mean and RMS:   SetOptStat("mr");
-    tdrStyle->SetStatColor(kWhite);
-    tdrStyle->SetStatFont(42);
-    tdrStyle->SetStatFontSize(0.025);
-    tdrStyle->SetStatTextColor(1);
-    tdrStyle->SetStatFormat("6.4g");
-    tdrStyle->SetStatBorderSize(1);
-    tdrStyle->SetStatH(0.1);
-    tdrStyle->SetStatW(0.15);
-    // tdrStyle->SetStatStyle(Style_t style = 1001);
-    // tdrStyle->SetStatX(Float_t x = 0);
-    // tdrStyle->SetStatY(Float_t y = 0);
+//// For the statistics box:
+//  style_->SetOptFile(0);
+//  style_->SetOptStat(0); // To display the mean and RMS:   SetOptStat("mr");
+//  style_->SetStatColor(kWhite);
+//  style_->SetStatFont(42);
+//  style_->SetStatFontSize(0.025);
+//  style_->SetStatTextColor(1);
+//  style_->SetStatFormat("6.4g");
+//  style_->SetStatBorderSize(1);
+//  style_->SetStatH(0.1);
+//  style_->SetStatW(0.15);
+//  // style_->SetStatStyle(Style_t style = 1001);
+//  // style_->SetStatX(Float_t x = 0);
+//  // style_->SetStatY(Float_t y = 0);
 
   // Margins:
-    tdrStyle->SetPadTopMargin(0.05);
-    tdrStyle->SetPadBottomMargin(0.15);//0.13);
-    tdrStyle->SetPadLeftMargin(0.15);//0.16);
-    tdrStyle->SetPadRightMargin(0.05);//0.02);
+    style_->SetPadTopMargin(0.05);
+    style_->SetPadBottomMargin(0.15);//0.13);
+    style_->SetPadLeftMargin(0.15);//0.16);
+    style_->SetPadRightMargin(0.05);//0.02);
 
   // For the Global title:
 
-    tdrStyle->SetOptTitle(0);
-    tdrStyle->SetTitleFont(42);
-    tdrStyle->SetTitleColor(1);
-    tdrStyle->SetTitleTextColor(1);
-    tdrStyle->SetTitleFillColor(10);
-    tdrStyle->SetTitleFontSize(0.05);
-    // tdrStyle->SetTitleH(0); // Set the height of the title box
-    // tdrStyle->SetTitleW(0); // Set the width of the title box
-    // tdrStyle->SetTitleX(0); // Set the position of the title box
-    // tdrStyle->SetTitleY(0.985); // Set the position of the title box
-    // tdrStyle->SetTitleStyle(Style_t style = 1001);
-    // tdrStyle->SetTitleBorderSize(2);
+    style_->SetOptTitle(0);
+    style_->SetTitleFont(42);
+    style_->SetTitleColor(1);
+    style_->SetTitleTextColor(1);
+    style_->SetTitleFillColor(10);
+    style_->SetTitleFontSize(0.05);
+    // style_->SetTitleH(0); // Set the height of the title box
+    // style_->SetTitleW(0); // Set the width of the title box
+    // style_->SetTitleX(0); // Set the position of the title box
+    // style_->SetTitleY(0.985); // Set the position of the title box
+    // style_->SetTitleStyle(Style_t style = 1001);
+    // style_->SetTitleBorderSize(2);
 
   // For the axis titles:
 
-    tdrStyle->SetTitleColor(1, "XYZ");
-    tdrStyle->SetTitleFont(42, "XYZ");
-    tdrStyle->SetTitleSize(0.06, "XYZ");
-    // tdrStyle->SetTitleXSize(Float_t size = 0.02); // Another way to set the size?
-    // tdrStyle->SetTitleYSize(Float_t size = 0.02);
-    tdrStyle->SetTitleXOffset(1.1);//0.9);
-    tdrStyle->SetTitleYOffset(1.25); // => 1.15 if exponents
-    // tdrStyle->SetTitleOffset(1.1, "Y"); // Another way to set the Offset
+    style_->SetTitleColor(1, "XYZ");
+    style_->SetTitleFont(42, "XYZ");
+    style_->SetTitleSize(0.05, "XYZ");
+    // style_->SetTitleXSize(Float_t size = 0.02); // Another way to set the size?
+    // style_->SetTitleYSize(Float_t size = 0.02);
+    style_->SetTitleXOffset(1.15);//0.9);
+    style_->SetTitleYOffset(1.4); // => 1.15 if exponents
+    // style_->SetTitleOffset(1.1, "Y"); // Another way to set the Offset
 
   // For the axis labels:
 
-    tdrStyle->SetLabelColor(1, "XYZ");
-    tdrStyle->SetLabelFont(42, "XYZ");
-    tdrStyle->SetLabelOffset(0.007, "XYZ");
-    tdrStyle->SetLabelSize(0.05, "XYZ");
+    style_->SetLabelColor(1, "XYZ");
+    style_->SetLabelFont(42, "XYZ");
+    style_->SetLabelOffset(0.007, "XYZ");
+    style_->SetLabelSize(0.045, "XYZ");
 
   // For the axis:
 
-    tdrStyle->SetAxisColor(1, "XYZ");
-    tdrStyle->SetStripDecimals(kTRUE);
-    tdrStyle->SetTickLength(0.03, "XYZ");
-    tdrStyle->SetNdivisions(510, "XYZ");
-    tdrStyle->SetPadTickX(1);  // To get tick marks on the opposite side of the frame
-    tdrStyle->SetPadTickY(1);
+    style_->SetAxisColor(1, "XYZ");
+    style_->SetStripDecimals(kTRUE);
+    style_->SetTickLength(0.03, "XYZ");
+    style_->SetNdivisions(510, "XYZ");
+    style_->SetPadTickX(1);  // To get tick marks on the opposite side of the frame
+    style_->SetPadTickY(1);
 
-  // Change for log plots:
-    tdrStyle->SetOptLogx(0);
-    tdrStyle->SetOptLogy(0);
-    tdrStyle->SetOptLogz(0);
+//// Change for log plots:
+//  style_->SetOptLogx(0);
+//  style_->SetOptLogy(0);
+//  style_->SetOptLogz(0);
 
-  // Postscript options:
-    tdrStyle->SetPaperSize(20.,20.);
-    // tdrStyle->SetLineScalePS(Float_t scale = 3);
-    // tdrStyle->SetLineStyleString(Int_t i, const char* text);
-    // tdrStyle->SetHeaderPS(const char* header);
-    // tdrStyle->SetTitlePS(const char* pstitle);
+//// Postscript options:
+//  style_->SetPaperSize(20.,20.);
+//  // style_->SetLineScalePS(Float_t scale = 3);
+//  // style_->SetLineStyleString(Int_t i, const char* text);
+//  // style_->SetHeaderPS(const char* header);
+//  // style_->SetTitlePS(const char* pstitle);
 
-    // tdrStyle->SetBarOffset(Float_t baroff = 0.5);
-    // tdrStyle->SetBarWidth(Float_t barwidth = 0.5);
-    // tdrStyle->SetPaintTextFormat(const char* format = "g");
-    // tdrStyle->SetPalette(Int_t ncolors = 0, Int_t* colors = 0);
-    // tdrStyle->SetTimeOffset(Double_t toffset);
-    // tdrStyle->SetHistMinimumZero(kTRUE);
+//  // style_->SetBarOffset(Float_t baroff = 0.5);
+//  // style_->SetBarWidth(Float_t barwidth = 0.5);
+//  // style_->SetPaintTextFormat(const char* format = "g");
+//  // style_->SetPalette(Int_t ncolors = 0, Int_t* colors = 0);
+//  // style_->SetTimeOffset(Double_t toffset);
+//  // style_->SetHistMinimumZero(kTRUE);
 
-    // Additional settings for QCD-10-011
-    tdrStyle->SetLegendBorderSize(0);
+//  // Additional settings for QCD-10-011
+//  style_->SetLegendBorderSize(0);
 
-    tdrStyle->cd();
-
-  } else {
-
-    TStyle *simpleStyle = new TStyle("simpleStyle","");
-    simpleStyle->SetCanvasColor(0);
-    simpleStyle->SetPadColor(0);
-    simpleStyle->SetFrameFillColor(0);
-    simpleStyle->SetStatColor(0);
-    simpleStyle->SetOptStat(0);
-    simpleStyle->SetTitleFillColor(0);
-    simpleStyle->SetCanvasBorderMode(0);
-    simpleStyle->SetPadBorderMode(0);
-    simpleStyle->SetFrameBorderMode(0);
-    simpleStyle->cd();
-
-  } //if is cms article
 
   analysisType_ = analysisType;
   recoType_ = recoType;
@@ -303,6 +296,12 @@ void DrawBase::set_sameInstanceNormalization() {
 }
 */
 
+
+void DrawBase::set_isCMSArticle( bool set ) {
+
+  isCMSArticle_ = set;
+
+}
 
 
 //void DrawBase::drawHisto( const std::string& name, const std::string& etaRegion, const std::string& flags, const std::string& axisName, const std::string& units, int legendQuadrant, bool log_aussi) {
@@ -672,13 +671,14 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     }
     h2_axes->SetXTitle(xAxis.c_str());
     h2_axes->SetYTitle(yAxis.c_str());
-    h2_axes->GetXaxis()->SetTitleOffset(1.1);
-    h2_axes->GetYaxis()->SetTitleOffset(1.5);
+  //h2_axes->GetXaxis()->SetTitleOffset(1.1);
+  //h2_axes->GetYaxis()->SetTitleOffset(1.5);
 
 
-    TPaveText* label_cms = get_labelCMS(2);
+    TPaveText* label_cms = get_labelCMS(0);
+    TPaveText* label_sqrt = get_labelSqrt(0);
 
-    TPaveText* label_sqrt = get_labelSqrt(2);
+//    TPaveText* label_CMStop = get_labelCMStop();
 
     TPaveText* label_cuts = 0;
 /*    if( analysisType_ == "MinBias" ) {
@@ -810,6 +810,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     gPad->RedrawAxis();
     label_cms->Draw("same");
     label_sqrt->Draw("same");
+//    label_CMStop->Draw("same");
     if( label_cuts!=0 )
       label_cuts->Draw("same");
     if( labelText!="" )
@@ -835,8 +836,8 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     //Float_t dataRMS = (noDATA) ? 0. : dataHistos[0]->GetRMS();
     //Float_t dataRMSErr = (noDATA) ? 0. : dataHistos[0]->GetMeanError();
 
-      Float_t meanTruncFraction = 1.;
-      Float_t rmsTruncFraction = 1.;
+      Float_t meanTruncFraction = 0.99;
+      Float_t rmsTruncFraction = 0.99;
 
       Float_t dataResponse = 0.;
       Float_t dataResponseErr = 0.;
@@ -1000,8 +1001,8 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
       canvasName = canvasName + "_" + ptRange_str;
 
     std::string canvasName_eps = canvasName + ".eps";
-    c1->SetLeftMargin(0.12);
-    c1->SetBottomMargin(0.12);
+ // c1->SetLeftMargin(0.12);
+ // c1->SetBottomMargin(0.12);
     c1->SaveAs(canvasName_eps.c_str());
     std::string canvasName_png = canvasName + ".png";
     c1->SaveAs(canvasName_png.c_str());
@@ -1035,8 +1036,8 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
       TH2D* h2_axes_log = new TH2D("axes_log", "", nBinsx, xMin, xMax, 10, 0.1*yMin, 5.*yMax);
       h2_axes_log->SetXTitle(xAxis.c_str());
       h2_axes_log->SetYTitle(yAxis.c_str());
-      h2_axes_log->GetXaxis()->SetTitleOffset(1.1);
-      h2_axes_log->GetYaxis()->SetTitleOffset(1.5);
+    //h2_axes_log->GetXaxis()->SetTitleOffset(1.1);
+    //h2_axes_log->GetYaxis()->SetTitleOffset(1.5);
       if( getBinLabels_ ) {
         for( unsigned iBinx=1; iBinx<nBinsx+1; ++iBinx ) {
           if( refHisto->GetXaxis()->GetBinLabel(iBinx)!="" )
@@ -1957,8 +1958,8 @@ void DrawBase::drawStack(const std::string& varY, const std::string& varX, const
     gStyle->SetPadTickY(1);
 
   TCanvas* c1 = new TCanvas("c1", "c1", 800, 800);
-  c1->SetLeftMargin(1.2);
-  c1->SetBottomMargin(1.2);
+//c1->SetLeftMargin(1.2);
+//c1->SetBottomMargin(1.2);
   c1->cd();
   if( varX=="pt" || varX=="ptCorr" )
     c1->SetLogx();
@@ -2123,6 +2124,8 @@ void DrawBase::compareDifferentHistos_singleFile( InputFile infile, const std::v
   TPaveText* label_CMS = get_labelCMS();
   TPaveText* label_sqrt = get_labelSqrt();
 
+//  TPaveText* label_CMStop = get_labelCMStop();
+
   std::vector<TPaveText*> rmsText;
   float yMin_text = 0.25;
   float yMax_text = 0.55;
@@ -2157,6 +2160,7 @@ void DrawBase::compareDifferentHistos_singleFile( InputFile infile, const std::v
     //rmsText[i]->Draw("same");
   }
   legend->Draw("same");
+//  label_CMStop->Draw("same");
   label_CMS->Draw("same");
   label_sqrt->Draw("same");
   gPad->RedrawAxis();
@@ -2404,10 +2408,10 @@ LegendBox DrawBase::get_legendBox( int legendQuadrant, const std::vector<std::st
     LegendBox lb;
 
     if( legendQuadrant==1 ) {
-      lb.xMin = 0.6;
-      lb.yMax = 0.88;
+      lb.xMin = 0.65;
+      lb.yMax = 0.92;
       lb.yMin = lb.yMax - 0.05*(float)nNames_total;
-      lb.xMax = 0.88;
+      lb.xMax = 0.92;
     } else if( legendQuadrant==0 ) {
       lb.xMin = 0.5;
       lb.yMax = 0.88;
@@ -2460,9 +2464,6 @@ LegendBox DrawBase::get_legendBox( int legendQuadrant, const std::vector<std::st
 
 std::string DrawBase::get_lumiText() const {
 
-  if( lumi_==0. ) {
-    return std::string("#sqrt{s} = 7 TeV");
-  }
   float lumi4Text(lumi_);
   lumi4Text *= 1000000.; // in mub-1
   bool onlyOneDecimal=false;
@@ -2484,6 +2485,10 @@ std::string DrawBase::get_lumiText() const {
     onlyOneDecimal=true;
   }
 
+  if( dataFiles_.size()==0 ) {
+    if( ((int)(lumi4Text*10.) % 10) == 0 ) onlyOneDecimal=true;
+  }
+
   char lumiText[200];
   if( onlyOneDecimal )
     sprintf( lumiText, "%.0f %s", lumi4Text, units.c_str());
@@ -2503,9 +2508,13 @@ std::string DrawBase::get_sqrtText() const {
 
   char label_sqrt_text[150];
   if( isCMSArticle_ )
-    sprintf( label_sqrt_text, "#sqrt{s} = 7 TeV", lumiText.c_str());
-  else
-    sprintf( label_sqrt_text, "#sqrt{s} = 7 TeV, L = %s", lumiText.c_str());
+    sprintf( label_sqrt_text, "#sqrt{s} = 7 TeV");
+  else {
+    if( lumi_==0. )
+      sprintf( label_sqrt_text, "#sqrt{s} = 7 TeV" );
+    else
+      sprintf( label_sqrt_text, "#sqrt{s} = 7 TeV, L = %s", lumiText.c_str());
+  }
 
   std::string returnString(label_sqrt_text);
 
@@ -2564,18 +2573,58 @@ std::string DrawBase::get_algoName() const {
 
 
 
+//void cmsPrel(bool wide = false) {
+TPaveText* DrawBase::get_labelCMStop( bool wide ) const {
+
+  //TLatex *latex = new TLatex();
+  //latex->SetNDC();
+  TPaveText *label_cmstop = new TPaveText(0.15, 0.94, 0.96, 0.98, "brNDC");
+  label_cmstop->SetTextSize(0.045);
+  label_cmstop->SetFillColor(0);
+  
+  label_cmstop->SetTextAlign(31); // align right
+  //latex->DrawLatex(wide ? 0.98 : 0.95, 0.96, "#sqrt{s} = 7 TeV");
+  label_cmstop->AddText("#sqrt{s} = 7 TeV");
+  std::string leftText;
+  if( dataFiles_.size()==0 ) {
+    leftText = "CMS Simulation 2010";
+  } else {
+    if( isCMSArticle_ )
+      leftText = "CMS 2010";
+    else
+      leftText = "CMS Preliminary 2010";
+  }
+
+  if (lumi_ > 0.) {
+    label_cmstop->SetTextAlign(11); // align left
+    std::string lumiText = this->get_lumiText();
+    if( dataFiles_.size()==0 ) lumiText = "L = " + lumiText;
+    //label_cmstop->DrawLatex(wide ? 0.06 : 0.15, 0.96, Form("%s, %s", leftText.c_str(), lumiText.c_str()));
+    label_cmstop->AddText(Form("%s, %s", leftText.c_str(), lumiText.c_str()));
+  } else {
+    label_cmstop->SetTextAlign(11); // align left
+    //label_cmstop->DrawLatex(wide ? 0.06 : 0.15, 0.96, Form("%s", leftText.c_str()));
+    label_cmstop->AddText(Form("%s", leftText.c_str()));
+  }
+
+  return label_cmstop;
+
+} // cmsPrel
+
+
+
 TPaveText* DrawBase::get_labelCMS( int legendQuadrant ) const {
 
-  if( legendQuadrant!=1 && legendQuadrant!=2 && legendQuadrant!=3 ) {
+  if( legendQuadrant!=0 && legendQuadrant!=1 && legendQuadrant!=2 && legendQuadrant!=3 ) {
     std::cout << "WARNING! Legend quadrant '" << legendQuadrant << "' not yet implemented for CMS label. Using 2." << std::endl;
     legendQuadrant = 2;
   }
 
   float x1, y1, x2, y2;
   if( legendQuadrant==1 ) {
-    x1 = 0.58;
+    x1 = 0.63;
     y1 = 0.83;
-    x2 = 0.75;
+    x2 = 0.8;
     y2 = 0.87;
   } else if( legendQuadrant==2 ) {
     x1 = (isCMSArticle_) ? 0.22 : 0.25;
@@ -2587,6 +2636,11 @@ TPaveText* DrawBase::get_labelCMS( int legendQuadrant ) const {
     y1 = 0.2;
     x2 = 0.42;
     y2 = 0.24;
+  } else if( legendQuadrant==0 ) {
+    x1 = 0.13;
+    y1 = 0.953;
+    x2 = 0.6;
+    y2 = 0.975;
   }
 
   
@@ -2595,7 +2649,27 @@ TPaveText* DrawBase::get_labelCMS( int legendQuadrant ) const {
   cmslabel->SetTextSize(0.038);
   cmslabel->SetTextFont(62);
   std::string label_CMS_text = this->get_CMSText();
-  cmslabel->AddText(label_CMS_text.c_str());
+  if( legendQuadrant!=0 ) {
+    cmslabel->AddText(label_CMS_text.c_str());
+  } else {
+    std::string leftText;
+    if( dataFiles_.size()==0 ) {
+      leftText = "CMS Simulation 2010";
+    } else {
+      if( isCMSArticle_ )
+        leftText = "CMS 2010";
+      else
+        leftText = "CMS Preliminary 2010";
+    }
+    if (lumi_ > 0.) {
+      cmslabel->SetTextAlign(11); // align left
+      std::string lumiText = this->get_lumiText();
+      cmslabel->AddText(Form("%s, %s", leftText.c_str(), lumiText.c_str()));
+    } else {
+      cmslabel->SetTextAlign(11); // align left
+      cmslabel->AddText(Form("%s", leftText.c_str()));
+    }
+  }
 
   return cmslabel;
 
@@ -2606,7 +2680,7 @@ TPaveText* DrawBase::get_labelCMS( int legendQuadrant ) const {
 
 TPaveText* DrawBase::get_labelSqrt( int legendQuadrant ) const {
 
-  if( legendQuadrant!=1 && legendQuadrant!=2 && legendQuadrant!=3 ) {
+  if( legendQuadrant!=0 && legendQuadrant!=1 && legendQuadrant!=2 && legendQuadrant!=3 ) {
     std::cout << "WARNING! Legend quadrant '" << legendQuadrant << "' not yet implemented for Sqrt label. Using 2." << std::endl;
     legendQuadrant = 2;
   }
@@ -2614,9 +2688,9 @@ TPaveText* DrawBase::get_labelSqrt( int legendQuadrant ) const {
 
   float x1, y1, x2, y2;
   if( legendQuadrant==1 ) {
-    x1 = 0.58;
+    x1 = 0.63;
     y1 = 0.78;
-    x2 = 0.75;
+    x2 = 0.8;
     y2 = 0.82;
   } else if( legendQuadrant==2 ) {
     x1 = (isCMSArticle_) ? 0.22 : 0.25;
@@ -2628,6 +2702,11 @@ TPaveText* DrawBase::get_labelSqrt( int legendQuadrant ) const {
     y1 = 0.16;
     x2 = 0.42;
     y2 = 0.2;
+  } else if( legendQuadrant==0 ) {
+    x1 = 0.7;
+    y1 = 0.953;
+    x2 = 0.96;
+    y2 = 0.975;
   }
 
 
@@ -2636,7 +2715,12 @@ TPaveText* DrawBase::get_labelSqrt( int legendQuadrant ) const {
   label_sqrt->SetTextSize(0.038);
   label_sqrt->SetTextFont(42);
   std::string label_sqrt_text = this->get_sqrtText();
-  label_sqrt->AddText(label_sqrt_text.c_str());
+  if( legendQuadrant!=0 ) {
+    label_sqrt->AddText(label_sqrt_text.c_str());
+  } else {
+    label_sqrt->SetTextAlign(31); // align right
+    label_sqrt->AddText("#sqrt{s} = 7 TeV");
+  }
 
   return label_sqrt;
 
@@ -2659,14 +2743,16 @@ TPaveText* DrawBase::get_labelAlgo( int legendQuadrant ) const {
     y2 = 0.86;
   } else if( legendQuadrant==3 ) {
     x1 = 0.27;
-    y1 = 0.15;
+    //y1 = 0.15;
+    y1 = 0.18;
     x2 = 0.32;
-    y2 = 0.2;
+    //y2 = 0.2;
+    y2 = 0.21;
   } else if( legendQuadrant==4 ) {
-    x1 = 0.7;
-    y1 = 0.15;
-    x2 = 0.75;
-    y2 = 0.2;
+    x1 = 0.75;
+    y1 = 0.18;
+    x2 = 0.8;
+    y2 = 0.21;
   } else {
     std::cout << "WARNING! Legend quadrant '" << legendQuadrant << "' not yet implemented for Algo label. Using 3." << std::endl;
     x1 = 0.27;
