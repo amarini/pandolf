@@ -2637,7 +2637,7 @@ TPaveText* DrawBase::get_labelCMS( int legendQuadrant ) const {
     x2 = 0.42;
     y2 = 0.24;
   } else if( legendQuadrant==0 ) {
-    x1 = 0.13;
+    x1 = 0.145;
     y1 = 0.953;
     x2 = 0.6;
     y2 = 0.975;
@@ -2646,6 +2646,8 @@ TPaveText* DrawBase::get_labelCMS( int legendQuadrant ) const {
   
   TPaveText* cmslabel = new TPaveText( x1, y1, x2, y2, "brNDC" );
   cmslabel->SetFillColor(kWhite);
+  cmslabel->SetTextSize(0.038);
+  if( legendQuadrant==0 ) cmslabel->SetTextAlign(11);
   cmslabel->SetTextSize(0.038);
   cmslabel->SetTextFont(62);
   std::string label_CMS_text = this->get_CMSText();
@@ -2732,20 +2734,20 @@ TPaveText* DrawBase::get_labelAlgo( int legendQuadrant ) const {
 
   float x1, y1, x2, y2;
   if( legendQuadrant==1 ) {
-    x1 = 0.7;
-    y1 = 0.82;
-    x2 = 0.75;
-    y2 = 0.86;
+    x1 = 0.77;
+    y1 = 0.88;
+    x2 = 0.82;
+    y2 = 0.92;
   } else if( legendQuadrant==2 ) {
     x1 = 0.27;
     y1 = 0.82;
     x2 = 0.32;
     y2 = 0.86;
   } else if( legendQuadrant==3 ) {
-    x1 = 0.27;
+    x1 = 0.3;
     //y1 = 0.15;
     y1 = 0.18;
-    x2 = 0.32;
+    x2 = 0.35;
     //y2 = 0.2;
     y2 = 0.21;
   } else if( legendQuadrant==4 ) {
