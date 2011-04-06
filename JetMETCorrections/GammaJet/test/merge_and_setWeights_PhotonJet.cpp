@@ -215,6 +215,7 @@ EventsAndLumi addInput( const std::string& dataset, const std::string& algoName,
 float getWeight( const std::string& dataset, int nEvents ) {
 
   float xSection = -1.;
+  TString dataset_tstr(dataset);
 
   if( dataset=="Zjets-madgraph" ) {
     xSection = 2800.;
@@ -252,53 +253,54 @@ float getWeight( const std::string& dataset, int nEvents ) {
     xSection = 2.18608-0.0112233;
   } else if( dataset=="QCD_Spring10_Pt1400" ) {
     xSection = 0.0112233;
-  } else if( dataset=="G_Pt_0to15_TuneZ2_7TeV_pythia6" || dataset=="G_Pt_0to15_TuneZ2_7TeV_pythia6_CORR" ) {
+  } else if( dataset_tstr.BeginsWith("G_Pt_0to15") ) {
     xSection = 8.420e+07;
-  } else if( dataset=="G_Pt_15to30_TuneZ2_7TeV_pythia6" || dataset=="G_Pt_15to30_TuneZ2_7TeV_pythia6_CORR" ) {
+  //} else if( dataset=="G_Pt_15to30_TuneZ2_7TeV_pythia6" || dataset=="G_Pt_15to30_TuneZ2_7TeV_pythia6_CORR" ) {
+  } else if( dataset_tstr.BeginsWith("G_Pt_15to30") ) {
     xSection = 1.717e+05;
-  } else if( dataset=="G_Pt_30to50_TuneZ2_7TeV_pythia6" || dataset=="G_Pt_30to50_TuneZ2_7TeV_pythia6_CORR" ) {
+  } else if( dataset_tstr.BeginsWith("G_Pt_30to50") ) {
     xSection = 1.669e+04;
-  } else if( dataset=="G_Pt_50to80_TuneZ2_7TeV_pythia6" || dataset=="G_Pt_50to80_TuneZ2_7TeV_pythia6_CORR") {
+  } else if( dataset_tstr.BeginsWith("G_Pt_50to80") ) {
     xSection = 2.722e+03;
-  } else if( dataset=="G_Pt_80to120_TuneZ2_7TeV_pythia6" || dataset=="G_Pt_80to120_TuneZ2_7TeV_pythia6_CORR" ) {
+  } else if( dataset_tstr.BeginsWith("G_Pt_80to120") ) {
     xSection = 4.472e+02;
-  } else if( dataset=="G_Pt_120to170_TuneZ2_7TeV_pythia6" || dataset=="G_Pt_120to170_TuneZ2_7TeV_pythia6_CORR") {
+  } else if( dataset_tstr.BeginsWith("G_Pt_120to170") ) {
     xSection = 8.417e+01;
-  } else if( dataset=="G_Pt_170to300_TuneZ2_7TeV_pythia6" || dataset=="G_Pt_170to300_TuneZ2_7TeV_pythia6_CORR") {
+  } else if( dataset_tstr.BeginsWith("G_Pt_170to300") ) {
     xSection = 2.264e+01;
-  } else if( dataset=="G_Pt_300to470_TuneZ2_7TeV_pythia6" || dataset=="G_Pt_300to470_TuneZ2_7TeV_pythia6_CORR") {
+  } else if( dataset_tstr.BeginsWith("G_Pt_300to470") ) {
     xSection = 1.493e+00;
-  } else if( dataset=="G_Pt_470to800_TuneZ2_7TeV_pythia6" || dataset=="G_Pt_470to800_TuneZ2_7TeV_pythia6_CORR") {
+  } else if( dataset_tstr.BeginsWith("G_Pt_470to800") ) {
     xSection = 1.323e-01;
-  } else if( dataset=="G_Pt_800to1400_TuneZ2_7TeV_pythia6" || dataset=="G_Pt_800to1400_TuneZ2_7TeV_pythia6_CORR") {
+  } else if( dataset_tstr.BeginsWith("G_Pt_800to1400") ) {
     xSection = 3.481e-03;
-  } else if( dataset=="G_Pt_1400to1800_TuneZ2_7TeV_pythia6" || dataset=="G_Pt_1400to1800_TuneZ2_7TeV_pythia6_CORR") {
+  } else if( dataset_tstr.BeginsWith("G_Pt_1400to1800") ) {
     xSection = 1.270e-05;
-  } else if( dataset=="G_Pt_1800toInf_TuneZ2_7TeV_pythia6" || dataset=="G_Pt_1800toInf_TuneZ2_7TeV_pythia6_CORR") {
+  } else if( dataset_tstr.BeginsWith("G_Pt_1800toInf") ) {
     xSection = 2.936e-07;
-  } else if( dataset=="QCD_Pt_15to30_TuneZ2_7TeV_pythia6" ) {
+  } else if( dataset_tstr.BeginsWith("QCD_Pt_15to30") ) {
     xSection = 8.159e+08;
-  } else if( dataset=="QCD_Pt_30to50_TuneZ2_7TeV_pythia6" ) {
+  } else if( dataset_tstr.BeginsWith("QCD_Pt_30to50") ) {
     xSection = 5.312e+07;
-  } else if( dataset=="QCD_Pt_50to80_TuneZ2_7TeV_pythia6" ) {
+  } else if( dataset_tstr.BeginsWith("QCD_Pt_50to80") ) {
     xSection = 6.359e+06;
-  } else if( dataset=="QCD_Pt_80to120_TuneZ2_7TeV_pythia6" ) {
+  } else if( dataset_tstr.BeginsWith("QCD_Pt_80to120") ) {
     xSection = 7.843e+05;
-  } else if( dataset=="QCD_Pt_120to170_TuneZ2_7TeV_pythia6" ) {
+  } else if( dataset_tstr.BeginsWith("QCD_Pt_120to170") ) {
     xSection = 1.151e+05;
-  } else if( dataset=="QCD_Pt_170to300_TuneZ2_7TeV_pythia6" ) {
+  } else if( dataset_tstr.BeginsWith("QCD_Pt_170to300") ) {
     xSection = 2.426e+04;
-  } else if( dataset=="QCD_Pt_300to470_TuneZ2_7TeV_pythia6" ) {
+  } else if( dataset_tstr.BeginsWith("QCD_Pt_300to470") ) {
     xSection = 1.168e+03;
-  } else if( dataset=="QCD_Pt_470to600_TuneZ2_7TeV_pythia6" ) {
+  } else if( dataset_tstr.BeginsWith("QCD_Pt_470to600") ) {
     xSection = 7.022e+01;
-  } else if( dataset=="QCD_Pt_600to800_TuneZ2_7TeV_pythia6" ) {
+  } else if( dataset_tstr.BeginsWith("QCD_Pt_600to800") ) {
     xSection = 1.555e+01;
-  } else if( dataset=="QCD_Pt_800to1000_TuneZ2_7TeV_pythia6" ) {
+  } else if( dataset_tstr.BeginsWith("QCD_Pt_800to1000") ) {
     xSection = 1.844e+00;
-  } else if( dataset=="QCD_Pt_1000to1400_TuneZ2_7TeV_pythia6" ) {
+  } else if( dataset_tstr.BeginsWith("QCD_Pt_1000to1400") ) {
     xSection = 3.321e-01;
-  } else if( dataset=="QCD_Pt_1400to1800_TuneZ2_7TeV_pythia6" ) {
+  } else if( dataset_tstr.BeginsWith("QCD_Pt_1400to1800") ) {
     xSection = 1.087e-02;
   } else if( dataset=="PhotonJet_Summer1036X_Pt5to15" ) {
     xSection = 4030000.;
