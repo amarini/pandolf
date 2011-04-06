@@ -238,6 +238,7 @@ void DrawBase::set_lumiNormalization( float givenLumi) {
 void DrawBase::set_shapeNormalization() {
 
   scaleFactor_ = -1.;
+  noStack_ = true;
 
 }
 
@@ -823,7 +824,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
       // draw pt phot cut label
       char labelPtPhot_text[200];
       sprintf( labelPtPhot_text, "%.0f < p_{T}^{#gamma} < %.0f GeV/c", ptPhot_binning[iplot], ptPhot_binning[iplot+1]);
-      TPaveText* label_ptPhot = new TPaveText(0.6, 0.45, 0.85, 0.55, "brNDC");
+      TPaveText* label_ptPhot = new TPaveText(0.22, 0.8, 0.47, 0.9, "brNDC");
       label_ptPhot->SetTextSize(0.030);
       label_ptPhot->SetFillColor(0);
       std::string jetAlgoText = get_algoName();
@@ -1045,7 +1046,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
         }
       }
       c1->SetLogy();
-      if( name=="ptPhot" ) {
+      if( name=="ptPhot" && analysisType_=="PhotonJet" ) {
         c1->SetLogx();
         h2_axes_log->GetXaxis()->SetNoExponent();
         h2_axes_log->GetXaxis()->SetMoreLogLabels();
@@ -2103,8 +2104,6 @@ void DrawBase::compareDifferentHistos_singleFile( InputFile infile, const std::v
   if( histos.size()>=4 ) yMax *= 1.15;
 
   TH2D* h2_axes = new TH2D("axes", "", 10, xMin, xMax, 10, yMin, yMax);
-  h2_axes->GetXaxis()->SetTitleOffset(1.1);
-  h2_axes->GetYaxis()->SetTitleOffset(1.5);
   std::string xAxisName_full(xAxisName);
   if( units!="" )
     xAxisName_full += " ["+units+"]";
@@ -2146,8 +2145,6 @@ void DrawBase::compareDifferentHistos_singleFile( InputFile infile, const std::v
 
   TCanvas* c1 = new TCanvas("c1", "", 600, 600 );
   c1->cd();
-  c1->SetLeftMargin(0.12);
-  c1->SetBottomMargin(0.12);
 
   h2_axes->Draw();
   for(unsigned i=0; i<histos.size(); ++i ) {
@@ -2408,10 +2405,10 @@ LegendBox DrawBase::get_legendBox( int legendQuadrant, const std::vector<std::st
     LegendBox lb;
 
     if( legendQuadrant==1 ) {
-      lb.xMin = 0.65;
-      lb.yMax = 0.92;
+      lb.xMin = 0.62;
+      lb.yMax = 0.9;
       lb.yMin = lb.yMax - 0.05*(float)nNames_total;
-      lb.xMax = 0.92;
+      lb.xMax = 0.88;
     } else if( legendQuadrant==0 ) {
       lb.xMin = 0.5;
       lb.yMax = 0.88;
@@ -2443,7 +2440,7 @@ LegendBox DrawBase::get_legendBox( int legendQuadrant, const std::vector<std::st
     if( legendTitle_.size()>13 ) widen=true;
     if( legendNames!=0 ) {
       for( unsigned i=0;i<legendNames->size(); ++i )
-        if( legendNames->at(i).length() > 13 ) widen=true;
+        if( legendNames->at(i).length() > 12 ) widen=true;
     } else {
       for( unsigned i=0;i<dataFiles_.size(); ++i )
         if( dataFiles_[i].legendName.length() > 13 ) widen=true;
