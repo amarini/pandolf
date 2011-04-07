@@ -16,6 +16,9 @@ class AnalysisJet {
 //Float_t eCorrReco;
   Float_t ptCorrReco;
 
+  Float_t ptD;
+  Float_t rmsCand;
+
   Float_t eGen;
   Float_t ptGen;
   Float_t etaGen;
