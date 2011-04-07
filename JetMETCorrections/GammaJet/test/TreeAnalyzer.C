@@ -1,5 +1,6 @@
 #include "TreeAnalyzer.h"
 #include "TH1F.h"
+#include "TRegexp.h"
 #include <cstdlib>
 #include <fstream>
 
@@ -435,6 +436,12 @@ void TreeAnalyzer::Init(TTree *tree)
      fChain->SetBranchAddress(branchName.c_str(), eHFHadrons, &b_eHFHadrons);
      branchName = "eHFEM_"+algoType_;
      fChain->SetBranchAddress(branchName.c_str(), eHFEM, &b_eHFEM);
+     if( recoType_=="pf" && jetAlgo_=="akt5" ) {
+       branchName = "ptDJet_"+algoType_;
+       fChain->SetBranchAddress(branchName.c_str(), ptDJet, &b_ptDJet);
+       branchName = "rmsCandJet_"+algoType_;
+       fChain->SetBranchAddress(branchName.c_str(), rmsCandJet, &b_rmsCandJet);
+     }
    }
    branchName = "nJetGen_"+jetAlgo_;
    fChain->SetBranchAddress(branchName.c_str(), &nJetGen, &b_nJetGen);
@@ -517,11 +524,13 @@ void TreeAnalyzer::Init(TTree *tree)
    fChain->SetBranchAddress("vntracks", vntracks, &b_vntracks);
    fChain->SetBranchAddress("vchi2", vchi2, &b_vchi2);
    fChain->SetBranchAddress("vndof", vndof, &b_vndof);
-   fChain->SetBranchAddress("hltPass", &hltPass, &b_hltPass);
+   //fChain->SetBranchAddress("hltPass", &hltPass, &b_hltPass);
    fChain->SetBranchAddress("nHLT", &nHLT, &b_nHLT);
-   fChain->SetBranchAddress("hltNamesLen", &hltNamesLen, &b_hltNamesLen);
-   fChain->SetBranchAddress("HLTNames", HLTNames, &b_HLTNames);
-   fChain->SetBranchAddress("HLTResults", HLTResults, &b_HLTResults);
+   //fChain->SetBranchAddress("hltNamesLen", &hltNamesLen, &b_hltNamesLen);
+   //fChain->SetBranchAddress("HLTNames", HLTNames, &b_HLTNames);
+   //fChain->SetBranchAddress("HLTResults", HLTResults, &b_HLTResults);
+   fChain->SetBranchAddress("HLTNames", &HLTNames);
+   fChain->SetBranchAddress("HLTResults", &HLTResults);
    fChain->SetBranchAddress("Xsec", &Xsec, &b_Xsec);
    Notify();
 }
@@ -845,3 +854,24 @@ GenEventParameters TreeAnalyzer::getGenEventParameters() {
    return returnGenPars;
 
 } // getGenEventParameters
+
+
+
+bool TreeAnalyzer::passedTrigger_regexp( const std::string& trigger ) {
+
+  TRegexp regexp(trigger);
+  bool returnBool = false;
+
+  for(unsigned iTrig=0; iTrig<HLTNames->size(); ++iTrig ) {
+
+    TString hltname_tstr( HLTNames->at(iTrig) );
+    if( hltname_tstr.Contains(regexp) ) {
+      if( HLTResults->at(iTrig)==true ) returnBool = true;
+      break; // logical OR requires at least one OK
+    }
+
+  } //for itrig
+
+  return returnBool;
+
+}

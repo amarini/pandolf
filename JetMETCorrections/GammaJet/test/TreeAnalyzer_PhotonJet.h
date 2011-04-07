@@ -23,8 +23,8 @@ class TreeAnalyzer_PhotonJet : public TreeAnalyzer {
 
    virtual void CreateOutputFile();
    virtual void Loop();
-   //float getCorrectionFactor( const std::string& fileName, float pt, float eta );
-   //float getCorrectedPt( float pt, float eta, bool applyAlsoResidual );
+ //float getCorrectionFactor( const std::string& fileName, float pt, float eta );
+ //float getCorrectedPt( float pt, float eta, bool applyAlsoResidual );
 
 
 
@@ -65,6 +65,17 @@ class TreeAnalyzer_PhotonJet : public TreeAnalyzer {
 
    Bool_t matchedToMC_;
 
+   Bool_t passed_Photon10_;
+   Bool_t passed_Photon15_;
+   Bool_t passed_Photon20_;
+   Bool_t passed_Photon25_;
+   Bool_t passed_Photon30_;
+   Bool_t passed_Photon35_;
+   Bool_t passed_Photon40_;
+   Bool_t passed_Photon50_;
+   Bool_t passed_Photon60_;
+   Bool_t passed_Photon70_;
+
    Float_t ePhotReco_;
    Float_t ptPhotReco_;
    Float_t etaPhotReco_;
@@ -90,6 +101,8 @@ class TreeAnalyzer_PhotonJet : public TreeAnalyzer {
    Float_t   eCorrJetReco_;
    Float_t phiJetReco_;
    Float_t etaJetReco_;
+   Float_t  ptDJetReco_;
+   Float_t  rmsCandJetReco_;
    Float_t   ptJetGen_;
 
    Float_t    eJetGen_;
