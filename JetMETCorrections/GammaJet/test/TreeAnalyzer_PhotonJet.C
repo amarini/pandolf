@@ -15,6 +15,7 @@
 //#include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 
 
+
 TreeAnalyzer_PhotonJet::TreeAnalyzer_PhotonJet( const std::string& dataset, const std::string& recoType, const std::string& jetAlgo, const std::string& flags, bool useGenJets, TTree* tree ) :
      TreeAnalyzer( "PhotonJet", dataset, recoType, jetAlgo, flags, tree ) {
 
@@ -98,6 +99,17 @@ void TreeAnalyzer_PhotonJet::CreateOutputFile() {
   jetTree_->Branch("passedPhotonID_tight",&passedPhotonID_tight_, "passedPhotonID_tight_/O");
   jetTree_->Branch("matchedToMC",&matchedToMC_, "matchedToMC_/O");
 
+  jetTree_->Branch("passed_Photon10", &passed_Photon10_, "passed_Photon10_/O");
+  jetTree_->Branch("passed_Photon15", &passed_Photon15_, "passed_Photon15_/O");
+  jetTree_->Branch("passed_Photon20", &passed_Photon20_, "passed_Photon20_/O");
+  jetTree_->Branch("passed_Photon25", &passed_Photon25_, "passed_Photon25_/O");
+  jetTree_->Branch("passed_Photon30", &passed_Photon30_, "passed_Photon30_/O");
+  jetTree_->Branch("passed_Photon35", &passed_Photon35_, "passed_Photon35_/O");
+  jetTree_->Branch("passed_Photon40", &passed_Photon40_, "passed_Photon40_/O");
+  jetTree_->Branch("passed_Photon50", &passed_Photon50_, "passed_Photon50_/O");
+  jetTree_->Branch("passed_Photon60", &passed_Photon60_, "passed_Photon60_/O");
+  jetTree_->Branch("passed_Photon70", &passed_Photon70_, "passed_Photon70_/O");
+
   jetTree_->Branch("ePhotReco",  &ePhotReco_,  "ePhotReco_/F");
   jetTree_->Branch("ptPhotReco",  &ptPhotReco_,  "ptPhotReco_/F");
   jetTree_->Branch("etaPhotReco",  &etaPhotReco_,  "etaPhotReco_/F");
@@ -122,6 +134,8 @@ void TreeAnalyzer_PhotonJet::CreateOutputFile() {
   jetTree_->Branch( "ptCorrJetReco",  &ptCorrJetReco_,  "ptCorrJetReco_/F");
   jetTree_->Branch("etaJetReco", &etaJetReco_, "etaJetReco_/F");
   jetTree_->Branch("phiJetReco", &phiJetReco_, "phiJetReco_/F");
+  jetTree_->Branch( "ptDJetReco",  &ptDJetReco_,  "ptDJetReco_/F");
+  jetTree_->Branch( "rmsCandJetReco",  &rmsCandJetReco_,  "rmsCandJetReco_/F");
   jetTree_->Branch(  "eJetGen",   &eJetGen_,   "eJetGen_/F");
   jetTree_->Branch(  "ptJetGen",   &ptJetGen_,   "ptJetGen_/F");
   jetTree_->Branch( "etaJetGen",  &etaJetGen_,  "etaJetGen_/F");
@@ -233,6 +247,10 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
      if( !isGoodLS() ) continue; //this takes care also of integrated luminosity
 
+     // good primary vertex requirement:
+     if( nvertex==0 ) continue;
+     bool goodVertex = (vndof[0] >= 4.0 && sqrt(vx[0]*vx[0]+vy[0]*vy[0]) < 2. && fabs(vz[0]) < 24. );
+     //if( !goodVertex ) continue;
  
      if( isMC )
        if( (ptHat_ > ptHatMax_) || (ptHat_ < ptHatMin_) ) continue;
@@ -451,7 +469,12 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
 
        thisJet.eReco  =  eJet[iRecoJet];
        thisJet.ptReco  =  ptJet[iRecoJet];
-       thisJet.ptCorrReco  =  ptCorrJet[iRecoJet];
+     //if( recoType_=="jpt" ) {
+     //  if( isMC ) thisJet.ptCorrReco = getCorrectedPt( ptJet[iRecoJet], etaJet[iRecoJet], (bool)false );
+     //  else       thisJet.ptCorrReco = getCorrectedPt( ptJet[iRecoJet], etaJet[iRecoJet], (bool)true );
+     //} else {
+         thisJet.ptCorrReco  =  ptCorrJet[iRecoJet];
+     //}
        thisJet.phiReco = phiJet[iRecoJet];
        thisJet.etaReco = etaJet[iRecoJet];
      //thisJet.eCorrReco  =  eCorrJet[iRecoJet];
@@ -465,6 +488,9 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
        thisJet.eElectronsReco = (recoType_=="pf" && jetAlgo_=="akt5") ? eElectrons[iRecoJet] : 0.;
        thisJet.eHFHadronsReco = (recoType_=="pf" && jetAlgo_=="akt5") ? eHFHadrons[iRecoJet] : 0.;
        thisJet.eHFEMReco = (recoType_=="pf" && jetAlgo_=="akt5") ? eHFEM[iRecoJet] : 0.;
+
+       thisJet.ptD = (recoType_=="pf" && jetAlgo_=="akt5") ? ptDJet[iRecoJet] : 0.;
+       thisJet.rmsCand = (recoType_=="pf" && jetAlgo_=="akt5") ? rmsCandJet[iRecoJet] : 0.;
 
        thisJet.nTracksReco = (recoType_=="pf" && jetAlgo_=="akt5") ? nChargedHadrons[iRecoJet] : 0;
        thisJet.nPhotonsReco = (recoType_=="pf" && jetAlgo_=="akt5") ? nPhotons[iRecoJet] : 0;
@@ -513,7 +539,12 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
 
        thisJet.eReco  =  eJet[iRecoJet];
        thisJet.ptReco  =  ptJet[iRecoJet];
-       thisJet.ptCorrReco  =  ptCorrJet[iRecoJet];
+     //if( recoType_=="jpt" ) {
+     //  if( isMC ) thisJet.ptCorrReco = getCorrectedPt( ptJet[iRecoJet], etaJet[iRecoJet], (bool)false );
+     //  else       thisJet.ptCorrReco = getCorrectedPt( ptJet[iRecoJet], etaJet[iRecoJet], (bool)true );
+     //} else {
+         thisJet.ptCorrReco  =  ptCorrJet[iRecoJet];
+     //}
        thisJet.phiReco = phiJet[iRecoJet];
        thisJet.etaReco = etaJet[iRecoJet];
 
@@ -648,6 +679,8 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
   ptCorrJetReco_  =  firstJet.ptCorrReco;
      phiJetReco_  =  firstJet.phiReco;
      etaJetReco_  =  firstJet.etaReco;
+     ptDJetReco_  =  firstJet.ptD;
+ rmsCandJetReco_  =  firstJet.rmsCand;
         eJetGen_  =  firstJet.eGen;
        ptJetGen_  =  firstJet.ptGen;
       phiJetGen_  =  firstJet.phiGen;
@@ -781,6 +814,17 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
      etaPart2nd_= etaPart2nd_found;
 
 
+     passed_Photon10_ = passedTrigger_regexp("HLT_Photon10_");
+     passed_Photon15_ = passedTrigger_regexp("HLT_Photon15_");
+     passed_Photon20_ = passedTrigger_regexp("HLT_Photon20_");
+     passed_Photon25_ = passedTrigger_regexp("HLT_Photon25_");
+     passed_Photon30_ = passedTrigger_regexp("HLT_Photon30_");
+     passed_Photon35_ = passedTrigger_regexp("HLT_Photon35_");
+     passed_Photon40_ = passedTrigger_regexp("HLT_Photon40_");
+     passed_Photon50_ = passedTrigger_regexp("HLT_Photon50_");
+     passed_Photon60_ = passedTrigger_regexp("HLT_Photon60_");
+     passed_Photon70_ = passedTrigger_regexp("HLT_Photon70_");
+
 
      bool eventOK = ( matchedToMC_ || isIsolated_veryloose_);
 
@@ -792,16 +836,17 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
      Float_t ptPhotMin = h1_eff_denom_vs_pt->GetBinLowEdge(1);
      // to compute efficiencies:
      if( fabs(foundRecoPhot.eta)<1.3 )
-       h1_eff_denom_vs_pt->Fill(ptPhotGen_, eventWeight_);
+       h1_eff_denom_vs_pt->Fill(ptPhotGen_);
      if( foundRecoPhot.pt>ptPhotMin && fabs(foundRecoPhot.eta)<1.3 && foundRecoPhot.passedPhotonID("medium") )
-       h1_eff_num_medium_vs_pt->Fill(foundRecoPhot.ptGen, eventWeight_);
+       h1_eff_num_medium_vs_pt->Fill(foundRecoPhot.ptGen);
      if( foundRecoPhot.pt>ptPhotMin && fabs(foundRecoPhot.eta)<1.3 && foundRecoPhot.passedPhotonID("loose") )
-       h1_eff_num_loose_vs_pt->Fill(foundRecoPhot.ptGen, eventWeight_);
+       h1_eff_num_loose_vs_pt->Fill(foundRecoPhot.ptGen);
      
 
    } //for entries
 
 
+/*
 
    // now if using genjets
    // correct weights with photon ID efficiency
@@ -864,8 +909,11 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
 
 
    } //if usegenjets
+*/
+
 
 } //loop
+
 
 
 /*

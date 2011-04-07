@@ -103,6 +103,8 @@ public :
    Float_t         n90HitsJet[100]; 
    Float_t         fHPDJet[100]; 
    Float_t         fRBXJet[100];
+   Float_t         ptDJet[100];   
+   Float_t         rmsCandJet[100];   
    Int_t           nChargedHadrons[100];
    Int_t           nPhotons[100]; 
    Int_t           nMuons[100];  
@@ -189,11 +191,13 @@ public :
    Float_t         vntracks[100];   //[nvertex]
    Float_t         vchi2[100];   //[nvertex]
    Float_t         vndof[100];   //[nvertex]
-   Bool_t          hltPass;
+   //Bool_t          hltPass;
    Int_t           nHLT;
-   Int_t           hltNamesLen;
-   Char_t          HLTNames[6000];   //[hltNamesLen]
-   Bool_t          HLTResults[50];   //[nHLT]
+   //Int_t           hltNamesLen;
+   std::vector<std::string> *HLTNames;
+   std::vector<bool>  *HLTResults;
+ //Char_t          HLTNames[6000];   //[hltNamesLen]
+ //Bool_t          HLTResults[50];   //[nHLT]
    Double_t        Xsec;
 
 
@@ -298,6 +302,8 @@ public :
    TBranch        *b_n90HitsJet;   //!
    TBranch        *b_fHPDJet;   //!
    TBranch        *b_fRBXJet;   //!
+   TBranch        *b_ptDJet;   //!
+   TBranch        *b_rmsCandJet;   //!
    TBranch        *b_nChargedHadrons;   //!
    TBranch        *b_nPhotons;   //!
    TBranch        *b_nMuons;   //!
@@ -384,7 +390,7 @@ public :
    TBranch        *b_vntracks;   //!
    TBranch        *b_vchi2;   //!
    TBranch        *b_vndof;   //!
-   TBranch        *b_hltPass;   //!
+   //TBranch        *b_hltPass;   //!
    TBranch        *b_nHLT;   //!
    TBranch        *b_hltNamesLen;   //!
    TBranch        *b_HLTNames;   //!
@@ -411,6 +417,7 @@ public :
    virtual void     ReadCSVFile(const std::string& csv);
    virtual void     UpdateCache();
    virtual bool     isGoodLS ();
+   virtual bool     passedTrigger_regexp( const std::string& trigger );
    virtual GenEventParameters     getGenEventParameters ();
 
    //virtual void BookStuff()=0;
