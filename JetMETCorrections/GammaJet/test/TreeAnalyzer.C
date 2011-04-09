@@ -19,6 +19,16 @@ TreeAnalyzer::TreeAnalyzer(const std::string& analyzerType, const std::string& d
    recoType_ = recoType;
    jetAlgo_ = jetAlgo;
 
+   if( recoType!="calo" && recoType!="jpt" && recoType!="pf" ) {
+     std::cout << "Unknown reco type (" << recoType_ << ")!! Exiting." << std::endl;
+     exit(33);
+   } 
+
+   if( jetAlgo!="akt5" && jetAlgo!="akt7" && jetAlgo!="kt4" && jetAlgo!="kt6" && jetAlgo!="ic5" ) {
+     std::cout << "Unknown jet algo (" << jetAlgo << ")!! Exiting." << std::endl;
+     exit(35);
+   } 
+
    if( recoType=="jpt" && jetAlgo=="akt5" ) {
      algoType_ = "jptak5"; //this is a bug in the ntuple producer
    } else {
