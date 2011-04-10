@@ -8,9 +8,9 @@ import time
 ### usage  cmst3_submit_manyfilesperjob.py dataset njobs applicationName queue 
 #######################################
 if len(sys.argv) != 6:
-    print "usage sendOnBatch.py PDname SDname recoType jetAlgo filesPerJob"
-    print "example : sendOnBatch.py QCD_Spring10 Pt80 pf akt5 5"
-    print "example : sendOnBatch.py EG Run2010A-PromptReco-v4 calo kt6 10"
+    print "usage sendOnBatch.py PDname SDname recoType jetAlgo files_per_job"
+    print "example : sendOnBatch.py QCD_Spring10 Pt80 pf akt5 10"
+    print "example : sendOnBatch.py EG Run2010A-PromptReco-v4 calo kt6 5"
     sys.exit(1)
 PDname = sys.argv[1]
 SDname = sys.argv[2]
@@ -33,7 +33,7 @@ application = "do2ndLevel_PhotonJet_batch"
 # to write on local disks
 ################################################
 #diskoutputdir = "/cmsrm/pc21_2/pandolf/DATA/EG/Run2010A-PromptReco-v4"
-if PDname=="EG":
+if PDname=="EG" or PDname=="Photon":
   diskoutputdir = "/cmsrm/pc21_2/pandolf/DATA/" + dataset_path
 else:
   diskoutputdir = "/cmsrm/pc21_2/pandolf/MC/" + dataset_path
@@ -59,7 +59,6 @@ inputfiles = input.readlines()
 ######################################
 ijob=0
 
-
 while (len(inputfiles) > 0):
     inputfilename = pwd+"/"+dir+"/input/input_"+str(ijob)+".list"
     inputfile = open(inputfilename,'w')
@@ -69,6 +68,31 @@ while (len(inputfiles) > 0):
             inputfile.write(ntpfile)
 
     inputfile.close()
+
+#numfiles = reduce(lambda x,y: x+1, file(inputlist).xreadlines(), 0)
+#filesperjob = numfiles/ijobmax
+#extrafiles  = numfiles%ijobmax
+#input = open(inputlist)
+######################################
+
+#for ijob in range(ijobmax):
+#    # prepare the list file
+#    inputfilename = pwd+"/"+dataset_name+"_"+recoType+jetAlgo+"/input/input_"+str(ijob)+".list"
+#    inputfile = open(inputfilename,'w')
+#    # if it is a normal job get filesperjob lines
+#    if ijob != (ijobmax-1):
+#        for line in range(filesperjob):
+#            ntpfile = input.readline() 
+#            inputfile.write(ntpfile)
+#            continue
+#    else:
+#        # if it is the last job get ALL remaining lines
+#        ntpfile = input.readline()
+#        while ntpfile != '':
+#            inputfile.write(ntpfile)
+#            ntpfile = input.readline()
+#            continue
+#    inputfile.close()
 
     # prepare the script to run
     outputname = dataset_name+"_"+recoType+jetAlgo+"/src/submit_"+str(ijob)+".src"
