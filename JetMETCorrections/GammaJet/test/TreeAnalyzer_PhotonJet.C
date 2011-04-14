@@ -121,6 +121,9 @@ void TreeAnalyzer_PhotonJet::CreateOutputFile() {
   jetTree_->Branch("clusterMajPhotReco",  &clusterMajPhotReco_,  "clusterMajPhotReco_/F");
   jetTree_->Branch("clusterMinPhotReco",  &clusterMinPhotReco_,  "clusterMinPhotReco_/F");
   jetTree_->Branch("hasPixelSeedPhotReco",  &hasPixelSeedPhotReco_,  "hasPixelSeedPhotReco_/I");
+  jetTree_->Branch("pid_twrHCALPhotReco",  &pid_twrHCALPhotReco_,  "pid_twrHCALPhotReco_/F");
+  jetTree_->Branch("pid_HoverEPhotReco",  &pid_HoverEPhotReco_,  "pid_HoverEPhotReco_/F");
+  jetTree_->Branch("pid_jurECALPhotReco",  &pid_jurECALPhotReco_,  "pid_jurECALPhotReco_/F");
 
   jetTree_->Branch("ePhotGen",  &ePhotGen_,  "ePhotGen_/F");
   jetTree_->Branch("ptPhotGen",  &ptPhotGen_,  "ptPhotGen_/F");
@@ -291,6 +294,9 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        thisPhot.clusterMaj = sMajMajPhot[iPhot];
        thisPhot.clusterMin = sMinMinPhot[iPhot];
        thisPhot.hasPixelSeed = hasPixelSeedPhot[iPhot];
+       thisPhot.pid_twrHCAL = pid_twrHCAL[iPhot];
+       thisPhot.pid_jurECAL = pid_jurECAL[iPhot];
+       thisPhot.pid_HoverE = pid_HoverE[iPhot];
 
        //if( thisPhot.pt < 10. ) continue;
 
@@ -375,6 +381,9 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        foundPhot.clusterMaj = 0.;
        foundPhot.clusterMin = 0.;
        foundPhot.hasPixelSeed = 0;
+       foundPhot.pid_jurECAL = 0.;
+       foundPhot.pid_HoverE = 0.;
+       foundPhot.pid_twrHCAL = 0.;
        foundPhot.eGen = foundGenJet.eGen;
        foundPhot.ptGen = foundGenJet.ptGen;
        foundPhot.etaGen = foundGenJet.etaGen;
@@ -441,6 +450,9 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
      clusterMajPhotReco_ = foundPhot.clusterMaj;
      clusterMinPhotReco_ = foundPhot.clusterMin;
      hasPixelSeedPhotReco_ = foundPhot.hasPixelSeed;
+     pid_twrHCALPhotReco_ = foundPhot.pid_twrHCAL;
+     pid_HoverEPhotReco_ = foundPhot.pid_HoverE;
+     pid_jurECALPhotReco_ = foundPhot.pid_jurECAL;
      ePhotGen_ = foundPhot.eGen;
      ptPhotGen_ = foundPhot.ptGen;
      etaPhotGen_ = foundPhot.etaGen;
