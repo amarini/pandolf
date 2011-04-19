@@ -238,7 +238,8 @@ void DrawBase::set_lumiNormalization( float givenLumi) {
 void DrawBase::set_shapeNormalization() {
 
   scaleFactor_ = -1.;
-  noStack_ = true;
+  if( dataFiles_.size()==0 )
+    noStack_ = true;
 
 }
 
@@ -2009,17 +2010,19 @@ void DrawBase::drawStack(const std::string& varY, const std::string& varX, const
 
 
 
-void DrawBase::compareDifferentHistos( const std::vector< HistoAndName > histos, const std::string saveVarName, const std::string xAxisName, const std::string& units, const std::string& instanceName, bool normalized, int legendQuadrant ) {
+void DrawBase::compareDifferentHistos( const std::vector< HistoAndName > histos, const std::string saveVarName, const std::string xAxisName, const std::string& units, const std::string& instanceName, int legendQuadrant ) {
 
-  for( unsigned iData=0; iData<dataFiles_.size(); ++iData ) compareDifferentHistos_singleFile( dataFiles_[iData], histos, saveVarName, xAxisName, units, instanceName, normalized, legendQuadrant );
-  for( unsigned iMC=0; iMC<mcFiles_.size(); ++iMC ) compareDifferentHistos_singleFile( mcFiles_[iMC], histos, saveVarName, xAxisName, units, instanceName, normalized, legendQuadrant );
+  for( unsigned iData=0; iData<dataFiles_.size(); ++iData ) compareDifferentHistos_singleFile( dataFiles_[iData], histos, saveVarName, xAxisName, units, instanceName, legendQuadrant );
+  for( unsigned iMC=0; iMC<mcFiles_.size(); ++iMC ) compareDifferentHistos_singleFile( mcFiles_[iMC], histos, saveVarName, xAxisName, units, instanceName, legendQuadrant );
 
 }
 
 
 
 
-void DrawBase::compareDifferentHistos_singleFile( InputFile infile, const std::vector< HistoAndName > histosandnames, const std::string saveVarName, const std::string xAxisName, const std::string& units, const std::string& instanceName, bool normalized, int legendQuadrant ) {
+void DrawBase::compareDifferentHistos_singleFile( InputFile infile, const std::vector< HistoAndName > histosandnames, const std::string saveVarName, const std::string xAxisName, const std::string& units, const std::string& instanceName, int legendQuadrant ) {
+
+  bool normalized = (lumi_<=0.);
 
   std::vector< TH1F* > histos;
   std::vector<std::string> legendNames;
@@ -2066,6 +2069,8 @@ void DrawBase::compareDifferentHistos_singleFile( InputFile infile, const std::v
     if( normalized ) {
       Float_t integral = histos[iHisto]->Integral(0, histos[iHisto]->GetNbinsX()+1);
       histos[iHisto]->Scale( 1./integral );
+    } else {
+      histos[iHisto]->Scale(scaleFactor_);
     }
 
     // 1. look for axis ranges:
@@ -2100,7 +2105,7 @@ void DrawBase::compareDifferentHistos_singleFile( InputFile infile, const std::v
 
   }
 
-  yMax *= 1.35;
+  yMax *= yAxisMaxScale_;
   if( histos.size()>=4 ) yMax *= 1.15;
 
   TH2D* h2_axes = new TH2D("axes", "", 10, xMin, xMax, 10, yMin, yMax);
@@ -2113,7 +2118,10 @@ void DrawBase::compareDifferentHistos_singleFile( InputFile infile, const std::v
   else {
     char yAxisName_char[150];
     if( units!="" ) {
-      sprintf( yAxisName_char, "%s / (%.1f %s)", instanceName.c_str(), histos[0]->GetBinWidth(1), units.c_str() );
+      if( ((int)(10.*histos[0]->GetBinWidth(1)) % 10) == 0 )
+        sprintf( yAxisName_char, "%s / (%.0f %s)", instanceName.c_str(), histos[0]->GetBinWidth(1), units.c_str() );
+      else
+        sprintf( yAxisName_char, "%s / (%.1f %s)", instanceName.c_str(), histos[0]->GetBinWidth(1), units.c_str() );
     } else {
       sprintf( yAxisName_char, "%s", instanceName.c_str());
     }
@@ -2151,8 +2159,12 @@ void DrawBase::compareDifferentHistos_singleFile( InputFile infile, const std::v
   //if( normalized ) histos[i]->DrawNormalized("histo same");
   //else histos[i]->Draw("histo same");
     // reverse order is prettier:
-    if( normalized ) histos[histos.size()-i-1]->DrawNormalized("histo same");
-    else histos[histos.size()-i-1]->Draw("histo same");
+    if( normalized ) {
+      histos[histos.size()-i-1]->DrawNormalized("histo same");
+    } else {
+      histos[histos.size()-i-1]->Draw("histo same");
+    }
+
     //histos[histos.size()-i-1]->Draw("histo same");
     //rmsText[i]->Draw("same");
   }
