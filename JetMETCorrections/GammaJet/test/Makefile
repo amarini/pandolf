@@ -15,8 +15,8 @@ do2ndLevel_PhotonJet: AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer
 do2ndLevel_PhotonJet_batch: AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJet.o  fitTools.o do2ndLevel_PhotonJet_batch.cpp
 	$(CC) -Wall -o do2ndLevel_PhotonJet_batch do2ndLevel_PhotonJet_batch.cpp AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJet.o fitTools.o $(ROOTFLAG) -lMinuit
 
-do2ndLevel_NP_batch: AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_NP.o Utilities.o JetCorrectorParameters.o SimpleJetCorrector.o FactorizedJetCorrector.o fitTools.o do2ndLevel_NP_batch.cpp
-	$(CC) -Wall -o do2ndLevel_NP_batch do2ndLevel_NP_batch.cpp AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_NP.o Utilities.o JetCorrectorParameters.o SimpleJetCorrector.o FactorizedJetCorrector.o fitTools.o $(ROOTFLAG) -lMinuit
+do2ndLevel_PhotonJetInclusive_batch: AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJetInclusive.o Utilities.o JetCorrectorParameters.o SimpleJetCorrector.o FactorizedJetCorrector.o fitTools.o do2ndLevel_PhotonJetInclusive_batch.cpp
+	$(CC) -Wall -o do2ndLevel_PhotonJetInclusive_batch do2ndLevel_PhotonJetInclusive_batch.cpp AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJetInclusive.o Utilities.o JetCorrectorParameters.o SimpleJetCorrector.o FactorizedJetCorrector.o fitTools.o $(ROOTFLAG) -lMinuit
 
 
 do2ndLevel_Calo_vs_PF_batch: AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_Calo_vs_PF.o do2ndLevel_Calo_vs_PF_batch.cpp fitTools.o
@@ -41,8 +41,8 @@ TreeAnalyzer.o: TreeAnalyzer.C
 TreeAnalyzer_PhotonJet.o: TreeAnalyzer_PhotonJet.C fitTools.o
 	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools fitTools.o TreeAnalyzer_PhotonJet.C $(ROOTFLAG)
 
-TreeAnalyzer_NP.o: TreeAnalyzer_NP.C fitTools.o
-	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools fitTools.o TreeAnalyzer_NP.C $(ROOTFLAG)
+TreeAnalyzer_PhotonJetInclusive.o: TreeAnalyzer_PhotonJetInclusive.C fitTools.o
+	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools fitTools.o TreeAnalyzer_PhotonJetInclusive.C $(ROOTFLAG)
 
 TreeAnalyzer_Calo_vs_PF.o: TreeAnalyzer_Calo_vs_PF.C fitTools.o
 	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools fitTools.o TreeAnalyzer_Calo_vs_PF.C $(ROOTFLAG)
