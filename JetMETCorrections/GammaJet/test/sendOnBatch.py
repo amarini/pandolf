@@ -34,9 +34,9 @@ application = "do2ndLevel_PhotonJet_batch"
 ################################################
 #diskoutputdir = "/cmsrm/pc21_2/pandolf/DATA/EG/Run2010A-PromptReco-v4"
 if PDname=="EG" or PDname=="Photon":
-  diskoutputdir = "/cmsrm/pc21_2/pandolf/DATA/" + dataset_path
+  diskoutputdir = "/cmsrm/pc23_2/pandolf/DATA/" + dataset_path
 else:
-  diskoutputdir = "/cmsrm/pc21_2/pandolf/MC/" + dataset_path
+  diskoutputdir = "/cmsrm/pc23_2/pandolf/MC/Spring11/" + dataset_path
 diskoutputmain = diskoutputdir
 # prepare job to write on the cmst3 cluster disks
 ################################################
@@ -99,6 +99,8 @@ while (len(inputfiles) > 0):
     outputfile = open(outputname,'w')
     outputfile.write('#!/bin/bash\n')
     outputfile.write('export STAGE_HOST=castorcms\n')
+    outputfile.write('export SCRAM_ARCH=slc5_amd64_gcc434\n')
+    outputfile.write('cd /afs/cern.ch/user/p/pandolf/scratch1/CMSSW_4_1_3_patch2/ ; eval `scramv1 runtime -sh` ; cd -\n')
     #    outputfile.write('cd '+pwd)
     outputfile.write('cp '+pwd+'/Cert_*.txt $WORKDIR\n')
     #outputfile.write('cp '+pwd+'/csv*.txt $WORKDIR\n')
