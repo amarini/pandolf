@@ -90,6 +90,9 @@ class TreeAnalyzer_PhotonJet : public TreeAnalyzer {
    Float_t pid_twrHCALPhotReco_;
    Float_t pid_HoverEPhotReco_;
    Float_t pid_jurECALPhotReco_;
+   Float_t pid_sIEtaIEtaPhotReco_;
+   Float_t pid_hlwTrackPhotReco_;
+
 
    Float_t ePhotGen_;
    Float_t ptPhotGen_;

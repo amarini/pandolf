@@ -124,6 +124,8 @@ void TreeAnalyzer_PhotonJet::CreateOutputFile() {
   jetTree_->Branch("pid_twrHCALPhotReco",  &pid_twrHCALPhotReco_,  "pid_twrHCALPhotReco_/F");
   jetTree_->Branch("pid_HoverEPhotReco",  &pid_HoverEPhotReco_,  "pid_HoverEPhotReco_/F");
   jetTree_->Branch("pid_jurECALPhotReco",  &pid_jurECALPhotReco_,  "pid_jurECALPhotReco_/F");
+  jetTree_->Branch("pid_sIEtaIEtaPhotReco",  &pid_sIEtaIEtaPhotReco_,  "pid_sIEtaIEtaPhotReco_/F");
+  jetTree_->Branch("pid_hlwTrackPhotReco",  &pid_hlwTrackPhotReco_,  "pid_hlwTrackPhotReco_/F");
 
   jetTree_->Branch("ePhotGen",  &ePhotGen_,  "ePhotGen_/F");
   jetTree_->Branch("ptPhotGen",  &ptPhotGen_,  "ptPhotGen_/F");
@@ -241,7 +243,7 @@ void TreeAnalyzer_PhotonJet::Loop()
 
 if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
-     if( (jentry%100000) == 0 ) std::cout << "Event #" << jentry  << " of " << nentries << std::endl;
+     if( (jentry%20000) == 0 ) std::cout << "Event #" << jentry  << " of " << nentries << std::endl;
 
      run_ = run;
      event_ = event;
@@ -297,6 +299,8 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        thisPhot.pid_twrHCAL = pid_twrHCAL[iPhot];
        thisPhot.pid_jurECAL = pid_jurECAL[iPhot];
        thisPhot.pid_HoverE = pid_HoverE[iPhot];
+       thisPhot.pid_hlwTrack = pid_hlwTrack[iPhot];
+       thisPhot.pid_etawid = pid_etawid[iPhot];
 
        //if( thisPhot.pt < 10. ) continue;
 
@@ -384,6 +388,8 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        foundPhot.pid_jurECAL = 0.;
        foundPhot.pid_HoverE = 0.;
        foundPhot.pid_twrHCAL = 0.;
+       foundPhot.pid_etawid = 0.;
+       foundPhot.pid_hlwTrack = 0.;
        foundPhot.eGen = foundGenJet.eGen;
        foundPhot.ptGen = foundGenJet.ptGen;
        foundPhot.etaGen = foundGenJet.etaGen;
@@ -453,6 +459,8 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
      pid_twrHCALPhotReco_ = foundPhot.pid_twrHCAL;
      pid_HoverEPhotReco_ = foundPhot.pid_HoverE;
      pid_jurECALPhotReco_ = foundPhot.pid_jurECAL;
+     pid_sIEtaIEtaPhotReco_ = foundPhot.pid_etawid;
+     pid_hlwTrackPhotReco_ = foundPhot.pid_hlwTrack;
      ePhotGen_ = foundPhot.eGen;
      ptPhotGen_ = foundPhot.ptGen;
      etaPhotGen_ = foundPhot.etaGen;

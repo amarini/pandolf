@@ -37,9 +37,11 @@ class AnalysisPhoton {
   Float_t clusterMin;
   Int_t hasPixelSeed;
 
+  Float_t pid_hlwTrack;
   Float_t pid_twrHCAL;
   Float_t pid_HoverE;
   Float_t pid_jurECAL;
+  Float_t pid_etawid;
 
 };
 
