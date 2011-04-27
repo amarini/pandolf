@@ -17,7 +17,7 @@
 
 
 
-
+bool isAOD_ = true;
 bool DEBUG_ = false;
 bool MCassoc_ = false;
 bool BINNINGFINO_ = false;
@@ -75,100 +75,7 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
 
 
-  if( dataset=="PhotonJet_Summer09") {
-
-    addInput( "PhotonJet_Summer09_Pt15" );
-    addInput( "PhotonJet_Summer09_Pt30" );
-    addInput( "PhotonJet_Summer09_Pt80" );
-    addInput( "PhotonJet_Summer09_Pt170" );
-    addInput( "PhotonJet_Summer09_Pt300" );
-    addInput( "PhotonJet_Summer09_Pt470" );
-    addInput( "PhotonJet_Summer09_Pt800" );
-    addInput( "PhotonJet_Summer09_Pt1400" );
-
-  } else if( dataset=="QCD_Summer09" ) {
-
-    addInput( "QCD_Summer09_Pt15" );
-    addInput( "QCD_Summer09_Pt30" );
-    addInput( "QCD_Summer09_Pt80" );
-    addInput( "QCD_Summer09_Pt170" );
-    addInput( "QCD_Summer09_Pt300" );
-    addInput( "QCD_Summer09_Pt470" );
-    addInput( "QCD_Summer09_Pt800" );
-    addInput( "QCD_Summer09_Pt1400" );
-
-  } else if( dataset=="PhotonJetQCD_Summer09" ) {
-
-    addInput( "PhotonJet_Summer09_Pt15" );
-    addInput( "PhotonJet_Summer09_Pt30" );
-    addInput( "PhotonJet_Summer09_Pt80" );
-    addInput( "PhotonJet_Summer09_Pt170" );
-    addInput( "PhotonJet_Summer09_Pt300" );
-    addInput( "PhotonJet_Summer09_Pt470" );
-    addInput( "PhotonJet_Summer09_Pt800" );
-    addInput( "PhotonJet_Summer09_Pt1400" );
-    addInput( "QCD_Summer09_Pt15" );
-    addInput( "QCD_Summer09_Pt30" );
-    addInput( "QCD_Summer09_Pt80" );
-    addInput( "QCD_Summer09_Pt170" );
-    addInput( "QCD_Summer09_Pt300" );
-    addInput( "QCD_Summer09_Pt470" );
-    addInput( "QCD_Summer09_Pt800" );
-    addInput( "QCD_Summer09_Pt1400" );
-
-  } else if( dataset=="PhotonJet_Spring10" ) {
-
-    addInput( "PhotonJet_Spring10_Pt5to15" );
-    addInput( "PhotonJet_Spring10_Pt15" );
-    addInput( "PhotonJet_Spring10_Pt30" );
-    addInput( "PhotonJet_Spring10_Pt80" );
-    addInput( "PhotonJet_Spring10_Pt170" );
-
-  } else if( dataset=="PhotonJet_Summer1036X" ) {
-
-    addInput( "PhotonJet_Summer1036X_Pt5to15" );
-    addInput( "PhotonJet_Summer1036X_Pt15to20" );
-    addInput( "PhotonJet_Summer1036X_Pt20to30" );
-    addInput( "PhotonJet_Summer1036X_Pt30to50" );
-    addInput( "PhotonJet_Summer1036X_Pt50to80" );
-    addInput( "PhotonJet_Summer1036X_Pt80to120" );
-    addInput( "PhotonJet_Summer1036X_Pt120to170" );
-    addInput( "PhotonJet_Summer1036X_Pt170to300" );
-    addInput( "PhotonJet_Summer1036X_Pt300to500" );
-    addInput( "PhotonJet_Summer1036X_Pt500toInf" );
-
-  } else if( dataset=="QCD_Spring10" ) {
-
-    //addInput( "QCD_Spring10_Pt5to15" );
-    addInput( "QCD_Spring10_Pt15to20" );
-    addInput( "QCD_Spring10_Pt20to30" );
-    addInput( "QCD_Spring10_Pt30to50" );
-    addInput( "QCD_Spring10_Pt50to80" );
-    addInput( "QCD_Spring10_Pt80" );
-    addInput( "QCD_Spring10_Pt170" );
-    addInput( "QCD_Spring10_Pt300" );
-  //addInput( "QCD_Spring10_Pt470" );
-  //addInput( "QCD_Spring10_Pt800" );
-
-  } else if( dataset=="PhotonJet_Summer1036X_QCD_Spring10" ) { //this option is the one to be used in case of extrapolation
-
-    addInput( "PhotonJet_Summer1036X_Pt5to15" );
-    addInput( "PhotonJet_Summer1036X_Pt15to20" );
-    addInput( "PhotonJet_Summer1036X_Pt20to30" );
-    addInput( "PhotonJet_Summer1036X_Pt30to50" );
-    addInput( "PhotonJet_Summer1036X_Pt50to80" );
-    addInput( "PhotonJet_Summer1036X_Pt80to120" );
-    addInput( "PhotonJet_Summer1036X_Pt120to170" );
-    addInput( "PhotonJet_Summer1036X_Pt170to300" );
-    addInput( "QCD_Spring10_Pt15to20" );
-    addInput( "QCD_Spring10_Pt20to30" );
-    addInput( "QCD_Spring10_Pt30to50" );
-    addInput( "QCD_Spring10_Pt50to80" );
-    addInput( "QCD_Spring10_Pt80" );
-    addInput( "QCD_Spring10_Pt170" );
-    addInput( "QCD_Spring10_Pt300" );
-
-  } else if( dataset=="G_TuneZ2_7TeV_pythia6" ) {
+  if( dataset=="G_TuneZ2_7TeV_pythia6" ) {
 
     addInput( "G_Pt_0to15_TuneZ2_7TeV_pythia6" );
     addInput( "G_Pt_15to30_TuneZ2_7TeV_pythia6" );
@@ -282,6 +189,21 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     addInput( "QCD_Pt_800to1000_TuneZ2_7TeV_pythia6", (bool)true );
     addInput( "QCD_Pt_1000to1400_TuneZ2_7TeV_pythia6", (bool)true );
     addInput( "QCD_Pt_1400to1800_TuneZ2_7TeV_pythia6", (bool)true );
+
+  } else if( dataset=="G_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" ) {
+
+    addInput( "G_Pt_15to30_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
+    addInput( "G_Pt_30to50_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
+    addInput( "G_Pt_50to80_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
+    addInput( "G_Pt_80to120_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
+    addInput( "G_Pt_120to170_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
+    addInput( "G_Pt_170to300_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
+    addInput( "G_Pt_300to470_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
+    addInput( "G_Pt_470to800_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
+    addInput( "G_Pt_800to1000_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
+    addInput( "G_Pt_1000to1400_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
+    addInput( "G_Pt_1400to1800_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
+    addInput( "G_Pt_1800_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
 
   } else if( dataset=="G_QCD_TuneZ2_7TeV_pythia6_Fall10_ProbDist_2010Data" ) {
 
@@ -749,6 +671,13 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   tree->SetBranchAddress("clusterMinPhotReco", &clusterMinPhotReco);
   Int_t hasPixelSeedPhotReco;
   tree->SetBranchAddress("hasPixelSeedPhotReco", &hasPixelSeedPhotReco);
+  Float_t pid_twrHCAL;
+  tree->SetBranchAddress("pid_twrHCAL", &pid_twrHCAL);
+  Float_t pid_HoverE;
+  tree->SetBranchAddress("pid_HoverE", &pid_HoverE);
+  Float_t pid_jurECAL;
+  tree->SetBranchAddress("pid_jurECAL", &pid_jurECAL);
+
 
   Bool_t matchedToMC;
   tree->SetBranchAddress("matchedToMC", &matchedToMC);
@@ -935,8 +864,18 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
     if( photonID=="medium" ) {
 
-      isIsolated_hcal = ( hcalIsoPhotReco<0.05 || hcalIsoPhotReco*ePhotReco<2.4 );
-      isIsolated_ecal = ( ecalIsoPhotReco<0.05  || ecalIsoPhotReco*ePhotReco<3. );
+      if( isAOD_ ) {
+        float hcalIso = pid_twrHCAL/ptPhotReco + pid_HoverE;
+        isIsolated_hcal = ( hcalIso<0.05 || hcalIso*ePhotReco<2.4 );
+      } else {
+        isIsolated_hcal = ( hcalIsoPhotReco<0.05 || hcalIsoPhotReco*ePhotReco<2.4 );
+      }
+      if( isAOD_ ) {
+        float ecalIso = pid_jurECAL*cosh(etaPhotReco) / ePhotReco;
+        isIsolated_ecal = ( ecalIso<0.05  || ecalIso*ePhotReco<3. );
+      } else {
+        isIsolated_ecal = ( ecalIsoPhotReco<0.05  || ecalIsoPhotReco*ePhotReco<3. );
+      }
       isIsolated_ptTracks = ( ptTrkIsoPhotReco<0.1 );
       isIsolated_nTracks = (nTrkIsoPhotReco < 3 );
       clusterMajOK = ( clusterMajPhotReco>0.15 && clusterMajPhotReco<0.35 );
