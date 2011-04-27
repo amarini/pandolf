@@ -8,7 +8,7 @@
 #include "fitTools.h"
 
 
-bool ELIF_ = true;
+bool ELIF_ = false;
 
 
 
@@ -303,18 +303,16 @@ std::cout << "responseBALANCINGMC points: " << gr_responseBALANCINGMC_vs_pt->Get
   axes->SetYTitle( yTitle.c_str() );
   axes->GetXaxis()->SetMoreLogLabels();
   axes->GetXaxis()->SetNoExponent();
-  axes->GetXaxis()->SetTitleOffset(1.1);
-  axes->GetYaxis()->SetTitleOffset(1.5);
 
 
   TLine* line_one = new TLine( xMin, 1., xMax, 1. );
 
   float legend_xmin, legend_xmax, legend_ymin, legend_ymax;
   if( resp_reso=="response" ) {
-    legend_xmin = 0.48;
-    legend_ymin = 0.15;
-    legend_xmax = 0.87;
-    legend_ymax = (correctedPt) ? 0.4 : 0.45;
+    legend_xmin = 0.52;
+    legend_ymin = 0.2;
+    legend_xmax = 0.9;
+    legend_ymax = (correctedPt) ? 0.45 : 0.5;
   } else {
     legend_xmin = 0.40;
     legend_ymin = 0.515;
@@ -357,8 +355,6 @@ std::cout << "responseBALANCINGMC points: " << gr_responseBALANCINGMC_vs_pt->Get
 
   TCanvas* c1 = new TCanvas("c1", "c1", 600, 600);
   c1->cd();
-  c1->SetLeftMargin(0.12);
-  c1->SetBottomMargin(0.12);
   c1->SetLogx();
   axes->Draw();
   if( correctedPt )
@@ -416,8 +412,6 @@ std::cout << "responseBALANCINGMC points: " << gr_responseBALANCINGMC_vs_pt->Get
   axes2->SetYTitle( "Data / MC" );
   axes2->GetXaxis()->SetMoreLogLabels();
   axes2->GetXaxis()->SetNoExponent();
-  axes2->GetXaxis()->SetTitleOffset(1.1);
-  axes2->GetYaxis()->SetTitleOffset(1.5);
   axes2->Draw();
 
   TGraphErrors* gr_dataMC_BALANCING = fitTools::get_graphRatio( gr_responseBALANCING_vs_pt, gr_responseBALANCINGMC_vs_pt);
@@ -481,14 +475,16 @@ std::cout << "responseBALANCINGMC points: " << gr_responseBALANCINGMC_vs_pt->Get
   systFile_name += "_"+db->get_algoType();
   systFile_name += ".root";
   TFile* file_syst = TFile::Open(systFile_name.c_str());
-  TH1D* syst_band = (TH1D*)file_syst->Get("syst_total");
-  syst_band->SetFillColor(kYellow-9);
-  syst_band->SetFillStyle(1001);
-  syst_band->SetLineColor(kBlack);
-  syst_band->SetLineWidth(1);
-  for( unsigned ibin_syst=0; ibin_syst<syst_band->GetNbinsX(); ++ibin_syst ) {
-    syst_band->SetBinError( ibin_syst+1, syst_band->GetBinContent(ibin_syst+1)/100.); //not in percent
-    syst_band->SetBinContent( ibin_syst+1, 1. ); //put it around one
+  TH1D* syst_band = (file_syst!=0) ? (TH1D*)file_syst->Get("syst_total") : 0;
+  if( syst_band!=0 ) {
+    syst_band->SetFillColor(kYellow-9);
+    syst_band->SetFillStyle(1001);
+    syst_band->SetLineColor(kBlack);
+    syst_band->SetLineWidth(1);
+    for( unsigned ibin_syst=0; ibin_syst<syst_band->GetNbinsX(); ++ibin_syst ) {
+      syst_band->SetBinError( ibin_syst+1, syst_band->GetBinContent(ibin_syst+1)/100.); //not in percent
+      syst_band->SetBinContent( ibin_syst+1, 1. ); //put it around one
+    }
   }
 
   char balancingText[400];
@@ -527,18 +523,22 @@ std::cout << "responseBALANCINGMC points: " << gr_responseBALANCINGMC_vs_pt->Get
   TLegend* legend_syst = new TLegend( 0.35, yMin_syst, 0.65, yMax_syst, "");
   legend_syst->SetFillColor(kWhite);
   legend_syst->SetTextSize(0.032);
-  if( resp_reso=="response" )
-    legend_syst->AddEntry(syst_band, "Extrap. Syst. Uncertainty", "F");
-  else
-    legend_syst->AddEntry(syst_band, "Syst. Uncertainty", "F");
+  if( syst_band!=0 ) {
+    if( resp_reso=="response" )
+      legend_syst->AddEntry(syst_band, "Extrap. Syst. Uncertainty", "F");
+    else
+      legend_syst->AddEntry(syst_band, "Syst. Uncertainty", "F");
+  }
 
 
   TPaveText* label_algo2 = db->get_labelAlgo(1);
   label_algo2->SetTextSize(0.032);
 
   legend2->Draw("same");
-  syst_band->Draw("c l e3 same");
-  legend_syst->Draw("same");
+  if( syst_band!=0 ) {
+    syst_band->Draw("c l e3 same");
+    legend_syst->Draw("same");
+  }
   if( ELIF_ ) {
     TLine* line_one2 = new TLine( xMin_dataMC, 1., xMax, 1. );
     line_one2->Draw("same");
@@ -660,8 +660,6 @@ std::cout << "responseBALANCINGMC points: " << gr_responseBALANCINGMC_vs_pt->Get
     axes3->SetYTitle( "#sqrt{Data^{2} - MC^{2}}" );
     axes3->GetXaxis()->SetMoreLogLabels();
     axes3->GetXaxis()->SetNoExponent();
-    axes3->GetXaxis()->SetTitleOffset(1.1);
-    axes3->GetYaxis()->SetTitleOffset(1.5);
     axes3->Draw();
 
     gr_squareDiff_BALANCING->Draw("p same");
@@ -788,8 +786,6 @@ std::cout << "responseBALANCINGMC points: " << gr_responseBALANCINGMC_vs_pt->Get
     axes4->SetYTitle( "Relative Uncertainty [%]");
     axes4->GetXaxis()->SetMoreLogLabels();
     axes4->GetXaxis()->SetNoExponent();
-    axes4->GetXaxis()->SetTitleOffset(1.1);
-    axes4->GetYaxis()->SetTitleOffset(1.5);
     axes4->Draw();
 
     TH1D* stat_errorEXTRAP = new TH1D(*band_responseEXTRAP);
