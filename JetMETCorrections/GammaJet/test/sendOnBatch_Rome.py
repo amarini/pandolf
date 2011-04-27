@@ -45,9 +45,11 @@ os.system("mkdir -p "+dir)
 os.system("mkdir -p "+dir+"/log/")
 os.system("mkdir -p "+dir+"/input/")
 os.system("mkdir -p "+dir+"/src/")
+os.system("mkdir -p "+dir+"/res/")
 
-#if diskoutputdir != "none": 
-#    os.system("ssh -o BatchMode=yes -o StrictHostKeyChecking=no pccmsrm21 mkdir -p "+diskoutputmain)
+if diskoutputdir != "none": 
+    os.system("mkdir -p "+diskoutputmain)
+
 
 #look for the current directory
 #######################################
@@ -69,30 +71,6 @@ while (len(inputfiles) > 0):
 
     inputfile.close()
 
-#numfiles = reduce(lambda x,y: x+1, file(inputlist).xreadlines(), 0)
-#filesperjob = numfiles/ijobmax
-#extrafiles  = numfiles%ijobmax
-#input = open(inputlist)
-######################################
-
-#for ijob in range(ijobmax):
-#    # prepare the list file
-#    inputfilename = pwd+"/"+dataset_name+"_"+recoType+jetAlgo+"/input/input_"+str(ijob)+".list"
-#    inputfile = open(inputfilename,'w')
-#    # if it is a normal job get filesperjob lines
-#    if ijob != (ijobmax-1):
-#        for line in range(filesperjob):
-#            ntpfile = input.readline() 
-#            inputfile.write(ntpfile)
-#            continue
-#    else:
-#        # if it is the last job get ALL remaining lines
-#        ntpfile = input.readline()
-#        while ntpfile != '':
-#            inputfile.write(ntpfile)
-#            ntpfile = input.readline()
-#            continue
-#    inputfile.close()
 
     # prepare the script to run
     outputname = dataset_name+"_"+recoType+jetAlgo+"/src/submit_"+str(ijob)+".src"
@@ -100,17 +78,18 @@ while (len(inputfiles) > 0):
     outputfile.write('#!/bin/bash\n')
     outputfile.write('export STAGE_HOST=castorcms\n')
     outputfile.write('export SCRAM_ARCH=slc5_amd64_gcc434\n')
-    outputfile.write('cd /afs/cern.ch/user/p/pandolf/scratch1/CMSSW_4_1_3_patch2/ ; eval `scramv1 runtime -sh` ; cd -\n')
+    outputfile.write('cd /cmshome/pandolf/CMSSW_4_1_5/src ; eval `scramv1 runtime -sh` ; cd -\n')
     #    outputfile.write('cd '+pwd)
-    outputfile.write('cp '+pwd+'/Cert_*.txt $WORKDIR\n')
-    #outputfile.write('cp '+pwd+'/csv*.txt $WORKDIR\n')
-    #outputfile.write('cp -r  /afs/cern.ch/user/p/pandolf/scratch1/CMSSW_3_6_3/src/CondFormats $WORKDIR\n')
-    #outputfile.write("echo copied CondFormats\n")
-    outputfile.write('cd $WORKDIR\n')
+    #outputfile.write('cd $WORKDIR\n')
+    outputfile.write("mkdir -p "+dir+"/res/job_"+str(ijob)+"\n")
+    outputfile.write("cp Cert* "+dir+"/res/job_"+str(ijob)+"\n")
+    #outputfile.write("cp "+application+" "+dir+"/res/job_"+str(ijob)+"\n")
+    outputfile.write("cd "+dir+"/res/job_"+str(ijob)+"\n")
     outputfile.write(pwd+'/'+application+" "+dataset_name+" "+recoType+" "+jetAlgo+" "+inputfilename+" _"+str(ijob)+"\n") 
     # select this for GENJETS ntuples:
     #outputfile.write(pwd+'/'+application+" "+dataset_name+" "+recoType+" "+jetAlgo+" "+inputfilename+" _"+str(ijob)+" true\n")
-    outputfile.write('ls *.root | xargs -i scp -o BatchMode=yes -o StrictHostKeyChecking=no {} pccmsrm21:'+diskoutputmain+'/{}\n') 
+    outputfile.write('mv *.root '+diskoutputmain+'\n') 
+    #outputfile.write('ls *.root | xargs -i scp -o BatchMode=yes -o StrictHostKeyChecking=no {} cmsrm-ui02:'+diskoutputmain+'/{}\n') 
     outputfile.close
     os.system("echo bsub -q "+queue+" -o "+dir+"/log/"+dataset_name+"_"+str(ijob)+".log source "+pwd+"/"+outputname)
     os.system("bsub -q "+queue+" -o "+dir+"/log/"+dataset_name+"_"+str(ijob)+".log source "+pwd+"/"+outputname+" -copyInput="+dataset_name+"_"+str(ijob))
