@@ -200,8 +200,7 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     addInput( "G_Pt_170to300_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
     addInput( "G_Pt_300to470_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
     addInput( "G_Pt_470to800_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
-    addInput( "G_Pt_800to1000_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
-    addInput( "G_Pt_1000to1400_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
+    addInput( "G_Pt_800to1400_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
     addInput( "G_Pt_1400to1800_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
     addInput( "G_Pt_1800_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
 
