@@ -253,7 +253,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      // good primary vertex requirement:
      if( nvertex==0 ) continue;
      bool goodVertex = (vndof[0] >= 4.0 && sqrt(vx[0]*vx[0]+vy[0]*vy[0]) < 2. && fabs(vz[0]) < 24. );
-     //if( !goodVertex ) continue;
+     if( !goodVertex ) continue;
  
      if( isMC )
        if( (ptHat_ > ptHatMax_) || (ptHat_ < ptHatMin_) ) continue;
