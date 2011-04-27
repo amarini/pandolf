@@ -47,7 +47,7 @@ std::vector<float> fitTools::getPtPhot_binning() {
   returnVector.push_back(70.);
   returnVector.push_back(100.);
   returnVector.push_back(150.);
-  returnVector.push_back(220.);
+  //returnVector.push_back(220.);
   returnVector.push_back(320.);
   returnVector.push_back(470.);
   returnVector.push_back(3500.);
@@ -1020,11 +1020,17 @@ TF1* fitTools::fitResponseGraph( TGraphErrors* graph, std::string funcType, std:
     //fitFunction->SetParameter(1, -0.6);
   } else if( funcType=="powerlaw" ) {
     fitFunction = new TF1(funcName.c_str(), "[0] - [1]/(pow(x, [2]))");
-    fitFunction->SetRange( 10., 1400. );
+    fitFunction->SetRange(rangeMin, rangeMax);
     fitFunction->SetParameters(1., 1., 0.3);
+  } else if( funcType=="powerlawL2L3" ) {
+    fitFunction = new TF1(funcName.c_str(), "1. + [0]/(pow(x, [1]))");
+    fitFunction->SetRange(rangeMin, rangeMax);
+    fitFunction->SetParameters(0.7, 0.7);
+  //fitFunction->SetParLimits(0, 0.5, 2.);
+  //fitFunction->SetParLimits(1, 0.5, 2.);
   } else if( funcType=="powerlaw_corr" ) {
     fitFunction = new TF1(funcName.c_str(), "[0] - [1]/(pow(x, [2])) + [3]/x");
-    fitFunction->SetRange( 10., 1400. );
+    fitFunction->SetRange(rangeMin, rangeMax);
     fitFunction->SetParameters(1., 1., 0.3, 1.);
   } else {
     std::cout << "Function '" << funcType << "' not implemented yet for fitResponseGraph. Exiting." << std::endl;
@@ -1045,21 +1051,18 @@ TF1* fitTools::fitResolutionGraph( TGraphErrors* graph, std::string funcType, st
   TF1* fitFunction;
 
   if( funcType=="NSC" ) {
-    fitFunction = new TF1(funcName.c_str(), NSC, rangeMin, rangeMax, 3); //will have to fix the range issue!
+    fitFunction = new TF1(funcName.c_str(), NSC, rangeMin, rangeMax, 3); 
     fitFunction->SetParameters( 0., 1., 0.05);
-    fitFunction->SetParLimits( 0, 0., 2.);
-    fitFunction->SetParLimits( 1, 0., 2.);
-    fitFunction->SetParLimits( 2, 0., 0.2 );
+    fitFunction->SetParLimits( 0, -2., 11.);
+    fitFunction->SetParLimits( 1, -2., 2.);
+    fitFunction->SetParLimits( 2, -0.3, 0.3 );
   } else if( funcType=="NSCPF" ) {
-    fitFunction = new TF1(funcName.c_str(), NSCPF, rangeMin, rangeMax, 4); //will have to fix the range issue!
-    //fitFunction = new TF1(funcName.c_str(), NSCPF, rangeMin, rangeMax, 2); //will have to fix the range issue!
+    fitFunction = new TF1(funcName.c_str(), NSCPF, rangeMin, rangeMax, 4);
     fitFunction->SetParameters( 0., 1., 0.05, 0.);
-    fitFunction->SetParLimits( 0, -2., 1.);
+    fitFunction->SetParLimits( 0, -2., 5.);
     fitFunction->SetParLimits( 1, 0., 1.1);
     fitFunction->SetParLimits( 2, 0., 0.12 );
-    fitFunction->SetParLimits( 3, 0., 1.);
-  //fitFunction->SetParLimits( 0, 0.7, 1.1);
-  //fitFunction->SetParLimits( 1, 0., 0.12 );
+    fitFunction->SetParLimits( 3, -1., 1.);
   } else {
     std::cout << "Function '" << funcType << "' not implemented yet for fitResolutionGraph. Exiting." << std::endl;
     exit(119);
@@ -1229,6 +1232,7 @@ TH1D* fitTools::getBand(TF1 *f, TMatrixD const& m, std::string name, bool getRel
 
   h1_band->SetMarkerStyle(20);
   h1_band->SetMarkerSize(0);
+  h1_band->SetFillColor(kYellow-9);
 
 
   //TGraph* h1_statError = new TGraph(npx, xvec, sigmaf);
@@ -1276,7 +1280,7 @@ TGraphErrors* fitTools::get_graphRatio( TGraphErrors* gr_data, TGraphErrors* gr_
     Double_t ratioyerr = (mcy>0.) ? sqrt( datayerr*datayerr/(mcy*mcy) + datay*datay*mcyerr*mcyerr/(mcy*mcy*mcy*mcy) ) : 0.;
 
 
-    if( ratioxerr>0. && ratioyerr>0. ) {
+    if( ratioyerr>0. ) {
       gr_ratio->SetPoint( i, ratiox, ratioy );
       gr_ratio->SetPointError( i, ratioxerr, ratioyerr );
     }
