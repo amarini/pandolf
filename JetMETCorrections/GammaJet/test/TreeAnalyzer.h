@@ -227,6 +227,7 @@ public :
    TH1F* h1_nCounter_;
 
    Int_t run_;
+   Int_t LS_;
    Int_t nvertex_;
    Int_t oldrun_;
    Int_t currentLS_;

@@ -61,6 +61,7 @@ void TreeAnalyzer_PhotonJet::CreateOutputFile() {
 
   jetTree_->Branch("run",&run_,"run_/I");
   jetTree_->Branch("event",&event_,"event_/I");
+  jetTree_->Branch("LS",&LS_,"LS_/I");
   jetTree_->Branch("nvertex",&nvertex_,"nvertex_/I");
 
   jetTree_->Branch("ptHat",&ptHat_,"ptHat_/F");
@@ -246,6 +247,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      if( (jentry%20000) == 0 ) std::cout << "Event #" << jentry  << " of " << nentries << std::endl;
 
      run_ = run;
+     LS_ = lbn;
      event_ = event;
      nvertex_ = nvertex;
      ptHat_ = genpt;
