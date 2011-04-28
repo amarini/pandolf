@@ -367,13 +367,15 @@ void DrawExtrap::drawResponseExtrap( const std::string& etaRegion, bool correcte
     Float_t xMax_fit_green = x[2]+2.;
 
     Float_t xMax_axis;
-    if( lastX <=12. ) 
+    if( lastX <=14. ) 
       xMax_axis = 15.;
-    else if( lastX <= 20. )
+    else if( lastX <= 19. )
+      xMax_axis = 20.;
+    else if( lastX <= 24. )
       xMax_axis = 25.;
-    else if( lastX <= 25. )
+    else if( lastX <= 29. )
       xMax_axis = 30.;
-    else if( lastX <= 35. )
+    else 
       xMax_axis = 40.;
     
 
@@ -564,10 +566,11 @@ void DrawExtrap::drawResponseExtrap( const std::string& etaRegion, bool correcte
 
     //TLatex* label_CMStop = this->get_labelCMStop();
 
-    gr_resp_recoGen->SetMarkerSize(1.6);
-    gr_resp_genPhot->SetMarkerSize(1.6);
-    gr_resp_recoPhot->SetMarkerSize(1.6);
-    gr_resp_DATA->SetMarkerSize(1.6);
+    float markerSize = 1.4;
+    gr_resp_recoGen->SetMarkerSize(markerSize);
+    gr_resp_genPhot->SetMarkerSize(markerSize);
+    gr_resp_recoPhot->SetMarkerSize(markerSize);
+    gr_resp_DATA->SetMarkerSize(markerSize);
 
     TCanvas* c1_resp = new TCanvas("c1_resp", "c1_resp", 600, 600);
   //c1_resp->SetLeftMargin(0.12);
@@ -585,8 +588,8 @@ void DrawExtrap::drawResponseExtrap( const std::string& etaRegion, bool correcte
     label_algo->Draw("same");
     // save one propaganda plot with no data to explain method:
     if( ptMin==47. || ptMin==70. ) {
-      char canvasName_resp_eps_NODATA[550];
-      char canvasName_resp_png_NODATA[550];
+      char canvasName_resp_eps_NODATA[500];
+      char canvasName_resp_png_NODATA[500];
       if( etaRegion!="" ) {
         sprintf(canvasName_resp_eps_NODATA, "%s/response%s_%s_ptBin_%d_%d_%s_NODATANOMC.eps", get_outputdir().c_str(), L2L3_text.c_str(), etaRegion.c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
         sprintf(canvasName_resp_png_NODATA, "%s/response%s_%s_ptBin_%d_%d_%s_NODATANOMC.png", get_outputdir().c_str(), L2L3_text.c_str(), etaRegion.c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
@@ -599,8 +602,8 @@ void DrawExtrap::drawResponseExtrap( const std::string& etaRegion, bool correcte
     }
     gr_resp_recoPhot->Draw("Psame");
     if( ptMin==47. || ptMin==70. ) {
-      char canvasName_resp_eps_NODATA[550];
-      char canvasName_resp_png_NODATA[550];
+      char canvasName_resp_eps_NODATA[500];
+      char canvasName_resp_png_NODATA[500];
       if( etaRegion!="" ) {
         sprintf(canvasName_resp_eps_NODATA, "%s/response%s_%s_ptBin_%d_%d_%s_NODATA.eps", get_outputdir().c_str(), L2L3_text.c_str(), etaRegion.c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
         sprintf(canvasName_resp_png_NODATA, "%s/response%s_%s_ptBin_%d_%d_%s_NODATA.png", get_outputdir().c_str(), L2L3_text.c_str(), etaRegion.c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
@@ -613,8 +616,8 @@ void DrawExtrap::drawResponseExtrap( const std::string& etaRegion, bool correcte
     }
     gr_resp_DATA->Draw("Psame");
 
-    char canvasName_resp_eps[550];
-    char canvasName_resp_png[550];
+    char canvasName_resp_eps[500];
+    char canvasName_resp_png[500];
     if( etaRegion!="" ) {
       sprintf(canvasName_resp_eps, "%s/response%s_%s_ptBin_%d_%d_%s.eps", get_outputdir().c_str(), L2L3_text.c_str(), etaRegion.c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
       sprintf(canvasName_resp_png, "%s/response%s_%s_ptBin_%d_%d_%s.png", get_outputdir().c_str(), L2L3_text.c_str(), etaRegion.c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
@@ -886,13 +889,7 @@ void DrawExtrap::drawResponseExtrap( const std::string& etaRegion, bool correcte
       h2_axes_reso->SetYTitle("Jet p_{T} Resolution");
     else 
       h2_axes_reso->SetYTitle("Raw Jet p_{T} Resolution");
-  //h2_axes_reso->GetXaxis()->SetTitleOffset(1.1);
-  //h2_axes_reso->GetYaxis()->SetTitleOffset(1.5);
 
-  //TPaveText* label_reso = new TPaveText(0.67, 0.83, 0.8, 0.86, "brNDC");
-  //label_reso->SetFillColor(kWhite);
-  //label_reso->SetTextSize(0.035);
-  //label_reso->AddText(labeltext);
 
     Float_t minLegend = 0.2;
     TLegend* legend_reso;
@@ -909,15 +906,15 @@ void DrawExtrap::drawResponseExtrap( const std::string& etaRegion, bool correcte
     legend_reso->AddEntry(gr_reso_recoPhot, "MC (#gamma + jet)", "PL");
     legend_reso->AddEntry(gr_reso_DATA, "DATA (#gamma + jet)", "L");
 
-    TPaveText* label_reso = new TPaveText(0.22, 0.55, 0.47, 0.6, "brNDC");
+    TPaveText* label_reso = new TPaveText(0.25, 0.85, 0.47, 0.9, "brNDC");
     label_reso->SetFillColor(kWhite);
     label_reso->SetTextSize(0.035);
     label_reso->AddText(labeltext);
 
-    gr_reso_recoGen->SetMarkerSize(1.6);
-    gr_reso_genPhot->SetMarkerSize(1.6);
-    gr_reso_recoPhot->SetMarkerSize(1.6);
-    gr_reso_DATA->SetMarkerSize(1.6);
+    gr_reso_recoGen->SetMarkerSize(markerSize);
+    gr_reso_genPhot->SetMarkerSize(markerSize);
+    gr_reso_recoPhot->SetMarkerSize(markerSize);
+    gr_reso_DATA->SetMarkerSize(markerSize);
 
     TCanvas* c1_reso = new TCanvas("c1_reso", "c1_reso", 600, 600);
   //c1_reso->SetLeftMargin(0.12);
@@ -938,8 +935,8 @@ void DrawExtrap::drawResponseExtrap( const std::string& etaRegion, bool correcte
     label_algo->Draw("same");
     // save one propaganda plot with no data to explain method:
     if( ptMin==47. ) {
-      char canvasName_reso_eps_NODATA[550];
-      char canvasName_reso_png_NODATA[550];
+      char canvasName_reso_eps_NODATA[500];
+      char canvasName_reso_png_NODATA[500];
       if( etaRegion!="" ) {
         sprintf(canvasName_reso_eps_NODATA, "%s/resolution%s_%s_ptBin_%d_%d_%s_NODATANOMC.eps", get_outputdir().c_str(), L2L3_text.c_str(), etaRegion.c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
         sprintf(canvasName_reso_png_NODATA, "%s/resolution%s_%s_ptBin_%d_%d_%s_NODATANOMC.png", get_outputdir().c_str(), L2L3_text.c_str(), etaRegion.c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
@@ -952,8 +949,8 @@ void DrawExtrap::drawResponseExtrap( const std::string& etaRegion, bool correcte
     }
     gr_reso_recoPhot->Draw("Psame");
     if( ptMin==47. ) {
-      char canvasName_reso_eps_NODATA[550];
-      char canvasName_reso_png_NODATA[550];
+      char canvasName_reso_eps_NODATA[500];
+      char canvasName_reso_png_NODATA[500];
       if( etaRegion!="" ) {
         sprintf(canvasName_reso_eps_NODATA, "%s/resolution%s_%s_ptBin_%d_%d_%s_NODATA.eps", get_outputdir().c_str(), L2L3_text.c_str(), etaRegion.c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
         sprintf(canvasName_reso_png_NODATA, "%s/resolution%s_%s_ptBin_%d_%d_%s_NODATA.png", get_outputdir().c_str(), L2L3_text.c_str(), etaRegion.c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
@@ -967,7 +964,7 @@ void DrawExtrap::drawResponseExtrap( const std::string& etaRegion, bool correcte
     gr_reso_DATA->Draw("Psame");
 
 
-    char canvasName_reso[550];
+    char canvasName_reso[500];
     if( etaRegion!="" ) {
       sprintf(canvasName_reso, "%s/resolution%s_%s_ptBin_%d_%d_%s", get_outputdir().c_str(), L2L3_text.c_str(), etaRegion.c_str(), (int)ptMin, (int)ptMax, recoGen.c_str());
     } else {
