@@ -5,7 +5,7 @@
 
 bool useMCassoc_ = false;
 bool NOQ=false;
-bool FIXM=false;
+bool FIXM=true;
 
 
 
@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
 
   DrawExtrap* db = new DrawExtrap("PhotonJet", recoType, jetAlgo, mcFlags);
   db->set_pdf_aussi((bool)false);
-  db->set_isCMSArticle((bool)true);
+  db->set_isCMSArticle((bool)false);
 
   db->set_FITRMS(FIT_RMS);
 
@@ -89,9 +89,14 @@ int main(int argc, char* argv[]) {
   db->add_mcFile( mcFile, mc_dataset.c_str(), "#gamma+jet + QCD MC", 46);
 
 
-  //db->set_shapeNormalization();
-  //db->set_lumiNormalization(33.8);
-  db->set_lumiNormalization(36.);
+  TString data_dataset_tstr(data_dataset);
+  float intLumi;
+  if( data_dataset_tstr.Contains("2010") ) {
+    intLumi = 36.;
+  } else if( data_dataset_tstr.Contains("2011") ) {
+    intLumi = 50.;
+  } 
+  db->set_lumiNormalization(intLumi);
 
 
   bool log = true;
