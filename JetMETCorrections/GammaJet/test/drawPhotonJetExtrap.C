@@ -5,13 +5,14 @@
 
 bool useMCassoc_ = false;
 bool NOQ=false;
+bool FIXM=false;
 
 
 
 int main(int argc, char* argv[]) {
 
   if( argc != 6 && argc!=7 && argc!=8 ) {
-    std::cout << "USAGE: ./drawPhotonJet [data_dataset] [mc_dataset] [recoType] [jetAlgo] [FIT_RMS] [flags=\"\"] [GENJETS=\"\"]" << std::endl;
+    std::cout << "USAGE: ./drawPhotonJetExtrap [data_dataset] [mc_dataset] [recoType] [jetAlgo] [FIT_RMS] [flags=\"\"] [GENJETS=\"\"]" << std::endl;
     exit(23);
   }
 
@@ -45,16 +46,18 @@ int main(int argc, char* argv[]) {
 
   DrawExtrap* db = new DrawExtrap("PhotonJet", recoType, jetAlgo, mcFlags);
   db->set_pdf_aussi((bool)false);
+  db->set_isCMSArticle((bool)true);
 
   db->set_FITRMS(FIT_RMS);
 
   std::string NOQtext = (NOQ) ? "_NOQ" : "";
+  std::string FIXMtext = (FIXM) ? "_FIXM" : "";
 
   char outputdir_char[200];
   if( mcFlags!="" ) {
-    sprintf( outputdir_char, "PhotonJetExtrapPlots_%s_vs_%s_%s_%s_%s%s", data_dataset.c_str(), mc_dataset.c_str(), algoType.c_str(), mcFlags.c_str(), FIT_RMS.c_str(), NOQtext.c_str());
+    sprintf( outputdir_char, "PhotonJetExtrapPlots_%s_vs_%s_%s_%s_%s%s%s", data_dataset.c_str(), mc_dataset.c_str(), algoType.c_str(), mcFlags.c_str(), FIT_RMS.c_str(), FIXMtext.c_str(), NOQtext.c_str());
   } else {
-    sprintf( outputdir_char, "PhotonJetExtrapPlots_%s_vs_%s_%s_%s%s", data_dataset.c_str(), mc_dataset.c_str(), algoType.c_str(), FIT_RMS.c_str(), NOQtext.c_str());
+    sprintf( outputdir_char, "PhotonJetExtrapPlots_%s_vs_%s_%s_%s%s%s", data_dataset.c_str(), mc_dataset.c_str(), algoType.c_str(), FIT_RMS.c_str(), FIXMtext.c_str(), NOQtext.c_str());
   }
   std::string outputdir_str(outputdir_char);
 
@@ -87,16 +90,22 @@ int main(int argc, char* argv[]) {
 
 
   //db->set_shapeNormalization();
-  db->set_lumiNormalization(33.8);
+  //db->set_lumiNormalization(33.8);
+  db->set_lumiNormalization(36.);
 
 
   bool log = true;
 
   db->set_NOQ( NOQ );
+  db->set_FIXM( FIXM );
  
   db->drawResponseExtrap("eta011");
   db->drawResponseExtrap("eta011", (bool)true);
   db->drawResponseExtrap("eta011", (bool)true, "RecoRelRaw");
+std::cout << "prova" << std::endl;
+  db->drawResponseExtrap("eta013");
+  db->drawResponseExtrap("eta013", (bool)true);
+  db->drawResponseExtrap("eta013", (bool)true, "RecoRelRaw");
 //db->drawResponseExtrap("eta1524");
 //db->drawResponseExtrap("eta1524", (bool)true);
 //db->drawResponseExtrap("eta243");
