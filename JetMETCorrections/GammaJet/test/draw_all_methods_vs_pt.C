@@ -89,9 +89,16 @@ int main( int argc, char* argv[] ) {
 
 
 
+  TString data_dataset_tstr(data_dataset);
+  float intLumi;
+  if( data_dataset_tstr.Contains("2010") ) {
+    intLumi = 34.;
+  } else if( data_dataset_tstr.Contains("2011") ) {
+    intLumi = 50.;
+  } 
 
-  //db->set_lumi(33.8);
-  db->set_lumiNormalization(36.);
+
+  db->set_lumiNormalization(intLumi);
   //db->set_shapeNormalization();
 
   db->set_outputdir();
@@ -344,9 +351,9 @@ std::cout << "responseBALANCINGMC points: " << gr_responseBALANCINGMC_vs_pt->Get
       legend_ymax = 0.385;
     } else {
       legend_xmin = 0.40;
-      legend_ymin = 0.615;
+      legend_ymin = 0.6;
       legend_xmax = 0.80;
-      legend_ymax = 0.83;
+      legend_ymax = 0.82;
     }
   }
 
