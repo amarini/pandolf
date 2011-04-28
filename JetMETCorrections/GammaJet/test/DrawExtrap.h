@@ -21,8 +21,9 @@ class DrawExtrap : public DrawBase {
   void set_FITRMS( const std::string& fit_rms ) { FIT_RMS_ = fit_rms; };
   void set_NOQ( bool noq ) { NOQ_ = noq; };
   void set_INTPERC( float intperc ) { INTPERC_ = intperc; };
+  void set_FIXM( bool fixm ) { FIXM_ = fixm; };
 
-  void drawResponseExtrap(const std::string& etaRegion, bool corrected=false, const std::string& recoGen="RecoRel") const;
+  void drawResponseExtrap(const std::string& etaRegion, bool corrected=false, const std::string& recoGen="RecoRel");
 
 
  private:
@@ -36,6 +37,7 @@ class DrawExtrap : public DrawBase {
   bool NOQ_;
   std::string FIT_RMS_;
   float INTPERC_;
+  bool FIXM_;
 
 };
 
