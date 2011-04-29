@@ -133,7 +133,8 @@ void drawSinglePlot( DrawBase* db, TFile* file, const std::string& varName, cons
   TF1* fitLine = new TF1("fitLine", "[0] + [1]*x", 0., histoThresh->GetXaxis()->GetXmax());
   fitLine->SetLineStyle(2);
   fitLine->SetLineWidth(1);
-  histoThresh->Fit(fitLine, "RQ");
+  std::cout << std::endl << "#### " << varName << " " << EB_EE << " rho" << rhoType << std::endl;
+  histoThresh->Fit(fitLine, "R");
 
 
   TH2D* h2_axes = new TH2D("axes", "", 10, histoThresh->GetXaxis()->GetXmin(), histoThresh->GetXaxis()->GetXmax(), 10, 0., 1.5*histoThresh->GetMaximum() );
