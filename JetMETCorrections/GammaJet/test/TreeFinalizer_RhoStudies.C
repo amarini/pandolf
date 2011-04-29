@@ -35,8 +35,10 @@ struct photonidegcuts {
 
 struct ThreshEff {
 
-  float thresh;
-  float eff;
+  float threshEB;
+  float effEB;
+  float threshEE;
+  float effEE;
 
 };
 
@@ -78,8 +80,8 @@ void addInput(const std::string& dataset);
 bool passedPhotonID(const AnalysisPhoton & photon, photonidegcuts const& pid, vector<bool> *vpass);
 
 std::vector<TH1D*> allocateHistoVector( int vectorSize, const std::string& name, int nBins, float xMin, float xMax );
-ThreshEff getThresh_constEff( TTree* tree, float eff, int iBinRho, float threshAbs);
-ThreshEff getThresh_constEff_pid( TTree* tree, float eff, int iBinRho, float threshAbs);
+//ThreshEff getThresh_constEff( TTree* tree, float eff, int iBinRho, float threshAbs);
+ThreshEff getThresh_constEff_pid( TTree* tree, float effEB, float effEE, int iBinRho, float threshAbs);
 
 
 
@@ -360,32 +362,60 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   float rhoPF_max = 16.;
 
 
-  TProfile* hp_hcalIsoMean_vs_rhoCalo = new TProfile("hcalIsoMean_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
-  hp_hcalIsoMean_vs_rhoCalo->Sumw2();
-  TProfile* hp_hcalIsoPIDMean_vs_rhoCalo = new TProfile("hcalIsoPIDMean_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
-  hp_hcalIsoPIDMean_vs_rhoCalo->Sumw2();
-  TProfile* hp_hcalIsoMean_vs_rhoPF = new TProfile("hcalIsoMean_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
-  hp_hcalIsoMean_vs_rhoPF->Sumw2();
-  TProfile* hp_hcalIsoPIDMean_vs_rhoPF = new TProfile("hcalIsoPIDMean_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
-  hp_hcalIsoPIDMean_vs_rhoPF->Sumw2();
+  TProfile* hp_hcalIsoMeanEB_vs_rhoCalo = new TProfile("hcalIsoMeanEB_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  hp_hcalIsoMeanEB_vs_rhoCalo->Sumw2();
+  TProfile* hp_hcalIsoPIDMeanEB_vs_rhoCalo = new TProfile("hcalIsoPIDMeanEB_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  hp_hcalIsoPIDMeanEB_vs_rhoCalo->Sumw2();
+  TProfile* hp_hcalIsoMeanEB_vs_rhoPF = new TProfile("hcalIsoMeanEB_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  hp_hcalIsoMeanEB_vs_rhoPF->Sumw2();
+  TProfile* hp_hcalIsoPIDMeanEB_vs_rhoPF = new TProfile("hcalIsoPIDMeanEB_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  hp_hcalIsoPIDMeanEB_vs_rhoPF->Sumw2();
 
-  TProfile* hp_ecalIsoMean_vs_rhoCalo = new TProfile("ecalIsoMean_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
-  hp_ecalIsoMean_vs_rhoCalo->Sumw2();
-  TProfile* hp_ecalIsoPIDMean_vs_rhoCalo = new TProfile("ecalIsoPIDMean_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
-  hp_ecalIsoPIDMean_vs_rhoCalo->Sumw2();
-  TProfile* hp_ecalIsoMean_vs_rhoPF = new TProfile("ecalIsoMean_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
-  hp_ecalIsoMean_vs_rhoPF->Sumw2();
-  TProfile* hp_ecalIsoPIDMean_vs_rhoPF = new TProfile("ecalIsoPIDMean_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
-  hp_ecalIsoPIDMean_vs_rhoPF->Sumw2();
+  TProfile* hp_ecalIsoMeanEB_vs_rhoCalo = new TProfile("ecalIsoMeanEB_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  hp_ecalIsoMeanEB_vs_rhoCalo->Sumw2();
+  TProfile* hp_ecalIsoPIDMeanEB_vs_rhoCalo = new TProfile("ecalIsoPIDMeanEB_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  hp_ecalIsoPIDMeanEB_vs_rhoCalo->Sumw2();
+  TProfile* hp_ecalIsoMeanEB_vs_rhoPF = new TProfile("ecalIsoMeanEB_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  hp_ecalIsoMeanEB_vs_rhoPF->Sumw2();
+  TProfile* hp_ecalIsoPIDMeanEB_vs_rhoPF = new TProfile("ecalIsoPIDMeanEB_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  hp_ecalIsoPIDMeanEB_vs_rhoPF->Sumw2();
 
-  TProfile* hp_ptTrkIsoMean_vs_rhoCalo = new TProfile("ptTrkIsoMean_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
-  hp_ptTrkIsoMean_vs_rhoCalo->Sumw2();
-  TProfile* hp_hlwTrackIsoMean_vs_rhoCalo = new TProfile("pid_hlwTrackMean_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
-  hp_hlwTrackIsoMean_vs_rhoCalo->Sumw2();
-  TProfile* hp_ptTrkIsoMean_vs_rhoPF = new TProfile("ptTrkIsoMean_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
-  hp_ptTrkIsoMean_vs_rhoPF->Sumw2();
-  TProfile* hp_hlwTrackIsoMean_vs_rhoPF = new TProfile("pid_hlwTrackMean_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
-  hp_hlwTrackIsoMean_vs_rhoPF->Sumw2();
+  TProfile* hp_ptTrkIsoMeanEB_vs_rhoCalo = new TProfile("ptTrkIsoMeanEB_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  hp_ptTrkIsoMeanEB_vs_rhoCalo->Sumw2();
+  TProfile* hp_hlwTrackIsoMeanEB_vs_rhoCalo = new TProfile("pid_hlwTrackMeanEB_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  hp_hlwTrackIsoMeanEB_vs_rhoCalo->Sumw2();
+  TProfile* hp_ptTrkIsoMeanEB_vs_rhoPF = new TProfile("ptTrkIsoMeanEB_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  hp_ptTrkIsoMeanEB_vs_rhoPF->Sumw2();
+  TProfile* hp_hlwTrackIsoMeanEB_vs_rhoPF = new TProfile("pid_hlwTrackMeanEB_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  hp_hlwTrackIsoMeanEB_vs_rhoPF->Sumw2();
+
+
+  TProfile* hp_hcalIsoMeanEE_vs_rhoCalo = new TProfile("hcalIsoMeanEE_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  hp_hcalIsoMeanEE_vs_rhoCalo->Sumw2();
+  TProfile* hp_hcalIsoPIDMeanEE_vs_rhoCalo = new TProfile("hcalIsoPIDMeanEE_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  hp_hcalIsoPIDMeanEE_vs_rhoCalo->Sumw2();
+  TProfile* hp_hcalIsoMeanEE_vs_rhoPF = new TProfile("hcalIsoMeanEE_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  hp_hcalIsoMeanEE_vs_rhoPF->Sumw2();
+  TProfile* hp_hcalIsoPIDMeanEE_vs_rhoPF = new TProfile("hcalIsoPIDMeanEE_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  hp_hcalIsoPIDMeanEE_vs_rhoPF->Sumw2();
+
+  TProfile* hp_ecalIsoMeanEE_vs_rhoCalo = new TProfile("ecalIsoMeanEE_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  hp_ecalIsoMeanEE_vs_rhoCalo->Sumw2();
+  TProfile* hp_ecalIsoPIDMeanEE_vs_rhoCalo = new TProfile("ecalIsoPIDMeanEE_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  hp_ecalIsoPIDMeanEE_vs_rhoCalo->Sumw2();
+  TProfile* hp_ecalIsoMeanEE_vs_rhoPF = new TProfile("ecalIsoMeanEE_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  hp_ecalIsoMeanEE_vs_rhoPF->Sumw2();
+  TProfile* hp_ecalIsoPIDMeanEE_vs_rhoPF = new TProfile("ecalIsoPIDMeanEE_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  hp_ecalIsoPIDMeanEE_vs_rhoPF->Sumw2();
+
+  TProfile* hp_ptTrkIsoMeanEE_vs_rhoCalo = new TProfile("ptTrkIsoMeanEE_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  hp_ptTrkIsoMeanEE_vs_rhoCalo->Sumw2();
+  TProfile* hp_hlwTrackIsoMeanEE_vs_rhoCalo = new TProfile("pid_hlwTrackMeanEE_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  hp_hlwTrackIsoMeanEE_vs_rhoCalo->Sumw2();
+  TProfile* hp_ptTrkIsoMeanEE_vs_rhoPF = new TProfile("ptTrkIsoMeanEE_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  hp_ptTrkIsoMeanEE_vs_rhoPF->Sumw2();
+  TProfile* hp_hlwTrackIsoMeanEE_vs_rhoPF = new TProfile("pid_hlwTrackMeanEE_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  hp_hlwTrackIsoMeanEE_vs_rhoPF->Sumw2();
 
 
   int nBinsDistrib = 200;
@@ -447,6 +477,20 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   tree_ptTrkIsoPhotReco_rhoCalo->Branch( "ePhotReco", &ptPhotReco, "ptPhotReco/F"); //ptPhot!!
   tree_hlwTrackIso_rhoCalo->Branch( "ePhotReco", &ptPhotReco, "ptPhotReco/F"); //ptPhot!!
 
+  tree_hcalIsoPhotReco_rhoPF->Branch( "etaPhotReco", &etaPhotReco, "etaPhotReco/F"); 
+  tree_hcalIsoPID_rhoPF->Branch( "etaPhotReco", &etaPhotReco, "etaPhotReco/F");
+  tree_ecalIsoPhotReco_rhoPF->Branch( "etaPhotReco", &etaPhotReco, "etaPhotReco/F"); 
+  tree_ecalIsoPID_rhoPF->Branch( "etaPhotReco", &etaPhotReco, "etaPhotReco/F");
+  tree_ptTrkIsoPhotReco_rhoPF->Branch( "etaPhotReco", &etaPhotReco, "etaPhotReco/F");
+  tree_hlwTrackIso_rhoPF->Branch( "etaPhotReco", &etaPhotReco, "etaPhotReco/F");
+
+  tree_hcalIsoPhotReco_rhoCalo->Branch( "etaPhotReco", &etaPhotReco, "etaPhotReco/F"); 
+  tree_hcalIsoPID_rhoCalo->Branch( "etaPhotReco", &etaPhotReco, "etaPhotReco/F");
+  tree_ecalIsoPhotReco_rhoCalo->Branch( "etaPhotReco", &etaPhotReco, "etaPhotReco/F"); 
+  tree_ecalIsoPID_rhoCalo->Branch( "etaPhotReco", &etaPhotReco, "etaPhotReco/F");
+  tree_ptTrkIsoPhotReco_rhoCalo->Branch( "etaPhotReco", &etaPhotReco, "etaPhotReco/F");
+  tree_hlwTrackIso_rhoCalo->Branch( "etaPhotReco", &etaPhotReco, "etaPhotReco/F");
+
   tree_hcalIsoPhotReco_rhoPF->Branch( "bin_rho", &bin_rhoPF, "bin_rhoPF/I");
   tree_hcalIsoPID_rhoPF->Branch( "bin_rho", &bin_rhoPF, "bin_rhoPF/I");
   tree_ecalIsoPhotReco_rhoPF->Branch( "bin_rho", &bin_rhoPF, "bin_rhoPF/I");
@@ -478,19 +522,33 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
 
 
 
-  float denom_hcalIso = 0.;
-  float denom_pid_hcalIso = 0.;
-  float denom_ecalIso = 0.;
-  float denom_pid_ecalIso = 0.;
-  float denom_ptTrkIso = 0.;
-  float denom_pid_hlwTrackIso = 0.;
+  float denomEB_hcalIso = 0.;
+  float denomEB_pid_hcalIso = 0.;
+  float denomEB_ecalIso = 0.;
+  float denomEB_pid_ecalIso = 0.;
+  float denomEB_ptTrkIso = 0.;
+  float denomEB_pid_hlwTrackIso = 0.;
 
-  float num_hcalIso = 0.;
-  float num_pid_hcalIso = 0.;
-  float num_ecalIso = 0.;
-  float num_pid_ecalIso = 0.;
-  float num_ptTrkIso = 0.;
-  float num_pid_hlwTrackIso = 0.;
+  float numEB_hcalIso = 0.;
+  float numEB_pid_hcalIso = 0.;
+  float numEB_ecalIso = 0.;
+  float numEB_pid_ecalIso = 0.;
+  float numEB_ptTrkIso = 0.;
+  float numEB_pid_hlwTrackIso = 0.;
+
+  float denomEE_hcalIso = 0.;
+  float denomEE_pid_hcalIso = 0.;
+  float denomEE_ecalIso = 0.;
+  float denomEE_pid_ecalIso = 0.;
+  float denomEE_ptTrkIso = 0.;
+  float denomEE_pid_hlwTrackIso = 0.;
+
+  float numEE_hcalIso = 0.;
+  float numEE_pid_hcalIso = 0.;
+  float numEE_ecalIso = 0.;
+  float numEE_pid_ecalIso = 0.;
+  float numEE_ptTrkIso = 0.;
+  float numEE_pid_hlwTrackIso = 0.;
 
 
   photonidegcuts hggtightid;
@@ -557,6 +615,14 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
     if( clusterMinPhotReco>0.3 ) continue;
     if( clusterMajPhotReco>0.35 ) continue;
 
+    
+    
+    bool isEB = false;
+    if( fabs(etaPhotReco)<1.4 ) {
+      isEB = true;
+    } else if( fabs(etaPhotReco)<1.6 ) {
+      continue;  //exclude crack
+    }
 
 
     // match photon to MC:
@@ -587,23 +653,45 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
     pid_ecalIso = photon.pid_jurECAL;
     pid_hlwTrackIso = photon.pid_hlwTrack;
   
-    hp_hcalIsoMean_vs_rhoCalo->Fill( rhoCalo, hcalIsoPhotReco, eventWeight );
-    hp_hcalIsoPIDMean_vs_rhoCalo->Fill( rhoCalo, pid_hcalIso, eventWeight );
-    hp_hcalIsoMean_vs_rhoPF->Fill( rhoPF, hcalIsoPhotReco, eventWeight );
-    hp_hcalIsoPIDMean_vs_rhoPF->Fill( rhoPF, pid_hcalIso, eventWeight );
+    if( isEB ) {
 
-    hp_ecalIsoMean_vs_rhoCalo->Fill( rhoCalo, ecalIsoPhotReco, eventWeight );
-    hp_ecalIsoPIDMean_vs_rhoCalo->Fill( rhoCalo, pid_ecalIso, eventWeight );
-    hp_ecalIsoMean_vs_rhoPF->Fill( rhoPF, ecalIsoPhotReco, eventWeight );
-    hp_ecalIsoPIDMean_vs_rhoPF->Fill( rhoPF, pid_ecalIso, eventWeight );
+      hp_hcalIsoMeanEB_vs_rhoCalo->Fill( rhoCalo, hcalIsoPhotReco, eventWeight );
+      hp_hcalIsoPIDMeanEB_vs_rhoCalo->Fill( rhoCalo, pid_hcalIso, eventWeight );
+      hp_hcalIsoMeanEB_vs_rhoPF->Fill( rhoPF, hcalIsoPhotReco, eventWeight );
+      hp_hcalIsoPIDMeanEB_vs_rhoPF->Fill( rhoPF, pid_hcalIso, eventWeight );
 
-    hp_ptTrkIsoMean_vs_rhoCalo->Fill( rhoCalo, ptTrkIsoPhotReco, eventWeight );
-    hp_hlwTrackIsoMean_vs_rhoCalo->Fill( rhoCalo, pid_hlwTrackIso, eventWeight );
-    hp_ptTrkIsoMean_vs_rhoPF->Fill( rhoPF, ptTrkIsoPhotReco, eventWeight );
-    hp_hlwTrackIsoMean_vs_rhoPF->Fill( rhoPF, pid_hlwTrackIso, eventWeight );
+      hp_ecalIsoMeanEB_vs_rhoCalo->Fill( rhoCalo, ecalIsoPhotReco, eventWeight );
+      hp_ecalIsoPIDMeanEB_vs_rhoCalo->Fill( rhoCalo, pid_ecalIso, eventWeight );
+      hp_ecalIsoMeanEB_vs_rhoPF->Fill( rhoPF, ecalIsoPhotReco, eventWeight );
+      hp_ecalIsoPIDMeanEB_vs_rhoPF->Fill( rhoPF, pid_ecalIso, eventWeight );
 
-    bin_rhoPF   = hp_hcalIsoMean_vs_rhoPF->FindFixBin(rhoPF);
-    bin_rhoCalo = hp_hcalIsoMean_vs_rhoCalo->FindFixBin(rhoCalo);
+      hp_ptTrkIsoMeanEB_vs_rhoCalo->Fill( rhoCalo, ptTrkIsoPhotReco, eventWeight );
+      hp_hlwTrackIsoMeanEB_vs_rhoCalo->Fill( rhoCalo, pid_hlwTrackIso, eventWeight );
+      hp_ptTrkIsoMeanEB_vs_rhoPF->Fill( rhoPF, ptTrkIsoPhotReco, eventWeight );
+      hp_hlwTrackIsoMeanEB_vs_rhoPF->Fill( rhoPF, pid_hlwTrackIso, eventWeight );
+
+    } else {
+
+      hp_hcalIsoMeanEE_vs_rhoCalo->Fill( rhoCalo, hcalIsoPhotReco, eventWeight );
+      hp_hcalIsoPIDMeanEE_vs_rhoCalo->Fill( rhoCalo, pid_hcalIso, eventWeight );
+      hp_hcalIsoMeanEE_vs_rhoPF->Fill( rhoPF, hcalIsoPhotReco, eventWeight );
+      hp_hcalIsoPIDMeanEE_vs_rhoPF->Fill( rhoPF, pid_hcalIso, eventWeight );
+
+      hp_ecalIsoMeanEE_vs_rhoCalo->Fill( rhoCalo, ecalIsoPhotReco, eventWeight );
+      hp_ecalIsoPIDMeanEE_vs_rhoCalo->Fill( rhoCalo, pid_ecalIso, eventWeight );
+      hp_ecalIsoMeanEE_vs_rhoPF->Fill( rhoPF, ecalIsoPhotReco, eventWeight );
+      hp_ecalIsoPIDMeanEE_vs_rhoPF->Fill( rhoPF, pid_ecalIso, eventWeight );
+
+      hp_ptTrkIsoMeanEE_vs_rhoCalo->Fill( rhoCalo, ptTrkIsoPhotReco, eventWeight );
+      hp_hlwTrackIsoMeanEE_vs_rhoCalo->Fill( rhoCalo, pid_hlwTrackIso, eventWeight );
+      hp_ptTrkIsoMeanEE_vs_rhoPF->Fill( rhoPF, ptTrkIsoPhotReco, eventWeight );
+      hp_hlwTrackIsoMeanEE_vs_rhoPF->Fill( rhoPF, pid_hlwTrackIso, eventWeight );
+
+    }
+
+
+    bin_rhoPF   = hp_hcalIsoMeanEB_vs_rhoPF->FindFixBin(rhoPF);
+    bin_rhoCalo = hp_hcalIsoMeanEB_vs_rhoCalo->FindFixBin(rhoCalo);
 
     // arrays start from zero:
     bin_rhoPF--;
@@ -646,38 +734,61 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
     // only for the no PU case
     if( nvertex==1 ) {
 
-      denom_hcalIso += eventWeight;
-      denom_pid_hcalIso += eventWeight;
-      denom_ecalIso += eventWeight;
-      denom_pid_ecalIso += eventWeight;
-      denom_ptTrkIso += eventWeight;
-      denom_pid_hlwTrackIso += eventWeight;
+      if( isEB ) {
 
-    
-    //bool passed_hcalIsoPhotReco = ( hcalIsoPhotReco < hcalIsoPhotReco_threshRel ) || ( hcalIsoPhotReco*photon.Energy() < hcalIsoPhotReco_threshAbs );
-    //bool passed_pid_hcalIso = ( pid_hcalIso < hcalIsoPhotReco_threshRel ) || ( pid_hcalIso*photon.Energy() < hcalIsoPhotReco_threshAbs );
-    //bool passed_ecalIsoPhotReco = ( ecalIsoPhotReco < ecalIsoPhotReco_threshRel ) || ( ecalIsoPhotReco*photon.Energy() < ecalIsoPhotReco_threshAbs );
-    //bool passed_pid_ecalIso = ( pid_ecalIso < ecalIsoPhotReco_threshRel ) || ( pid_ecalIso*photon.Energy() < ecalIsoPhotReco_threshAbs );
-    //bool passed_ptTrkIsoPhotReco = ( ptTrkIsoPhotReco < ptTrkIsoPhotReco_threshRel );
-    //bool passed_pid_hlwTrackIso = ( pid_hlwTrackIso < ptTrkIsoPhotReco_threshRel );
+        denomEB_hcalIso += eventWeight;
+        denomEB_pid_hcalIso += eventWeight;
+        denomEB_ecalIso += eventWeight;
+        denomEB_pid_ecalIso += eventWeight;
+        denomEB_ptTrkIso += eventWeight;
+        denomEB_pid_hlwTrackIso += eventWeight;
+      
+        bool passed_pid_hcalIso = idpasseg[2];
+        bool passed_pid_ecalIso = idpasseg[1];
+        bool passed_pid_hlwTrackIso = idpasseg[0];
+      //bool passed_pid_hcalIso = ( pid_hcalIso < (pid_hcalIso_threshRel*photon.Pt()+pid_hcalIso_threshAbs) );
+      //bool passed_pid_ecalIso = ( pid_ecalIso < (pid_ecalIso_threshRel*photon.Pt()+pid_ecalIso_threshAbs) );
+      //bool passed_pid_hlwTrackIso = ( pid_hlwTrackIso < (pid_hlwTrackIso_threshRel*photon.Pt()+pid_hlwTrackIso_threshAbs) );
 
-      bool passed_pid_hcalIso = idpasseg[2];
-      bool passed_pid_ecalIso = idpasseg[1];
-      bool passed_pid_hlwTrackIso = idpasseg[0];
-    //bool passed_pid_hcalIso = ( pid_hcalIso < (pid_hcalIso_threshRel*photon.Pt()+pid_hcalIso_threshAbs) );
-    //bool passed_pid_ecalIso = ( pid_ecalIso < (pid_ecalIso_threshRel*photon.Pt()+pid_ecalIso_threshAbs) );
-    //bool passed_pid_hlwTrackIso = ( pid_hlwTrackIso < (pid_hlwTrackIso_threshRel*photon.Pt()+pid_hlwTrackIso_threshAbs) );
+        bool passed_hcalIsoPhotReco = ( hcalIsoPhotReco < hcalIsoPhotReco_threshRel ) || ( hcalIsoPhotReco*photon.Energy() < hcalIsoPhotReco_threshAbs );
+        bool passed_ecalIsoPhotReco = ( ecalIsoPhotReco < ecalIsoPhotReco_threshRel ) || ( ecalIsoPhotReco*photon.Energy() < ecalIsoPhotReco_threshAbs );
+        bool passed_ptTrkIsoPhotReco = ( ptTrkIsoPhotReco < ptTrkIsoPhotReco_threshRel );
 
-      bool passed_hcalIsoPhotReco = ( hcalIsoPhotReco < hcalIsoPhotReco_threshRel ) || ( hcalIsoPhotReco*photon.Energy() < hcalIsoPhotReco_threshAbs );
-      bool passed_ecalIsoPhotReco = ( ecalIsoPhotReco < ecalIsoPhotReco_threshRel ) || ( ecalIsoPhotReco*photon.Energy() < ecalIsoPhotReco_threshAbs );
-      bool passed_ptTrkIsoPhotReco = ( ptTrkIsoPhotReco < ptTrkIsoPhotReco_threshRel );
+        if( passed_hcalIsoPhotReco )       numEB_hcalIso += eventWeight;
+        if( passed_pid_hcalIso )           numEB_pid_hcalIso += eventWeight;
+        if( passed_ecalIsoPhotReco )       numEB_ecalIso += eventWeight;
+        if( passed_pid_ecalIso )           numEB_pid_ecalIso += eventWeight;
+        if( passed_ptTrkIsoPhotReco )      numEB_ptTrkIso += eventWeight;
+        if( passed_pid_hlwTrackIso )       numEB_pid_hlwTrackIso += eventWeight;
 
-      if( passed_hcalIsoPhotReco )       num_hcalIso += eventWeight;
-      if( passed_pid_hcalIso )           num_pid_hcalIso += eventWeight;
-      if( passed_ecalIsoPhotReco )       num_ecalIso += eventWeight;
-      if( passed_pid_ecalIso )           num_pid_ecalIso += eventWeight;
-      if( passed_ptTrkIsoPhotReco )      num_ptTrkIso += eventWeight;
-      if( passed_pid_hlwTrackIso )       num_pid_hlwTrackIso += eventWeight;
+      } else {
+
+        denomEE_hcalIso += eventWeight;
+        denomEE_pid_hcalIso += eventWeight;
+        denomEE_ecalIso += eventWeight;
+        denomEE_pid_ecalIso += eventWeight;
+        denomEE_ptTrkIso += eventWeight;
+        denomEE_pid_hlwTrackIso += eventWeight;
+      
+        bool passed_pid_hcalIso = idpasseg[2];
+        bool passed_pid_ecalIso = idpasseg[1];
+        bool passed_pid_hlwTrackIso = idpasseg[0];
+      //bool passed_pid_hcalIso = ( pid_hcalIso < (pid_hcalIso_threshRel*photon.Pt()+pid_hcalIso_threshAbs) );
+      //bool passed_pid_ecalIso = ( pid_ecalIso < (pid_ecalIso_threshRel*photon.Pt()+pid_ecalIso_threshAbs) );
+      //bool passed_pid_hlwTrackIso = ( pid_hlwTrackIso < (pid_hlwTrackIso_threshRel*photon.Pt()+pid_hlwTrackIso_threshAbs) );
+
+        bool passed_hcalIsoPhotReco = ( hcalIsoPhotReco < hcalIsoPhotReco_threshRel ) || ( hcalIsoPhotReco*photon.Energy() < hcalIsoPhotReco_threshAbs );
+        bool passed_ecalIsoPhotReco = ( ecalIsoPhotReco < ecalIsoPhotReco_threshRel ) || ( ecalIsoPhotReco*photon.Energy() < ecalIsoPhotReco_threshAbs );
+        bool passed_ptTrkIsoPhotReco = ( ptTrkIsoPhotReco < ptTrkIsoPhotReco_threshRel );
+
+        if( passed_hcalIsoPhotReco )       numEE_hcalIso += eventWeight;
+        if( passed_pid_hcalIso )           numEE_pid_hcalIso += eventWeight;
+        if( passed_ecalIsoPhotReco )       numEE_ecalIso += eventWeight;
+        if( passed_pid_ecalIso )           numEE_pid_ecalIso += eventWeight;
+        if( passed_ptTrkIsoPhotReco )      numEE_ptTrkIso += eventWeight;
+        if( passed_pid_hlwTrackIso )       numEE_pid_hlwTrackIso += eventWeight;
+
+      } // if is EE
 
     }
 
@@ -685,100 +796,158 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   } //for entries
 
 
-  // compute working point efficiencies:
+  // compute working point Efficiencies:
 
-  float eff_hcalIso     = num_hcalIso / denom_hcalIso;
-  float eff_hcalIsoPID  = num_pid_hcalIso / denom_pid_hcalIso;
-  float eff_ecalIso     = num_ecalIso / denom_ecalIso;
-  float eff_ecalIsoPID  = num_pid_ecalIso / denom_pid_ecalIso;
-  float eff_ptTrkIso    = num_ptTrkIso / denom_ptTrkIso;
-  float eff_hlwTrackIso = num_pid_hlwTrackIso / denom_pid_hlwTrackIso;
+  float effEB_hcalIso     = numEB_hcalIso         / denomEB_hcalIso;
+  float effEB_hcalIsoPID  = numEB_pid_hcalIso     / denomEB_pid_hcalIso;
+  float effEB_ecalIso     = numEB_ecalIso         / denomEB_ecalIso;
+  float effEB_ecalIsoPID  = numEB_pid_ecalIso     / denomEB_pid_ecalIso;
+  float effEB_ptTrkIso    = numEB_ptTrkIso        / denomEB_ptTrkIso;
+  float effEB_hlwTrackIso = numEB_pid_hlwTrackIso / denomEB_pid_hlwTrackIso;
 
-  std::cout << "eff_hcalIso: " << 100.*eff_hcalIso << "%" << std::endl;
-  std::cout << "eff_hcalIsoPID: " << 100.*eff_hcalIsoPID << "%" << std::endl;
-  std::cout << "eff_ecalIso: " << 100.*eff_ecalIso << "%" << std::endl;
-  std::cout << "eff_ecalIsoPID: " << 100.*eff_ecalIsoPID << "%" << std::endl;
-  std::cout << "eff_ptTrkIso: " << 100.*eff_ptTrkIso << "%" << std::endl;
-  std::cout << "eff_hlwTrackIso: " << 100.*eff_hlwTrackIso << "%" << std::endl;
-
-  TH1D* h1_hcalIsoPhotRecoThresh_vs_rhoPF = new TH1D("hcalIsoPhotRecoThresh_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
-  TH1D* h1_hcalIsoPIDThresh_vs_rhoPF = new TH1D("hcalIsoPIDThresh_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
-  TH1D* h1_ecalIsoPhotRecoThresh_vs_rhoPF = new TH1D("ecalIsoPhotRecoThresh_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
-  TH1D* h1_ecalIsoPIDThresh_vs_rhoPF = new TH1D("ecalIsoPIDThresh_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
-  TH1D* h1_ptTrkIsoPhotRecoThresh_vs_rhoPF = new TH1D("ptTrkIsoPhotRecoThresh_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
-  TH1D* h1_hlwTrackIsoThresh_vs_rhoPF = new TH1D("hlwTrackIsoThresh_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
-
-  TH1D* h1_hcalIsoPhotRecoThresh_vs_rhoCalo = new TH1D("hcalIsoPhotRecoThresh_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
-  TH1D* h1_hcalIsoPIDThresh_vs_rhoCalo = new TH1D("hcalIsoPIDThresh_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
-  TH1D* h1_ecalIsoPhotRecoThresh_vs_rhoCalo = new TH1D("ecalIsoPhotRecoThresh_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
-  TH1D* h1_ecalIsoPIDThresh_vs_rhoCalo = new TH1D("ecalIsoPIDThresh_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
-  TH1D* h1_ptTrkIsoPhotRecoThresh_vs_rhoCalo = new TH1D("ptTrkIsoPhotRecoThresh_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
-  TH1D* h1_hlwTrackIsoThresh_vs_rhoCalo = new TH1D("hlwTrackIsoThresh_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
-
-  TH1D* h1_hcalIsoPhotRecoEff_vs_rhoPF = new TH1D("hcalIsoPhotRecoEff_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
-  TH1D* h1_hcalIsoPIDEff_vs_rhoPF = new TH1D("hcalIsoPIDEff_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
-  TH1D* h1_ecalIsoPhotRecoEff_vs_rhoPF = new TH1D("ecalIsoPhotRecoEff_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
-  TH1D* h1_ecalIsoPIDEff_vs_rhoPF = new TH1D("ecalIsoPIDEff_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
-  TH1D* h1_ptTrkIsoPhotRecoEff_vs_rhoPF = new TH1D("ptTrkIsoPhotRecoEff_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
-  TH1D* h1_hlwTrackIsoEff_vs_rhoPF = new TH1D("hlwTrackIsoEff_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
-
-  TH1D* h1_hcalIsoPhotRecoEff_vs_rhoCalo = new TH1D("hcalIsoPhotRecoEff_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
-  TH1D* h1_hcalIsoPIDEff_vs_rhoCalo = new TH1D("hcalIsoPIDEff_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
-  TH1D* h1_ecalIsoPhotRecoEff_vs_rhoCalo = new TH1D("ecalIsoPhotRecoEff_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
-  TH1D* h1_ecalIsoPIDEff_vs_rhoCalo = new TH1D("ecalIsoPIDEff_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
-  TH1D* h1_ptTrkIsoPhotRecoEff_vs_rhoCalo = new TH1D("ptTrkIsoPhotRecoEff_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
-  TH1D* h1_hlwTrackIsoEff_vs_rhoCalo = new TH1D("hlwTrackIsoEff_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  float effEE_hcalIso     = numEE_hcalIso         / denomEE_hcalIso;
+  float effEE_hcalIsoPID  = numEE_pid_hcalIso     / denomEE_pid_hcalIso;
+  float effEE_ecalIso     = numEE_ecalIso         / denomEE_ecalIso;
+  float effEE_ecalIsoPID  = numEE_pid_ecalIso     / denomEE_pid_ecalIso;
+  float effEE_ptTrkIso    = numEE_ptTrkIso        / denomEE_ptTrkIso;
+  float effEE_hlwTrackIso = numEE_pid_hlwTrackIso / denomEE_pid_hlwTrackIso;
 
 
-  // find const efficiency thresholds:
+
+  TH1D* h1_hcalIsoPhotRecoThreshEB_vs_rhoPF = new TH1D("hcalIsoPhotRecoThreshEB_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  TH1D* h1_hcalIsoPIDThreshEB_vs_rhoPF = new TH1D("hcalIsoPIDThreshEB_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  TH1D* h1_ecalIsoPhotRecoThreshEB_vs_rhoPF = new TH1D("ecalIsoPhotRecoThreshEB_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  TH1D* h1_ecalIsoPIDThreshEB_vs_rhoPF = new TH1D("ecalIsoPIDThreshEB_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  TH1D* h1_ptTrkIsoPhotRecoThreshEB_vs_rhoPF = new TH1D("ptTrkIsoPhotRecoThreshEB_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  TH1D* h1_hlwTrackIsoThreshEB_vs_rhoPF = new TH1D("hlwTrackIsoThreshEB_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+
+  TH1D* h1_hcalIsoPhotRecoThreshEB_vs_rhoCalo = new TH1D("hcalIsoPhotRecoThreshEB_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  TH1D* h1_hcalIsoPIDThreshEB_vs_rhoCalo = new TH1D("hcalIsoPIDThreshEB_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  TH1D* h1_ecalIsoPhotRecoThreshEB_vs_rhoCalo = new TH1D("ecalIsoPhotRecoThreshEB_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  TH1D* h1_ecalIsoPIDThreshEB_vs_rhoCalo = new TH1D("ecalIsoPIDThreshEB_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  TH1D* h1_ptTrkIsoPhotRecoThreshEB_vs_rhoCalo = new TH1D("ptTrkIsoPhotRecoThreshEB_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  TH1D* h1_hlwTrackIsoThreshEB_vs_rhoCalo = new TH1D("hlwTrackIsoThreshEB_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+
+  TH1D* h1_hcalIsoPhotRecoThreshEE_vs_rhoPF = new TH1D("hcalIsoPhotRecoThreshEE_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  TH1D* h1_hcalIsoPIDThreshEE_vs_rhoPF = new TH1D("hcalIsoPIDThreshEE_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  TH1D* h1_ecalIsoPhotRecoThreshEE_vs_rhoPF = new TH1D("ecalIsoPhotRecoThreshEE_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  TH1D* h1_ecalIsoPIDThreshEE_vs_rhoPF = new TH1D("ecalIsoPIDThreshEE_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  TH1D* h1_ptTrkIsoPhotRecoThreshEE_vs_rhoPF = new TH1D("ptTrkIsoPhotRecoThreshEE_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  TH1D* h1_hlwTrackIsoThreshEE_vs_rhoPF = new TH1D("hlwTrackIsoThreshEE_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+
+  TH1D* h1_hcalIsoPhotRecoThreshEE_vs_rhoCalo = new TH1D("hcalIsoPhotRecoThreshEE_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  TH1D* h1_hcalIsoPIDThreshEE_vs_rhoCalo = new TH1D("hcalIsoPIDThreshEE_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  TH1D* h1_ecalIsoPhotRecoThreshEE_vs_rhoCalo = new TH1D("ecalIsoPhotRecoThreshEE_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  TH1D* h1_ecalIsoPIDThreshEE_vs_rhoCalo = new TH1D("ecalIsoPIDThreshEE_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  TH1D* h1_ptTrkIsoPhotRecoThreshEE_vs_rhoCalo = new TH1D("ptTrkIsoPhotRecoThreshEE_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  TH1D* h1_hlwTrackIsoThreshEE_vs_rhoCalo = new TH1D("hlwTrackIsoThreshEE_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+
+
+
+  TH1D* h1_hcalIsoPhotRecoEffEB_vs_rhoPF = new TH1D("hcalIsoPhotRecoEffEB_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  TH1D* h1_hcalIsoPIDEffEB_vs_rhoPF = new TH1D("hcalIsoPIDEffEB_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  TH1D* h1_ecalIsoPhotRecoEffEB_vs_rhoPF = new TH1D("ecalIsoPhotRecoEffEB_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  TH1D* h1_ecalIsoPIDEffEB_vs_rhoPF = new TH1D("ecalIsoPIDEffEB_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  TH1D* h1_ptTrkIsoPhotRecoEffEB_vs_rhoPF = new TH1D("ptTrkIsoPhotRecoEffEB_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  TH1D* h1_hlwTrackIsoEffEB_vs_rhoPF = new TH1D("hlwTrackIsoEffEB_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+
+  TH1D* h1_hcalIsoPhotRecoEffEB_vs_rhoCalo = new TH1D("hcalIsoPhotRecoEffEB_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  TH1D* h1_hcalIsoPIDEffEB_vs_rhoCalo = new TH1D("hcalIsoPIDEffEB_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  TH1D* h1_ecalIsoPhotRecoEffEB_vs_rhoCalo = new TH1D("ecalIsoPhotRecoEffEB_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  TH1D* h1_ecalIsoPIDEffEB_vs_rhoCalo = new TH1D("ecalIsoPIDEffEB_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  TH1D* h1_ptTrkIsoPhotRecoEffEB_vs_rhoCalo = new TH1D("ptTrkIsoPhotRecoEffEB_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  TH1D* h1_hlwTrackIsoEffEB_vs_rhoCalo = new TH1D("hlwTrackIsoEffEB_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+
+  TH1D* h1_hcalIsoPhotRecoEffEE_vs_rhoPF = new TH1D("hcalIsoPhotRecoEffEE_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  TH1D* h1_hcalIsoPIDEffEE_vs_rhoPF = new TH1D("hcalIsoPIDEffEE_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  TH1D* h1_ecalIsoPhotRecoEffEE_vs_rhoPF = new TH1D("ecalIsoPhotRecoEffEE_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  TH1D* h1_ecalIsoPIDEffEE_vs_rhoPF = new TH1D("ecalIsoPIDEffEE_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  TH1D* h1_ptTrkIsoPhotRecoEffEE_vs_rhoPF = new TH1D("ptTrkIsoPhotRecoEffEE_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  TH1D* h1_hlwTrackIsoEffEE_vs_rhoPF = new TH1D("hlwTrackIsoEffEE_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+
+  TH1D* h1_hcalIsoPhotRecoEffEE_vs_rhoCalo = new TH1D("hcalIsoPhotRecoEffEE_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  TH1D* h1_hcalIsoPIDEffEE_vs_rhoCalo = new TH1D("hcalIsoPIDEffEE_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  TH1D* h1_ecalIsoPhotRecoEffEE_vs_rhoCalo = new TH1D("ecalIsoPhotRecoEffEE_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  TH1D* h1_ecalIsoPIDEffEE_vs_rhoCalo = new TH1D("ecalIsoPIDEffEE_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  TH1D* h1_ptTrkIsoPhotRecoEffEE_vs_rhoCalo = new TH1D("ptTrkIsoPhotRecoEffEE_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  TH1D* h1_hlwTrackIsoEffEE_vs_rhoCalo = new TH1D("hlwTrackIsoEffEE_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+
+
+  // find const Efficiency thresholds:
 
   for( unsigned iBinRho=0; iBinRho<nBinsRho; ++iBinRho ) {
 
     std::cout << "Scanning Rho Bin: " << iBinRho << "/" << nBinsRho << std::endl;
 
-    ThreshEff threshEff_hcalIsoPF = getThresh_constEff( tree_hcalIsoPhotReco_rhoPF, eff_hcalIso, iBinRho, hcalIsoPhotReco_threshRel );
-    h1_hcalIsoPhotRecoThresh_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_hcalIsoPF.thresh );
-    h1_hcalIsoPhotRecoEff_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_hcalIsoPF.eff );
-    ThreshEff threshEff_hcalIsoPIDPF = getThresh_constEff_pid( tree_hcalIsoPID_rhoPF, eff_hcalIsoPID, iBinRho, pid_hcalIso_threshRel );
-    h1_hcalIsoPIDThresh_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_hcalIsoPIDPF.thresh );
-    h1_hcalIsoPIDEff_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_hcalIsoPIDPF.eff );
+//  ThreshEff threshEff_hcalIsoPF = getThresh_constEff( tree_hcalIsoPhotReco_rhoPF, eff_hcalIso, iBinRho, hcalIsoPhotReco_threshRel );
+//  h1_hcalIsoPhotRecoThresh_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_hcalIsoPF.thresh );
+//  h1_hcalIsoPhotRecoEff_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_hcalIsoPF.eff );
 
-    ThreshEff threshEff_ecalIsoPF = getThresh_constEff( tree_ecalIsoPhotReco_rhoPF, eff_ecalIso, iBinRho, ecalIsoPhotReco_threshRel );
-    h1_ecalIsoPhotRecoThresh_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_ecalIsoPF.thresh );
-    h1_ecalIsoPhotRecoEff_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_ecalIsoPF.eff );
-    ThreshEff threshEff_ecalIsoPIDPF = getThresh_constEff_pid( tree_ecalIsoPID_rhoPF, eff_ecalIsoPID, iBinRho, pid_ecalIso_threshRel );
-    h1_ecalIsoPIDThresh_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_ecalIsoPIDPF.thresh );
-    h1_ecalIsoPIDEff_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_ecalIsoPIDPF.eff );
+    ThreshEff threshEff_hcalIsoPIDPF = getThresh_constEff_pid( tree_hcalIsoPID_rhoPF, effEB_hcalIsoPID, effEE_hcalIsoPID, iBinRho, pid_hcalIso_threshRel );
+    h1_hcalIsoPIDThreshEB_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_hcalIsoPIDPF.threshEB );
+    h1_hcalIsoPIDEffEB_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_hcalIsoPIDPF.effEB );
+    h1_hcalIsoPIDThreshEE_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_hcalIsoPIDPF.threshEE );
+    h1_hcalIsoPIDEffEE_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_hcalIsoPIDPF.effEE );
 
-    ThreshEff threshEff_ptTrkIsoPF = getThresh_constEff( tree_ptTrkIsoPhotReco_rhoPF, eff_ptTrkIso, iBinRho, 0. );
-    h1_ptTrkIsoPhotRecoThresh_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_ptTrkIsoPF.thresh );
-    h1_ptTrkIsoPhotRecoEff_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_ptTrkIsoPF.eff );
-    ThreshEff threshEff_hlwTrackIsoPF = getThresh_constEff_pid( tree_hlwTrackIso_rhoPF, eff_hlwTrackIso, iBinRho, 0. );
-    h1_hlwTrackIsoThresh_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_hlwTrackIsoPF.thresh );
-    h1_hlwTrackIsoEff_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_hlwTrackIsoPF.eff );
+    std::cout << std::endl;
+    std::cout << "iBinRho+1: " << iBinRho+1 << std::endl;
+    std::cout << "threshEff_hcalIsoPIDPF.effEE: " << threshEff_hcalIsoPIDPF.effEE << std::endl;
+    std::cout << "threshEff_hcalIsoPIDPF.effEB: " << threshEff_hcalIsoPIDPF.effEB << std::endl;
+    std::cout << "threshEff_hcalIsoPIDPF.threshEE: " << threshEff_hcalIsoPIDPF.threshEE << std::endl;
+    std::cout << "threshEff_hcalIsoPIDPF.threshEB: " << threshEff_hcalIsoPIDPF.threshEB << std::endl;
+
+//  ThreshEff threshEff_ecalIsoPF = getThresh_constEff( tree_ecalIsoPhotReco_rhoPF, eff_ecalIso, iBinRho, ecalIsoPhotReco_threshRel );
+//  h1_ecalIsoPhotRecoThresh_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_ecalIsoPF.thresh );
+//  h1_ecalIsoPhotRecoEff_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_ecalIsoPF.eff );
+
+    ThreshEff threshEff_ecalIsoPIDPF = getThresh_constEff_pid( tree_ecalIsoPID_rhoPF, effEB_ecalIsoPID, effEE_ecalIsoPID, iBinRho, pid_ecalIso_threshRel );
+    h1_ecalIsoPIDThreshEB_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_ecalIsoPIDPF.threshEB );
+    h1_ecalIsoPIDEffEB_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_ecalIsoPIDPF.effEB );
+    h1_ecalIsoPIDThreshEE_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_ecalIsoPIDPF.threshEE );
+    h1_ecalIsoPIDEffEE_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_ecalIsoPIDPF.effEE );
+
+
+//  ThreshEff threshEff_ptTrkIsoPF = getThresh_constEff( tree_ptTrkIsoPhotReco_rhoPF, eff_ptTrkIso, iBinRho, 0. );
+//  h1_ptTrkIsoPhotRecoThresh_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_ptTrkIsoPF.thresh );
+//  h1_ptTrkIsoPhotRecoEff_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_ptTrkIsoPF.eff );
+
+    ThreshEff threshEff_hlwTrackIsoPF = getThresh_constEff_pid( tree_hlwTrackIso_rhoPF, effEB_hlwTrackIso, effEE_hlwTrackIso, iBinRho, pid_ecalIso_threshRel );
+    h1_hlwTrackIsoThreshEB_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_hlwTrackIsoPF.threshEB );
+    h1_hlwTrackIsoEffEB_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_hlwTrackIsoPF.effEB );
+    h1_hlwTrackIsoThreshEE_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_hlwTrackIsoPF.threshEE );
+    h1_hlwTrackIsoEffEE_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_hlwTrackIsoPF.effEE );
 
 
 
-    ThreshEff threshEff_hcalIsoCalo = getThresh_constEff( tree_hcalIsoPhotReco_rhoCalo, eff_hcalIso, iBinRho, hcalIsoPhotReco_threshRel );
-    h1_hcalIsoPhotRecoThresh_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_hcalIsoCalo.thresh );
-    h1_hcalIsoPhotRecoEff_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_hcalIsoCalo.eff );
-    ThreshEff threshEff_hcalIsoPIDCalo = getThresh_constEff_pid( tree_hcalIsoPID_rhoCalo, eff_hcalIsoPID, iBinRho, pid_hcalIso_threshRel );
-    h1_hcalIsoPIDThresh_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_hcalIsoPIDCalo.thresh );
-    h1_hcalIsoPIDEff_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_hcalIsoPIDCalo.eff );
+//  ThreshEff threshEff_hcalIsoCalo = getThresh_constEff( tree_hcalIsoPhotReco_rhoCalo, eff_hcalIso, iBinRho, hcalIsoPhotReco_threshRel );
+//  h1_hcalIsoPhotRecoThresh_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_hcalIsoCalo.thresh );
+//  h1_hcalIsoPhotRecoEff_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_hcalIsoCalo.eff );
 
-    ThreshEff threshEff_ecalIsoCalo = getThresh_constEff( tree_ecalIsoPhotReco_rhoCalo, eff_ecalIso, iBinRho, ecalIsoPhotReco_threshRel );
-    h1_ecalIsoPhotRecoThresh_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_ecalIsoCalo.thresh );
-    h1_ecalIsoPhotRecoEff_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_ecalIsoCalo.eff );
-    ThreshEff threshEff_ecalIsoPIDCalo = getThresh_constEff_pid( tree_ecalIsoPID_rhoCalo, eff_ecalIsoPID, iBinRho, pid_ecalIso_threshRel );
-    h1_ecalIsoPIDThresh_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_ecalIsoPIDCalo.thresh );
-    h1_ecalIsoPIDEff_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_ecalIsoPIDCalo.eff );
+    ThreshEff threshEff_hcalIsoPIDCalo = getThresh_constEff_pid( tree_hcalIsoPID_rhoCalo, effEB_hcalIsoPID, effEE_hcalIsoPID, iBinRho, pid_hcalIso_threshRel );
+    h1_hcalIsoPIDThreshEB_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_hcalIsoPIDCalo.threshEB );
+    h1_hcalIsoPIDEffEB_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_hcalIsoPIDCalo.effEB );
+    h1_hcalIsoPIDThreshEE_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_hcalIsoPIDCalo.threshEE );
+    h1_hcalIsoPIDEffEE_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_hcalIsoPIDCalo.effEE );
 
-    ThreshEff threshEff_ptTrkIsoCalo = getThresh_constEff( tree_ptTrkIsoPhotReco_rhoCalo, eff_ptTrkIso, iBinRho, 0. );
-    h1_ptTrkIsoPhotRecoThresh_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_ptTrkIsoCalo.thresh );
-    h1_ptTrkIsoPhotRecoEff_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_ptTrkIsoCalo.eff );
-    ThreshEff threshEff_hlwTrackIsoCalo = getThresh_constEff_pid( tree_hlwTrackIso_rhoCalo, eff_hlwTrackIso, iBinRho, 0. );
-    h1_hlwTrackIsoThresh_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_hlwTrackIsoCalo.thresh );
-    h1_hlwTrackIsoEff_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_hlwTrackIsoCalo.eff );
+//  ThreshEff threshEff_ecalIsoCalo = getThresh_constEff( tree_ecalIsoPhotReco_rhoCalo, eff_ecalIso, iBinRho, ecalIsoPhotReco_threshRel );
+//  h1_ecalIsoPhotRecoThresh_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_ecalIsoCalo.thresh );
+//  h1_ecalIsoPhotRecoEff_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_ecalIsoCalo.eff );
+
+    ThreshEff threshEff_ecalIsoPIDCalo = getThresh_constEff_pid( tree_ecalIsoPID_rhoCalo, effEB_ecalIsoPID, effEE_ecalIsoPID, iBinRho, pid_ecalIso_threshRel );
+    h1_ecalIsoPIDThreshEB_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_ecalIsoPIDCalo.threshEB );
+    h1_ecalIsoPIDEffEB_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_ecalIsoPIDCalo.effEB );
+    h1_ecalIsoPIDThreshEE_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_ecalIsoPIDCalo.threshEE );
+    h1_ecalIsoPIDEffEE_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_ecalIsoPIDCalo.effEE );
+
+//  ThreshEff threshEff_ptTrkIsoCalo = getThresh_constEff( tree_ptTrkIsoPhotReco_rhoCalo, eff_ptTrkIso, iBinRho, 0. );
+//  h1_ptTrkIsoPhotRecoThresh_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_ptTrkIsoCalo.thresh );
+//  h1_ptTrkIsoPhotRecoEff_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_ptTrkIsoCalo.eff );
+
+    ThreshEff threshEff_hlwTrackIsoCalo = getThresh_constEff_pid( tree_hlwTrackIso_rhoCalo, effEB_hlwTrackIso, effEE_hlwTrackIso, iBinRho, pid_ecalIso_threshRel );
+    h1_hlwTrackIsoThreshEB_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_hlwTrackIsoCalo.threshEB );
+    h1_hlwTrackIsoEffEB_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_hlwTrackIsoCalo.effEB );
+    h1_hlwTrackIsoThreshEE_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_hlwTrackIsoCalo.threshEE );
+    h1_hlwTrackIsoEffEE_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_hlwTrackIsoCalo.effEE );
 
   }
 
@@ -786,37 +955,73 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   // FIT TRENDS VS. RHO:
 
   TF1* linePF = new TF1("linePF", "[0] + [1]*x", 0., rhoPF_max);
-  std::cout << std::endl << std::endl << "### HCAL MEAN vs rhoPF: " << std::endl;
-  hp_hcalIsoMean_vs_rhoPF->Fit(linePF, "R");
-  std::cout << std::endl << std::endl << "### HCAL PID MEAN vs rhoPF: " << std::endl;
-  hp_hcalIsoPIDMean_vs_rhoPF->Fit(linePF, "R");
-  std::cout << std::endl << std::endl << "### ECAL MEAN vs rhoPF: " << std::endl;
-  hp_ecalIsoMean_vs_rhoPF->Fit(linePF, "R");
-  std::cout << std::endl << std::endl << "### ECAL PID MEAN vs rhoPF: " << std::endl;
-  hp_ecalIsoPIDMean_vs_rhoPF->Fit(linePF, "R");
-  std::cout << std::endl << std::endl << "### TRACK MEAN vs rhoPF: " << std::endl;
-  hp_ptTrkIsoMean_vs_rhoPF->Fit(linePF, "R");
+  std::cout << std::endl << std::endl << "### HCAL MeanEB vs rhoPF: " << std::endl;
+  hp_hcalIsoMeanEB_vs_rhoPF->Fit(linePF, "R");
+  std::cout << std::endl << std::endl << "### HCAL PID MeanEB vs rhoPF: " << std::endl;
+  hp_hcalIsoPIDMeanEB_vs_rhoPF->Fit(linePF, "R");
+  std::cout << std::endl << std::endl << "### ECAL MeanEB vs rhoPF: " << std::endl;
+  hp_ecalIsoMeanEB_vs_rhoPF->Fit(linePF, "R");
+  std::cout << std::endl << std::endl << "### ECAL PID MeanEB vs rhoPF: " << std::endl;
+  hp_ecalIsoPIDMeanEB_vs_rhoPF->Fit(linePF, "R");
+  std::cout << std::endl << std::endl << "### TRACK MeanEB vs rhoPF: " << std::endl;
+  hp_ptTrkIsoMeanEB_vs_rhoPF->Fit(linePF, "R");
 
-  std::cout << std::endl << std::endl << "### HCAL THRESH vs rhoPF: " << std::endl;
-  h1_hcalIsoPhotRecoThresh_vs_rhoPF->Fit(linePF, "R");
-  std::cout << std::endl << std::endl << "### HCAL PID THRESH vs rhoPF: " << std::endl;
-  h1_hcalIsoPIDThresh_vs_rhoPF->Fit(linePF, "R");
-  std::cout << std::endl << std::endl << "### ECAL THRESH vs rhoPF: " << std::endl;
-  h1_ecalIsoPhotRecoThresh_vs_rhoPF->Fit(linePF, "R");
-  std::cout << std::endl << std::endl << "### ECAL PID THRESH vs rhoPF: " << std::endl;
-  h1_ecalIsoPIDThresh_vs_rhoPF->Fit(linePF, "R");
-  std::cout << std::endl << std::endl << "### TRACK THRESH vs rhoPF: " << std::endl;
-  h1_ptTrkIsoPhotRecoThresh_vs_rhoPF->Fit(linePF, "R");
+  std::cout << std::endl << std::endl << "### HCAL ThreshEB vs rhoPF: " << std::endl;
+  h1_hcalIsoPhotRecoThreshEB_vs_rhoPF->Fit(linePF, "R");
+  std::cout << std::endl << std::endl << "### HCAL PID ThreshEB vs rhoPF: " << std::endl;
+  h1_hcalIsoPIDThreshEB_vs_rhoPF->Fit(linePF, "R");
+  std::cout << std::endl << std::endl << "### ECAL ThreshEB vs rhoPF: " << std::endl;
+  h1_ecalIsoPhotRecoThreshEB_vs_rhoPF->Fit(linePF, "R");
+  std::cout << std::endl << std::endl << "### ECAL PID ThreshEB vs rhoPF: " << std::endl;
+  h1_ecalIsoPIDThreshEB_vs_rhoPF->Fit(linePF, "R");
+  std::cout << std::endl << std::endl << "### TRACK ThreshEB vs rhoPF: " << std::endl;
+  h1_ptTrkIsoPhotRecoThreshEB_vs_rhoPF->Fit(linePF, "R");
 
-//TF1* lineCalo = new TF1("lineCalo", "[0] + [1]*x", 0., rhoCalo_max);
-//std::cout << std::endl << std::endl << "### HCAL vs rhoCalo: " << std::endl;
-//hp_hcalIsoMean_vs_rhoCalo->Fit(lineCalo, "R");
-//std::cout << std::endl << std::endl << "### HCAL PID vs rhoCalo: " << std::endl;
-//hp_hcalIsoPIDMean_vs_rhoCalo->Fit(lineCalo, "R");
-////std::cout << std::endl << std::endl << "### ECAL vs rhoCalo: " << std::endl;
-////hp_ecalIsoMean_vs_rhoCalo->Fit(lineCalo, "R");
-//std::cout << std::endl << std::endl << "### ECAL PID vs rhoCalo: " << std::endl;
-//hp_ecalIsoPIDMean_vs_rhoCalo->Fit(lineCalo, "R");
+  std::cout << std::endl << std::endl << "### HCAL ThreshEE vs rhoPF: " << std::endl;
+  h1_hcalIsoPhotRecoThreshEE_vs_rhoPF->Fit(linePF, "R");
+  std::cout << std::endl << std::endl << "### HCAL PID ThreshEE vs rhoPF: " << std::endl;
+  h1_hcalIsoPIDThreshEE_vs_rhoPF->Fit(linePF, "R");
+  std::cout << std::endl << std::endl << "### ECAL ThreshEE vs rhoPF: " << std::endl;
+  h1_ecalIsoPhotRecoThreshEE_vs_rhoPF->Fit(linePF, "R");
+  std::cout << std::endl << std::endl << "### ECAL PID ThreshEE vs rhoPF: " << std::endl;
+  h1_ecalIsoPIDThreshEE_vs_rhoPF->Fit(linePF, "R");
+  std::cout << std::endl << std::endl << "### TRACK ThreshEE vs rhoPF: " << std::endl;
+  h1_ptTrkIsoPhotRecoThreshEE_vs_rhoPF->Fit(linePF, "R");
+
+  TF1* lineCalo = new TF1("lineCalo", "[0] + [1]*x", 0., rhoCalo_max);
+  std::cout << std::endl << std::endl << "### HCAL MeanEB vs rhoCalo: " << std::endl;
+  hp_hcalIsoMeanEB_vs_rhoCalo->Fit(lineCalo, "R");
+  std::cout << std::endl << std::endl << "### HCAL PID MeanEB vs rhoCalo: " << std::endl;
+  hp_hcalIsoPIDMeanEB_vs_rhoCalo->Fit(lineCalo, "R");
+  std::cout << std::endl << std::endl << "### ECAL MeanEB vs rhoCalo: " << std::endl;
+  hp_ecalIsoMeanEB_vs_rhoCalo->Fit(lineCalo, "R");
+  std::cout << std::endl << std::endl << "### ECAL PID MeanEB vs rhoCalo: " << std::endl;
+  hp_ecalIsoPIDMeanEB_vs_rhoCalo->Fit(lineCalo, "R");
+  std::cout << std::endl << std::endl << "### TRACK MeanEB vs rhoCalo: " << std::endl;
+  hp_ptTrkIsoMeanEB_vs_rhoCalo->Fit(lineCalo, "R");
+
+  std::cout << std::endl << std::endl << "### HCAL ThreshEB vs rhoCalo: " << std::endl;
+  h1_hcalIsoPhotRecoThreshEB_vs_rhoCalo->Fit(lineCalo, "R");
+  std::cout << std::endl << std::endl << "### HCAL PID ThreshEB vs rhoCalo: " << std::endl;
+  h1_hcalIsoPIDThreshEB_vs_rhoCalo->Fit(lineCalo, "R");
+  std::cout << std::endl << std::endl << "### ECAL ThreshEB vs rhoCalo: " << std::endl;
+  h1_ecalIsoPhotRecoThreshEB_vs_rhoCalo->Fit(lineCalo, "R");
+  std::cout << std::endl << std::endl << "### ECAL PID ThreshEB vs rhoCalo: " << std::endl;
+  h1_ecalIsoPIDThreshEB_vs_rhoCalo->Fit(lineCalo, "R");
+  std::cout << std::endl << std::endl << "### TRACK ThreshEB vs rhoCalo: " << std::endl;
+  h1_ptTrkIsoPhotRecoThreshEB_vs_rhoCalo->Fit(lineCalo, "R");
+
+  std::cout << std::endl << std::endl << "### HCAL ThreshEE vs rhoCalo: " << std::endl;
+  h1_hcalIsoPhotRecoThreshEE_vs_rhoCalo->Fit(lineCalo, "R");
+  std::cout << std::endl << std::endl << "### HCAL PID ThreshEE vs rhoCalo: " << std::endl;
+  h1_hcalIsoPIDThreshEE_vs_rhoCalo->Fit(lineCalo, "R");
+  std::cout << std::endl << std::endl << "### ECAL ThreshEE vs rhoCalo: " << std::endl;
+  h1_ecalIsoPhotRecoThreshEE_vs_rhoCalo->Fit(lineCalo, "R");
+  std::cout << std::endl << std::endl << "### ECAL PID ThreshEE vs rhoCalo: " << std::endl;
+  h1_ecalIsoPIDThreshEE_vs_rhoCalo->Fit(lineCalo, "R");
+  std::cout << std::endl << std::endl << "### TRACK ThreshEE vs rhoCalo: " << std::endl;
+  h1_ptTrkIsoPhotRecoThreshEE_vs_rhoCalo->Fit(lineCalo, "R");
+
 
 
 
@@ -850,48 +1055,94 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   tree_hlwTrackIso_rhoCalo->Write();
 
 
-  hp_hcalIsoMean_vs_rhoCalo->Write();
-  hp_hcalIsoPIDMean_vs_rhoCalo->Write();
-  hp_hcalIsoMean_vs_rhoPF->Write();
-  hp_hcalIsoPIDMean_vs_rhoPF->Write();
+  hp_hcalIsoMeanEB_vs_rhoCalo->Write();
+  hp_hcalIsoPIDMeanEB_vs_rhoCalo->Write();
+  hp_hcalIsoMeanEB_vs_rhoPF->Write();
+  hp_hcalIsoPIDMeanEB_vs_rhoPF->Write();
 
-  hp_ecalIsoMean_vs_rhoCalo->Write();
-  hp_ecalIsoPIDMean_vs_rhoCalo->Write();
-  hp_ecalIsoMean_vs_rhoPF->Write();
-  hp_ecalIsoPIDMean_vs_rhoPF->Write();
+  hp_ecalIsoMeanEB_vs_rhoCalo->Write();
+  hp_ecalIsoPIDMeanEB_vs_rhoCalo->Write();
+  hp_ecalIsoMeanEB_vs_rhoPF->Write();
+  hp_ecalIsoPIDMeanEB_vs_rhoPF->Write();
 
-  hp_ptTrkIsoMean_vs_rhoCalo->Write();
-  hp_hlwTrackIsoMean_vs_rhoCalo->Write();
-  hp_ptTrkIsoMean_vs_rhoPF->Write();
-  hp_hlwTrackIsoMean_vs_rhoPF->Write();
+  hp_ptTrkIsoMeanEB_vs_rhoCalo->Write();
+  hp_hlwTrackIsoMeanEB_vs_rhoCalo->Write();
+  hp_ptTrkIsoMeanEB_vs_rhoPF->Write();
+  hp_hlwTrackIsoMeanEB_vs_rhoPF->Write();
 
-  h1_hcalIsoPhotRecoThresh_vs_rhoPF->Write();
-  h1_hcalIsoPIDThresh_vs_rhoPF->Write();
-  h1_ecalIsoPhotRecoThresh_vs_rhoPF->Write();
-  h1_ecalIsoPIDThresh_vs_rhoPF->Write();
-  h1_ptTrkIsoPhotRecoThresh_vs_rhoPF->Write();
-  h1_hlwTrackIsoThresh_vs_rhoPF->Write();
+  hp_hcalIsoMeanEE_vs_rhoCalo->Write();
+  hp_hcalIsoPIDMeanEE_vs_rhoCalo->Write();
+  hp_hcalIsoMeanEE_vs_rhoPF->Write();
+  hp_hcalIsoPIDMeanEE_vs_rhoPF->Write();
 
-  h1_hcalIsoPhotRecoThresh_vs_rhoCalo->Write();
-  h1_hcalIsoPIDThresh_vs_rhoCalo->Write();
-  h1_ecalIsoPhotRecoThresh_vs_rhoCalo->Write();
-  h1_ecalIsoPIDThresh_vs_rhoCalo->Write();
-  h1_ptTrkIsoPhotRecoThresh_vs_rhoCalo->Write();
-  h1_hlwTrackIsoThresh_vs_rhoCalo->Write();
+  hp_ecalIsoMeanEE_vs_rhoCalo->Write();
+  hp_ecalIsoPIDMeanEE_vs_rhoCalo->Write();
+  hp_ecalIsoMeanEE_vs_rhoPF->Write();
+  hp_ecalIsoPIDMeanEE_vs_rhoPF->Write();
 
-  h1_hcalIsoPhotRecoEff_vs_rhoPF->Write();
-  h1_hcalIsoPIDEff_vs_rhoPF->Write();
-  h1_ecalIsoPhotRecoEff_vs_rhoPF->Write();
-  h1_ecalIsoPIDEff_vs_rhoPF->Write();
-  h1_ptTrkIsoPhotRecoEff_vs_rhoPF->Write();
-  h1_hlwTrackIsoEff_vs_rhoPF->Write();
+  hp_ptTrkIsoMeanEE_vs_rhoCalo->Write();
+  hp_hlwTrackIsoMeanEE_vs_rhoCalo->Write();
+  hp_ptTrkIsoMeanEE_vs_rhoPF->Write();
+  hp_hlwTrackIsoMeanEE_vs_rhoPF->Write();
 
-  h1_hcalIsoPhotRecoEff_vs_rhoCalo->Write();
-  h1_hcalIsoPIDEff_vs_rhoCalo->Write();
-  h1_ecalIsoPhotRecoEff_vs_rhoCalo->Write();
-  h1_ecalIsoPIDEff_vs_rhoCalo->Write();
-  h1_ptTrkIsoPhotRecoEff_vs_rhoCalo->Write();
-  h1_hlwTrackIsoEff_vs_rhoCalo->Write();
+
+
+  h1_hcalIsoPhotRecoThreshEB_vs_rhoPF->Write();
+  h1_hcalIsoPIDThreshEB_vs_rhoPF->Write();
+  h1_ecalIsoPhotRecoThreshEB_vs_rhoPF->Write();
+  h1_ecalIsoPIDThreshEB_vs_rhoPF->Write();
+  h1_ptTrkIsoPhotRecoThreshEB_vs_rhoPF->Write();
+  h1_hlwTrackIsoThreshEB_vs_rhoPF->Write();
+
+  h1_hcalIsoPhotRecoThreshEB_vs_rhoCalo->Write();
+  h1_hcalIsoPIDThreshEB_vs_rhoCalo->Write();
+  h1_ecalIsoPhotRecoThreshEB_vs_rhoCalo->Write();
+  h1_ecalIsoPIDThreshEB_vs_rhoCalo->Write();
+  h1_ptTrkIsoPhotRecoThreshEB_vs_rhoCalo->Write();
+  h1_hlwTrackIsoThreshEB_vs_rhoCalo->Write();
+
+  h1_hcalIsoPhotRecoThreshEE_vs_rhoPF->Write();
+  h1_hcalIsoPIDThreshEE_vs_rhoPF->Write();
+  h1_ecalIsoPhotRecoThreshEE_vs_rhoPF->Write();
+  h1_ecalIsoPIDThreshEE_vs_rhoPF->Write();
+  h1_ptTrkIsoPhotRecoThreshEE_vs_rhoPF->Write();
+  h1_hlwTrackIsoThreshEE_vs_rhoPF->Write();
+
+  h1_hcalIsoPhotRecoThreshEE_vs_rhoCalo->Write();
+  h1_hcalIsoPIDThreshEE_vs_rhoCalo->Write();
+  h1_ecalIsoPhotRecoThreshEE_vs_rhoCalo->Write();
+  h1_ecalIsoPIDThreshEE_vs_rhoCalo->Write();
+  h1_ptTrkIsoPhotRecoThreshEE_vs_rhoCalo->Write();
+  h1_hlwTrackIsoThreshEE_vs_rhoCalo->Write();
+
+
+  h1_hcalIsoPhotRecoEffEB_vs_rhoPF->Write();
+  h1_hcalIsoPIDEffEB_vs_rhoPF->Write();
+  h1_ecalIsoPhotRecoEffEB_vs_rhoPF->Write();
+  h1_ecalIsoPIDEffEB_vs_rhoPF->Write();
+  h1_ptTrkIsoPhotRecoEffEB_vs_rhoPF->Write();
+  h1_hlwTrackIsoEffEB_vs_rhoPF->Write();
+
+  h1_hcalIsoPhotRecoEffEB_vs_rhoCalo->Write();
+  h1_hcalIsoPIDEffEB_vs_rhoCalo->Write();
+  h1_ecalIsoPhotRecoEffEB_vs_rhoCalo->Write();
+  h1_ecalIsoPIDEffEB_vs_rhoCalo->Write();
+  h1_ptTrkIsoPhotRecoEffEB_vs_rhoCalo->Write();
+  h1_hlwTrackIsoEffEB_vs_rhoCalo->Write();
+
+  h1_hcalIsoPhotRecoEffEE_vs_rhoPF->Write();
+  h1_hcalIsoPIDEffEE_vs_rhoPF->Write();
+  h1_ecalIsoPhotRecoEffEE_vs_rhoPF->Write();
+  h1_ecalIsoPIDEffEE_vs_rhoPF->Write();
+  h1_ptTrkIsoPhotRecoEffEE_vs_rhoPF->Write();
+  h1_hlwTrackIsoEffEE_vs_rhoPF->Write();
+
+  h1_hcalIsoPhotRecoEffEE_vs_rhoCalo->Write();
+  h1_hcalIsoPIDEffEE_vs_rhoCalo->Write();
+  h1_ecalIsoPhotRecoEffEE_vs_rhoCalo->Write();
+  h1_ecalIsoPIDEffEE_vs_rhoCalo->Write();
+  h1_ptTrkIsoPhotRecoEffEE_vs_rhoCalo->Write();
+  h1_hlwTrackIsoEffEE_vs_rhoCalo->Write();
 
   outFile->Close();
 
@@ -980,7 +1231,8 @@ std::vector<TH1D*> allocateHistoVector( int vectorSize, const std::string& name,
 
 
 
-ThreshEff getThresh_constEff( TTree* ttree, float eff, int iBinRho, float threshRel) {
+/*
+ThreshEff getThresh_constEff( TTree* ttree, float Eff, int iBinRho, float threshRel) {
 
   float foundThresh = 0.;
   float foundEff = 0.;
@@ -990,16 +1242,16 @@ ThreshEff getThresh_constEff( TTree* ttree, float eff, int iBinRho, float thresh
   float nEntries = ttree->GetEntries(denomCondition);
 
 
-  for( unsigned i=0; i<200; ++i) {
+  for( unsigned i=0; i<1000; ++i) {
 
     float threshMax = 20.;
-    float threshAbs = (float)i/200.*threshMax;
+    float threshAbs = (float)i/1000.*threshMax;
 
     char numCondition[800];
     sprintf( numCondition, "bin_rho == %d  && ( isoVar < %f  || isoVar*ePhotReco < %f )", iBinRho, threshRel, threshAbs );
     float thisEff = ttree->GetEntries(numCondition)/nEntries;
 
-    if( thisEff > eff ) {
+    if( thisEff > Eff ) {
       foundThresh = threshAbs;
       foundEff = thisEff;
       break;
@@ -1009,44 +1261,65 @@ ThreshEff getThresh_constEff( TTree* ttree, float eff, int iBinRho, float thresh
 
   ThreshEff returnThreshEff;
   returnThreshEff.thresh = foundThresh;
-  returnThreshEff.eff = foundEff;
+  returnThreshEff.Eff = foundEff;
 
   return returnThreshEff;
 
 }
+*/
 
 
+ThreshEff getThresh_constEff_pid( TTree* ttree, float effEB, float effEE, int iBinRho, float threshRel) {
 
-ThreshEff getThresh_constEff_pid( TTree* ttree, float eff, int iBinRho, float threshRel) {
+  float foundThreshEB = 0.;
+  float foundEffEB = 0.;
 
-  float foundThresh = 0.;
-  float foundEff = 0.;
+  float foundThreshEE = 0.;
+  float foundEffEE = 0.;
 
-  char denomCondition[500];
-  sprintf( denomCondition, "bin_rho == %d", iBinRho );
-  float nEntries = ttree->GetEntries(denomCondition);
+  char denomConditionEB[500];
+  sprintf( denomConditionEB, "bin_rho == %d && abs(etaPhotReco)<1.4", iBinRho );
+  float nEntriesEB = ttree->GetEntries(denomConditionEB);
 
+  char denomConditionEE[500];
+  sprintf( denomConditionEE, "bin_rho == %d && abs(etaPhotReco)>1.6 && abs(etaPhotReco)<3.", iBinRho );
+  float nEntriesEE = ttree->GetEntries(denomConditionEE);
 
-  for( unsigned i=0; i<200; ++i) {
+  bool foundEB=false;
+  bool foundEE=false;
+
+  for( unsigned i=0; i<200 && (!foundEB || !foundEE); ++i) {
 
     float threshMax = 20.;
     float threshAbs = (float)i/200.*threshMax;
 
-    char numCondition[800];
-    sprintf( numCondition, "bin_rho == %d  && ( isoVar < ( %f*ePhotReco + %f ) )", iBinRho, threshRel, threshAbs );
-    float thisEff = ttree->GetEntries(numCondition)/nEntries;
+    char numConditionEB[800];
+    sprintf( numConditionEB, "bin_rho == %d  && abs(etaPhotReco)<1.4 && ( isoVar < ( %f*ePhotReco + %f ) )", iBinRho, threshRel, threshAbs );
+    float thisEffEB = ttree->GetEntries(numConditionEB)/nEntriesEB;
 
-    if( thisEff > eff ) {
-      foundThresh = threshAbs;
-      foundEff = thisEff;
-      break;
+    char numConditionEE[800];
+    sprintf( numConditionEE, "bin_rho == %d  && abs(etaPhotReco)>1.6 && abs(etaPhotReco)<3. && ( isoVar < ( %f*ePhotReco + %f ) )", iBinRho, threshRel, threshAbs );
+    float thisEffEE = ttree->GetEntries(numConditionEE)/nEntriesEE;
+
+    if( thisEffEB > effEB  && !foundEB ) {
+      foundThreshEB = threshAbs;
+      foundEffEB = thisEffEB;
+      foundEB = true;
+    }
+
+    if( thisEffEE > effEE && !foundEE ) {
+      foundThreshEE = threshAbs;
+      foundEffEE = thisEffEE;
+      foundEE = true;
     }
 
   } //for
 
   ThreshEff returnThreshEff;
-  returnThreshEff.thresh = foundThresh;
-  returnThreshEff.eff = foundEff;
+  returnThreshEff.threshEB = foundThreshEB;
+  returnThreshEff.effEB = foundEffEB;
+  returnThreshEff.threshEE = foundThreshEE;
+  returnThreshEff.effEE = foundEffEE;
 
   return returnThreshEff;
 
