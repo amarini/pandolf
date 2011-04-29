@@ -159,15 +159,6 @@ void drawSinglePlot( DrawBase* db, TFile* file, const std::string& varName, cons
   label_fitResults->AddText(label_fitResultsText);
   label_fitResults->Draw("same");
 
-  TPaveText* label_EBEE2 = new TPaveText(0.55, 0.2, 0.85, 0.25, "brNDC");
-  label_EBEE2->SetFillColor(0);
-  label_EBEE2->SetTextSize(0.04);
-  if( EB_EE == "EB" ) 
-    label_EBEE2->AddText( "ECAL Barrel" );
-  else
-    label_EBEE2->AddText( "ECAL Endcaps" );
-  label_EBEE2->Draw("same");
-
 
   std::string canvasName = db->get_outputdir() + "/" + varName + "Thresh" + EB_EE + "_vs_" + rhoType;
   std::string canvasName_png = canvasName + ".png";
