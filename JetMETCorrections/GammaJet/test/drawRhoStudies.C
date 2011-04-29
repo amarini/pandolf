@@ -35,11 +35,15 @@ int main( int argc, char* argv[] )  {
 //drawSinglePlot( db, file, "hcalIsoPID", "HCAL Isolation", "Calo", "EB");
 //drawSinglePlot( db, file, "ecalIsoPID", "ECAL Isolation", "Calo", "EB");
 
-  drawSinglePlot( db, file, "hcalIsoPID", "HCAL Isolation", "PF", "EB");
-  drawSinglePlot( db, file, "ecalIsoPID", "ECAL Isolation", "PF", "EB");
+  drawSinglePlot( db, file, "twrHcalIso", "HCAL Isolation", "PF", "EB");
+  drawSinglePlot( db, file, "HoverE", "H/E", "PF", "EB");
+  drawSinglePlot( db, file, "jurEcalIso", "ECAL Isolation", "PF", "EB");
+  drawSinglePlot( db, file, "hlwTrackIso", "Track Isolation", "PF", "EB");
 
-  drawSinglePlot( db, file, "hcalIsoPID", "HCAL Isolation", "PF", "EE");
-  drawSinglePlot( db, file, "ecalIsoPID", "ECAL Isolation", "PF", "EE");
+  drawSinglePlot( db, file, "twrHcalIso", "HCAL Isolation", "PF", "EE");
+  drawSinglePlot( db, file, "HoverE", "H/E", "PF", "EE");
+  drawSinglePlot( db, file, "jurEcalIso", "ECAL Isolation", "PF", "EE");
+  drawSinglePlot( db, file, "hlwTrackIso", "Track Isolation", "PF", "EE");
 
   return 0;
 
@@ -125,6 +129,12 @@ void drawSinglePlot( DrawBase* db, TFile* file, const std::string& varName, cons
 
   // then the thresholds:
 
+  std::string lineName = "line"+rhoType;
+  TF1* fitLine = new TF1("fitLine", "[0] + [1]*x", 0., histoThresh->GetXaxis()->GetXmax());
+  fitLine->SetLineStyle(2);
+  fitLine->SetLineWidth(1);
+  histoThresh->Fit(fitLine, "RQ");
+
 
   TH2D* h2_axes = new TH2D("axes", "", 10, histoThresh->GetXaxis()->GetXmin(), histoThresh->GetXaxis()->GetXmax(), 10, 0., 1.5*histoThresh->GetMaximum() );
   if( rhoType=="PF" )
@@ -139,11 +149,6 @@ void drawSinglePlot( DrawBase* db, TFile* file, const std::string& varName, cons
   histoThresh->SetMarkerSize(1.8);
   histoThresh->SetMarkerColor(kRed+1);
   
-  std::string lineName = "line"+rhoType;
-  TF1* fitLine = histoThresh->GetFunction(lineName.c_str());
-  fitLine->SetLineStyle(2);
-  fitLine->SetLineWidth(1);
-
   histoThresh->Draw("Psame");
 
   cmsLabel->Draw("same");
@@ -151,7 +156,8 @@ void drawSinglePlot( DrawBase* db, TFile* file, const std::string& varName, cons
 
   label_EBEE->Draw("same");
 
-  TPaveText* label_fitResults = new TPaveText(0.3, 0.65, 0.6, 0.75, "brNDC");
+  //TPaveText* label_fitResults = new TPaveText(0.3, 0.65, 0.6, 0.75, "brNDC");
+  TPaveText* label_fitResults = new TPaveText(0.55, 0.25, 0.85, 0.35, "brNDC");
   label_fitResults->SetFillColor(0);
   label_fitResults->SetTextSize(0.04);
   char label_fitResultsText[300];
