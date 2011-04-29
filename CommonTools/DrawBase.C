@@ -2665,12 +2665,12 @@ TPaveText* DrawBase::get_labelCMS( int legendQuadrant ) const {
   } else {
     std::string leftText;
     if( dataFiles_.size()==0 ) {
-      leftText = "CMS Simulation 2010";
+      leftText = "CMS Simulation 2011";
     } else {
       if( isCMSArticle_ )
-        leftText = "CMS 2010";
+        leftText = "CMS 2011";
       else
-        leftText = "CMS Preliminary 2010";
+        leftText = "CMS Preliminary 2011";
     }
     if (lumi_ > 0.) {
       cmslabel->SetTextAlign(11); // align left
@@ -2789,13 +2789,13 @@ std::string DrawBase::get_CMSText() const {
   std::string returnString;
 
   if(dataFiles_.size()==0) {
-    returnString = "CMS Simulation 2010";
+    returnString = "CMS Simulation 2011";
   } else {
     if( isCMSArticle_ ) {
       std::string lumiText = this->get_lumiText();
-      returnString = "CMS 2010, " + lumiText;
+      returnString = "CMS 2011, " + lumiText;
     } else {
-      returnString = "CMS Preliminary 2010";
+      returnString = "CMS Preliminary 2011";
     }
   }
 
