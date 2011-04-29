@@ -11,7 +11,7 @@
 
 
 
-void drawSinglePlot( DrawBase* db, TFile* file, const std::string& varName, const std::string& yAxisTitle, const std::string& rhoType );
+void drawSinglePlot( DrawBase* db, TFile* file, const std::string& varName, const std::string& yAxisTitle, const std::string& rhoType, const std::string& EB_EE );
 
 
 int main( int argc, char* argv[] )  {
@@ -32,32 +32,46 @@ int main( int argc, char* argv[] )  {
   std::string outputdirName = "RhoStudiesPlots_"+dataset;
   db->set_outputdir(outputdirName);
 
-  drawSinglePlot( db, file, "hcalIsoPID", "HCAL Isolation Threshold [GeV]", "PF" );
-  drawSinglePlot( db, file, "ecalIsoPID", "ECAL Isolation Threshold [GeV]", "PF" );
+//drawSinglePlot( db, file, "hcalIsoPID", "HCAL Isolation", "Calo", "EB");
+//drawSinglePlot( db, file, "ecalIsoPID", "ECAL Isolation", "Calo", "EB");
+
+  drawSinglePlot( db, file, "hcalIsoPID", "HCAL Isolation", "PF", "EB");
+  drawSinglePlot( db, file, "ecalIsoPID", "ECAL Isolation", "PF", "EB");
+
+  drawSinglePlot( db, file, "hcalIsoPID", "HCAL Isolation", "PF", "EE");
+  drawSinglePlot( db, file, "ecalIsoPID", "ECAL Isolation", "PF", "EE");
 
   return 0;
 
 }
 
 
-void drawSinglePlot( DrawBase* db, TFile* file, const std::string& varName, const std::string& yAxisTitle, const std::string& rhoType ) {
+void drawSinglePlot( DrawBase* db, TFile* file, const std::string& varName, const std::string& yAxisName, const std::string& rhoType, const std::string& EB_EE ) {
 
-  std::string histoThreshName = varName+"Thresh_vs_rho"+rhoType;
-  std::string histoEffName = varName+"Eff_vs_rho"+rhoType;
+  std::string histoThreshName = varName+"Thresh" + EB_EE + "_vs_rho"+rhoType;
+  std::string histoEffName = varName+"Eff" + EB_EE + "_vs_rho"+rhoType;
 
   TH1D* histoThresh = (TH1D*)file->Get(histoThreshName.c_str());
   TH1D* histoEff = (TH1D*)file->Get(histoEffName.c_str());
 
+
   TPaveText* cmsLabel = db->get_labelCMS();
   TPaveText* sqrtLabel = db->get_labelSqrt();
+
+  TF1* constLine = new TF1("constLine", "[0]");
+  constLine->SetLineStyle(2);
+  constLine->SetLineWidth(1);
+
+  histoEff->Fit( constLine, "Q" );
 
 
   TCanvas* c1 = new TCanvas("c1", "c1", 600, 600);
   c1->cd();
 
+
   // first draw efficiency:
 
-  TH2D* h2_axes_eff = new TH2D("axes_eff", "", 10, histoThresh->GetXaxis()->GetXmin(), histoThresh->GetXaxis()->GetXmax(), 10, 0., 1.1);
+  TH2D* h2_axes_eff = new TH2D("axes_eff", "", 10, histoThresh->GetXaxis()->GetXmin(), histoThresh->GetXaxis()->GetXmax(), 10, 0.7, 1.1 );
   if( rhoType=="PF" )
     h2_axes_eff->SetXTitle("Particle Flow Energy Density (#rho) [GeV]");
   else
@@ -69,17 +83,28 @@ void drawSinglePlot( DrawBase* db, TFile* file, const std::string& varName, cons
   histoEff->SetMarkerSize(1.8);
   histoEff->SetMarkerColor(38);
   
-  TF1* constLine = new TF1("constLine", "[0]");
-  constLine->SetLineStyle(2);
-  constLine->SetLineWidth(1);
-
-  histoEff->Fit( constLine, "Q" );
   histoEff->Draw("p same");
 
   cmsLabel->Draw("same");
   sqrtLabel->Draw("same");
 
-  TPaveText* label_fitResults_eff = new TPaveText(0.2, 0.22, 0.5, 0.3, "brNDC");
+  TPaveText* label_explain = new TPaveText(0.25, 0.31, 0.85, 0.45, "brNDC");
+  label_explain->SetFillColor(0);
+  label_explain->SetTextSize(0.035);
+  std::string explainText =  "Efficency of dynamic cut on " + yAxisName;
+  label_explain->AddText(explainText.c_str());
+  label_explain->Draw("same");
+  
+  TPaveText* label_EBEE = new TPaveText(0.7, 0.85, 0.83, 0.88, "brNDC");
+  label_EBEE->SetFillColor(0);
+  label_EBEE->SetTextSize(0.04);
+  if( EB_EE == "EB" ) 
+    label_EBEE->AddText( "ECAL Barrel" );
+  else
+    label_EBEE->AddText( "ECAL Endcaps" );
+  label_EBEE->Draw("same");
+
+  TPaveText* label_fitResults_eff = new TPaveText(0.3, 0.22, 0.7, 0.3, "brNDC");
   label_fitResults_eff->SetFillColor(0);
   label_fitResults_eff->SetTextSize(0.035);
   char label_fitResultsText_eff[300];
@@ -87,7 +112,7 @@ void drawSinglePlot( DrawBase* db, TFile* file, const std::string& varName, cons
   label_fitResults_eff->AddText(label_fitResultsText_eff);
   label_fitResults_eff->Draw("same");
 
-  std::string canvasName_eff = db->get_outputdir() + "/" + varName + "Eff_vs_PF";
+  std::string canvasName_eff = db->get_outputdir() + "/" + varName + "Eff" + EB_EE + "_vs_" + rhoType;
   std::string canvasName_eff_png = canvasName_eff + ".png";
   std::string canvasName_eff_eps = canvasName_eff + ".eps";
 
@@ -100,11 +125,13 @@ void drawSinglePlot( DrawBase* db, TFile* file, const std::string& varName, cons
 
   // then the thresholds:
 
+
   TH2D* h2_axes = new TH2D("axes", "", 10, histoThresh->GetXaxis()->GetXmin(), histoThresh->GetXaxis()->GetXmax(), 10, 0., 1.5*histoThresh->GetMaximum() );
   if( rhoType=="PF" )
     h2_axes->SetXTitle("Particle Flow Energy Density (#rho) [GeV]");
   else
     h2_axes->SetXTitle("Calorimeter Energy Density (#rho) [GeV]");
+  std::string yAxisTitle = yAxisName + " Threshold [GeV]";
   h2_axes->SetYTitle(yAxisTitle.c_str());
   h2_axes->Draw();
 
@@ -112,8 +139,8 @@ void drawSinglePlot( DrawBase* db, TFile* file, const std::string& varName, cons
   histoThresh->SetMarkerSize(1.8);
   histoThresh->SetMarkerColor(kRed+1);
   
-  std::string funcName = "line"+rhoType;
-  TF1* fitLine = histoThresh->GetFunction(funcName.c_str());
+  std::string lineName = "line"+rhoType;
+  TF1* fitLine = histoThresh->GetFunction(lineName.c_str());
   fitLine->SetLineStyle(2);
   fitLine->SetLineWidth(1);
 
@@ -122,8 +149,9 @@ void drawSinglePlot( DrawBase* db, TFile* file, const std::string& varName, cons
   cmsLabel->Draw("same");
   sqrtLabel->Draw("same");
 
+  label_EBEE->Draw("same");
 
-  TPaveText* label_fitResults = new TPaveText(0.3, 0.73, 0.6, 0.85, "brNDC");
+  TPaveText* label_fitResults = new TPaveText(0.3, 0.65, 0.6, 0.75, "brNDC");
   label_fitResults->SetFillColor(0);
   label_fitResults->SetTextSize(0.04);
   char label_fitResultsText[300];
@@ -131,7 +159,17 @@ void drawSinglePlot( DrawBase* db, TFile* file, const std::string& varName, cons
   label_fitResults->AddText(label_fitResultsText);
   label_fitResults->Draw("same");
 
-  std::string canvasName = db->get_outputdir() + "/" + varName + "Thresh_vs_PF";
+  TPaveText* label_EBEE2 = new TPaveText(0.55, 0.2, 0.85, 0.25, "brNDC");
+  label_EBEE2->SetFillColor(0);
+  label_EBEE2->SetTextSize(0.04);
+  if( EB_EE == "EB" ) 
+    label_EBEE2->AddText( "ECAL Barrel" );
+  else
+    label_EBEE2->AddText( "ECAL Endcaps" );
+  label_EBEE2->Draw("same");
+
+
+  std::string canvasName = db->get_outputdir() + "/" + varName + "Thresh" + EB_EE + "_vs_" + rhoType;
   std::string canvasName_png = canvasName + ".png";
   std::string canvasName_eps = canvasName + ".eps";
 
