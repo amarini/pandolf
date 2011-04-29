@@ -11,7 +11,7 @@
 
 
 
-void drawSinglePlot( DrawBase* db, TFile* file, const std::string& varName, const std::string& yAxisTitle, const std::string& rhoType, const std::string& EB_EE );
+void drawSinglePlot( DrawBase* db, TFile* file, const std::string& varName, const std::string& units, const std::string& yAxisTitle, const std::string& rhoType, const std::string& EB_EE );
 
 
 int main( int argc, char* argv[] )  {
@@ -35,22 +35,22 @@ int main( int argc, char* argv[] )  {
 //drawSinglePlot( db, file, "hcalIsoPID", "HCAL Isolation", "Calo", "EB");
 //drawSinglePlot( db, file, "ecalIsoPID", "ECAL Isolation", "Calo", "EB");
 
-  drawSinglePlot( db, file, "twrHcalIso", "HCAL Isolation", "PF", "EB");
-  drawSinglePlot( db, file, "HoverE", "H/E", "PF", "EB");
-  drawSinglePlot( db, file, "jurEcalIso", "ECAL Isolation", "PF", "EB");
-  drawSinglePlot( db, file, "hlwTrackIso", "Track Isolation", "PF", "EB");
+  drawSinglePlot( db, file, "twrHcalIso", "HCAL Isolation", "GeV", "PF", "EB");
+  drawSinglePlot( db, file, "HoverE", "H/E", "", "PF", "EB");
+  drawSinglePlot( db, file, "jurEcalIso", "ECAL Isolation", "GeV", "PF", "EB");
+  drawSinglePlot( db, file, "hlwTrackIso", "Track Isolation", "GeV", "PF", "EB");
 
-  drawSinglePlot( db, file, "twrHcalIso", "HCAL Isolation", "PF", "EE");
-  drawSinglePlot( db, file, "HoverE", "H/E", "PF", "EE");
-  drawSinglePlot( db, file, "jurEcalIso", "ECAL Isolation", "PF", "EE");
-  drawSinglePlot( db, file, "hlwTrackIso", "Track Isolation", "PF", "EE");
+  drawSinglePlot( db, file, "twrHcalIso", "HCAL Isolation", "GeV", "PF", "EE");
+  drawSinglePlot( db, file, "HoverE", "H/E", "", "PF", "EE");
+  drawSinglePlot( db, file, "jurEcalIso", "ECAL Isolation", "GeV", "PF", "EE");
+  drawSinglePlot( db, file, "hlwTrackIso", "Track Isolation", "GeV", "PF", "EE");
 
   return 0;
 
 }
 
 
-void drawSinglePlot( DrawBase* db, TFile* file, const std::string& varName, const std::string& yAxisName, const std::string& rhoType, const std::string& EB_EE ) {
+void drawSinglePlot( DrawBase* db, TFile* file, const std::string& varName, const std::string& yAxisName, const std::string& units, const std::string& rhoType, const std::string& EB_EE ) {
 
   std::string histoThreshName = varName+"Thresh" + EB_EE + "_vs_rho"+rhoType;
   std::string histoEffName = varName+"Eff" + EB_EE + "_vs_rho"+rhoType;
@@ -141,7 +141,8 @@ void drawSinglePlot( DrawBase* db, TFile* file, const std::string& varName, cons
     h2_axes->SetXTitle("Particle Flow Energy Density (#rho) [GeV]");
   else
     h2_axes->SetXTitle("Calorimeter Energy Density (#rho) [GeV]");
-  std::string yAxisTitle = yAxisName + " Threshold [GeV]";
+  std::string yAxisTitle = yAxisName + " Threshold";
+  if( units!="" ) yAxisTitle += " [" + units + "]";
   h2_axes->SetYTitle(yAxisTitle.c_str());
   h2_axes->Draw();
 
@@ -161,7 +162,7 @@ void drawSinglePlot( DrawBase* db, TFile* file, const std::string& varName, cons
   label_fitResults->SetFillColor(0);
   label_fitResults->SetTextSize(0.04);
   char label_fitResultsText[300];
-  sprintf( label_fitResultsText, "y = %.3f x + %.3f GeV", fitLine->GetParameter(1), fitLine->GetParameter(0) );
+  sprintf( label_fitResultsText, "y = %.3f x + %.3f %s", fitLine->GetParameter(1), fitLine->GetParameter(0), units.c_str() );
   label_fitResults->AddText(label_fitResultsText);
   label_fitResults->Draw("same");
 
