@@ -2596,12 +2596,12 @@ TPaveText* DrawBase::get_labelCMStop( bool wide ) const {
   label_cmstop->AddText("#sqrt{s} = 7 TeV");
   std::string leftText;
   if( dataFiles_.size()==0 ) {
-    leftText = "CMS Simulation 2010";
+    leftText = "CMS Simulation 2011";
   } else {
     if( isCMSArticle_ )
-      leftText = "CMS 2010";
+      leftText = "CMS 2011";
     else
-      leftText = "CMS Preliminary 2010";
+      leftText = "CMS Preliminary 2011";
   }
 
   if (lumi_ > 0.) {
