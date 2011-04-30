@@ -81,7 +81,7 @@ bool passedPhotonID(const AnalysisPhoton & photon, photonidegcuts const& pid, ve
 
 std::vector<TH1D*> allocateHistoVector( int vectorSize, const std::string& name, int nBins, float xMin, float xMax );
 //ThreshEff getThresh_constEff( TTree* tree, float eff, int iBinRho, float threshAbs);
-ThreshEff getThresh_constEff_pid( TTree* tree, float effEB, float effEE, int iBinRho, float threshAbs, float threshMax=15.);
+ThreshEff getThresh_constEff_pid( TTree* tree, float effEB, float effEE, int iBinRho, float threshRelEB, float threshRelEE, float threshMax=15.);
 
 
 
@@ -275,7 +275,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   Float_t pid_jurECALPhotReco;
   tree->SetBranchAddress("pid_jurECALPhotReco", &pid_jurECALPhotReco);
   Float_t pid_hlwTrackPhotReco;
-  tree->SetBranchAddress("pid_hlwTrackPhotReco", &pid_hlwTrackPhotReco);
+  tree->SetBranchAddress("pid_hlwTrackNoDzPhotReco", &pid_hlwTrackPhotReco);
   Float_t pid_sIEtaIEtaPhotReco;
   tree->SetBranchAddress("pid_sIEtaIEtaPhotReco", &pid_sIEtaIEtaPhotReco);
 
@@ -354,6 +354,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   float HoverE;
   float jurEcalIso;
   float hlwTrackIso;
+  float etawid;
 
   int bin_rhoPF;
   int bin_rhoCalo;
@@ -443,6 +444,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   TTree* tree_jurEcalIso_rhoPF       = new TTree( "tree_jurEcalIso_rhoPF", "" );
   TTree* tree_ptTrkIsoPhotReco_rhoPF = new TTree( "tree_ptTrkIsoPhotReco_rhoPF", "" );
   TTree* tree_hlwTrackIso_rhoPF      = new TTree( "tree_hlwTrackIso_rhoPF", "" );
+  TTree* tree_etawid_rhoPF           = new TTree( "tree_etawid_rhoPF", "" );
 
   TTree* tree_hcalIsoPhotReco_rhoCalo  = new TTree( "tree_hcalIsoPhotReco_rhoCalo", "" );
   TTree* tree_twrHcalIso_rhoCalo       = new TTree( "tree_twrHcalIso_rhoCalo", "" );
@@ -451,6 +453,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   TTree* tree_jurEcalIso_rhoCalo       = new TTree( "tree_jurEcalIso_rhoCalo", "" );
   TTree* tree_ptTrkIsoPhotReco_rhoCalo = new TTree( "tree_ptTrkIsoPhotReco_rhoCalo", "" );
   TTree* tree_hlwTrackIso_rhoCalo      = new TTree( "tree_hlwTrackIso_rhoCalo", "" );
+  TTree* tree_etawid_rhoCalo           = new TTree( "tree_etawid_rhoCalo", "" );
 
   tree_hcalIsoPhotReco_rhoPF->Branch( "eventWeight", &eventWeight, "eventWeight/F");
   tree_twrHcalIso_rhoPF->Branch( "eventWeight", &eventWeight, "eventWeight/F");
@@ -459,6 +462,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   tree_jurEcalIso_rhoPF->Branch( "eventWeight", &eventWeight, "eventWeight/F");
   tree_ptTrkIsoPhotReco_rhoPF->Branch( "eventWeight", &eventWeight, "eventWeight/F");
   tree_hlwTrackIso_rhoPF->Branch( "eventWeight", &eventWeight, "eventWeight/F");
+  tree_etawid_rhoPF->Branch( "eventWeight", &eventWeight, "eventWeight/F");
 
   tree_hcalIsoPhotReco_rhoCalo->Branch( "eventWeight", &eventWeight, "eventWeight/F");
   tree_twrHcalIso_rhoCalo->Branch( "eventWeight", &eventWeight, "eventWeight/F");
@@ -467,6 +471,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   tree_jurEcalIso_rhoCalo->Branch( "eventWeight", &eventWeight, "eventWeight/F");
   tree_ptTrkIsoPhotReco_rhoCalo->Branch( "eventWeight", &eventWeight, "eventWeight/F");
   tree_hlwTrackIso_rhoCalo->Branch( "eventWeight", &eventWeight, "eventWeight/F");
+  tree_etawid_rhoCalo->Branch( "eventWeight", &eventWeight, "eventWeight/F");
 
   tree_hcalIsoPhotReco_rhoPF->Branch( "ePhotReco", &ePhotReco, "ePhotReco/F"); 
   tree_twrHcalIso_rhoPF->Branch( "ePhotReco", &ePhotReco, "ePhotReco/F");
@@ -475,6 +480,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   tree_jurEcalIso_rhoPF->Branch( "ePhotReco", &ePhotReco, "ePhotReco/F");
   tree_ptTrkIsoPhotReco_rhoPF->Branch( "ePhotReco", &ptPhotReco, "ptPhotReco/F"); //ptPhot!!
   tree_hlwTrackIso_rhoPF->Branch( "ePhotReco", &ptPhotReco, "ptPhotReco/F"); //ptPhot!!
+  tree_etawid_rhoPF->Branch( "ePhotReco", &ptPhotReco, "ptPhotReco/F"); //ptPhot!!
 
   tree_hcalIsoPhotReco_rhoCalo->Branch( "ePhotReco", &ePhotReco, "ePhotReco/F"); 
   tree_twrHcalIso_rhoCalo->Branch( "ePhotReco", &ePhotReco, "ePhotReco/F");
@@ -483,6 +489,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   tree_jurEcalIso_rhoCalo->Branch( "ePhotReco", &ePhotReco, "ePhotReco/F");
   tree_ptTrkIsoPhotReco_rhoCalo->Branch( "ePhotReco", &ptPhotReco, "ptPhotReco/F"); //ptPhot!!
   tree_hlwTrackIso_rhoCalo->Branch( "ePhotReco", &ptPhotReco, "ptPhotReco/F"); //ptPhot!!
+  tree_etawid_rhoCalo->Branch( "ePhotReco", &ptPhotReco, "ptPhotReco/F"); //ptPhot!!
 
   tree_hcalIsoPhotReco_rhoPF->Branch( "etaPhotReco", &etaPhotReco, "etaPhotReco/F"); 
   tree_twrHcalIso_rhoPF->Branch( "etaPhotReco", &etaPhotReco, "etaPhotReco/F");
@@ -491,6 +498,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   tree_jurEcalIso_rhoPF->Branch( "etaPhotReco", &etaPhotReco, "etaPhotReco/F");
   tree_ptTrkIsoPhotReco_rhoPF->Branch( "etaPhotReco", &etaPhotReco, "etaPhotReco/F");
   tree_hlwTrackIso_rhoPF->Branch( "etaPhotReco", &etaPhotReco, "etaPhotReco/F");
+  tree_etawid_rhoPF->Branch( "etaPhotReco", &etaPhotReco, "etaPhotReco/F");
 
   tree_hcalIsoPhotReco_rhoCalo->Branch( "etaPhotReco", &etaPhotReco, "etaPhotReco/F"); 
   tree_twrHcalIso_rhoCalo->Branch( "etaPhotReco", &etaPhotReco, "etaPhotReco/F");
@@ -499,6 +507,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   tree_jurEcalIso_rhoCalo->Branch( "etaPhotReco", &etaPhotReco, "etaPhotReco/F");
   tree_ptTrkIsoPhotReco_rhoCalo->Branch( "etaPhotReco", &etaPhotReco, "etaPhotReco/F");
   tree_hlwTrackIso_rhoCalo->Branch( "etaPhotReco", &etaPhotReco, "etaPhotReco/F");
+  tree_etawid_rhoCalo->Branch( "etaPhotReco", &etaPhotReco, "etaPhotReco/F");
 
   tree_hcalIsoPhotReco_rhoPF->Branch( "bin_rho", &bin_rhoPF, "bin_rhoPF/I");
   tree_twrHcalIso_rhoPF->Branch( "bin_rho", &bin_rhoPF, "bin_rhoPF/I");
@@ -507,6 +516,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   tree_jurEcalIso_rhoPF->Branch( "bin_rho", &bin_rhoPF, "bin_rhoPF/I");
   tree_ptTrkIsoPhotReco_rhoPF->Branch( "bin_rho", &bin_rhoPF, "bin_rhoPF/I");
   tree_hlwTrackIso_rhoPF->Branch( "bin_rho", &bin_rhoPF, "bin_rhoPF/I");
+  tree_etawid_rhoPF->Branch( "bin_rho", &bin_rhoPF, "bin_rhoPF/I");
 
   tree_hcalIsoPhotReco_rhoCalo->Branch( "bin_rho", &bin_rhoCalo, "bin_rhoCalo/I");
   tree_twrHcalIso_rhoCalo->Branch( "bin_rho", &bin_rhoCalo, "bin_rhoCalo/I");
@@ -515,6 +525,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   tree_jurEcalIso_rhoCalo->Branch( "bin_rho", &bin_rhoCalo, "bin_rhoCalo/I");
   tree_ptTrkIsoPhotReco_rhoCalo->Branch( "bin_rho", &bin_rhoCalo, "bin_rhoCalo/I");
   tree_hlwTrackIso_rhoCalo->Branch( "bin_rho", &bin_rhoCalo, "bin_rhoCalo/I");
+  tree_etawid_rhoCalo->Branch( "bin_rho", &bin_rhoCalo, "bin_rhoCalo/I");
 
   tree_hcalIsoPhotReco_rhoPF->Branch( "isoVar", &hcalIsoPhotReco, "hcalIsoPhotReco/F");
   tree_twrHcalIso_rhoPF->Branch( "isoVar", &twrHcalIso, "twrHcalIso/F");
@@ -523,6 +534,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   tree_jurEcalIso_rhoPF->Branch( "isoVar", &jurEcalIso, "jurEcalIso/F");
   tree_ptTrkIsoPhotReco_rhoPF->Branch( "isoVar", &ptTrkIsoPhotReco, "ptTrkIsoPhotReco/F");
   tree_hlwTrackIso_rhoPF->Branch( "isoVar", &hlwTrackIso, "hlwTrackIso/F");
+  tree_etawid_rhoPF->Branch( "isoVar", &etawid, "etawid/F");
 
   tree_hcalIsoPhotReco_rhoCalo->Branch( "isoVar", &hcalIsoPhotReco, "hcalIsoPhotReco/F");
   tree_twrHcalIso_rhoCalo->Branch( "isoVar", &twrHcalIso, "twrHcalIso/F");
@@ -531,6 +543,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   tree_jurEcalIso_rhoCalo->Branch( "isoVar", &jurEcalIso, "jurEcalIso/F");
   tree_ptTrkIsoPhotReco_rhoCalo->Branch( "isoVar", &ptTrkIsoPhotReco, "ptTrkIsoPhotReco/F");
   tree_hlwTrackIso_rhoCalo->Branch( "isoVar", &hlwTrackIso, "hlwTrackIso/F");
+  tree_etawid_rhoCalo->Branch( "isoVar", &etawid, "etawid/F");
 
 
 
@@ -544,6 +557,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   float numEB_jurEcalIso = 0.;
   float numEB_ptTrkIso = 0.;
   float numEB_hlwTrackIso = 0.;
+  float numEB_etawid = 0.;
 
   float denomEE = 0.;
 
@@ -554,6 +568,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   float numEE_jurEcalIso = 0.;
   float numEE_ptTrkIso = 0.;
   float numEE_hlwTrackIso = 0.;
+  float numEE_etawid = 0.;
 
 
   photonidegcuts hggtightid;
@@ -581,6 +596,8 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   float jurEcalIso_threshAbs = hggtightid.ecaliso_abs;
   float hlwTrackIso_threshRel = hggtightid.trackiso_rel;
   float hlwTrackIso_threshAbs = hggtightid.trackiso_abs;
+  float etawid_threshRelEB = hggtightid.setaetaEB;
+  float etawid_threshRelEE = hggtightid.setaetaEE;
     
 
   int nEntries = tree->GetEntries();
@@ -660,6 +677,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
     HoverE = photon.pid_HoverE;
     jurEcalIso = photon.pid_jurECAL;
     hlwTrackIso = photon.pid_hlwTrack;
+    etawid = photon.pid_etawid;
   
     if( isEB ) {
 
@@ -713,6 +731,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
       tree_jurEcalIso_rhoPF->Fill();
       tree_ptTrkIsoPhotReco_rhoPF->Fill();
       tree_hlwTrackIso_rhoPF->Fill();
+      tree_etawid_rhoPF->Fill();
 
       vh1_hcalIsoPhotReco_rhoPF[bin_rhoPF]->Fill( hcalIsoPhotReco, eventWeight );
       vh1_twrHcalIso_rhoPF[bin_rhoPF]->Fill( twrHcalIso, eventWeight );
@@ -730,6 +749,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
       tree_jurEcalIso_rhoCalo->Fill();
       tree_ptTrkIsoPhotReco_rhoCalo->Fill();
       tree_hlwTrackIso_rhoCalo->Fill();
+      tree_etawid_rhoCalo->Fill();
 
       vh1_hcalIsoPhotReco_rhoCalo[bin_rhoCalo]->Fill( hcalIsoPhotReco, eventWeight );
       vh1_twrHcalIso_rhoCalo[bin_rhoCalo]->Fill( twrHcalIso, eventWeight );
@@ -748,6 +768,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
       bool passed_jurEcalIso  = idpasseg[1];
       bool passed_twrHcalIso  = idpasseg[2];
       bool passed_HoverE      = idpasseg[3];
+      bool passed_etawid      = idpasseg[4];
 
       bool passed_hcalIsoPhotReco = ( hcalIsoPhotReco < hcalIsoPhotReco_threshRel ) || ( hcalIsoPhotReco*photon.Energy() < hcalIsoPhotReco_threshAbs );
       bool passed_ecalIsoPhotReco = ( ecalIsoPhotReco < ecalIsoPhotReco_threshRel ) || ( ecalIsoPhotReco*photon.Energy() < ecalIsoPhotReco_threshAbs );
@@ -765,6 +786,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
         if( passed_jurEcalIso )        numEB_jurEcalIso += eventWeight;
         if( passed_ptTrkIsoPhotReco )  numEB_ptTrkIso += eventWeight;
         if( passed_hlwTrackIso )       numEB_hlwTrackIso += eventWeight;
+        if( passed_etawid )            numEB_etawid += eventWeight;
 
       } else {
 
@@ -777,6 +799,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
         if( passed_jurEcalIso )        numEE_jurEcalIso += eventWeight;
         if( passed_ptTrkIsoPhotReco )  numEE_ptTrkIso += eventWeight;
         if( passed_hlwTrackIso )       numEE_hlwTrackIso += eventWeight;
+        if( passed_etawid )            numEE_etawid += eventWeight;
 
       } // if is EE
 
@@ -795,6 +818,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   float effEB_jurEcalIso  = numEB_jurEcalIso   / denomEB;
   float effEB_ptTrkIso    = numEB_ptTrkIso     / denomEB;
   float effEB_hlwTrackIso = numEB_hlwTrackIso  / denomEB;
+  float effEB_etawid      = numEB_etawid       / denomEB;
 
   float effEE_hcalIso     = numEE_hcalIso      / denomEE;
   float effEE_twrHcalIso  = numEE_twrHcalIso   / denomEE;
@@ -803,6 +827,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   float effEE_jurEcalIso  = numEE_jurEcalIso   / denomEE;
   float effEE_ptTrkIso    = numEE_ptTrkIso     / denomEE;
   float effEE_hlwTrackIso = numEE_hlwTrackIso  / denomEE;
+  float effEE_etawid      = numEE_etawid       / denomEE;
 
 
 
@@ -813,6 +838,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   TH1D* h1_jurEcalIsoThreshEB_vs_rhoPF = new TH1D("jurEcalIsoThreshEB_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
   TH1D* h1_ptTrkIsoPhotRecoThreshEB_vs_rhoPF = new TH1D("ptTrkIsoPhotRecoThreshEB_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
   TH1D* h1_hlwTrackIsoThreshEB_vs_rhoPF = new TH1D("hlwTrackIsoThreshEB_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  TH1D* h1_etawidThreshEB_vs_rhoPF = new TH1D("etawidThreshEB_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
 
   TH1D* h1_hcalIsoPhotRecoThreshEB_vs_rhoCalo = new TH1D("hcalIsoPhotRecoThreshEB_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
   TH1D* h1_twrHcalIsoThreshEB_vs_rhoCalo = new TH1D("twrHcalIsoThreshEB_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
@@ -821,6 +847,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   TH1D* h1_jurEcalIsoThreshEB_vs_rhoCalo = new TH1D("jurEcalIsoThreshEB_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
   TH1D* h1_ptTrkIsoPhotRecoThreshEB_vs_rhoCalo = new TH1D("ptTrkIsoPhotRecoThreshEB_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
   TH1D* h1_hlwTrackIsoThreshEB_vs_rhoCalo = new TH1D("hlwTrackIsoThreshEB_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  TH1D* h1_etawidThreshEB_vs_rhoCalo = new TH1D("etawidThreshEB_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
 
   TH1D* h1_hcalIsoPhotRecoThreshEE_vs_rhoPF = new TH1D("hcalIsoPhotRecoThreshEE_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
   TH1D* h1_twrHcalIsoThreshEE_vs_rhoPF = new TH1D("twrHcalIsoThreshEE_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
@@ -829,6 +856,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   TH1D* h1_jurEcalIsoThreshEE_vs_rhoPF = new TH1D("jurEcalIsoThreshEE_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
   TH1D* h1_ptTrkIsoPhotRecoThreshEE_vs_rhoPF = new TH1D("ptTrkIsoPhotRecoThreshEE_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
   TH1D* h1_hlwTrackIsoThreshEE_vs_rhoPF = new TH1D("hlwTrackIsoThreshEE_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  TH1D* h1_etawidThreshEE_vs_rhoPF = new TH1D("etawidThreshEE_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
 
   TH1D* h1_hcalIsoPhotRecoThreshEE_vs_rhoCalo = new TH1D("hcalIsoPhotRecoThreshEE_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
   TH1D* h1_twrHcalIsoThreshEE_vs_rhoCalo = new TH1D("twrHcalIsoThreshEE_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
@@ -837,6 +865,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   TH1D* h1_jurEcalIsoThreshEE_vs_rhoCalo = new TH1D("jurEcalIsoThreshEE_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
   TH1D* h1_ptTrkIsoPhotRecoThreshEE_vs_rhoCalo = new TH1D("ptTrkIsoPhotRecoThreshEE_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
   TH1D* h1_hlwTrackIsoThreshEE_vs_rhoCalo = new TH1D("hlwTrackIsoThreshEE_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  TH1D* h1_etawidThreshEE_vs_rhoCalo = new TH1D("etawidThreshEE_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
 
 
 
@@ -847,6 +876,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   TH1D* h1_jurEcalIsoEffEB_vs_rhoPF = new TH1D("jurEcalIsoEffEB_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
   TH1D* h1_ptTrkIsoPhotRecoEffEB_vs_rhoPF = new TH1D("ptTrkIsoPhotRecoEffEB_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
   TH1D* h1_hlwTrackIsoEffEB_vs_rhoPF = new TH1D("hlwTrackIsoEffEB_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  TH1D* h1_etawidEffEB_vs_rhoPF = new TH1D("etawidEffEB_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
 
   TH1D* h1_hcalIsoPhotRecoEffEB_vs_rhoCalo = new TH1D("hcalIsoPhotRecoEffEB_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
   TH1D* h1_twrHcalIsoEffEB_vs_rhoCalo = new TH1D("twrHcalIsoEffEB_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
@@ -855,6 +885,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   TH1D* h1_jurEcalIsoEffEB_vs_rhoCalo = new TH1D("jurEcalIsoEffEB_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
   TH1D* h1_ptTrkIsoPhotRecoEffEB_vs_rhoCalo = new TH1D("ptTrkIsoPhotRecoEffEB_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
   TH1D* h1_hlwTrackIsoEffEB_vs_rhoCalo = new TH1D("hlwTrackIsoEffEB_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  TH1D* h1_etawidEffEB_vs_rhoCalo = new TH1D("etawidEffEB_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
 
   TH1D* h1_hcalIsoPhotRecoEffEE_vs_rhoPF = new TH1D("hcalIsoPhotRecoEffEE_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
   TH1D* h1_twrHcalIsoEffEE_vs_rhoPF = new TH1D("twrHcalIsoEffEE_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
@@ -863,6 +894,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   TH1D* h1_jurEcalIsoEffEE_vs_rhoPF = new TH1D("jurEcalIsoEffEE_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
   TH1D* h1_ptTrkIsoPhotRecoEffEE_vs_rhoPF = new TH1D("ptTrkIsoPhotRecoEffEE_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
   TH1D* h1_hlwTrackIsoEffEE_vs_rhoPF = new TH1D("hlwTrackIsoEffEE_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
+  TH1D* h1_etawidEffEE_vs_rhoPF = new TH1D("etawidEffEE_vs_rhoPF", "", nBinsRho, 0., rhoPF_max);
 
   TH1D* h1_hcalIsoPhotRecoEffEE_vs_rhoCalo = new TH1D("hcalIsoPhotRecoEffEE_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
   TH1D* h1_twrHcalIsoEffEE_vs_rhoCalo = new TH1D("twrHcalIsoEffEE_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
@@ -871,6 +903,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   TH1D* h1_jurEcalIsoEffEE_vs_rhoCalo = new TH1D("jurEcalIsoEffEE_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
   TH1D* h1_ptTrkIsoPhotRecoEffEE_vs_rhoCalo = new TH1D("ptTrkIsoPhotRecoEffEE_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
   TH1D* h1_hlwTrackIsoEffEE_vs_rhoCalo = new TH1D("hlwTrackIsoEffEE_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
+  TH1D* h1_etawidEffEE_vs_rhoCalo = new TH1D("etawidEffEE_vs_rhoCalo", "", nBinsRho, 0., rhoCalo_max);
 
 
   // find const Efficiency thresholds:
@@ -883,13 +916,13 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
 //  h1_hcalIsoPhotRecoThresh_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_hcalIsoPF.thresh );
 //  h1_hcalIsoPhotRecoEff_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_hcalIsoPF.eff );
 
-    ThreshEff threshEff_twrHcalIsoPF = getThresh_constEff_pid( tree_twrHcalIso_rhoPF, effEB_twrHcalIso, effEE_twrHcalIso, iBinRho, twrHcalIso_threshRel );
+    ThreshEff threshEff_twrHcalIsoPF = getThresh_constEff_pid( tree_twrHcalIso_rhoPF, effEB_twrHcalIso, effEE_twrHcalIso, iBinRho, twrHcalIso_threshRel, twrHcalIso_threshRel );
     h1_twrHcalIsoThreshEB_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_twrHcalIsoPF.threshEB );
     h1_twrHcalIsoEffEB_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_twrHcalIsoPF.effEB );
     h1_twrHcalIsoThreshEE_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_twrHcalIsoPF.threshEE );
     h1_twrHcalIsoEffEE_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_twrHcalIsoPF.effEE );
 
-    ThreshEff threshEff_HoverEPF = getThresh_constEff_pid( tree_HoverE_rhoPF, effEB_HoverE, effEE_HoverE, iBinRho, HoverE_threshRel, 0.1);
+    ThreshEff threshEff_HoverEPF = getThresh_constEff_pid( tree_HoverE_rhoPF, effEB_HoverE, effEE_HoverE, iBinRho, HoverE_threshRel, HoverE_threshRel, 0.1);
     h1_HoverEThreshEB_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_HoverEPF.threshEB );
     h1_HoverEEffEB_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_HoverEPF.effEB );
     h1_HoverEThreshEE_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_HoverEPF.threshEE );
@@ -899,7 +932,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
 //  h1_ecalIsoPhotRecoThresh_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_ecalIsoPF.thresh );
 //  h1_ecalIsoPhotRecoEff_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_ecalIsoPF.eff );
 
-    ThreshEff threshEff_jurEcalIsoPF = getThresh_constEff_pid( tree_jurEcalIso_rhoPF, effEB_jurEcalIso, effEE_jurEcalIso, iBinRho, jurEcalIso_threshRel );
+    ThreshEff threshEff_jurEcalIsoPF = getThresh_constEff_pid( tree_jurEcalIso_rhoPF, effEB_jurEcalIso, effEE_jurEcalIso, iBinRho, jurEcalIso_threshRel, jurEcalIso_threshRel );
     h1_jurEcalIsoThreshEB_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_jurEcalIsoPF.threshEB );
     h1_jurEcalIsoEffEB_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_jurEcalIsoPF.effEB );
     h1_jurEcalIsoThreshEE_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_jurEcalIsoPF.threshEE );
@@ -910,14 +943,20 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
 //  h1_ptTrkIsoPhotRecoThresh_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_ptTrkIsoPF.thresh );
 //  h1_ptTrkIsoPhotRecoEff_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_ptTrkIsoPF.eff );
 
-    ThreshEff threshEff_hlwTrackIsoPF = getThresh_constEff_pid( tree_hlwTrackIso_rhoPF, effEB_hlwTrackIso, effEE_hlwTrackIso, iBinRho, hlwTrackIso_threshRel, 5. );
+    ThreshEff threshEff_hlwTrackIsoPF = getThresh_constEff_pid( tree_hlwTrackIso_rhoPF, effEB_hlwTrackIso, effEE_hlwTrackIso, iBinRho, hlwTrackIso_threshRel, hlwTrackIso_threshRel, 15. );
     h1_hlwTrackIsoThreshEB_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_hlwTrackIsoPF.threshEB );
     h1_hlwTrackIsoEffEB_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_hlwTrackIsoPF.effEB );
     h1_hlwTrackIsoThreshEE_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_hlwTrackIsoPF.threshEE );
     h1_hlwTrackIsoEffEE_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_hlwTrackIsoPF.effEE );
 
+    ThreshEff threshEff_etawidPF = getThresh_constEff_pid( tree_etawid_rhoPF, effEB_etawid, effEE_etawid, iBinRho, etawid_threshRelEB, etawid_threshRelEE, 15. );
+    h1_etawidThreshEB_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_etawidPF.threshEB );
+    h1_etawidEffEB_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_etawidPF.effEB );
+    h1_etawidThreshEE_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_etawidPF.threshEE );
+    h1_etawidEffEE_vs_rhoPF->SetBinContent( iBinRho+1, threshEff_etawidPF.effEE );
 
 
+/*
 //  ThreshEff threshEff_hcalIsoCalo = getThresh_constEff( tree_hcalIsoPhotReco_rhoCalo, eff_hcalIso, iBinRho, hcalIsoPhotReco_threshRel );
 //  h1_hcalIsoPhotRecoThresh_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_hcalIsoCalo.thresh );
 //  h1_hcalIsoPhotRecoEff_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_hcalIsoCalo.eff );
@@ -948,12 +987,13 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
 //  h1_ptTrkIsoPhotRecoThresh_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_ptTrkIsoCalo.thresh );
 //  h1_ptTrkIsoPhotRecoEff_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_ptTrkIsoCalo.eff );
 
-    ThreshEff threshEff_hlwTrackIsoCalo = getThresh_constEff_pid( tree_hlwTrackIso_rhoCalo, effEB_hlwTrackIso, effEE_hlwTrackIso, iBinRho, hlwTrackIso_threshRel, 5. );
+    ThreshEff threshEff_hlwTrackIsoCalo = getThresh_constEff_pid( tree_hlwTrackIso_rhoCalo, effEB_hlwTrackIso, effEE_hlwTrackIso, iBinRho, hlwTrackIso_threshRel, 15. );
     h1_hlwTrackIsoThreshEB_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_hlwTrackIsoCalo.threshEB );
     h1_hlwTrackIsoEffEB_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_hlwTrackIsoCalo.effEB );
     h1_hlwTrackIsoThreshEE_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_hlwTrackIsoCalo.threshEE );
     h1_hlwTrackIsoEffEE_vs_rhoCalo->SetBinContent( iBinRho+1, threshEff_hlwTrackIsoCalo.effEE );
 
+*/
   }
 
 
@@ -1053,6 +1093,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   tree_jurEcalIso_rhoPF->Write();
   tree_ptTrkIsoPhotReco_rhoPF->Write();
   tree_hlwTrackIso_rhoPF->Write();
+  tree_etawid_rhoPF->Write();
 
   tree_hcalIsoPhotReco_rhoCalo->Write();
   tree_twrHcalIso_rhoCalo->Write();
@@ -1061,6 +1102,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   tree_jurEcalIso_rhoCalo->Write();
   tree_ptTrkIsoPhotReco_rhoCalo->Write();
   tree_hlwTrackIso_rhoCalo->Write();
+  tree_etawid_rhoCalo->Write();
 
 
   hp_hcalIsoMeanEB_vs_rhoCalo->Write();
@@ -1102,6 +1144,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   h1_jurEcalIsoThreshEB_vs_rhoPF->Write();
   h1_ptTrkIsoPhotRecoThreshEB_vs_rhoPF->Write();
   h1_hlwTrackIsoThreshEB_vs_rhoPF->Write();
+  h1_etawidThreshEB_vs_rhoPF->Write();
 
   h1_hcalIsoPhotRecoThreshEB_vs_rhoCalo->Write();
   h1_twrHcalIsoThreshEB_vs_rhoCalo->Write();
@@ -1110,6 +1153,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   h1_jurEcalIsoThreshEB_vs_rhoCalo->Write();
   h1_ptTrkIsoPhotRecoThreshEB_vs_rhoCalo->Write();
   h1_hlwTrackIsoThreshEB_vs_rhoCalo->Write();
+  h1_etawidThreshEB_vs_rhoCalo->Write();
 
   h1_hcalIsoPhotRecoThreshEE_vs_rhoPF->Write();
   h1_twrHcalIsoThreshEE_vs_rhoPF->Write();
@@ -1118,6 +1162,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   h1_jurEcalIsoThreshEE_vs_rhoPF->Write();
   h1_ptTrkIsoPhotRecoThreshEE_vs_rhoPF->Write();
   h1_hlwTrackIsoThreshEE_vs_rhoPF->Write();
+  h1_etawidThreshEE_vs_rhoPF->Write();
 
   h1_hcalIsoPhotRecoThreshEE_vs_rhoCalo->Write();
   h1_twrHcalIsoThreshEE_vs_rhoCalo->Write();
@@ -1126,6 +1171,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   h1_jurEcalIsoThreshEE_vs_rhoCalo->Write();
   h1_ptTrkIsoPhotRecoThreshEE_vs_rhoCalo->Write();
   h1_hlwTrackIsoThreshEE_vs_rhoCalo->Write();
+  h1_etawidThreshEE_vs_rhoCalo->Write();
 
 
   h1_hcalIsoPhotRecoEffEB_vs_rhoPF->Write();
@@ -1135,6 +1181,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   h1_jurEcalIsoEffEB_vs_rhoPF->Write();
   h1_ptTrkIsoPhotRecoEffEB_vs_rhoPF->Write();
   h1_hlwTrackIsoEffEB_vs_rhoPF->Write();
+  h1_etawidEffEB_vs_rhoPF->Write();
 
   h1_hcalIsoPhotRecoEffEB_vs_rhoCalo->Write();
   h1_twrHcalIsoEffEB_vs_rhoCalo->Write();
@@ -1143,6 +1190,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   h1_jurEcalIsoEffEB_vs_rhoCalo->Write();
   h1_ptTrkIsoPhotRecoEffEB_vs_rhoCalo->Write();
   h1_hlwTrackIsoEffEB_vs_rhoCalo->Write();
+  h1_etawidEffEB_vs_rhoCalo->Write();
 
   h1_hcalIsoPhotRecoEffEE_vs_rhoPF->Write();
   h1_twrHcalIsoEffEE_vs_rhoPF->Write();
@@ -1151,6 +1199,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   h1_jurEcalIsoEffEE_vs_rhoPF->Write();
   h1_ptTrkIsoPhotRecoEffEE_vs_rhoPF->Write();
   h1_hlwTrackIsoEffEE_vs_rhoPF->Write();
+  h1_etawidEffEE_vs_rhoPF->Write();
 
   h1_hcalIsoPhotRecoEffEE_vs_rhoCalo->Write();
   h1_twrHcalIsoEffEE_vs_rhoCalo->Write();
@@ -1159,6 +1208,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   h1_jurEcalIsoEffEE_vs_rhoCalo->Write();
   h1_ptTrkIsoPhotRecoEffEE_vs_rhoCalo->Write();
   h1_hlwTrackIsoEffEE_vs_rhoCalo->Write();
+  h1_etawidEffEE_vs_rhoCalo->Write();
 
   outFile->Close();
 
@@ -1285,7 +1335,7 @@ ThreshEff getThresh_constEff( TTree* ttree, float Eff, int iBinRho, float thresh
 */
 
 
-ThreshEff getThresh_constEff_pid( TTree* ttree, float effEB, float effEE, int iBinRho, float threshRel, float threshMax) {
+ThreshEff getThresh_constEff_pid( TTree* ttree, float effEB, float effEE, int iBinRho, float threshRelEB, float threshRelEE, float threshMax) {
 
   float foundThreshEB = 0.;
   float foundEffEB = 0.;
@@ -1309,11 +1359,11 @@ ThreshEff getThresh_constEff_pid( TTree* ttree, float effEB, float effEE, int iB
     float threshAbs = (float)i/200.*threshMax;
 
     char numConditionEB[800];
-    sprintf( numConditionEB, "bin_rho == %d  && abs(etaPhotReco)<1.4 && ( isoVar < ( %f*ePhotReco + %f ) )", iBinRho, threshRel, threshAbs );
+    sprintf( numConditionEB, "bin_rho == %d  && abs(etaPhotReco)<1.4 && ( isoVar < ( %f*ePhotReco + %f ) )", iBinRho, threshRelEB, threshAbs );
     float thisEffEB = ttree->GetEntries(numConditionEB)/nEntriesEB;
 
     char numConditionEE[800];
-    sprintf( numConditionEE, "bin_rho == %d  && abs(etaPhotReco)>1.6 && abs(etaPhotReco)<3. && ( isoVar < ( %f*ePhotReco + %f ) )", iBinRho, threshRel, threshAbs );
+    sprintf( numConditionEE, "bin_rho == %d  && abs(etaPhotReco)>1.6 && abs(etaPhotReco)<3. && ( isoVar < ( %f*ePhotReco + %f ) )", iBinRho, threshRelEE, threshAbs );
     float thisEffEE = ttree->GetEntries(numConditionEE)/nEntriesEE;
 
     if( thisEffEB > effEB  && !foundEB ) {
