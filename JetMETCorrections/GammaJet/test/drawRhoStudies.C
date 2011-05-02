@@ -14,6 +14,7 @@
 
 std::vector<float> drawSinglePlot( DrawBase* db, TFile* file, const std::string& varName, const std::string& units, const std::string& yAxisTitle, const std::string& rhoType, const std::string& EB_EE );
 void drawSinglePlot_Mean( DrawBase* db, TFile* file, const std::string& varName, const std::string& yAxisName, const std::string& units, const std::string& rhoType, const std::string& EB_EE );
+void drawCompare( DrawBase* db, TFile* file, const std::string& varName, const std::string& yAxisName, const std::string& rhoType, const std::string& EB_EE );
 
 
 int main( int argc, char* argv[] )  {
@@ -80,6 +81,16 @@ int main( int argc, char* argv[] )  {
   drawSinglePlot_Mean( db, file, "jurEcalIso", "ECAL Isolation", "GeV", "PF", "EE");
   drawSinglePlot_Mean( db, file, "hlwTrackIso", "Track Isolation", "GeV", "PF", "EE");
 
+  drawCompare( db, file, "twrHcalIso", "HCAL Isolation", "PF", "EB");
+  drawCompare( db, file, "jurEcalIso", "ECAL Isolation", "PF", "EB");
+  drawCompare( db, file, "hlwTrackIso", "Track Isolation", "PF", "EB");
+  drawCompare( db, file, "HoverE", "H/E", "PF", "EB");
+
+  drawCompare( db, file, "twrHcalIso", "HCAL Isolation", "PF", "EE");
+  drawCompare( db, file, "jurEcalIso", "ECAL Isolation", "PF", "EE");
+  drawCompare( db, file, "hlwTrackIso", "Track Isolation", "PF", "EE");
+  drawCompare( db, file, "HoverE", "H/E", "PF", "EE");
+
   return 0;
 
 }
@@ -93,14 +104,9 @@ std::vector<float> drawSinglePlot( DrawBase* db, TFile* file, const std::string&
   std::string histoThreshName = varName+"Thresh" + EB_EE + "_vs_rho"+rhoType;
   std::string histoEffName = varName+"Eff" + EB_EE + "_vs_rho"+rhoType;
 
-  std::cout << histoThreshName << std::endl;
-  std::cout << histoEffName << std::endl;
 
   TH1D* histoThresh = (TH1D*)file->Get(histoThreshName.c_str());
   TH1D* histoEff = (TH1D*)file->Get(histoEffName.c_str());
-
-  std::cout <<  histoThresh << std::endl;
-  std::cout <<  histoEff << std::endl;
 
 
   TPaveText* cmsLabel = db->get_labelCMS();
@@ -259,7 +265,7 @@ void drawSinglePlot_Mean( DrawBase* db, TFile* file, const std::string& varName,
   c1->cd();
 
 
-  TPaveText* label_EBEE = new TPaveText(0.7, 0.85, 0.83, 0.88, "brNDC");
+  TPaveText* label_EBEE = new TPaveText(0.72, 0.86, 0.85, 0.89, "brNDC");
   label_EBEE->SetFillColor(0);
   label_EBEE->SetTextSize(0.04);
   if( EB_EE == "EB" ) 
@@ -349,6 +355,92 @@ void drawSinglePlot_Mean( DrawBase* db, TFile* file, const std::string& varName,
 
   c1->SaveAs(canvasName_eff_png.c_str());
   c1->SaveAs(canvasName_eff_eps.c_str());
+
+}
+
+
+
+void drawCompare( DrawBase* db, TFile* file, const std::string& varName, const std::string& yAxisName, const std::string& rhoType, const std::string& EB_EE ) {
+
+  std::string histoNameEff_noCorr = "eff_"+varName+EB_EE + rhoType+"_noCorr";
+  std::string histoNameEff_stoeckli = "eff_"+varName+EB_EE + rhoType+"_stoeckli";
+  std::string histoNameEff_isoEff = "eff_"+varName+EB_EE + rhoType+"_isoEff";
+
+  TH1D* histoEff_noCorr = (TH1D*)file->Get(histoNameEff_noCorr.c_str());
+  TH1D* histoEff_stoeckli = (TH1D*)file->Get(histoNameEff_stoeckli.c_str());
+  TH1D* histoEff_isoEff = (TH1D*)file->Get(histoNameEff_isoEff.c_str());
+
+  float markerSize = 1.6;
+
+  histoEff_noCorr->SetMarkerStyle(21);
+  histoEff_noCorr->SetMarkerSize(markerSize);
+  histoEff_noCorr->SetMarkerColor(kGray+2);
+
+  histoEff_stoeckli->SetMarkerStyle(20);
+  histoEff_stoeckli->SetMarkerSize(markerSize);
+  histoEff_stoeckli->SetMarkerColor(38);
+
+  histoEff_isoEff->SetMarkerStyle(22);
+  histoEff_isoEff->SetMarkerSize(markerSize);
+  histoEff_isoEff->SetMarkerColor(46);
+
+
+  TPaveText* cmsLabel = db->get_labelCMS();
+  TPaveText* sqrtLabel = db->get_labelSqrt();
+
+
+
+  TCanvas* c1 = new TCanvas("c1", "c1", 600, 600);
+  c1->cd();
+
+
+  TPaveText* label_EBEE = new TPaveText(0.72, 0.87, 0.85, 0.9, "brNDC");
+  label_EBEE->SetFillColor(0);
+  label_EBEE->SetTextSize(0.04);
+  if( EB_EE == "EB" ) 
+    label_EBEE->AddText( "ECAL Barrel" );
+  else
+    label_EBEE->AddText( "ECAL Endcaps" );
+  label_EBEE->Draw("same");
+
+
+
+  float effMin = 0.75;
+  if( EB_EE=="EB" && varName=="jurEcalIso" ) effMin=0.5;
+  if( varName=="hlwTrackIso" ) effMin=0.;
+  TH2D* h2_axes_eff = new TH2D("axes_eff", "", 10, histoEff_isoEff->GetXaxis()->GetXmin(), histoEff_isoEff->GetXaxis()->GetXmax(), 10, effMin, 1.1 );
+  if( rhoType=="PF" )
+    h2_axes_eff->SetXTitle("Particle Flow Energy Density (#rho) [GeV]");
+  else
+    h2_axes_eff->SetXTitle("Calorimeter Energy Density (#rho) [GeV]");
+  h2_axes_eff->SetYTitle("Efficiency");
+  h2_axes_eff->Draw();
+
+
+  TLegend* legend = new TLegend(0.2, 0.2, 0.55, 0.45, yAxisName.c_str());
+  legend->SetFillColor(0);
+  legend->SetTextSize(0.035);
+  legend->AddEntry( histoEff_noCorr, "No Correction", "P" );
+  legend->AddEntry( histoEff_stoeckli, "Mean Correction", "P" );
+  legend->AddEntry( histoEff_isoEff, "Iso-Efficiency", "P" );
+  legend->Draw("same");
+
+  histoEff_noCorr->Draw("Psame");
+  histoEff_stoeckli->Draw("Psame");
+  histoEff_isoEff->Draw("Psame");
+
+  cmsLabel->Draw("same");
+  sqrtLabel->Draw("same");
+
+  label_EBEE->Draw("same");
+
+
+  std::string canvasName = db->get_outputdir() + "/compare_" + varName + EB_EE + "_vs_" + rhoType;
+  std::string canvasName_png = canvasName + ".png";
+  std::string canvasName_eps = canvasName + ".eps";
+
+  c1->SaveAs(canvasName_png.c_str());
+  c1->SaveAs(canvasName_eps.c_str());
 
 
 }
