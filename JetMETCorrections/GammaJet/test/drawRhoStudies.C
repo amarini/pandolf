@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <iostream>
+#include <fstream>
 
 #include "TFile.h"
 #include "TH1D.h"
@@ -11,7 +12,8 @@
 
 
 
-void drawSinglePlot( DrawBase* db, TFile* file, const std::string& varName, const std::string& units, const std::string& yAxisTitle, const std::string& rhoType, const std::string& EB_EE );
+std::vector<float> drawSinglePlot( DrawBase* db, TFile* file, const std::string& varName, const std::string& units, const std::string& yAxisTitle, const std::string& rhoType, const std::string& EB_EE );
+void drawSinglePlot_Mean( DrawBase* db, TFile* file, const std::string& varName, const std::string& yAxisName, const std::string& units, const std::string& rhoType, const std::string& EB_EE );
 
 
 int main( int argc, char* argv[] )  {
@@ -35,28 +37,70 @@ int main( int argc, char* argv[] )  {
 //drawSinglePlot( db, file, "hcalIsoPID", "HCAL Isolation", "Calo", "EB");
 //drawSinglePlot( db, file, "ecalIsoPID", "ECAL Isolation", "Calo", "EB");
 
-  drawSinglePlot( db, file, "twrHcalIso", "HCAL Isolation", "GeV", "PF", "EB");
-  drawSinglePlot( db, file, "HoverE", "H/E", "", "PF", "EB");
-  drawSinglePlot( db, file, "jurEcalIso", "ECAL Isolation", "GeV", "PF", "EB");
-  drawSinglePlot( db, file, "hlwTrackIso", "Track Isolation", "GeV", "PF", "EB");
+  char ofsName[400];
+  sprintf( ofsName, "parameters_%s.txt", dataset.c_str());
+  ofstream ofs(ofsName);
 
-  drawSinglePlot( db, file, "twrHcalIso", "HCAL Isolation", "GeV", "PF", "EE");
-  drawSinglePlot( db, file, "HoverE", "H/E", "", "PF", "EE");
-  drawSinglePlot( db, file, "jurEcalIso", "ECAL Isolation", "GeV", "PF", "EE");
-  drawSinglePlot( db, file, "hlwTrackIso", "Track Isolation", "GeV", "PF", "EE");
+  ofs <<  "if(TMath::Abs(etaPhot[i]) < 1.44) {" << std::endl;
+
+  std::vector<float> parameters;
+  parameters = drawSinglePlot( db, file, "twrHcalIso", "HCAL Isolation", "GeV", "PF", "EB");
+  ofs << "  hcaliso = (pid_twrHCAL[i] < ptPhot[i] * pid.hcaliso_rel + " << parameters[0] << " + " << parameters[1] << "*rhoPF - 2.0 + pid.hcaliso_abs );" << std::endl;
+  parameters = drawSinglePlot( db, file, "HoverE", "H/E", "", "PF", "EB");
+  ofs << "  hovereiso = (pid_HoverE[i] < " << parameters[0] << " + " << parameters[1] << "*rhoPF - 0.02 + pid.hovereiso );" << std::endl;
+  parameters = drawSinglePlot( db, file, "jurEcalIso", "ECAL Isolation", "GeV", "PF", "EB");
+  ofs << "  ecaliso = (pid_jurECAL[i] < ptPhot[i] * pid.ecaliso_rel + " << parameters[0] << " + " << parameters[1] << "*rhoPF - 2.0 + pid.ecaliso_abs );" << std::endl;
+  parameters = drawSinglePlot( db, file, "jurEcalIso", "ECAL Isolation", "GeV", "PF", "EB1");
+  parameters = drawSinglePlot( db, file, "jurEcalIso", "ECAL Isolation", "GeV", "PF", "EB2");
+  parameters = drawSinglePlot( db, file, "hlwTrackIso", "Track Isolation", "GeV", "PF", "EB");
+  ofs << "  ptiso = (pid_hlwTrackNoDz[i] < ptPhot[i] * pid.trackiso_rel + " << parameters[0] << " + " << parameters[1] << "*rhoPF - 1.5 + pid.trackiso_abs);" << std::endl;
+  parameters = drawSinglePlot( db, file, "etawid", "#sigma i#eta i#eta", "", "PF", "EB");
+
+  ofs << " }else{" << std::endl;
+  parameters = drawSinglePlot( db, file, "twrHcalIso", "HCAL Isolation", "GeV", "PF", "EE");
+  ofs << "  hcaliso = (pid_twrHCAL[i] < ptPhot[i] * pid.hcaliso_rel + " << parameters[0] << " + " << parameters[1] << "*rhoPF - 2.0 + pid.hcaliso_abs );" << std::endl;
+  parameters = drawSinglePlot( db, file, "HoverE", "H/E", "", "PF", "EE");
+  ofs << "  hovereiso = (pid_HoverE[i] < " << parameters[0] << " + " << parameters[1] << "*rhoPF - 0.02 + pid.hovereiso );" << std::endl;
+  parameters = drawSinglePlot( db, file, "jurEcalIso", "ECAL Isolation", "GeV", "PF", "EE");
+  ofs << "  ecaliso = (pid_jurECAL[i] < ptPhot[i] * pid.ecaliso_rel + " << parameters[0] << " + " << parameters[1] << "*rhoPF - 2.0 + pid.ecaliso_abs );" << std::endl;
+  parameters = drawSinglePlot( db, file, "hlwTrackIso", "Track Isolation", "GeV", "PF", "EE");
+  ofs << "  ptiso = (pid_hlwTrackNoDz[i] < ptPhot[i] * pid.trackiso_rel + " << parameters[0] << " + " << parameters[1] << "*rhoPF - 1.5 + pid.trackiso_abs);" << std::endl;
+  parameters = drawSinglePlot( db, file, "etawid", "#sigma i#eta i#eta", "", "PF", "EE");
+
+  ofs << "}" << std::endl;
+  ofs.close();
+
+  drawSinglePlot_Mean( db, file, "twrHcalIso", "HCAL Isolation", "GeV", "PF", "EB");
+//  drawSinglePlot_Mean( db, file, "HoverE", "H/E", "", "PF", "EB");
+  drawSinglePlot_Mean( db, file, "jurEcalIso", "ECAL Isolation", "GeV", "PF", "EB");
+  drawSinglePlot_Mean( db, file, "hlwTrackIso", "Track Isolation", "GeV", "PF", "EB");
+
+  drawSinglePlot_Mean( db, file, "twrHcalIso", "HCAL Isolation", "GeV", "PF", "EE");
+//  drawSinglePlot_Mean( db, file, "HoverE", "H/E", "", "PF", "EE");
+  drawSinglePlot_Mean( db, file, "jurEcalIso", "ECAL Isolation", "GeV", "PF", "EE");
+  drawSinglePlot_Mean( db, file, "hlwTrackIso", "Track Isolation", "GeV", "PF", "EE");
 
   return 0;
 
 }
 
 
-void drawSinglePlot( DrawBase* db, TFile* file, const std::string& varName, const std::string& yAxisName, const std::string& units, const std::string& rhoType, const std::string& EB_EE ) {
+
+std::vector<float> drawSinglePlot( DrawBase* db, TFile* file, const std::string& varName, const std::string& yAxisName, const std::string& units, const std::string& rhoType, const std::string& EB_EE ) {
+
+  std::vector<float> return_vector;
 
   std::string histoThreshName = varName+"Thresh" + EB_EE + "_vs_rho"+rhoType;
   std::string histoEffName = varName+"Eff" + EB_EE + "_vs_rho"+rhoType;
 
+  std::cout << histoThreshName << std::endl;
+  std::cout << histoEffName << std::endl;
+
   TH1D* histoThresh = (TH1D*)file->Get(histoThreshName.c_str());
   TH1D* histoEff = (TH1D*)file->Get(histoEffName.c_str());
+
+  std::cout <<  histoThresh << std::endl;
+  std::cout <<  histoEff << std::endl;
 
 
   TPaveText* cmsLabel = db->get_labelCMS();
@@ -65,6 +109,9 @@ void drawSinglePlot( DrawBase* db, TFile* file, const std::string& varName, cons
   TF1* constLine = new TF1("constLine", "[0]");
   constLine->SetLineStyle(2);
   constLine->SetLineWidth(1);
+  if( varName=="etawid" && EB_EE=="EE" ) {
+    constLine->SetRange(0., 14.);
+  }
 
   histoEff->Fit( constLine, "Q" );
 
@@ -104,8 +151,12 @@ void drawSinglePlot( DrawBase* db, TFile* file, const std::string& varName, cons
   label_EBEE->SetTextSize(0.04);
   if( EB_EE == "EB" ) 
     label_EBEE->AddText( "ECAL Barrel" );
-  else
+  else if( EB_EE == "EE" )
     label_EBEE->AddText( "ECAL Endcaps" );
+  else if( EB_EE == "EB1" )
+    label_EBEE->AddText( "|#eta| < 1" );
+  else if( EB_EE == "EB2" )
+    label_EBEE->AddText( "1 < |#eta| < 1.4" );
   label_EBEE->Draw("same");
 
   TPaveText* label_fitResults_eff = new TPaveText(0.3, 0.22, 0.7, 0.3, "brNDC");
@@ -133,6 +184,14 @@ void drawSinglePlot( DrawBase* db, TFile* file, const std::string& varName, cons
   TF1* fitLine = new TF1("fitLine", "[0] + [1]*x", 0., histoThresh->GetXaxis()->GetXmax());
   fitLine->SetLineStyle(2);
   fitLine->SetLineWidth(1);
+  // exclude last point, fit more stable:
+  fitLine->SetRange(0., 14.);
+
+  //if( varName=="twrHcalIso" && EB_EE=="EB" ) {
+//}
+//if( varName=="etawid" && EB_EE=="EE" ) {
+//  fitLine->SetRange(0., 14.);
+//}
   std::cout << std::endl << "#### " << varName << " " << EB_EE << " rho" << rhoType << std::endl;
   histoThresh->Fit(fitLine, "R");
 
@@ -175,4 +234,122 @@ void drawSinglePlot( DrawBase* db, TFile* file, const std::string& varName, cons
   c1->SaveAs(canvasName_png.c_str());
   c1->SaveAs(canvasName_eps.c_str());
 
+  return_vector.push_back(fitLine->GetParameter(0));
+  return_vector.push_back(fitLine->GetParameter(1));
+
+  return return_vector;
+
 }
+
+
+void drawSinglePlot_Mean( DrawBase* db, TFile* file, const std::string& varName, const std::string& yAxisName, const std::string& units, const std::string& rhoType, const std::string& EB_EE ) {
+
+  std::string histoNameMean = varName+"Mean" + EB_EE + "_vs_rho"+rhoType;
+  std::string histoNameEff = "eff_"+varName+EB_EE + rhoType+"_stoeckli";
+
+  TH1D* histoMean = (TH1D*)file->Get(histoNameMean.c_str());
+  TH1D* histoEff = (TH1D*)file->Get(histoNameEff.c_str());
+
+  TPaveText* cmsLabel = db->get_labelCMS();
+  TPaveText* sqrtLabel = db->get_labelSqrt();
+
+
+
+  TCanvas* c1 = new TCanvas("c1", "c1", 600, 600);
+  c1->cd();
+
+
+  TPaveText* label_EBEE = new TPaveText(0.7, 0.85, 0.83, 0.88, "brNDC");
+  label_EBEE->SetFillColor(0);
+  label_EBEE->SetTextSize(0.04);
+  if( EB_EE == "EB" ) 
+    label_EBEE->AddText( "ECAL Barrel" );
+  else
+    label_EBEE->AddText( "ECAL Endcaps" );
+  label_EBEE->Draw("same");
+
+
+  std::string lineName = "line"+rhoType;
+  TF1* fitLine = new TF1("fitLine", "[0] + [1]*x", 0., histoMean->GetXaxis()->GetXmax());
+  fitLine->SetLineStyle(2);
+  fitLine->SetLineWidth(1);
+  if( varName=="etawid" && EB_EE=="EE" ) {
+    fitLine->SetRange(0., 14.);
+  }
+  std::cout << std::endl << "#### " << varName << " " << EB_EE << " rho" << rhoType << std::endl;
+  histoMean->Fit(fitLine, "R");
+
+
+  TH2D* h2_axes = new TH2D("axes", "", 10, histoMean->GetXaxis()->GetXmin(), histoMean->GetXaxis()->GetXmax(), 10, 0., 1.5*histoMean->GetMaximum() );
+  if( rhoType=="PF" )
+    h2_axes->SetXTitle("Particle Flow Energy Density (#rho) [GeV]");
+  else
+    h2_axes->SetXTitle("Calorimeter Energy Density (#rho) [GeV]");
+  std::string yAxisTitle = yAxisName + " Mean";
+  if( units!="" ) yAxisTitle += " [" + units + "]";
+  h2_axes->SetYTitle(yAxisTitle.c_str());
+  h2_axes->Draw();
+
+  histoMean->SetMarkerStyle(29);
+  histoMean->SetMarkerSize(1.8);
+  histoMean->SetMarkerColor(38);
+  
+  histoMean->Draw("Psame");
+
+  cmsLabel->Draw("same");
+  sqrtLabel->Draw("same");
+
+  label_EBEE->Draw("same");
+
+  //TPaveText* label_fitResults = new TPaveText(0.3, 0.65, 0.6, 0.75, "brNDC");
+  TPaveText* label_fitResults = new TPaveText(0.55, 0.25, 0.85, 0.35, "brNDC");
+  label_fitResults->SetFillColor(0);
+  label_fitResults->SetTextSize(0.04);
+  char label_fitResultsText[300];
+  sprintf( label_fitResultsText, "y = %.3f x + %.3f %s", fitLine->GetParameter(1), fitLine->GetParameter(0), units.c_str() );
+  label_fitResults->AddText(label_fitResultsText);
+  label_fitResults->Draw("same");
+
+
+  std::string canvasName = db->get_outputdir() + "/" + varName + "Mean" + EB_EE + "_vs_" + rhoType;
+  std::string canvasName_png = canvasName + ".png";
+  std::string canvasName_eps = canvasName + ".eps";
+
+  c1->SaveAs(canvasName_png.c_str());
+  c1->SaveAs(canvasName_eps.c_str());
+
+
+  c1->Clear();
+
+
+  // now efficiency:
+
+  TH2D* h2_axes_eff = new TH2D("axes_eff", "", 10, histoEff->GetXaxis()->GetXmin(), histoEff->GetXaxis()->GetXmax(), 10, 0.7, 1.1 );
+  if( rhoType=="PF" )
+    h2_axes_eff->SetXTitle("Particle Flow Energy Density (#rho) [GeV]");
+  else
+    h2_axes_eff->SetXTitle("Calorimeter Energy Density (#rho) [GeV]");
+  h2_axes_eff->SetYTitle("Efficiency");
+  h2_axes_eff->Draw();
+
+  histoEff->SetMarkerStyle(29);
+  histoEff->SetMarkerSize(1.8);
+  histoEff->SetMarkerColor(38);
+  
+  histoEff->Draw("p same");
+
+  cmsLabel->Draw("same");
+  sqrtLabel->Draw("same");
+  
+  label_EBEE->Draw("same");
+
+  std::string canvasName_eff = db->get_outputdir() + "/" + varName + "StoeckliEff" + EB_EE + "_vs_" + rhoType;
+  std::string canvasName_eff_png = canvasName_eff + ".png";
+  std::string canvasName_eff_eps = canvasName_eff + ".eps";
+
+  c1->SaveAs(canvasName_eff_png.c_str());
+  c1->SaveAs(canvasName_eff_eps.c_str());
+
+
+}
+
