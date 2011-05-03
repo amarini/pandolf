@@ -15,6 +15,7 @@
 std::vector<float> drawSinglePlot( DrawBase* db, TFile* file, const std::string& varName, const std::string& units, const std::string& yAxisTitle, const std::string& rhoType, const std::string& EB_EE );
 void drawSinglePlot_Mean( DrawBase* db, TFile* file, const std::string& varName, const std::string& yAxisName, const std::string& units, const std::string& rhoType, const std::string& EB_EE );
 void drawCompare( DrawBase* db, TFile* file, const std::string& varName, const std::string& yAxisName, const std::string& rhoType, const std::string& EB_EE );
+void drawCompare_fullSelection( DrawBase* db, TFile* file, const std::string& rhoType, const std::string& EB_EE );
 
 
 int main( int argc, char* argv[] )  {
@@ -90,6 +91,9 @@ int main( int argc, char* argv[] )  {
   drawCompare( db, file, "jurEcalIso", "ECAL Isolation", "PF", "EE");
   drawCompare( db, file, "hlwTrackIso", "Track Isolation", "PF", "EE");
   drawCompare( db, file, "HoverE", "H/E", "PF", "EE");
+
+  drawCompare_fullSelection( db, file, "PF", "EB" );
+  drawCompare_fullSelection( db, file, "PF", "EE" );
 
   return 0;
 
@@ -436,6 +440,127 @@ void drawCompare( DrawBase* db, TFile* file, const std::string& varName, const s
 
 
   std::string canvasName = db->get_outputdir() + "/compare_" + varName + EB_EE + "_vs_" + rhoType;
+  std::string canvasName_png = canvasName + ".png";
+  std::string canvasName_eps = canvasName + ".eps";
+
+  c1->SaveAs(canvasName_png.c_str());
+  c1->SaveAs(canvasName_eps.c_str());
+
+
+}
+
+
+
+void drawCompare_fullSelection( DrawBase* db, TFile* file, const std::string& rhoType, const std::string& EB_EE ) {
+
+
+  TH1D* h1_fullEff_noCorr;
+  TH1D* h1_fullEff_stoeckli;
+  TH1D* h1_fullEff_isoEff;
+
+  std::vector<std::string> varNames;
+  varNames.push_back( "twrHcalIso" );
+  varNames.push_back( "jurEcalIso" );
+  varNames.push_back( "hlwTrackIso" );
+  varNames.push_back( "HoverE" );
+
+  for( unsigned iVar=0; iVar<varNames.size(); ++iVar ) {
+
+    std::string histoName_noCorr = "eff_" + varNames[iVar] + EB_EE + rhoType + "_noCorr";
+    std::string histoName_stoeckli = "eff_" + varNames[iVar] + EB_EE + rhoType + "_stoeckli";
+    std::string histoName_isoEff = "eff_" + varNames[iVar] + EB_EE + rhoType + "_isoEff";
+
+    TH1D* h1_noCorr = (TH1D*)file->Get(histoName_noCorr.c_str());
+    TH1D* h1_stoeckli = (TH1D*)file->Get(histoName_stoeckli.c_str());
+    TH1D* h1_isoEff = (TH1D*)file->Get(histoName_isoEff.c_str());
+    
+    if( iVar==0 ) {
+
+      h1_fullEff_noCorr = new TH1D("fullEff_noCorr", "", h1_noCorr->GetXaxis()->GetNbins(), h1_noCorr->GetXaxis()->GetXmin(), h1_noCorr->GetXaxis()->GetXmax() );
+      h1_fullEff_stoeckli = new TH1D("fullEff_stoeckli", "", h1_noCorr->GetXaxis()->GetNbins(), h1_noCorr->GetXaxis()->GetXmin(), h1_noCorr->GetXaxis()->GetXmax() );
+      h1_fullEff_isoEff = new TH1D("fullEff_isoEff", "", h1_noCorr->GetXaxis()->GetNbins(), h1_noCorr->GetXaxis()->GetXmin(), h1_noCorr->GetXaxis()->GetXmax() );
+ 
+      for( unsigned iBin=0; iBin<h1_noCorr->GetXaxis()->GetNbins(); ++iBin ) {
+        h1_fullEff_noCorr->SetBinContent(iBin+1, 1.);
+        h1_fullEff_stoeckli->SetBinContent(iBin+1, 1.);
+        h1_fullEff_isoEff->SetBinContent(iBin+1, 1.);
+      }
+
+    }
+
+    for( unsigned iBin=0; iBin<h1_noCorr->GetXaxis()->GetNbins(); ++iBin ) {
+      h1_fullEff_noCorr->SetBinContent(iBin+1, h1_fullEff_noCorr->GetBinContent(iBin+1)*h1_noCorr->GetBinContent(iBin+1) );
+      h1_fullEff_stoeckli->SetBinContent(iBin+1, h1_fullEff_stoeckli->GetBinContent(iBin+1)*h1_stoeckli->GetBinContent(iBin+1) );
+      h1_fullEff_isoEff->SetBinContent(iBin+1, h1_fullEff_isoEff->GetBinContent(iBin+1)*h1_isoEff->GetBinContent(iBin+1) );
+    }
+
+  }
+    
+
+
+  float markerSize = 1.6;
+
+  h1_fullEff_noCorr->SetMarkerStyle(21);
+  h1_fullEff_noCorr->SetMarkerSize(markerSize);
+  h1_fullEff_noCorr->SetMarkerColor(kGray+2);
+
+  h1_fullEff_stoeckli->SetMarkerStyle(20);
+  h1_fullEff_stoeckli->SetMarkerSize(markerSize);
+  h1_fullEff_stoeckli->SetMarkerColor(38);
+
+  h1_fullEff_isoEff->SetMarkerStyle(22);
+  h1_fullEff_isoEff->SetMarkerSize(markerSize);
+  h1_fullEff_isoEff->SetMarkerColor(46);
+
+
+  TPaveText* cmsLabel = db->get_labelCMS();
+  TPaveText* sqrtLabel = db->get_labelSqrt();
+
+
+
+  TCanvas* c1 = new TCanvas("c1", "c1", 600, 600);
+  c1->cd();
+
+
+  TPaveText* label_EBEE = new TPaveText(0.72, 0.87, 0.85, 0.9, "brNDC");
+  label_EBEE->SetFillColor(0);
+  label_EBEE->SetTextSize(0.04);
+  if( EB_EE == "EB" ) 
+    label_EBEE->AddText( "ECAL Barrel" );
+  else
+    label_EBEE->AddText( "ECAL Endcaps" );
+  label_EBEE->Draw("same");
+
+
+
+  TH2D* h2_axes_eff = new TH2D("axes_eff", "", 10, h1_fullEff_isoEff->GetXaxis()->GetXmin(), h1_fullEff_isoEff->GetXaxis()->GetXmax(), 10, 0., 1.1 );
+  if( rhoType=="PF" )
+    h2_axes_eff->SetXTitle("Particle Flow Energy Density (#rho) [GeV]");
+  else
+    h2_axes_eff->SetXTitle("Calorimeter Energy Density (#rho) [GeV]");
+  h2_axes_eff->SetYTitle("Efficiency");
+  h2_axes_eff->Draw();
+
+
+  TLegend* legend = new TLegend(0.2, 0.2, 0.55, 0.45, "Full Selection" );
+  legend->SetFillColor(0);
+  legend->SetTextSize(0.035);
+  legend->AddEntry( h1_fullEff_noCorr, "No Correction", "P" );
+  legend->AddEntry( h1_fullEff_stoeckli, "Mean Correction", "P" );
+  legend->AddEntry( h1_fullEff_isoEff, "Iso-Efficiency", "P" );
+  legend->Draw("same");
+
+  h1_fullEff_noCorr->Draw("Psame");
+  h1_fullEff_stoeckli->Draw("Psame");
+  h1_fullEff_isoEff->Draw("Psame");
+
+  cmsLabel->Draw("same");
+  sqrtLabel->Draw("same");
+
+  label_EBEE->Draw("same");
+
+
+  std::string canvasName = db->get_outputdir() + "/compareFullEff_" + EB_EE + "_vs_" + rhoType;
   std::string canvasName_png = canvasName + ".png";
   std::string canvasName_eps = canvasName + ".eps";
 
