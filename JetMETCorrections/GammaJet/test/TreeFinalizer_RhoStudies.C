@@ -91,6 +91,7 @@ std::vector<TH1D*> allocateHistoVector( int vectorSize, const std::string& name,
 //ThreshEff getThresh_constEff( TTree* tree, float eff, int iBinRho, float threshAbs);
 ThreshEff getThresh_constEff_pid( TTree* tree, float effEB, float effEE, int iBinRho, float threshRelEB, float threshRelEE, float threshMax=15., bool twoEBregions=false);
 ThreshEff getEff( int iBinRho, TTree* ttree, float threshRel, float threshAbsEB, float threshAbsEE, float slopeEB, float slopeEE );
+ThreshEff getEff_nvertex( int iVertex, TTree* ttree, float threshRel, float threshAbsEB, float threshAbsEE, float slopeEB, float slopeEE );
 
 
 
@@ -492,6 +493,24 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   tree_ptTrkIsoPhotReco_rhoCalo->Branch( "eventWeight", &eventWeight, "eventWeight/F");
   tree_hlwTrackIso_rhoCalo->Branch( "eventWeight", &eventWeight, "eventWeight/F");
   tree_etawid_rhoCalo->Branch( "eventWeight", &eventWeight, "eventWeight/F");
+
+  tree_hcalIsoPhotReco_rhoPF->Branch( "nvertex", &nvertex, "nvertex/I");
+  tree_twrHcalIso_rhoPF->Branch( "nvertex", &nvertex, "nvertex/I");
+  tree_HoverE_rhoPF->Branch( "nvertex", &nvertex, "nvertex/I");
+  tree_ecalIsoPhotReco_rhoPF->Branch( "nvertex", &nvertex, "nvertex/I");
+  tree_jurEcalIso_rhoPF->Branch( "nvertex", &nvertex, "nvertex/I");
+  tree_ptTrkIsoPhotReco_rhoPF->Branch( "nvertex", &nvertex, "nvertex/I");
+  tree_hlwTrackIso_rhoPF->Branch( "nvertex", &nvertex, "nvertex/I");
+  tree_etawid_rhoPF->Branch( "nvertex", &nvertex, "nvertex/I");
+
+  tree_hcalIsoPhotReco_rhoCalo->Branch( "nvertex", &nvertex, "nvertex/I");
+  tree_twrHcalIso_rhoCalo->Branch( "nvertex", &nvertex, "nvertex/I");
+  tree_HoverE_rhoCalo->Branch( "nvertex", &nvertex, "nvertex/I");
+  tree_ecalIsoPhotReco_rhoCalo->Branch( "nvertex", &nvertex, "nvertex/I");
+  tree_jurEcalIso_rhoCalo->Branch( "nvertex", &nvertex, "nvertex/I");
+  tree_ptTrkIsoPhotReco_rhoCalo->Branch( "nvertex", &nvertex, "nvertex/I");
+  tree_hlwTrackIso_rhoCalo->Branch( "nvertex", &nvertex, "nvertex/I");
+  tree_etawid_rhoCalo->Branch( "nvertex", &nvertex, "nvertex/I");
 
   tree_hcalIsoPhotReco_rhoPF->Branch( "ePhotReco", &ePhotReco, "ePhotReco/F"); 
   tree_twrHcalIso_rhoPF->Branch( "ePhotReco", &ePhotReco, "ePhotReco/F");
@@ -1075,7 +1094,6 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   TH1D* h1_eff_HoverEEEPF_isoEff = new TH1D("eff_HoverEEEPF_isoEff", "", nBinsRho, 0., rhoPF_max );
 
 
-
   for( unsigned iBinRho=0; iBinRho<nBinsRho; ++iBinRho ) {
 
     std::cout << "Closure: Rho Bin: " << iBinRho+1 << "/" << nBinsRho << std::endl;
@@ -1104,6 +1122,7 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
     h1_eff_hlwTrackIsoEEPF_noCorr->SetBinError  ( iBinRho+1, thresheff_hlwTrackIsoPF_noCorr.efferrEE );
     h1_eff_HoverEEEPF_noCorr->SetBinContent( iBinRho+1, thresheff_HoverEPF_noCorr.effEE );
     h1_eff_HoverEEEPF_noCorr->SetBinError  ( iBinRho+1, thresheff_HoverEPF_noCorr.efferrEE );
+
 
 
     // closure: mean correction:
@@ -1159,6 +1178,126 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
     h1_eff_HoverEEEPF_isoEff->SetBinError  ( iBinRho+1, thresheff_HoverEPF_isoEff.efferrEE );
 
   } // for rho bins
+
+
+
+  // closure vs nvertex:
+
+
+  TH1D* h1_eff_twrHcalIsoEBPF_noCorr_vs_nvertex = new TH1D("eff_twrHcalIsoEBPF_noCorr_vs_nvertex", "", 14, 0.5, 14.5 );
+  TH1D* h1_eff_jurEcalIsoEBPF_noCorr_vs_nvertex = new TH1D("eff_jurEcalIsoEBPF_noCorr_vs_nvertex", "", 14, 0.5, 14.5 );
+  TH1D* h1_eff_hlwTrackIsoEBPF_noCorr_vs_nvertex = new TH1D("eff_hlwTrackIsoEBPF_noCorr_vs_nvertex", "", 14, 0.5, 14.5 );
+  TH1D* h1_eff_HoverEEBPF_noCorr_vs_nvertex = new TH1D("eff_HoverEEBPF_noCorr_vs_nvertex", "", 14, 0.5, 14.5 );
+
+  TH1D* h1_eff_twrHcalIsoEEPF_noCorr_vs_nvertex = new TH1D("eff_twrHcalIsoEEPF_noCorr_vs_nvertex", "", 14, 0.5, 14.5 );
+  TH1D* h1_eff_jurEcalIsoEEPF_noCorr_vs_nvertex = new TH1D("eff_jurEcalIsoEEPF_noCorr_vs_nvertex", "", 14, 0.5, 14.5 );
+  TH1D* h1_eff_hlwTrackIsoEEPF_noCorr_vs_nvertex = new TH1D("eff_hlwTrackIsoEEPF_noCorr_vs_nvertex", "", 14, 0.5, 14.5 );
+  TH1D* h1_eff_HoverEEEPF_noCorr_vs_nvertex = new TH1D("eff_HoverEEEPF_noCorr_vs_nvertex", "", 14, 0.5, 14.5 );
+
+  TH1D* h1_eff_twrHcalIsoEBPF_stoeckli_vs_nvertex = new TH1D("eff_twrHcalIsoEBPF_stoeckli_vs_nvertex", "", 14, 0.5, 14.5 );
+  TH1D* h1_eff_jurEcalIsoEBPF_stoeckli_vs_nvertex = new TH1D("eff_jurEcalIsoEBPF_stoeckli_vs_nvertex", "", 14, 0.5, 14.5 );
+  TH1D* h1_eff_hlwTrackIsoEBPF_stoeckli_vs_nvertex = new TH1D("eff_hlwTrackIsoEBPF_stoeckli_vs_nvertex", "", 14, 0.5, 14.5 );
+  TH1D* h1_eff_HoverEEBPF_stoeckli_vs_nvertex = new TH1D("eff_HoverEEBPF_stoeckli_vs_nvertex", "", 14, 0.5, 14.5 );
+
+  TH1D* h1_eff_twrHcalIsoEEPF_stoeckli_vs_nvertex = new TH1D("eff_twrHcalIsoEEPF_stoeckli_vs_nvertex", "", 14, 0.5, 14.5 );
+  TH1D* h1_eff_jurEcalIsoEEPF_stoeckli_vs_nvertex = new TH1D("eff_jurEcalIsoEEPF_stoeckli_vs_nvertex", "", 14, 0.5, 14.5 );
+  TH1D* h1_eff_hlwTrackIsoEEPF_stoeckli_vs_nvertex = new TH1D("eff_hlwTrackIsoEEPF_stoeckli_vs_nvertex", "", 14, 0.5, 14.5 );
+  TH1D* h1_eff_HoverEEEPF_stoeckli_vs_nvertex = new TH1D("eff_HoverEEEPF_stoeckli_vs_nvertex", "", 14, 0.5, 14.5 );
+
+  TH1D* h1_eff_twrHcalIsoEBPF_isoEff_vs_nvertex = new TH1D("eff_twrHcalIsoEBPF_isoEff_vs_nvertex", "", 14, 0.5, 14.5 );
+  TH1D* h1_eff_jurEcalIsoEBPF_isoEff_vs_nvertex = new TH1D("eff_jurEcalIsoEBPF_isoEff_vs_nvertex", "", 14, 0.5, 14.5 );
+  TH1D* h1_eff_hlwTrackIsoEBPF_isoEff_vs_nvertex = new TH1D("eff_hlwTrackIsoEBPF_isoEff_vs_nvertex", "", 14, 0.5, 14.5 );
+  TH1D* h1_eff_HoverEEBPF_isoEff_vs_nvertex = new TH1D("eff_HoverEEBPF_isoEff_vs_nvertex", "", 14, 0.5, 14.5 );
+
+  TH1D* h1_eff_twrHcalIsoEEPF_isoEff_vs_nvertex = new TH1D("eff_twrHcalIsoEEPF_isoEff_vs_nvertex", "", 14, 0.5, 14.5 );
+  TH1D* h1_eff_jurEcalIsoEEPF_isoEff_vs_nvertex = new TH1D("eff_jurEcalIsoEEPF_isoEff_vs_nvertex", "", 14, 0.5, 14.5 );
+  TH1D* h1_eff_hlwTrackIsoEEPF_isoEff_vs_nvertex = new TH1D("eff_hlwTrackIsoEEPF_isoEff_vs_nvertex", "", 14, 0.5, 14.5 );
+  TH1D* h1_eff_HoverEEEPF_isoEff_vs_nvertex = new TH1D("eff_HoverEEEPF_isoEff_vs_nvertex", "", 14, 0.5, 14.5 );
+
+
+  for( unsigned iVertex=1; iVertex<15; ++iVertex ) {
+
+    std::cout << "Closure: nVertexes: " << iVertex << "/" << 14 << std::endl;
+
+    ThreshEff thresheff_twrHcalIsoPF_noCorr_vs_nvertex = getEff_nvertex( iVertex, tree_twrHcalIso_rhoPF, twrHcalIso_threshRel, twrHcalIso_threshAbs, twrHcalIso_threshAbs, 0., 0. );
+    ThreshEff thresheff_jurEcalIsoPF_noCorr_vs_nvertex = getEff_nvertex( iVertex, tree_jurEcalIso_rhoPF, jurEcalIso_threshRel, jurEcalIso_threshAbs, jurEcalIso_threshAbs, 0., 0. );
+    ThreshEff thresheff_hlwTrackIsoPF_noCorr_vs_nvertex = getEff_nvertex( iVertex, tree_hlwTrackIso_rhoPF, hlwTrackIso_threshRel, hlwTrackIso_threshAbs, hlwTrackIso_threshAbs, 0., 0. );
+    ThreshEff thresheff_HoverEPF_noCorr_vs_nvertex = getEff_nvertex( iVertex, tree_HoverE_rhoPF, HoverE_threshRel, HoverE_threshAbs, HoverE_threshAbs, 0., 0. );
+
+    h1_eff_twrHcalIsoEBPF_noCorr_vs_nvertex->SetBinContent ( iVertex, thresheff_twrHcalIsoPF_noCorr_vs_nvertex.effEB );
+    h1_eff_twrHcalIsoEBPF_noCorr_vs_nvertex->SetBinError   ( iVertex, thresheff_twrHcalIsoPF_noCorr_vs_nvertex.efferrEB );
+    h1_eff_jurEcalIsoEBPF_noCorr_vs_nvertex->SetBinContent ( iVertex, thresheff_jurEcalIsoPF_noCorr_vs_nvertex.effEB );
+    h1_eff_jurEcalIsoEBPF_noCorr_vs_nvertex->SetBinError   ( iVertex, thresheff_jurEcalIsoPF_noCorr_vs_nvertex.efferrEB );
+    h1_eff_hlwTrackIsoEBPF_noCorr_vs_nvertex->SetBinContent( iVertex, thresheff_hlwTrackIsoPF_noCorr_vs_nvertex.effEB );
+    h1_eff_hlwTrackIsoEBPF_noCorr_vs_nvertex->SetBinError  ( iVertex, thresheff_hlwTrackIsoPF_noCorr_vs_nvertex.efferrEB );
+    h1_eff_HoverEEBPF_noCorr_vs_nvertex->SetBinContent( iVertex, thresheff_HoverEPF_noCorr_vs_nvertex.effEB );
+    h1_eff_HoverEEBPF_noCorr_vs_nvertex->SetBinError  ( iVertex, thresheff_HoverEPF_noCorr_vs_nvertex.efferrEB );
+
+    h1_eff_twrHcalIsoEEPF_noCorr_vs_nvertex->SetBinContent ( iVertex, thresheff_twrHcalIsoPF_noCorr_vs_nvertex.effEE );
+    h1_eff_twrHcalIsoEEPF_noCorr_vs_nvertex->SetBinError   ( iVertex, thresheff_twrHcalIsoPF_noCorr_vs_nvertex.efferrEE );
+    h1_eff_jurEcalIsoEEPF_noCorr_vs_nvertex->SetBinContent ( iVertex, thresheff_jurEcalIsoPF_noCorr_vs_nvertex.effEE );
+    h1_eff_jurEcalIsoEEPF_noCorr_vs_nvertex->SetBinError   ( iVertex, thresheff_jurEcalIsoPF_noCorr_vs_nvertex.efferrEE );
+    h1_eff_hlwTrackIsoEEPF_noCorr_vs_nvertex->SetBinContent( iVertex, thresheff_hlwTrackIsoPF_noCorr_vs_nvertex.effEE );
+    h1_eff_hlwTrackIsoEEPF_noCorr_vs_nvertex->SetBinError  ( iVertex, thresheff_hlwTrackIsoPF_noCorr_vs_nvertex.efferrEE );
+    h1_eff_HoverEEEPF_noCorr_vs_nvertex->SetBinContent( iVertex, thresheff_HoverEPF_noCorr_vs_nvertex.effEE );
+    h1_eff_HoverEEEPF_noCorr_vs_nvertex->SetBinError  ( iVertex, thresheff_HoverEPF_noCorr_vs_nvertex.efferrEE );
+
+
+
+    // closure: mean correction:
+
+    ThreshEff thresheff_twrHcalIsoPF_stoeckli_vs_nvertex = getEff_nvertex( iVertex, tree_twrHcalIso_rhoPF, twrHcalIso_threshRel, twrHcalIso_threshAbs, twrHcalIso_threshAbs, line_twrHcalIsoEBPF->GetParameter(1), line_twrHcalIsoEEPF->GetParameter(1) );
+    ThreshEff thresheff_jurEcalIsoPF_stoeckli_vs_nvertex = getEff_nvertex( iVertex, tree_jurEcalIso_rhoPF, jurEcalIso_threshRel, jurEcalIso_threshAbs, jurEcalIso_threshAbs, line_jurEcalIsoEBPF->GetParameter(1), line_jurEcalIsoEEPF->GetParameter(1) );
+    ThreshEff thresheff_hlwTrackIsoPF_stoeckli_vs_nvertex = getEff_nvertex( iVertex, tree_hlwTrackIso_rhoPF, hlwTrackIso_threshRel, hlwTrackIso_threshAbs, hlwTrackIso_threshAbs, line_hlwTrackIsoEBPF->GetParameter(1), line_hlwTrackIsoEEPF->GetParameter(1) );
+    ThreshEff thresheff_HoverEPF_stoeckli_vs_nvertex = getEff_nvertex( iVertex, tree_HoverE_rhoPF, HoverE_threshRel, HoverE_threshAbs, HoverE_threshAbs, line_HoverEEBPF->GetParameter(1), line_HoverEEEPF->GetParameter(1) );
+
+    h1_eff_twrHcalIsoEBPF_stoeckli_vs_nvertex->SetBinContent ( iVertex, thresheff_twrHcalIsoPF_stoeckli_vs_nvertex.effEB );
+    h1_eff_twrHcalIsoEBPF_stoeckli_vs_nvertex->SetBinError   ( iVertex, thresheff_twrHcalIsoPF_stoeckli_vs_nvertex.efferrEB );
+    h1_eff_jurEcalIsoEBPF_stoeckli_vs_nvertex->SetBinContent ( iVertex, thresheff_jurEcalIsoPF_stoeckli_vs_nvertex.effEB );
+    h1_eff_jurEcalIsoEBPF_stoeckli_vs_nvertex->SetBinError   ( iVertex, thresheff_jurEcalIsoPF_stoeckli_vs_nvertex.efferrEB );
+    h1_eff_hlwTrackIsoEBPF_stoeckli_vs_nvertex->SetBinContent( iVertex, thresheff_hlwTrackIsoPF_stoeckli_vs_nvertex.effEB );
+    h1_eff_hlwTrackIsoEBPF_stoeckli_vs_nvertex->SetBinError  ( iVertex, thresheff_hlwTrackIsoPF_stoeckli_vs_nvertex.efferrEB );
+    h1_eff_HoverEEBPF_stoeckli_vs_nvertex->SetBinContent( iVertex, thresheff_HoverEPF_stoeckli_vs_nvertex.effEB );
+    h1_eff_HoverEEBPF_stoeckli_vs_nvertex->SetBinError  ( iVertex, thresheff_HoverEPF_stoeckli_vs_nvertex.efferrEB );
+
+    h1_eff_twrHcalIsoEEPF_stoeckli_vs_nvertex->SetBinContent ( iVertex, thresheff_twrHcalIsoPF_stoeckli_vs_nvertex.effEE );
+    h1_eff_twrHcalIsoEEPF_stoeckli_vs_nvertex->SetBinError   ( iVertex, thresheff_twrHcalIsoPF_stoeckli_vs_nvertex.efferrEE );
+    h1_eff_jurEcalIsoEEPF_stoeckli_vs_nvertex->SetBinContent ( iVertex, thresheff_jurEcalIsoPF_stoeckli_vs_nvertex.effEE );
+    h1_eff_jurEcalIsoEEPF_stoeckli_vs_nvertex->SetBinError   ( iVertex, thresheff_jurEcalIsoPF_stoeckli_vs_nvertex.efferrEE );
+    h1_eff_hlwTrackIsoEEPF_stoeckli_vs_nvertex->SetBinContent( iVertex, thresheff_hlwTrackIsoPF_stoeckli_vs_nvertex.effEE );
+    h1_eff_hlwTrackIsoEEPF_stoeckli_vs_nvertex->SetBinError  ( iVertex, thresheff_hlwTrackIsoPF_stoeckli_vs_nvertex.efferrEE );
+    h1_eff_HoverEEEPF_stoeckli_vs_nvertex->SetBinContent( iVertex, thresheff_HoverEPF_stoeckli_vs_nvertex.effEE );
+    h1_eff_HoverEEEPF_stoeckli_vs_nvertex->SetBinError  ( iVertex, thresheff_HoverEPF_stoeckli_vs_nvertex.efferrEE );
+
+
+
+    // closure: isoefficiency:
+
+    ThreshEff thresheff_twrHcalIsoPF_isoEff_vs_nvertex = getEff_nvertex( iVertex, tree_twrHcalIso_rhoPF, twrHcalIso_threshRel, fitLine_twrHcalIsoEBPF->GetParameter(0), fitLine_twrHcalIsoEEPF->GetParameter(0), fitLine_twrHcalIsoEBPF->GetParameter(1), fitLine_twrHcalIsoEEPF->GetParameter(1) );
+    ThreshEff thresheff_jurEcalIsoPF_isoEff_vs_nvertex = getEff_nvertex( iVertex, tree_jurEcalIso_rhoPF, jurEcalIso_threshRel, fitLine_jurEcalIsoEBPF->GetParameter(0), fitLine_jurEcalIsoEEPF->GetParameter(0), fitLine_jurEcalIsoEBPF->GetParameter(1), fitLine_jurEcalIsoEEPF->GetParameter(1) );
+    ThreshEff thresheff_hlwTrackIsoPF_isoEff_vs_nvertex = getEff_nvertex( iVertex, tree_hlwTrackIso_rhoPF, hlwTrackIso_threshRel, fitLine_hlwTrackIsoEBPF->GetParameter(0), fitLine_hlwTrackIsoEEPF->GetParameter(0), fitLine_hlwTrackIsoEBPF->GetParameter(1), fitLine_hlwTrackIsoEEPF->GetParameter(1) );
+    ThreshEff thresheff_HoverEPF_isoEff_vs_nvertex = getEff_nvertex( iVertex, tree_HoverE_rhoPF, HoverE_threshRel, fitLine_HoverEEBPF->GetParameter(0), fitLine_HoverEEEPF->GetParameter(0), fitLine_HoverEEBPF->GetParameter(1), fitLine_HoverEEEPF->GetParameter(1) );
+
+    h1_eff_twrHcalIsoEBPF_isoEff_vs_nvertex->SetBinContent ( iVertex, thresheff_twrHcalIsoPF_isoEff_vs_nvertex.effEB );
+    h1_eff_twrHcalIsoEBPF_isoEff_vs_nvertex->SetBinError   ( iVertex, thresheff_twrHcalIsoPF_isoEff_vs_nvertex.efferrEB );
+    h1_eff_jurEcalIsoEBPF_isoEff_vs_nvertex->SetBinContent ( iVertex, thresheff_jurEcalIsoPF_isoEff_vs_nvertex.effEB );
+    h1_eff_jurEcalIsoEBPF_isoEff_vs_nvertex->SetBinError   ( iVertex, thresheff_jurEcalIsoPF_isoEff_vs_nvertex.efferrEB );
+    h1_eff_hlwTrackIsoEBPF_isoEff_vs_nvertex->SetBinContent( iVertex, thresheff_hlwTrackIsoPF_isoEff_vs_nvertex.effEB );
+    h1_eff_hlwTrackIsoEBPF_isoEff_vs_nvertex->SetBinError  ( iVertex, thresheff_hlwTrackIsoPF_isoEff_vs_nvertex.efferrEB );
+    h1_eff_HoverEEBPF_isoEff_vs_nvertex->SetBinContent( iVertex, thresheff_HoverEPF_isoEff_vs_nvertex.effEB );
+    h1_eff_HoverEEBPF_isoEff_vs_nvertex->SetBinError  ( iVertex, thresheff_HoverEPF_isoEff_vs_nvertex.efferrEB );
+
+    h1_eff_twrHcalIsoEEPF_isoEff_vs_nvertex->SetBinContent ( iVertex, thresheff_twrHcalIsoPF_isoEff_vs_nvertex.effEE );
+    h1_eff_twrHcalIsoEEPF_isoEff_vs_nvertex->SetBinError   ( iVertex, thresheff_twrHcalIsoPF_isoEff_vs_nvertex.efferrEE );
+    h1_eff_jurEcalIsoEEPF_isoEff_vs_nvertex->SetBinContent ( iVertex, thresheff_jurEcalIsoPF_isoEff_vs_nvertex.effEE );
+    h1_eff_jurEcalIsoEEPF_isoEff_vs_nvertex->SetBinError   ( iVertex, thresheff_jurEcalIsoPF_isoEff_vs_nvertex.efferrEE );
+    h1_eff_hlwTrackIsoEEPF_isoEff_vs_nvertex->SetBinContent( iVertex, thresheff_hlwTrackIsoPF_isoEff_vs_nvertex.effEE );
+    h1_eff_hlwTrackIsoEEPF_isoEff_vs_nvertex->SetBinError  ( iVertex, thresheff_hlwTrackIsoPF_isoEff_vs_nvertex.efferrEE );
+    h1_eff_HoverEEEPF_isoEff_vs_nvertex->SetBinContent( iVertex, thresheff_HoverEPF_isoEff_vs_nvertex.effEE );
+    h1_eff_HoverEEEPF_isoEff_vs_nvertex->SetBinError  ( iVertex, thresheff_HoverEPF_isoEff_vs_nvertex.efferrEE );
+
+  } //for nvertex
+
 
 
 
@@ -1393,6 +1532,37 @@ void finalize(const std::string& dataset, std::string photonID="medium" ) {
   h1_eff_jurEcalIsoEEPF_isoEff->Write();
   h1_eff_hlwTrackIsoEEPF_isoEff->Write();
   h1_eff_HoverEEEPF_isoEff->Write();
+
+
+  h1_eff_twrHcalIsoEBPF_noCorr_vs_nvertex->Write();
+  h1_eff_jurEcalIsoEBPF_noCorr_vs_nvertex->Write();
+  h1_eff_hlwTrackIsoEBPF_noCorr_vs_nvertex->Write();
+  h1_eff_HoverEEBPF_noCorr_vs_nvertex->Write();
+
+  h1_eff_twrHcalIsoEEPF_noCorr_vs_nvertex->Write();
+  h1_eff_jurEcalIsoEEPF_noCorr_vs_nvertex->Write();
+  h1_eff_hlwTrackIsoEEPF_noCorr_vs_nvertex->Write();
+  h1_eff_HoverEEEPF_noCorr_vs_nvertex->Write();
+
+  h1_eff_twrHcalIsoEBPF_stoeckli_vs_nvertex->Write();
+  h1_eff_jurEcalIsoEBPF_stoeckli_vs_nvertex->Write();
+  h1_eff_hlwTrackIsoEBPF_stoeckli_vs_nvertex->Write();
+  h1_eff_HoverEEBPF_stoeckli_vs_nvertex->Write();
+
+  h1_eff_twrHcalIsoEEPF_stoeckli_vs_nvertex->Write();
+  h1_eff_jurEcalIsoEEPF_stoeckli_vs_nvertex->Write();
+  h1_eff_hlwTrackIsoEEPF_stoeckli_vs_nvertex->Write();
+  h1_eff_HoverEEEPF_stoeckli_vs_nvertex->Write();
+
+  h1_eff_twrHcalIsoEBPF_isoEff_vs_nvertex->Write();
+  h1_eff_jurEcalIsoEBPF_isoEff_vs_nvertex->Write();
+  h1_eff_hlwTrackIsoEBPF_isoEff_vs_nvertex->Write();
+  h1_eff_HoverEEBPF_isoEff_vs_nvertex->Write();
+
+  h1_eff_twrHcalIsoEEPF_isoEff_vs_nvertex->Write();
+  h1_eff_jurEcalIsoEEPF_isoEff_vs_nvertex->Write();
+  h1_eff_hlwTrackIsoEEPF_isoEff_vs_nvertex->Write();
+  h1_eff_HoverEEEPF_isoEff_vs_nvertex->Write();
 
   outFile->Close();
 
@@ -1646,6 +1816,44 @@ ThreshEff getEff( int iBinRho, TTree* ttree, float threshRel, float threshAbsEB,
 
   char numConditionEE[500];
   sprintf( numConditionEE, "bin_rho == %d && abs(etaPhotReco)>1.6 && abs(etaPhotReco)<3. && (isoVar < %f*ePhotReco + %f + %f*rhoPF)", iBinRho, threshRel, threshAbsEE, slopeEE );
+  float numEE = ttree->GetEntries(numConditionEE);
+
+  float effEE = numEE/nEntriesEE;
+  float efferrEE = sqrt( effEE*(1-effEE) / nEntriesEE );  // brutal
+
+  ThreshEff returnThreshEff;
+  returnThreshEff.effEB = effEB;
+  returnThreshEff.efferrEB = efferrEB;
+  returnThreshEff.effEE = effEE;
+  returnThreshEff.efferrEE = efferrEE;
+
+  return returnThreshEff;
+
+}
+
+
+
+
+
+ThreshEff getEff_nvertex( int iVertex, TTree* ttree, float threshRel, float threshAbsEB, float threshAbsEE, float slopeEB, float slopeEE ) {
+
+  char denomConditionEB[500];
+  sprintf( denomConditionEB, "nvertex == %d && abs(etaPhotReco)<1.4", iVertex );
+  float nEntriesEB = ttree->GetEntries(denomConditionEB);
+
+  char numConditionEB[500];
+  sprintf( numConditionEB, "nvertex == %d && abs(etaPhotReco)<1.4 && (isoVar < %f*ePhotReco + %f + %f*rhoPF)", iVertex, threshRel, threshAbsEB, slopeEB );
+  float numEB = ttree->GetEntries(numConditionEB);
+
+  float effEB = numEB/nEntriesEB;
+  float efferrEB = sqrt( effEB*(1-effEB) / nEntriesEB );  // brutal
+
+  char denomConditionEE[500];
+  sprintf( denomConditionEE, "nvertex == %d && abs(etaPhotReco)>1.6 && abs(etaPhotReco)<3.", iVertex );
+  float nEntriesEE = ttree->GetEntries(denomConditionEE);
+
+  char numConditionEE[500];
+  sprintf( numConditionEE, "nvertex == %d && abs(etaPhotReco)>1.6 && abs(etaPhotReco)<3. && (isoVar < %f*ePhotReco + %f + %f*rhoPF)", iVertex, threshRel, threshAbsEE, slopeEE );
   float numEE = ttree->GetEntries(numConditionEE);
 
   float effEE = numEE/nEntriesEE;
