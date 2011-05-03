@@ -15,7 +15,7 @@
 std::vector<float> drawSinglePlot( DrawBase* db, TFile* file, const std::string& varName, const std::string& units, const std::string& yAxisTitle, const std::string& rhoType, const std::string& EB_EE );
 void drawSinglePlot_Mean( DrawBase* db, TFile* file, const std::string& varName, const std::string& yAxisName, const std::string& units, const std::string& rhoType, const std::string& EB_EE );
 void drawCompare( DrawBase* db, TFile* file, const std::string& varName, const std::string& yAxisName, const std::string& rhoType, const std::string& EB_EE );
-void drawCompare_fullSelection( DrawBase* db, TFile* file, const std::string& rhoType, const std::string& EB_EE );
+void drawCompare_fullSelection( DrawBase* db, TFile* file, const std::string& rhoType, const std::string& EB_EE, bool vs_nvertex=false );
 
 
 int main( int argc, char* argv[] )  {
@@ -94,6 +94,9 @@ int main( int argc, char* argv[] )  {
 
   drawCompare_fullSelection( db, file, "PF", "EB" );
   drawCompare_fullSelection( db, file, "PF", "EE" );
+
+  drawCompare_fullSelection( db, file, "PF", "EB", (bool)true );
+  drawCompare_fullSelection( db, file, "PF", "EE", (bool)true );
 
   return 0;
 
@@ -451,7 +454,7 @@ void drawCompare( DrawBase* db, TFile* file, const std::string& varName, const s
 
 
 
-void drawCompare_fullSelection( DrawBase* db, TFile* file, const std::string& rhoType, const std::string& EB_EE ) {
+void drawCompare_fullSelection( DrawBase* db, TFile* file, const std::string& rhoType, const std::string& EB_EE, bool vs_nvertex ) {
 
 
   TH1D* h1_fullEff_noCorr;
@@ -469,6 +472,12 @@ void drawCompare_fullSelection( DrawBase* db, TFile* file, const std::string& rh
     std::string histoName_noCorr = "eff_" + varNames[iVar] + EB_EE + rhoType + "_noCorr";
     std::string histoName_stoeckli = "eff_" + varNames[iVar] + EB_EE + rhoType + "_stoeckli";
     std::string histoName_isoEff = "eff_" + varNames[iVar] + EB_EE + rhoType + "_isoEff";
+
+    if( vs_nvertex ) {
+      histoName_noCorr   += "_vs_nvertex";
+      histoName_stoeckli += "_vs_nvertex";
+      histoName_isoEff   += "_vs_nvertex";
+    }
 
     TH1D* h1_noCorr = (TH1D*)file->Get(histoName_noCorr.c_str());
     TH1D* h1_stoeckli = (TH1D*)file->Get(histoName_stoeckli.c_str());
@@ -534,10 +543,14 @@ void drawCompare_fullSelection( DrawBase* db, TFile* file, const std::string& rh
 
 
   TH2D* h2_axes_eff = new TH2D("axes_eff", "", 10, h1_fullEff_isoEff->GetXaxis()->GetXmin(), h1_fullEff_isoEff->GetXaxis()->GetXmax(), 10, 0., 1.1 );
-  if( rhoType=="PF" )
-    h2_axes_eff->SetXTitle("Particle Flow Energy Density (#rho) [GeV]");
-  else
-    h2_axes_eff->SetXTitle("Calorimeter Energy Density (#rho) [GeV]");
+  if( vs_nvertex ) {
+    h2_axes_eff->SetXTitle("Number of Reconstructed Vertexes");
+  } else {
+    if( rhoType=="PF" )
+      h2_axes_eff->SetXTitle("Particle Flow Energy Density (#rho) [GeV]");
+    else
+      h2_axes_eff->SetXTitle("Calorimeter Energy Density (#rho) [GeV]");
+  }
   h2_axes_eff->SetYTitle("Efficiency");
   h2_axes_eff->Draw();
 
@@ -560,7 +573,9 @@ void drawCompare_fullSelection( DrawBase* db, TFile* file, const std::string& rh
   label_EBEE->Draw("same");
 
 
-  std::string canvasName = db->get_outputdir() + "/compareFullEff_" + EB_EE + "_vs_" + rhoType;
+  std::string canvasName = db->get_outputdir() + "/compareFullEff_" + EB_EE + "_vs_";
+  if( vs_nvertex ) canvasName += "nvertex";
+  else             canvasName += rhoType;
   std::string canvasName_png = canvasName + ".png";
   std::string canvasName_eps = canvasName + ".eps";
 
