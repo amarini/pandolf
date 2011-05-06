@@ -2,6 +2,8 @@
 #include <vector>
 #include <string>
 
+#include "TLorentzVector.h"
+
 //#include "RooRealVar.h"
 //#include "RooProdPdf.h"
 
@@ -36,6 +38,8 @@ class HelicityLikelihoodDiscriminant{
   void setMeasurables(vector<double> myvars);
   void setMeasurables(double newmzz,double newcostheta1,double newcostheta2,double newcosthetastar, double newphi, double newphistar1);
   void setMeasurables(HelicityAngles ha);
+
+  HelicityAngles computeHelicityAngles(TLorentzVector leptMinus, TLorentzVector leptPlus, TLorentzVector jet1, TLorentzVector jet2 );
 
 
  private:
