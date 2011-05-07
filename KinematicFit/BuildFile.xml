@@ -1,0 +1,7 @@
+<flags CXXFLAGS="-I$(CMSSW_RELEASE_BASE)/src/PhysicsTools/KinFitter/interface/"/>
+
+<use name="PhysicsTools/KinFitter"/>                                                         
+<export>
+  <lib   name="1" />
+  <use name="PhysicsTools/KinFitter"/>  
+</export>
