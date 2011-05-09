@@ -825,7 +825,8 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
       // draw pt phot cut label
       char labelPtPhot_text[200];
       sprintf( labelPtPhot_text, "%.0f < p_{T}^{#gamma} < %.0f GeV/c", ptPhot_binning[iplot], ptPhot_binning[iplot+1]);
-      TPaveText* label_ptPhot = new TPaveText(0.22, 0.8, 0.47, 0.9, "brNDC");
+      TPaveText* label_ptPhot = new TPaveText(0.65, 0.45, 0.9, 0.55, "brNDC");
+      //TPaveText* label_ptPhot = new TPaveText(0.22, 0.8, 0.47, 0.9, "brNDC");
       label_ptPhot->SetTextSize(0.030);
       label_ptPhot->SetFillColor(0);
       std::string jetAlgoText = get_algoName();
@@ -2417,35 +2418,35 @@ LegendBox DrawBase::get_legendBox( int legendQuadrant, const std::vector<std::st
     LegendBox lb;
 
     if( legendQuadrant==1 ) {
-      lb.xMin = 0.62;
-      lb.yMax = 0.9;
-      lb.yMin = lb.yMax - 0.05*(float)nNames_total;
-      lb.xMax = 0.88;
+      lb.xMin = 0.65;
+      lb.yMax = 0.91;
+      lb.yMin = lb.yMax - 0.06*(float)nNames_total;
+      lb.xMax = 0.92;
     } else if( legendQuadrant==0 ) {
       lb.xMin = 0.5;
       lb.yMax = 0.88;
-      lb.yMin = lb.yMax - 0.05*(float)nNames_total;
+      lb.yMin = lb.yMax - 0.06*(float)nNames_total;
       lb.xMax = 0.73;
     } else if( legendQuadrant==2 ) {
       lb.xMin = 0.18;
       lb.yMax = 0.88;
-      lb.yMin = lb.yMax - 0.05*(float)nNames_total;
+      lb.yMin = lb.yMax - 0.06*(float)nNames_total;
       lb.xMax = 0.41;
     } else if( legendQuadrant==3 ) {
       lb.xMin = 0.18;
       lb.yMin = 0.15;
       lb.xMax = 0.41;
-      lb.yMax = lb.yMin + 0.05*(float)nNames_total;
+      lb.yMax = lb.yMin + 0.06*(float)nNames_total;
     } else if( legendQuadrant==4 ) {
       lb.xMin = 0.5;
       lb.yMin = 0.15;
       lb.xMax = 0.73;
-      lb.yMax = lb.yMin + 0.05*(float)nNames_total;
+      lb.yMax = lb.yMin + 0.06*(float)nNames_total;
     } else if( legendQuadrant==5 ) {
       lb.xMin = 0.4;
       lb.yMin = 0.15;
       lb.xMax = 0.6;
-      lb.yMax = lb.yMin + 0.05*(float)nNames_total;
+      lb.yMax = lb.yMin + 0.06*(float)nNames_total;
     }
 
     bool widen = false;
@@ -2485,7 +2486,7 @@ std::string DrawBase::get_lumiText() const {
     lumi4Text /= 1000.;
     units = "pb ^{-1}";
   }
-  if( lumi4Text > 100. ) {
+  if( lumi4Text >= 1000. ) {
     lumi4Text /= 1000.;
     units = "fb ^{-1}";
   }
