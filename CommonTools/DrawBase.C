@@ -346,8 +346,8 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
  // hp_ptJetGen_mc = (TProfile*)mcFiles_[0].file->Get("ptJetGenMean");
 
     h2_ptPhot_data = (TH2D*)dataFiles_[0].file->Get(ptPhotMean_name.c_str());
-    h2_ptPhot_mc = (TH2D*)mcFiles_[0].file->Get(ptPhotMean_name.c_str());
-    h2_ptJetGen_mc = (TH2D*)mcFiles_[0].file->Get(ptJetGenMean_name.c_str());
+    h2_ptPhot_mc = (mcFiles_.size()>0) ? (TH2D*)mcFiles_[0].file->Get(ptPhotMean_name.c_str()) : 0;
+    h2_ptJetGen_mc = (mcFiles_.size()>0) ? (TH2D*)mcFiles_[0].file->Get(ptJetGenMean_name.c_str()) : 0;
 
     if( mcFiles_.size() > 1 ) {
       for( unsigned i=1; i<mcFiles_.size(); ++i ) {
