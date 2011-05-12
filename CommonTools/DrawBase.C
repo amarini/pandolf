@@ -2279,6 +2279,10 @@ void DrawBase::add_dataFile( TFile* dataFile, const std::string& datasetName, co
     lumi_ = h1_lumi->GetBinContent(1);
   }
 
+  if( dataFile == 0 ) {
+    std::cout << "File: '" << dataFile->GetName() << " does not exist! Skipping." << std::endl;
+    return;
+  }
   dataFiles_.push_back( thisFile );
   std::cout << "-> Added DATA file '" << dataFile->GetName() << "'." << std::endl;
 
@@ -2304,6 +2308,10 @@ void DrawBase::add_mcFile( TFile* mcFile, float weight, const std::string& datas
   thisfile.markerStyle=markerStyle;
   thisfile.lineColor=lineColor;
   thisfile.lineWidth=lineWidth;
+  if( mcFile == 0 ) {
+    std::cout << "File: '" << mcFile->GetName() << " does not exist! Skipping." << std::endl;
+    return;
+  }
   mcFiles_.push_back( thisfile );
 
   std::cout << "-> Added MC file '" << mcFile->GetName()  << "'." << std::endl;
