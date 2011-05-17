@@ -174,7 +174,11 @@ DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType
 
   scaleFactor_ = 0.;
   rebin_ = 1;
+
+  yAxisMax_ = 9999.;
   yAxisMaxScale_ = 1.4;
+  yAxisMaxScaleLog_ = 5.;
+
   markerSize_ = 1.6;
   getBinLabels_ = false;
   legendTitle_ = "";
@@ -648,6 +652,8 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
       yMax *= 1.2;
     }
 
+    if( yAxisMax_ != 9999. ) yMax = yAxisMax_;
+
 
     TLegend* legend = new TLegend(lb.xMin, lb.yMin, lb.xMax, lb.yMax, legendTitle_.c_str());
     legend->SetFillColor(kWhite);
@@ -1036,7 +1042,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
           if( dataHistos[iHisto]->GetBinContent(iBin)>0. && dataHistos[iHisto]->GetBinContent(iBin) < yMin ) 
             yMin = dataHistos[iHisto]->GetBinContent(iBin);
 
-      TH2D* h2_axes_log = new TH2D("axes_log", "", nBinsx, xMin, xMax, 10, 0.1*yMin, 5.*yMax);
+      TH2D* h2_axes_log = new TH2D("axes_log", "", nBinsx, xMin, xMax, 10, 0.1*yMin, yAxisMaxScaleLog_*yMax);
       h2_axes_log->SetXTitle(xAxis.c_str());
       h2_axes_log->SetYTitle(yAxis.c_str());
     //h2_axes_log->GetXaxis()->SetTitleOffset(1.1);
