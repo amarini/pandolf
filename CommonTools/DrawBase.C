@@ -175,6 +175,8 @@ DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType
   scaleFactor_ = 0.;
   rebin_ = 1;
 
+  logx_ = false;
+
   yAxisMax_ = 9999.;
   yAxisMaxScale_ = 1.4;
   yAxisMaxScaleLog_ = 5.;
