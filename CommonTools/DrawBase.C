@@ -177,6 +177,9 @@ DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType
 
   logx_ = false;
 
+  xAxisMin_ = 9999.;
+  xAxisMax_ = 9999.;
+
   yAxisMax_ = 9999.;
   yAxisMaxScale_ = 1.4;
   yAxisMaxScaleLog_ = 5.;
@@ -654,6 +657,8 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
       yMax *= 1.2;
     }
 
+    if( xAxisMin_ != 9999. ) xMin = xAxisMin_;
+    if( xAxisMax_ != 9999. ) xMax = xAxisMax_;
     if( yAxisMax_ != 9999. ) yMax = yAxisMax_;
 
 
