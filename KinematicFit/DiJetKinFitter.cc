@@ -59,7 +59,11 @@ std::pair<TLorentzVector,TLorentzVector> DiJetKinFitter::fit(TLorentzVector jet1
   jetpair.first  = jet1_kinfit;
   jetpair.second = jet2_kinfit;
 
+  delete fitJet1; delete fitJet2; delete mCons_jets;
+
   return jetpair;
+
+
 
 }
 
