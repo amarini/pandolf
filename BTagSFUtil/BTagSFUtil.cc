@@ -8,7 +8,7 @@
 
 BTagSFUtil::BTagSFUtil( int seed ) {
 
-  rand_ = new TRandom(seed);
+  rand_ = new TRandom3(seed);
 
 }
 

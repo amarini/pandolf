@@ -2,7 +2,7 @@
 #define BTagSFUtil_h
 
 
-#include "TRandom.h"
+#include "TRandom3.h"
 
 
 struct BTagScaleFactor{
@@ -28,7 +28,7 @@ class BTagSFUtil {
 
  private:
 
-  TRandom* rand_;
+  TRandom3* rand_;
 
 
 };
