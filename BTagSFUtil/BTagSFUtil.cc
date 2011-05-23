@@ -1,4 +1,3 @@
-#include <iostream>
 #include <fstream>
 #include "BTagSFUtil.h"
 #include "TMath.h"
@@ -9,7 +8,7 @@
 BTagSFUtil::BTagSFUtil( int seed ) {
 
   rand_ = new TRandom3(seed);
-
+  setSFFileName("");
 }
 
 
@@ -50,12 +49,16 @@ void BTagSFUtil::modifyBTagsWithSF( bool& isBTagged_loose, bool& isBTagged_mediu
     // use loose efficiencies if it not tagged
     // (don't do anything if it is medium tagged)
     // this is because the jet has a probability of being upgraded
+    if(sfFileName_==""){
+      std::cout<<"Empty string with SF filename. Setting automatically to "<<std::flush;
+      sfFileName_="SF_light_"+tagger;
+      std::cout<<sfFileName_.c_str()<<std::endl;
+    }    
+
     if( isBTagged_loose ) {
-      std::string fileName = "SF_light_"+tagger+"M.txt";
-      btsf = getSF(fileName, jetpt, jeteta);
+      btsf = getSF(sfFileName_+"M.txt", jetpt, jeteta);
     } else  {
-      std::string fileName = "SF_light_"+tagger+"L.txt";
-      btsf = getSF(fileName, jetpt, jeteta);
+      btsf = getSF(sfFileName_+"L.txt", jetpt, jeteta);
     }
 
     float mistagPercent = ( btsf.SF*btsf.eff - btsf.eff ) / ( 1. - btsf.eff );
@@ -84,6 +87,10 @@ BTagScaleFactor BTagSFUtil::getSF( const std::string& fileName, float jetpt, flo
    bool foundSF = false;
 
    ifstream ifs(fileName.c_str());
+
+   if(!ifs.good()){
+     std::cout<<"WARNING ! Didn't find file "<<fileName.c_str()<<std::endl;
+   }
 
    while( ifs.good() && !foundSF ) {
 
