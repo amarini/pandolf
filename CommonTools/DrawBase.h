@@ -70,8 +70,8 @@ class DrawBase {
   void drawProfile( const std::string& yVar, const std::string& xVar, int legendQuadrant=1);
   void drawStack(const std::string& varY, const std::string& varX, const std::string& RECO_GEN, bool isData) const { this->drawStack( varY, varX, "", RECO_GEN, isData); };
   void drawStack(const std::string& varY, const std::string& varX, const std::string& etaRegion, const std::string& RECO_GEN, bool isData) const;
-  void compareDifferentHistos( const std::vector< HistoAndName > histosandnames, const std::string saveVarName, const std::string xAxisName, const std::string& units="", const std::string& instanceName="Entries", int legendQuadrant=1 );
-  void compareDifferentHistos_singleFile( InputFile file, const std::vector< HistoAndName > histosandnames, const std::string saveVarName, const std::string xAxisName, const std::string& units="", const std::string& instanceName="Entries", int legendQuadrant=1 );
+  void compareDifferentHistos( const std::vector< HistoAndName > histosandnames, const std::string saveVarName, const std::string xAxisName, const std::string& units="", const std::string& instanceName="Entries", bool stacked=false, int legendQuadrant=1 );
+  void compareDifferentHistos_singleFile( InputFile file, const std::vector< HistoAndName > histosandnames, const std::string saveVarName, const std::string xAxisName, const std::string& units="", const std::string& instanceName="Entries", bool stacked=false, int legendQuadrant=1 );
   void drawObjects( const std::vector< TObject* > objects, const std::string& name, 
                    const std::string& xAxisName, float xMin, float xMax, 
                    const std::string& yAxisName, float yMin, float yMax, 
@@ -94,7 +94,7 @@ class DrawBase {
   void set_xAxisMin( float xAxisMin=9999. ) { xAxisMin_ = xAxisMin;};
   void set_xAxisMax( float xAxisMax=9999. ) { xAxisMax_ = xAxisMax;};
   void set_yAxisMax( float yAxisMax=9999. ) { yAxisMax_ = yAxisMax;};
-  void set_yAxisMaxScale( float yAxisMaxScale ) { yAxisMaxScale_ = yAxisMaxScale;};
+  void set_yAxisMaxScale( float yAxisMaxScale=1.4 ) { yAxisMaxScale_ = yAxisMaxScale;};
   void set_yAxisMaxScaleLog( float yAxisMaxScale ) { yAxisMaxScaleLog_ = yAxisMaxScale;};
   void set_noStack( bool set=true ) { noStack_ = set; };
   void set_isCMSArticle( bool set=true );

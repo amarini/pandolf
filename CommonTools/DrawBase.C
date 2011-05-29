@@ -2024,17 +2024,17 @@ void DrawBase::drawStack(const std::string& varY, const std::string& varX, const
 
 
 
-void DrawBase::compareDifferentHistos( const std::vector< HistoAndName > histos, const std::string saveVarName, const std::string xAxisName, const std::string& units, const std::string& instanceName, int legendQuadrant ) {
+void DrawBase::compareDifferentHistos( const std::vector< HistoAndName > histos, const std::string saveVarName, const std::string xAxisName, const std::string& units, const std::string& instanceName, bool stacked, int legendQuadrant ) {
 
-  for( unsigned iData=0; iData<dataFiles_.size(); ++iData ) compareDifferentHistos_singleFile( dataFiles_[iData], histos, saveVarName, xAxisName, units, instanceName, legendQuadrant );
-  for( unsigned iMC=0; iMC<mcFiles_.size(); ++iMC ) compareDifferentHistos_singleFile( mcFiles_[iMC], histos, saveVarName, xAxisName, units, instanceName, legendQuadrant );
+  for( unsigned iData=0; iData<dataFiles_.size(); ++iData ) compareDifferentHistos_singleFile( dataFiles_[iData], histos, saveVarName, xAxisName, units, instanceName, stacked, legendQuadrant );
+  for( unsigned iMC=0; iMC<mcFiles_.size(); ++iMC ) compareDifferentHistos_singleFile( mcFiles_[iMC], histos, saveVarName, xAxisName, units, instanceName, stacked, legendQuadrant );
 
 }
 
 
 
 
-void DrawBase::compareDifferentHistos_singleFile( InputFile infile, const std::vector< HistoAndName > histosandnames, const std::string saveVarName, const std::string xAxisName, const std::string& units, const std::string& instanceName, int legendQuadrant ) {
+void DrawBase::compareDifferentHistos_singleFile( InputFile infile, const std::vector< HistoAndName > histosandnames, const std::string saveVarName, const std::string xAxisName, const std::string& units, const std::string& instanceName, bool stacked, int legendQuadrant ) {
 
   bool normalized = (lumi_<=0.);
 
@@ -2075,6 +2075,7 @@ void DrawBase::compareDifferentHistos_singleFile( InputFile infile, const std::v
   float xMin, xMax, yMin, yMax;
   yMin = 0.;
 
+  THStack* stack = new THStack();
 
   for( unsigned iHisto=0; iHisto<histos.size(); ++iHisto ) {
 
@@ -2103,13 +2104,13 @@ void DrawBase::compareDifferentHistos_singleFile( InputFile infile, const std::v
     }
 
     // 2. set fill colors and styles
-    histos[iHisto]->SetFillStyle( 3004+iHisto );
+    if( !stacked ) histos[iHisto]->SetFillStyle( 3004+iHisto );
     if( iHisto<fillColors.size() ) {
       histos[iHisto]->SetFillColor( fillColors[iHisto] );
-      histos[iHisto]->SetLineColor( fillColors[iHisto] );
+      if( !stacked ) histos[iHisto]->SetLineColor( fillColors[iHisto] );
     } else {
       histos[iHisto]->SetFillColor( iHisto );
-      histos[iHisto]->SetLineColor( iHisto );
+      if( !stacked ) histos[iHisto]->SetLineColor( iHisto );
     }
     histos[iHisto]->SetLineWidth(2);
 
@@ -2117,7 +2118,13 @@ void DrawBase::compareDifferentHistos_singleFile( InputFile infile, const std::v
     // 3. add to legend
     legend->AddEntry( histos[iHisto], (histosandnames[iHisto].legendName).c_str() , "F");
 
+
+    // add to stack (useful if stacked):
+    stack->Add(histos[iHisto]);
+
   }
+
+  if( stacked ) yMax = stack->GetMaximum();
 
   yMax *= yAxisMaxScale_;
   if( histos.size()>=4 ) yMax *= 1.15;
@@ -2169,26 +2176,25 @@ void DrawBase::compareDifferentHistos_singleFile( InputFile infile, const std::v
   c1->cd();
 
   h2_axes->Draw();
-  for(unsigned i=0; i<histos.size(); ++i ) {
-  //if( normalized ) histos[i]->DrawNormalized("histo same");
-  //else histos[i]->Draw("histo same");
-    // reverse order is prettier:
-    if( normalized ) {
-      histos[histos.size()-i-1]->DrawNormalized("histo same");
-    } else {
-      histos[histos.size()-i-1]->Draw("histo same");
+  if( stacked ) {
+    stack->Draw("histo same");
+  } else {
+    for(unsigned i=0; i<histos.size(); ++i ) {
+      // reverse order is prettier:
+      if( normalized ) {
+        histos[histos.size()-i-1]->DrawNormalized("histo same");
+      } else {
+        histos[histos.size()-i-1]->Draw("histo same");
+      }
     }
-
-    //histos[histos.size()-i-1]->Draw("histo same");
-    //rmsText[i]->Draw("same");
-  }
+  } // if stacked
   legend->Draw("same");
-//  label_CMStop->Draw("same");
   label_CMS->Draw("same");
   label_sqrt->Draw("same");
   gPad->RedrawAxis();
 
   std::string canvasName = this->get_outputdir() + "/" + infile.datasetName + "_" + saveVarName;
+  if( stacked ) canvasName += "_stack";
   std::string canvasName_eps = canvasName + ".eps";
   std::string canvasName_png = canvasName + ".png";
   c1->SaveAs( canvasName_eps.c_str() );
@@ -2449,10 +2455,10 @@ LegendBox DrawBase::get_legendBox( int legendQuadrant, const std::vector<std::st
       lb.yMin = lb.yMax - 0.06*(float)nNames_total;
       lb.xMax = 0.73;
     } else if( legendQuadrant==2 ) {
-      lb.xMin = 0.18;
-      lb.yMax = 0.88;
+      lb.xMin = 0.2;
+      lb.yMax = 0.91;
       lb.yMin = lb.yMax - 0.06*(float)nNames_total;
-      lb.xMax = 0.41;
+      lb.xMax = 0.47;
     } else if( legendQuadrant==3 ) {
       lb.xMin = 0.18;
       lb.yMin = 0.15;
