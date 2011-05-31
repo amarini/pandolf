@@ -22,9 +22,9 @@ class BTagSFUtil {
 
   BTagSFUtil( int seed=0 );
 
-  void modifyBTagsWithSF( bool& isBTagged_loose, bool& isBTagged_medium, float jetpt, float jeteta, int pdgIdPart, const std::string& tagger="TCHE" );
+  void modifyBTagsWithSF( bool& isBTagged_loose, bool& isBTagged_medium, float jetpt, float jeteta, int pdgIdPart, double Btageff_SF = 0.9, double Btagmistag_SF = 1.0, const std::string& tagger="TCHE");
   BTagScaleFactor  getSF( const std::string& fileName, float jetpt, float jeteta );
-  void setSFFileName(const std::string fileName){ sfFileName_= fileName;std::cout<<"New SF Filename: "<<sfFileName_.c_str()<<std::endl;};
+  void setSFFileName(const std::string fileName){ sfFileName_= fileName;};
 
  private:
 
