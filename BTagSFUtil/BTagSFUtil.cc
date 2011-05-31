@@ -13,7 +13,7 @@ BTagSFUtil::BTagSFUtil( int seed ) {
 
 
 
-void BTagSFUtil::modifyBTagsWithSF( bool& isBTagged_loose, bool& isBTagged_medium, float jetpt, float jeteta, int pdgIdPart, const std::string& tagger ) {
+void BTagSFUtil::modifyBTagsWithSF( bool& isBTagged_loose, bool& isBTagged_medium, float jetpt, float jeteta, int pdgIdPart, double Btageff_SF, double Btagmistag_SF, const std::string& tagger) {
 
 
   // b quarks:
@@ -23,18 +23,21 @@ void BTagSFUtil::modifyBTagsWithSF( bool& isBTagged_loose, bool& isBTagged_mediu
     if( !isBTagged_loose ) return;
 
     // SF for b's
-    float b_SF = 0.9;
+    float b_SF = Btageff_SF;
 
     float coin = rand_->Uniform(1.);
+    
+    float eff_m = 0.7;
+    float eff_l = 0.8;
+    float b_SF_l = (b_SF*eff_l-eff_m)/(eff_l-eff_m);
+    
 
-    if( coin > b_SF ) {
-
-      // scale it down one btag category:
-      if( isBTagged_medium ) isBTagged_medium=false;
-      else if( isBTagged_loose ) isBTagged_loose=false;
- 
+    if( isBTagged_medium ){ 
+      if( coin > b_SF ) isBTagged_medium=false; //turn medium off, loose is still on
     }
-
+    else if( isBTagged_loose ){
+      if( coin > b_SF_l ) isBTagged_loose=false; //
+    }
 
   // light quarks:
   } else if( abs( pdgIdPart)>0 ) { //in data it is 0 (save computing time)
@@ -50,9 +53,9 @@ void BTagSFUtil::modifyBTagsWithSF( bool& isBTagged_loose, bool& isBTagged_mediu
     // (don't do anything if it is medium tagged)
     // this is because the jet has a probability of being upgraded
     if(sfFileName_==""){
-      std::cout<<"Empty string with SF filename. Setting automatically to "<<std::flush;
+      //std::cout<<"Empty string with SF filename. Setting automatically to "<<std::flush;
       sfFileName_="SF_light_"+tagger;
-      std::cout<<sfFileName_.c_str()<<std::endl;
+      //std::cout<<sfFileName_.c_str()<<std::endl;
     }    
 
     if( isBTagged_loose ) {
@@ -61,17 +64,20 @@ void BTagSFUtil::modifyBTagsWithSF( bool& isBTagged_loose, bool& isBTagged_mediu
       btsf = getSF(sfFileName_+"L.txt", jetpt, jeteta);
     }
 
-    float mistagPercent = ( btsf.SF*btsf.eff - btsf.eff ) / ( 1. - btsf.eff );
+    float sysSF = Btagmistag_SF;
+
+    float mistagPercent = ( (sysSF*btsf.SF)*btsf.eff - btsf.eff ) / ( 1. - btsf.eff );
 
     float coin = rand_->Uniform(1.);
 
     // for light quarks, the jet has to be upgraded:
     if( coin < mistagPercent ) {
 
-      if( !isBTagged_loose ) isBTagged_loose = true;
-      else if( !isBTagged_medium ) isBTagged_medium = true;
+      if( !isBTagged_loose ) {isBTagged_loose = true;}
+      else if( !isBTagged_medium ) {isBTagged_medium = true; }
 
     }
+    
 
   } //if b-light quark
 
@@ -120,5 +126,3 @@ BTagScaleFactor BTagSFUtil::getSF( const std::string& fileName, float jetpt, flo
    return btsf;
 
 }
-
-
