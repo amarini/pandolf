@@ -49,6 +49,8 @@ public :
    Int_t           orbit;
    Int_t           run;
    Int_t           event;
+   Float_t         rhoCalo;
+   Float_t         rhoPF;
    Int_t           nMC;
    Int_t           pdgIdMC[150];   //[nMC]
    Int_t           statusMC[150];   //[nMC]
@@ -74,9 +76,8 @@ public :
    Float_t         pid_twrHCAL[40];   //[nPhot]
    Float_t         pid_HoverE[40];   //[nPhot]
    Float_t         pid_hlwTrack[40];   //[nPhot]
+   Float_t         pid_hlwTrackNoDz[40];   //[nPhot]
    Float_t         pid_etawid[40];   //[nPhot]
-   Float_t         ptiso0015Phot[40];   //[nPhot]
-   Int_t           ntrkiso0015Phot[40];   //[nPhot]
    Float_t         ptiso035Phot[40];   //[nPhot]
    Int_t           ntrkiso035Phot[40];   //[nPhot]
    Float_t         ptiso04Phot[40];   //[nPhot]
@@ -236,6 +237,8 @@ public :
    Float_t ptHatMin_;
    Float_t ptHatMax_;
    Float_t eventWeight_;
+   Float_t rhoCalo_;
+   Float_t rhoPF_;
 
    bool DEBUG_;
 
@@ -249,6 +252,8 @@ public :
    TBranch        *b_orbit;   //!
    TBranch        *b_run;   //!
    TBranch        *b_event;   //!
+   TBranch        *b_rhoCalo;   //!
+   TBranch        *b_rhoPF;   //!
    TBranch        *b_nMC;   //!
    TBranch        *b_pdgIdMC;   //!
    TBranch        *b_statusMC;   //!
@@ -274,9 +279,8 @@ public :
    TBranch        *b_pid_twrHCAL;   //!
    TBranch        *b_pid_HoverE;   //!
    TBranch        *b_pid_hlwTrack;   //!
+   TBranch        *b_pid_hlwTrackNoDz;   //!
    TBranch        *b_pid_etawid;   //!
-   TBranch        *b_ptiso0015Phot;   //!
-   TBranch        *b_ntrkiso0015Phot;   //!
    TBranch        *b_ptiso035Phot;   //!
    TBranch        *b_ntrkiso035Phot;   //!
    TBranch        *b_ptiso04Phot;   //!
