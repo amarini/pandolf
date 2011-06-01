@@ -49,6 +49,7 @@ public :
    Int_t           orbit;
    Int_t           run;
    Int_t           event;
+   Int_t           nPU;
    Float_t         rhoCalo;
    Float_t         rhoPF;
    Int_t           nMC;
@@ -237,6 +238,7 @@ public :
    Float_t ptHatMin_;
    Float_t ptHatMax_;
    Float_t eventWeight_;
+   Int_t   nPU_;
    Float_t rhoCalo_;
    Float_t rhoPF_;
 
