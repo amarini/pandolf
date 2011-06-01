@@ -38,6 +38,7 @@ class AnalysisPhoton {
   Int_t hasPixelSeed;
 
   Float_t pid_hlwTrack;
+  Float_t pid_hlwTrackNoDz;
   Float_t pid_twrHCAL;
   Float_t pid_HoverE;
   Float_t pid_jurECAL;
