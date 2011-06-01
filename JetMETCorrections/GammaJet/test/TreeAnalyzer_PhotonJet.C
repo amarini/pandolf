@@ -66,6 +66,8 @@ void TreeAnalyzer_PhotonJet::CreateOutputFile() {
 
   jetTree_->Branch("ptHat",&ptHat_,"ptHat_/F");
 
+  jetTree_->Branch("nPU",&nPU_,"nPU_/I");
+
   jetTree_->Branch("rhoCalo",&rhoCalo_,"rhoCalo_/F");
   jetTree_->Branch("rhoPF",&rhoPF_,"rhoPF_/F");
 
@@ -255,6 +257,8 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      event_ = event;
      nvertex_ = nvertex;
      ptHat_ = genpt;
+
+     nPU_ = nPU;
 
      rhoCalo_ = rhoCalo;
      rhoPF_ = rhoPF;
