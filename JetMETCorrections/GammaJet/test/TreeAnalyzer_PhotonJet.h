@@ -30,6 +30,7 @@ class TreeAnalyzer_PhotonJet : public TreeAnalyzer {
 
  private:
 
+
    Float_t eventWeight_medium_;
    Float_t eventWeight_loose_;
 
@@ -92,6 +93,7 @@ class TreeAnalyzer_PhotonJet : public TreeAnalyzer {
    Float_t pid_jurECALPhotReco_;
    Float_t pid_sIEtaIEtaPhotReco_;
    Float_t pid_hlwTrackPhotReco_;
+   Float_t pid_hlwTrackNoDzPhotReco_;
 
 
    Float_t ePhotGen_;

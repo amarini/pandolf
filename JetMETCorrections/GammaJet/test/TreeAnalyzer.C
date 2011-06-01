@@ -348,6 +348,8 @@ void TreeAnalyzer::Init(TTree *tree)
    fChain->SetBranchAddress("orbit", &orbit, &b_orbit);
    fChain->SetBranchAddress("run", &run, &b_run);
    fChain->SetBranchAddress("event", &event, &b_event);
+   fChain->SetBranchAddress("rhoCalo", &rhoCalo, &b_rhoCalo);
+   fChain->SetBranchAddress("rhoPF", &rhoPF, &b_rhoPF);
    fChain->SetBranchAddress("nMC", &nMC, &b_nMC);
    fChain->SetBranchAddress("pdgIdMC", &pdgIdMC, &b_pdgIdMC);
    fChain->SetBranchAddress("statusMC", &statusMC, &b_statusMC);
@@ -373,9 +375,8 @@ void TreeAnalyzer::Init(TTree *tree)
    fChain->SetBranchAddress("pid_twrHCAL", pid_twrHCAL, &b_pid_twrHCAL);
    fChain->SetBranchAddress("pid_HoverE", pid_HoverE, &b_pid_HoverE);
    fChain->SetBranchAddress("pid_hlwTrack", pid_hlwTrack, &b_pid_hlwTrack);
+   fChain->SetBranchAddress("pid_hlwTrackNoDz", pid_hlwTrackNoDz, &b_pid_hlwTrackNoDz);
    fChain->SetBranchAddress("pid_etawid", pid_etawid, &b_pid_etawid);
-   fChain->SetBranchAddress("ptiso0015Phot", ptiso0015Phot, &b_ptiso0015Phot);
-   fChain->SetBranchAddress("ntrkiso0015Phot", ntrkiso0015Phot, &b_ntrkiso0015Phot);
    fChain->SetBranchAddress("ptiso035Phot", ptiso035Phot, &b_ptiso035Phot);
    fChain->SetBranchAddress("ntrkiso035Phot", ntrkiso035Phot, &b_ntrkiso035Phot);
    fChain->SetBranchAddress("ptiso04Phot", ptiso04Phot, &b_ptiso04Phot);

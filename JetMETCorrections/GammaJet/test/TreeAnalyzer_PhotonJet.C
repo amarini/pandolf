@@ -66,6 +66,9 @@ void TreeAnalyzer_PhotonJet::CreateOutputFile() {
 
   jetTree_->Branch("ptHat",&ptHat_,"ptHat_/F");
 
+  jetTree_->Branch("rhoCalo",&rhoCalo_,"rhoCalo_/F");
+  jetTree_->Branch("rhoPF",&rhoPF_,"rhoPF_/F");
+
   jetTree_->Branch("eventWeight",&eventWeight_,"eventWeight_/F");
   jetTree_->Branch("eventWeight_medium",&eventWeight_medium_,"eventWeight_medium_/F");
   jetTree_->Branch("eventWeight_loose",&eventWeight_loose_,"eventWeight_loose_/F");
@@ -127,6 +130,7 @@ void TreeAnalyzer_PhotonJet::CreateOutputFile() {
   jetTree_->Branch("pid_jurECALPhotReco",  &pid_jurECALPhotReco_,  "pid_jurECALPhotReco_/F");
   jetTree_->Branch("pid_sIEtaIEtaPhotReco",  &pid_sIEtaIEtaPhotReco_,  "pid_sIEtaIEtaPhotReco_/F");
   jetTree_->Branch("pid_hlwTrackPhotReco",  &pid_hlwTrackPhotReco_,  "pid_hlwTrackPhotReco_/F");
+  jetTree_->Branch("pid_hlwTrackNoDzPhotReco",  &pid_hlwTrackNoDzPhotReco_,  "pid_hlwTrackNoDzPhotReco_/F");
 
   jetTree_->Branch("ePhotGen",  &ePhotGen_,  "ePhotGen_/F");
   jetTree_->Branch("ptPhotGen",  &ptPhotGen_,  "ptPhotGen_/F");
@@ -252,6 +256,9 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      nvertex_ = nvertex;
      ptHat_ = genpt;
 
+     rhoCalo_ = rhoCalo;
+     rhoPF_ = rhoPF;
+
      if( !isGoodLS() ) continue; //this takes care also of integrated luminosity
 
      // good primary vertex requirement:
@@ -302,6 +309,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        thisPhot.pid_jurECAL = pid_jurECAL[iPhot];
        thisPhot.pid_HoverE = pid_HoverE[iPhot];
        thisPhot.pid_hlwTrack = pid_hlwTrack[iPhot];
+       thisPhot.pid_hlwTrackNoDz = pid_hlwTrackNoDz[iPhot];
        thisPhot.pid_etawid = pid_etawid[iPhot];
 
        //if( thisPhot.pt < 10. ) continue;
@@ -315,6 +323,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      Float_t deltaRmin_Phot = 999.;
      for( unsigned int iMC=0; iMC<nMC; ++iMC ) {
    
+       //if( statusMC[iMC]!=3 ) continue;
        if( pdgIdMC[iMC]!=22 ) continue;
    
        Float_t deltaEta = foundRecoPhot.eta - etaMC[iMC];
@@ -392,6 +401,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        foundPhot.pid_twrHCAL = 0.;
        foundPhot.pid_etawid = 0.;
        foundPhot.pid_hlwTrack = 0.;
+       foundPhot.pid_hlwTrackNoDz = 0.;
        foundPhot.eGen = foundGenJet.eGen;
        foundPhot.ptGen = foundGenJet.ptGen;
        foundPhot.etaGen = foundGenJet.etaGen;
@@ -463,6 +473,7 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
      pid_jurECALPhotReco_ = foundPhot.pid_jurECAL;
      pid_sIEtaIEtaPhotReco_ = foundPhot.pid_etawid;
      pid_hlwTrackPhotReco_ = foundPhot.pid_hlwTrack;
+     pid_hlwTrackNoDzPhotReco_ = foundPhot.pid_hlwTrackNoDz;
      ePhotGen_ = foundPhot.eGen;
      ptPhotGen_ = foundPhot.ptGen;
      etaPhotGen_ = foundPhot.etaGen;
