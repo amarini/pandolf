@@ -657,10 +657,6 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
       yMax *= 1.2;
     }
 
-    if( xAxisMin_ != 9999. ) xMin = xAxisMin_;
-    if( xAxisMax_ != 9999. ) xMax = xAxisMax_;
-    if( yAxisMax_ != 9999. ) yMax = yAxisMax_;
-
 
     TLegend* legend = new TLegend(lb.xMin, lb.yMin, lb.xMax, lb.yMax, legendTitle_.c_str());
     legend->SetFillColor(kWhite);
@@ -678,6 +674,9 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     }
 
     TH2D* h2_axes = new TH2D("axes", "", nBinsx, xMin, xMax, 10, yMin, yMax);
+    if( xAxisMin_ != 9999. ) h2_axes->GetXaxis()->SetRangeUser(xAxisMin_, xMax);
+    if( xAxisMax_ != 9999. ) h2_axes->GetXaxis()->SetRangeUser(xMin, xAxisMax_);
+    if( yAxisMax_ != 9999. ) h2_axes->GetYaxis()->SetRangeUser(yMin, yAxisMax_);
     if( getBinLabels_ ) {
       for( unsigned iBinx=1; iBinx<nBinsx+1; ++iBinx ) {
         if( refHisto->GetXaxis()->GetBinLabel(iBinx) != "" )
@@ -686,97 +685,13 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     }
     h2_axes->SetXTitle(xAxis.c_str());
     h2_axes->SetYTitle(yAxis.c_str());
-  //h2_axes->GetXaxis()->SetTitleOffset(1.1);
-  //h2_axes->GetYaxis()->SetTitleOffset(1.5);
 
 
     TPaveText* label_cms = get_labelCMS(0);
     TPaveText* label_sqrt = get_labelSqrt(0);
 
-//    TPaveText* label_CMStop = get_labelCMStop();
 
     TPaveText* label_cuts = 0;
-/*    if( analysisType_ == "MinBias" ) {
-
-      Float_t label_cuts_xMin = 0.63;
-      Float_t label_cuts_yMin = 0.5;
-      Float_t label_cuts_xMax = 0.84;
-      Float_t label_cuts_yMax = 0.65;
-
-      if( name=="asymmJet" || name=="deltaPhiJet" || name=="RchJet" || name=="etaJet" || name=="phiJet" ) {
-       label_cuts_xMin = 0.25;
-       label_cuts_yMin = 0.60;
-       label_cuts_xMax = 0.36;
-       label_cuts_yMax = 0.73;
-      }
-      if( name=="RnhJet" ) {
-       label_cuts_xMin = 0.4;
-       label_cuts_yMin = 0.6;
-       label_cuts_xMax = 0.6;
-       label_cuts_yMax = 0.7;
-      }
-
-      label_cuts = new TPaveText(label_cuts_xMin, label_cuts_yMin, label_cuts_xMax, label_cuts_yMax,  "brNDC");
-      label_cuts->SetFillColor(kWhite);
-      label_cuts->SetTextSize(0.035);
-      label_cuts->SetTextFont(42);
-      std::string jetAlgoName = get_algoName();
-      label_cuts->AddText(jetAlgoName.c_str());
-    //if( name != "etaJet" )
-    //  label_cuts->AddText(etaRange.c_str());
-      if( name != "ptJet" && name != "ptCorrJet" ) {
-        char labelText[70];
-        sprintf( labelText, "p_{T}^{%s} > %d GeV/c", raw_corr_.c_str(), pt_thresh_);
-        label_cuts->AddText(labelText);
-      }
-
-    } else if( analysisType_=="PhotonJet" ) {
-
-      Float_t label_cuts_xMin = 0.63;
-      Float_t label_cuts_yMin = 0.53;
-      Float_t label_cuts_xMax = 0.84;
-      Float_t label_cuts_yMax = 0.68;
-
-      if( name=="deltaPhi" || name=="deltaPhi_2ndJet" ) {
-       label_cuts_xMin = 0.25;
-       label_cuts_yMin = 0.60;
-       label_cuts_xMax = 0.36;
-       label_cuts_yMax = 0.73;
-      }
-      label_cuts = new TPaveText(label_cuts_xMin, label_cuts_yMin, label_cuts_xMax, label_cuts_yMax,  "brNDC");
-      label_cuts->SetFillColor(kWhite);
-      label_cuts->SetTextSize(0.035);
-      label_cuts->SetTextFont(42);
-      
-      if( name != "ptPhot" ) {
-        char ptCutName[60];
-        if( draw_vs_pt_graphs )
-          sprintf( ptCutName, "%.0f < p_{T}^{#gamma} < %.0f GeV/c", ptPhot_binning[iplot], ptPhot_binning[iplot+1] );
-        else
-          sprintf( ptCutName, "p_{T}^{#gamma} > %.0f GeV/c", ptPhot_binning[0]);
-
-        label_cuts->AddText(ptCutName);
-      }
-
-      if( name != "etaPhot" )
-        label_cuts->AddText("|#eta_{#gamma}| < 1.3");
-
-      if( draw_vs_pt_graphs||name=="deltaPhi"||name=="ptSecondJetRel" ) {
-        std::string jetAlgoName = get_algoName();
-        label_cuts->AddText(jetAlgoName.c_str());
-      }
-
-    } else if( analysisType_=="HZZlljj" ) {
-
-      //nothing here yet
-
-    } else {
-
-      std::cout << "AnalysisType: '" << analysisType_ << "' not yet implemented. Exiting." << std::endl;
-      exit(991);
-
-    }
-*/
 
     TPaveText* label_bonus = new TPaveText(0.63, lb.yMin-0.07, 0.84, lb.yMin-0.02,  "brNDC");
     label_bonus->SetFillColor(kWhite);
@@ -784,9 +699,6 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     label_bonus->SetTextFont(42);
     label_bonus->AddText(labelText.c_str());
 
-  //TPaveText* label_algo = new TPaveText(0.64, 0.6, 0.88, 0.65, "brNDC");
-  //label_bonus->SetFillColor(kWhite);
-  //label_bonus->SetTextSize(0.035);
 
     TCanvas* c1 = new TCanvas("c1", "c1", 800, 800);
     c1->cd();
@@ -825,7 +737,6 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     gPad->RedrawAxis();
     label_cms->Draw("same");
     label_sqrt->Draw("same");
-//    label_CMStop->Draw("same");
     if( label_cuts!=0 )
       label_cuts->Draw("same");
     if( labelText!="" )
@@ -1029,27 +940,30 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     if( log_aussi ) {
 
       // look for minimum in histos:
-      float yMin=yMax;
+      float yMin_log=yMax;
       // first: MC
       if( !noMC ) {
         if( noStack_ ) {
           for(unsigned iHisto=0; iHisto<mcHistos.size(); ++iHisto) 
             for( unsigned iBin=1; iBin<mcHistos[iHisto]->GetNbinsX(); ++iBin ) 
-              if( mcHistos[iHisto]->GetBinContent(iBin)>0. && mcHistos[iHisto]->GetBinContent(iBin) < yMin ) 
-                yMin = mcHistos[iHisto]->GetBinContent(iBin);
+              if( mcHistos[iHisto]->GetBinContent(iBin)>0. && mcHistos[iHisto]->GetBinContent(iBin) < yMin_log ) 
+                yMin_log = mcHistos[iHisto]->GetBinContent(iBin);
         } else {
             for( unsigned iBin=1; iBin<mcHisto_sum->GetNbinsX(); ++iBin ) 
-              if( mcHisto_sum->GetBinContent(iBin)>0. && mcHisto_sum->GetBinContent(iBin) < yMin ) 
-                yMin = mcHisto_sum->GetBinContent(iBin);
+              if( mcHisto_sum->GetBinContent(iBin)>0. && mcHisto_sum->GetBinContent(iBin) < yMin_log ) 
+                yMin_log = mcHisto_sum->GetBinContent(iBin);
         }
       } // if nomc
       // second: data
       for(unsigned iHisto=0; iHisto<dataHistos.size(); ++iHisto) 
         for( unsigned iBin=1; iBin<dataHistos[iHisto]->GetNbinsX(); ++iBin ) 
-          if( dataHistos[iHisto]->GetBinContent(iBin)>0. && dataHistos[iHisto]->GetBinContent(iBin) < yMin ) 
-            yMin = dataHistos[iHisto]->GetBinContent(iBin);
+          if( dataHistos[iHisto]->GetBinContent(iBin)>0. && dataHistos[iHisto]->GetBinContent(iBin) < yMin_log ) 
+            yMin_log = dataHistos[iHisto]->GetBinContent(iBin);
 
-      TH2D* h2_axes_log = new TH2D("axes_log", "", nBinsx, xMin, xMax, 10, 0.1*yMin, yAxisMaxScaleLog_*yMax);
+      TH2D* h2_axes_log = new TH2D("axes_log", "", nBinsx, xMin, xMax, 10, 0.1*yMin_log, yAxisMaxScaleLog_*yMax);
+      if( xAxisMin_ != 9999. ) h2_axes_log->GetXaxis()->SetRangeUser(xAxisMin_, xMax);
+      if( xAxisMax_ != 9999. ) h2_axes_log->GetXaxis()->SetRangeUser(xMin, xAxisMax_);
+      if( yAxisMax_ != 9999. ) h2_axes_log->GetYaxis()->SetRangeUser(0.1*yMin_log, yAxisMaxScaleLog_*yAxisMax_);
       h2_axes_log->SetXTitle(xAxis.c_str());
       h2_axes_log->SetYTitle(yAxis.c_str());
     //h2_axes_log->GetXaxis()->SetTitleOffset(1.1);
