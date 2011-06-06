@@ -131,8 +131,9 @@ RooBkgd2L2JV2::RooBkgd2L2JV2(const char *name, const char *title,
  { 
    double h1Func = (1.0+h1param0*h1*h1)*(1.0+h1param2*h1*h1+h1param4*h1*h1*h1*h1);
    //   std::cout << "h1Func: " << h1Func << endl;
-   double h2Func = (1.0+h2param0*h2*h2)*(1.0+h2param2*h2*h2+h2param4*h2*h2*h2*h2)
-     /(1 + exp((-h2cutOff + h2)/h2g));
+   //double h2Func = (1.0+h2param0*h2*h2)*(1.0+h2param2*h2*h2+h2param4*h2*h2*h2*h2)
+   //  /(1 + exp((-h2cutOff + h2)/h2g));
+   double h2Func = (1.0+h2param2*h2*h2-h2param2*h2*h2*h2*h2)/(1 + exp((-h2cutOff + h2)/h2g));
    //   std::cout <<"h2Func: " << h2Func <<endl;
    double hsFunc =  (1.0+hsparam2*hs*hs+hsparam4*hs*hs*hs*hs);
    //   std::cout <<"hsFunc: " << hsFunc <<endl;
@@ -144,8 +145,9 @@ RooBkgd2L2JV2::RooBkgd2L2JV2(const char *name, const char *title,
    double h1_Norm = 2*(1 + (h1param0+h1param2)/3 + (h1param4+h1param0*h1param2)/5
 		       + h1param0*h1param4/7);
    //   std::cout <<"h1Norm: " << h1_Norm <<endl;
-   double h2_Norm = (1 + (h2param0+h2param2)/3 + (h2param4+h2param0*h2param2)/5
-		     + h2param0*h2param4/7);
+   //double h2_Norm = (1 + (h2param0+h2param2)/3 + (h2param4+h2param0*h2param2)/5
+   //	     + h2param0*h2param4/7);
+   double h2_Norm = 1+h2param2*(1/3-1/5);
    //   std::cout <<"h2Norm: " << h2_Norm<<endl;
    double hs_Norm = 2*(1 + hsparam2/3 + hsparam4/5);
    //   std::cout <<"hsNorm: " << hs_Norm <<endl;
@@ -155,29 +157,30 @@ RooBkgd2L2JV2::RooBkgd2L2JV2(const char *name, const char *title,
    //   std::cout <<"phi1Norm: " << phi1_Norm <<endl;
 
    if(h2Func<0){ 
-     std::cout << "JUST SO YOU KNOW: h2FUNC was less than zero, specifically: " << h2Func << " at h2: " << h2 << std::endl;
-     h2Func=.0001;
+     //std::cout << "JUST SO YOU KNOW: h2FUNC was less than zero, specifically: " << h2Func << " at h2: " << h2 << " and mzz: " << mZZ << std::endl;
+     //h2Func=.0001;
    }
    if(hsFunc<0){
-     std::cout << "JUST SO YOU KNOW: hsFUNC was less than zero, specifically: " << hsFunc << std::endl;
-     hsFunc=.0001;
+     //std::cout << "JUST SO YOU KNOW: hsFUNC was less than zero, specifically: " << hsFunc << " at hs: " << hs << " and mzz: " << mZZ << std::endl;
+     //hsFunc=.0001;
    }  
    if(h1Func<0){
-     std::cout << "JUST SO YOU KNOW: h1FUNC was less than zero, specifically: " << h1Func << std::endl;
-     h1Func=.0001;
+     //std::cout << "JUST SO YOU KNOW: h1FUNC was less than zero, specifically: " << h1Func << std::endl;
+     //h1Func=.0001;
    }
    if(phiFunc<0){
-     std::cout << "JUST SO YOU KNOW: phiFUNC was less than zero, specifically: " << phiFunc << std::endl;
-     phiFunc=.0001;
+     //std::cout << "JUST SO YOU KNOW: phiFUNC was less than zero, specifically: " << phiFunc << std::endl;
+     //phiFunc=.0001;
    }
    if(phi1Func<0){
-     std::cout << "JUST SO YOU KNOW: phi1FUNC was less than zero, specifically: " << phi1Func << std::endl;
-     cout << "phi1: " << phi1 << "hs: " << hs << endl;
-     phi1Func=.0001;
+     //std::cout << "JUST SO YOU KNOW: phi1FUNC was less than zero, specifically: " << phi1Func << std::endl;
+     //cout << "phi1: " << phi1 << "hs: " << hs << endl;
+     //phi1Func=.0001;
    }   
    //std::cout << "Bkg Prod: " << h1Func*h2Func*hsFunc*phiFunc*phi1Func/(h1_Norm*h2_Norm*hs_Norm*phi_Norm*phi1_Norm) << endl;
    return(h1Func*h2Func*hsFunc*phiFunc*phi1Func/(h1_Norm*h2_Norm*hs_Norm*phi_Norm*phi1_Norm));
  } 
+
 
 
 void RooBkgd2L2JV2::setVars(vector<double> allVars){
@@ -249,20 +252,26 @@ void RooBkgd2L2JV2::SetParameters(){
   h2param0_1= -0.0239946;
   h2param0_2= 3.61955e-05;
 
-  h2param2_0= 1.5;
-  h2param2_1= 0.;
-  h2param2_2=0.;
+  h2param2_0= -1.01298;
+  h2param2_1= .0047841;
+  h2param2_2= 0.;
 
   h2param4_0= -0.357522;
   h2param4_1= -0.00109411;
   h2param4_2=0.;
 
-  h2g_0= 0.0101505;
-  h2g_1= 5.30009e-06;
-  h2g_2=0.0;
+  if(mZZ>=250){
+    h2g_0= .0594631;
+    h2g_1= -.0000696859;
+    h2g_2=0.0;
+  }else{
+    h2g_0= .488962;
+    h2g_1= -.00177202;
+    h2g_2= 0.0;
+  }
 
-  h2cutOff_0= .85;
-  h2cutOff_1= 0.000192922;
+  h2cutOff_0= .692987;
+  h2cutOff_1= .000206678;
   h2cutOff_2=0.;
 
   hsparam2_0= 1.84553;
@@ -309,7 +318,11 @@ void RooBkgd2L2JV2::SetParameters(){
   hsparam4 = hsparam4_0 + hsparam4_1*mZZ + hsparam4_2*mZZ*mZZ;
 
   h2cutOff = h2cutOff_0 + h2cutOff_1*mZZ + h2cutOff_2*mZZ*mZZ;
-  h2g = h2g_0 + h2g_1*mZZ + h2g_2*mZZ*mZZ;
+
+  if(mZZ>=700)
+    h2g = 0.01068297;
+  else
+    h2g = h2g_0 + h2g_1*mZZ + h2g_2*mZZ*mZZ;
 
   h2param0 = h2param0_0 + h2param0_1*mZZ + h2param0_2*mZZ*mZZ;
   h2param2 = h2param2_0 + h2param2_1*mZZ + h2param2_2*mZZ*mZZ;
