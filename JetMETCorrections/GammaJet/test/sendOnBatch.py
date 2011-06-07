@@ -15,7 +15,8 @@ if len(sys.argv) != 6:
 PDname = sys.argv[1]
 SDname = sys.argv[2]
 dataset_name = PDname + "_" + SDname
-dataset_path = PDname + "/" + SDname
+#dataset_path = PDname + "/" + SDname
+dataset_path = dataset_name
 print "path: " + dataset_path + "  name: " + dataset_name
 recoType = sys.argv[3]
 jetAlgo = sys.argv[4]
@@ -36,7 +37,7 @@ application = "do2ndLevel_PhotonJet_batch"
 if PDname=="EG" or PDname=="Photon":
   diskoutputdir = "/cmsrm/pc23_2/pandolf/DATA/" + dataset_path
 else:
-  diskoutputdir = "/cmsrm/pc23_2/pandolf/MC/Spring11/" + dataset_path
+  diskoutputdir = "/cmsrm/pc23_2/pandolf/MC/Summer11/" + dataset_path
 diskoutputmain = diskoutputdir
 # prepare job to write on the cmst3 cluster disks
 ################################################
