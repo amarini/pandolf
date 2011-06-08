@@ -148,6 +148,7 @@ void TreeAnalyzer_PhotonJet::CreateOutputFile() {
   jetTree_->Branch("phiJetReco", &phiJetReco_, "phiJetReco_/F");
   jetTree_->Branch( "ptDJetReco",  &ptDJetReco_,  "ptDJetReco_/F");
   jetTree_->Branch( "rmsCandJetReco",  &rmsCandJetReco_,  "rmsCandJetReco_/F");
+  jetTree_->Branch("trackCountingHighEffBJetTagsJetReco",  &trackCountingHighEffBJetTagsJetReco_,  "trackCountingHighEffBJetTagsJetReco_/F");
   jetTree_->Branch(  "eJetGen",   &eJetGen_,   "eJetGen_/F");
   jetTree_->Branch(  "ptJetGen",   &ptJetGen_,   "ptJetGen_/F");
   jetTree_->Branch( "etaJetGen",  &etaJetGen_,  "etaJetGen_/F");
@@ -529,6 +530,8 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
        thisJet.ptD = (recoType_=="pf" && jetAlgo_=="akt5") ? ptDJet[iRecoJet] : 0.;
        thisJet.rmsCand = (recoType_=="pf" && jetAlgo_=="akt5") ? rmsCandJet[iRecoJet] : 0.;
 
+       thisJet.trackCountingHighEffBJetTags = (recoType_=="pf" && jetAlgo_=="akt5") ? trackCountingHighEffBJetTags[iRecoJet] : 0.;
+
        thisJet.nTracksReco = (recoType_=="pf" && jetAlgo_=="akt5") ? nChargedHadrons[iRecoJet] : 0;
        thisJet.nPhotonsReco = (recoType_=="pf" && jetAlgo_=="akt5") ? nPhotons[iRecoJet] : 0;
        thisJet.nNeutralHadronsReco = (recoType_=="pf" && jetAlgo_=="akt5") ? nNeutralHadrons[iRecoJet] : 0;
@@ -718,6 +721,7 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
      etaJetReco_  =  firstJet.etaReco;
      ptDJetReco_  =  firstJet.ptD;
  rmsCandJetReco_  =  firstJet.rmsCand;
+ trackCountingHighEffBJetTagsJetReco_  =  firstJet.trackCountingHighEffBJetTags;
         eJetGen_  =  firstJet.eGen;
        ptJetGen_  =  firstJet.ptGen;
       phiJetGen_  =  firstJet.phiGen;

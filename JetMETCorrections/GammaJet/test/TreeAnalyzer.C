@@ -452,6 +452,8 @@ void TreeAnalyzer::Init(TTree *tree)
        fChain->SetBranchAddress(branchName.c_str(), ptDJet, &b_ptDJet);
        branchName = "rmsCandJet_"+algoType_;
        fChain->SetBranchAddress(branchName.c_str(), rmsCandJet, &b_rmsCandJet);
+       branchName = "trackCountingHighEffBJetTags";
+       fChain->SetBranchAddress(branchName.c_str(), trackCountingHighEffBJetTags, &b_trackCountingHighEffBJetTags);
      }
    }
    branchName = "nJetGen_"+jetAlgo_;
