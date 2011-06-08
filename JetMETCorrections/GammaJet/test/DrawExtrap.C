@@ -20,8 +20,10 @@ DrawExtrap::DrawExtrap( const std::string& analysisType, const std::string& reco
 
 void DrawExtrap::drawResponseExtrap( const std::string& etaRegion, bool corrected, const std::string& recoGen ) {
 
+  int recoPhot_color = kRed;
+  int recoGen_color = kBlue;
+  int genPhot_color = kGreen+2;
   //int genPhot_color = kGreen+3;
-  int genPhot_color = kBlack;
 
   std::string etaRegion_str;
   if( etaRegion=="eta013" ) etaRegion_str = "|#eta| < 1.3";
@@ -330,11 +332,11 @@ void DrawExtrap::drawResponseExtrap( const std::string& etaRegion, bool correcte
 
     TGraphErrors* gr_resp_DATA = new TGraphErrors(nPoints, xDATA, y_resp_DATA, x_errDATA, y_resp_err_DATA);
     gr_resp_DATA->SetMarkerStyle(20);
-    gr_resp_DATA->SetMarkerColor(kRed);
+    gr_resp_DATA->SetMarkerColor(recoPhot_color);
 
     TGraphErrors* gr_resp_recoPhot = new TGraphErrors(nPoints, x, y_resp_recoPhot, x_err, y_resp_recoPhot_err);
     gr_resp_recoPhot->SetMarkerStyle(24);
-    gr_resp_recoPhot->SetMarkerColor(kRed);
+    gr_resp_recoPhot->SetMarkerColor(recoPhot_color);
 
     TGraphErrors* gr_resp_genPhot = new TGraphErrors(nPoints, x, y_resp_genPhot, x_err, y_resp_genPhot_err);
     gr_resp_genPhot->SetMarkerStyle(22);
@@ -343,7 +345,7 @@ void DrawExtrap::drawResponseExtrap( const std::string& etaRegion, bool correcte
 
     TGraphErrors* gr_resp_recoGen = new TGraphErrors(nPoints, x, y_resp_recoGen, x_err, y_resp_recoGen_err);
     gr_resp_recoGen->SetMarkerStyle(21);
-    gr_resp_recoGen->SetMarkerColor(kBlue);
+    gr_resp_recoGen->SetMarkerColor(recoGen_color);
 
     TGraphErrors* gr_resp_genPart = new TGraphErrors(nPoints, x, y_resp_genPart, x_err, y_resp_genPart_err);
     gr_resp_genPart->SetMarkerStyle(21);
@@ -363,31 +365,32 @@ void DrawExtrap::drawResponseExtrap( const std::string& etaRegion, bool correcte
 
 
     Float_t lastX = x[nPoints-1];
-    Float_t xMax_fit = lastX+2.;
-    Float_t xMax_fit_green = x[2]+2.;
+    Float_t xMax_fit = lastX+2./100.;
+    Float_t xMax_fit_green = x[2]+2./100.;
 
     Float_t xMax_axis;
-    if( lastX <=14. ) 
-      xMax_axis = 15.;
-    else if( lastX <= 19. )
-      xMax_axis = 20.;
-    else if( lastX <= 24. )
-      xMax_axis = 25.;
-    else if( lastX <= 29. )
-      xMax_axis = 30.;
-    else 
-      xMax_axis = 40.;
+    if( lastX <=12./100. ) 
+      xMax_axis = 15./100.;
+    else if( lastX <= 20./100. )
+      xMax_axis = 25./100.;
+    else if( lastX <= 25./100. )
+      xMax_axis = 30./100.;
+    else if( lastX <= 35./100. )
+      xMax_axis = 40./100.;
+
     
 
     std::string xTitle;
     if( recoGen=="Reco" ) {
-      xTitle = "p_{T}^{2ndJet} [GeV/c]";
+      xTitle = "p_{T}^{2ndJet} [GeV]";
     } else if( recoGen=="Gen" ) {
-      xTitle = "p_{T}^{2ndJet gen} [GeV/c]";
+      xTitle = "p_{T}^{2ndJet gen} [GeV]";
     } else if( recoGen=="RecoRel" || recoGen=="RecoRelRaw" ) {
-      xTitle = "p_{T}^{2ndJet} / p_{T}^{#gamma}  [%]";
+      xTitle = "p_{T}^{2ndJet} / p_{T}^{#gamma}";
+      //xTitle = "p_{T}^{2ndJet} / p_{T}^{#gamma}  [%]";
     } else if( recoGen=="GenRel" ) {
-      xTitle = "p_{T}^{2ndJet gen} / p_{T}^{#gamma}  [%]";
+      xTitle = "p_{T}^{2ndJet gen} / p_{T}^{#gamma}";
+      //xTitle = "p_{T}^{2ndJet gen} / p_{T}^{#gamma}  [%]";
     }
 
 
@@ -408,7 +411,7 @@ void DrawExtrap::drawResponseExtrap( const std::string& etaRegion, bool correcte
     TF1* fit_resp_recoGen = new TF1("fit_resp_recoGen", "[0]");
     fit_resp_recoGen->SetRange(0., xMax_fit);
     fit_resp_recoGen->SetLineWidth(0.5);
-    fit_resp_recoGen->SetLineColor(kBlue);
+    fit_resp_recoGen->SetLineColor(recoGen_color);
     gr_resp_recoGen->Fit( fit_resp_recoGen, "RQ");
 
     TF1* fit_resp_genPart = new TF1("fit_resp_genPart", "[0]+[1]*x");
@@ -453,7 +456,7 @@ void DrawExtrap::drawResponseExtrap( const std::string& etaRegion, bool correcte
       fit_respParabola->SetParameter(2, fit_resp_genPhot->GetParameter(1));
  // }
     fit_respParabola->SetLineColor(2);
-    fit_respParabola->SetLineColor(kRed);
+    fit_respParabola->SetLineColor(recoPhot_color);
     fit_respParabola->SetLineStyle(2);
     fit_respParabola->SetLineWidth(1.);
     gr_resp_recoPhot->Fit( fit_respParabola, "RQ" );
@@ -469,7 +472,7 @@ void DrawExtrap::drawResponseExtrap( const std::string& etaRegion, bool correcte
     }
     if( FIXM_ )
       fit_respParabola_DATA->FixParameter(2, fit_respParabola->GetParameter(2) );
-    fit_respParabola_DATA->SetLineColor(kRed);
+    fit_respParabola_DATA->SetLineColor(recoPhot_color);
     fit_respParabola_DATA->SetLineWidth(1.);
     gr_resp_DATA->Fit( fit_respParabola_DATA, "RQ" );
 
@@ -553,7 +556,8 @@ void DrawExtrap::drawResponseExtrap( const std::string& etaRegion, bool correcte
     legend_resp->AddEntry(gr_resp_DATA, "DATA ( #gamma + jet)", "P");
 
     char labeltext[50];
-    sprintf(labeltext, "%d < p_{T}^{#gamma} < %d GeV/c", (int)ptMin, (int)ptMax);  
+    sprintf(labeltext, "%d < p_{T}^{#gamma} < %d GeV", (int)ptMin, (int)ptMax);  
+    //sprintf(labeltext, "%d < p_{T}^{#gamma} < %d GeV/c", (int)ptMin, (int)ptMax);  
     TPaveText* label_resp = new TPaveText(0.18, 0.15, 0.4, 0.18, "brNDC");
     label_resp->SetFillColor(kWhite);
     label_resp->SetTextSize(0.035);
@@ -637,7 +641,7 @@ void DrawExtrap::drawResponseExtrap( const std::string& etaRegion, bool correcte
 
     TGraphErrors* gr_reso_DATA = new TGraphErrors(nPoints, xDATA, y_reso_DATA, x_errDATA, y_reso_err_DATA);
     gr_reso_DATA->SetMarkerStyle(20);
-    gr_reso_DATA->SetMarkerColor(kRed);
+    gr_reso_DATA->SetMarkerColor(recoPhot_color);
     // take out points with reso=0:
     for( unsigned iPointDATA=0; iPointDATA<gr_reso_DATA->GetN(); ++iPointDATA ) {
       Double_t x,y;
@@ -645,15 +649,15 @@ void DrawExtrap::drawResponseExtrap( const std::string& etaRegion, bool correcte
       Double_t yerr = gr_reso_DATA->GetErrorY(iPointDATA);
       if( y<0.00000001 || yerr==0.00000000001 ) gr_reso_DATA->RemovePoint(iPointDATA);
     }
-    gr_reso_DATA->SetLineColor(kRed);
+    gr_reso_DATA->SetLineColor(recoPhot_color);
     gr_reso_DATA->SetLineWidth(1.);
     gr_reso_DATA->ResetAttLine();
 
 
     TGraphErrors* gr_reso_recoPhot = new TGraphErrors(nPoints, x, y_reso_recoPhot, x_err, y_reso_recoPhot_err);
     gr_reso_recoPhot->SetMarkerStyle(24);
-    gr_reso_recoPhot->SetMarkerColor(kRed);
-    gr_reso_recoPhot->SetLineColor(kRed);
+    gr_reso_recoPhot->SetMarkerColor(recoPhot_color);
+    gr_reso_recoPhot->SetLineColor(recoPhot_color);
     gr_reso_recoPhot->SetLineStyle(2);
     gr_reso_recoPhot->SetLineWidth(1.);
 
@@ -664,7 +668,7 @@ void DrawExtrap::drawResponseExtrap( const std::string& etaRegion, bool correcte
 
     TGraphErrors* gr_reso_recoGen = new TGraphErrors(nPoints, x, y_reso_recoGen, x_err, y_reso_recoGen_err);
     gr_reso_recoGen->SetMarkerStyle(21);
-    gr_reso_recoGen->SetMarkerColor(kBlue);
+    gr_reso_recoGen->SetMarkerColor(recoGen_color);
 
     TGraphErrors* gr_reso_genPart = new TGraphErrors(nPoints, x, y_reso_genPart, x_err, y_reso_genPart_err);
     gr_reso_genPart->SetMarkerStyle(21);
@@ -723,7 +727,7 @@ void DrawExtrap::drawResponseExtrap( const std::string& etaRegion, bool correcte
     gr_reso_recoGen->GetPoint(2, x2, y2);
     fit_reso_recoGen->SetParameter(0, y1);
     fit_reso_recoGen->SetLineWidth(0.5);
-    fit_reso_recoGen->SetLineColor(kBlue);
+    fit_reso_recoGen->SetLineColor(recoGen_color);
     gr_reso_recoGen->Fit(fit_reso_recoGen, "RQ");
 
 
@@ -760,10 +764,11 @@ void DrawExtrap::drawResponseExtrap( const std::string& etaRegion, bool correcte
       fit_extrapToZero_sqrt->FixParameter(2, m);
     } else {
       fit_extrapToZero_sqrt->SetParameter(2, m);
-      fit_extrapToZero_sqrt->SetParLimits(2, 0., 0.05);
+      //fit_extrapToZero_sqrt->SetParLimits(2, 0., 0.05);
+      fit_extrapToZero_sqrt->SetParLimits(2, 0., 0.05*100.);
     }
     fit_extrapToZero_sqrt->SetLineStyle(2);
-    fit_extrapToZero_sqrt->SetLineColor(kRed);
+    fit_extrapToZero_sqrt->SetLineColor(recoPhot_color);
     fit_extrapToZero_sqrt->SetLineWidth(1.);
 
     TF1* fit_extrapToZero_sqrt_DATA = new TF1(*fit_extrapToZero_sqrt);
@@ -779,7 +784,7 @@ void DrawExtrap::drawResponseExtrap( const std::string& etaRegion, bool correcte
     fit_extrapToZero_line->SetParameter(0, y1_reco);
     fit_extrapToZero_line->SetParameter(1, (y2_reco-y1_reco)/(x2_reco-x1_reco));
     fit_extrapToZero_line->SetParLimits(0, 0., 0.4);
-    fit_extrapToZero_line->SetLineColor(kRed);
+    fit_extrapToZero_line->SetLineColor(recoPhot_color);
     fit_extrapToZero_line->SetLineWidth(0.5);
 
     std::cout << "MC: "  << std::endl;
