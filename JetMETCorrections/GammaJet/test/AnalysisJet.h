@@ -87,6 +87,9 @@ class AnalysisJet {
   Int_t nHFHadronsGen;
   Int_t nHFEMGen;
 
+  //btag:
+  Float_t trackCountingHighEffBJetTags;
+
 };
 
 

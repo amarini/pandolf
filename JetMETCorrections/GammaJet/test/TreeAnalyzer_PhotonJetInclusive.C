@@ -136,7 +136,9 @@ void TreeAnalyzer_PhotonJetInclusive::CreateOutputFile() {
   jetTree_->Branch("etaJet", etaJet_, "etaJet_[nJet_]/F");
   jetTree_->Branch("phiJet", phiJet_, "phiJet_[nJet_]/F");
   jetTree_->Branch( "ptDJet",  ptDJet_,  "ptDJet_[nJet_]/F");
+  jetTree_->Branch( "ptDJet",  ptDJet_,  "ptDJet_[nJet_]/F");
   jetTree_->Branch( "rmsCandJet",  rmsCandJet_,  "rmsCandJet_[nJet_]/F");
+  jetTree_->Branch("trackCountingHighEffBJetTagsJetReco",  &trackCountingHighEffBJetTagsJetReco_,  "trackCountingHighEffBJetTagsJetReco_/F");
   jetTree_->Branch(  "eJetGen",   eJetGen_,   "eJetGen_[nJet_]/F");
   jetTree_->Branch(  "ptJetGen",   ptJetGen_,   "ptJetGen_[nJet_]/F");
   jetTree_->Branch( "etaJetGen",  etaJetGen_,  "etaJetGen_[nJet_]/F");
@@ -447,6 +449,8 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
        etaJet_[nJet_] = etaJet[iRecoJet];
        ptDJet_[nJet_] = ptDJet[iRecoJet];
        rmsCandJet_[nJet_] = rmsCandJet[iRecoJet];
+
+       trackCountingHighEffBJetTagsJetReco_[nJet_] = trackCountingHighEffBJetTags[iRecoJet];
    
        eChargedHadronsJet_[nJet_] = eChargedHadrons[iRecoJet];
        ePhotonsJet_[nJet_] = ePhotons[iRecoJet];
