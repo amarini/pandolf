@@ -138,7 +138,7 @@ void TreeAnalyzer_PhotonJetInclusive::CreateOutputFile() {
   jetTree_->Branch( "ptDJet",  ptDJet_,  "ptDJet_[nJet_]/F");
   jetTree_->Branch( "ptDJet",  ptDJet_,  "ptDJet_[nJet_]/F");
   jetTree_->Branch( "rmsCandJet",  rmsCandJet_,  "rmsCandJet_[nJet_]/F");
-  jetTree_->Branch("trackCountingHighEffBJetTagsJetReco",  &trackCountingHighEffBJetTagsJetReco_,  "trackCountingHighEffBJetTagsJetReco_/F");
+  jetTree_->Branch("trackCountingHighEffBJetTagsJetReco",  trackCountingHighEffBJetTagsJetReco_,  "trackCountingHighEffBJetTagsJetReco_[nJet]/F");
   jetTree_->Branch(  "eJetGen",   eJetGen_,   "eJetGen_[nJet_]/F");
   jetTree_->Branch(  "ptJetGen",   ptJetGen_,   "ptJetGen_[nJet_]/F");
   jetTree_->Branch( "etaJetGen",  etaJetGen_,  "etaJetGen_[nJet_]/F");
