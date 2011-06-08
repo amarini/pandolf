@@ -55,6 +55,8 @@ int main(int argc, char* argv[]) {
 //}
   db->set_flags( flags );
 
+  db->set_isCMSArticle( (bool)true );
+
 std::cout << "flags set." << std::endl;
 //char outputdir_char[200];
 //std::string dirflags(flags);
@@ -123,11 +125,11 @@ std::cout << "flags set." << std::endl;
 
 
   if( norm=="LUMI" )
-    db->set_lumiNormalization(34.);
+    db->set_lumiNormalization(36.);
   else
     db->set_shapeNormalization();
 
-  db->set_lumi(34.);
+  db->set_lumi(36.);
 
   if( ONEVTX ) {
     flags += "_ONEVTX";
@@ -139,10 +141,17 @@ std::cout << "outputdir set." << std::endl;
 
   bool log = true;
 
-  db->drawHisto( "ptPhot", "Photon Transverse Momentum", "GeV/c", "Events", log, 1, "passedID");
-  db->drawHisto( "ptPhot", "Photon Transverse Momentum", "GeV/c", "Events", log);
+  db->drawHisto( "ptPhot", "Photon Transverse Momentum", "GeV", "Events", log, 1, "passedID");
+  db->drawHisto( "ptPhot", "Photon Transverse Momentum", "GeV", "Events", log);
 
-  //db->drawHisto( "ptSecondJetRel_clusterOK_isolated", "Second Jet p_{T} / Photon p_{T}", "", "Events", log);
+//db->drawHisto( "nvertex", "Number of Reconstructed Vertexes", "", "Events", log);
+//db->drawHisto( "nvertex_passedID", "Number of Reconstructed Vertexes", "", "Events", log);
+//db->drawHisto( "nvertex_passedID_pt50", "Number of Reconstructed Vertexes", "", "Events", log);
+
+//db->drawHisto( "ptSecondJetRel_passedID", "Second Jet p_{T} / Photon p_{T}", "", "Events", log);
+//db->drawHisto( "ptSecondJetRel_passedID_pt50", "Second Jet p_{T} / Photon p_{T}", "", "Events", log);
+//db->drawHisto( "deltaPhi_2ndJet_passedID", "Photon - 2ndJet Azimuth Difference", "rad", "Events", log);
+//db->drawHisto( "deltaPhi_2ndJet_passedID_pt50", "Photon - 2ndJet Azimuth Difference", "rad", "Events", log);
 
 //db->drawHisto( "ptPhot", "", "loose", "", 1, log);
 //db->drawHisto( "ptPhot", "", "medium", "", 1, log);
@@ -153,7 +162,6 @@ std::cout << "outputdir set." << std::endl;
 //db->drawHisto( "deltaPhi", "", "clusterOK", "", 1);
 
 //db->drawHisto( "deltaPhi_2ndJet", "", "loose", "", 1);
-//db->drawHisto( "deltaPhi_2ndJet", "", "medium", "", 1);
 
 //db->drawHisto( "ptSecondJetRel", "", "Nm1", "", 1, log);
 //db->drawHisto( "hcalIsoPhotReco", "", "Nm1", "", 1, log);
@@ -195,18 +203,26 @@ std::cout << "outputdir set." << std::endl;
   db->set_legendTitle("|#eta| < 1.1");
   db->drawHisto( "response", "p_{T}/p_{T}^{#gamma} Response", "", "Events", log, 1, "eta011");
   db->drawHisto( "response", "p_{T}/p_{T}^{#gamma} Response", "", "Events", log, 1, "eta011", (bool)true);
+  db->set_rebin(5);
   db->drawHisto( "responseMPF", "MPF Response", "", "Events", log, 1, "eta011");
-  db->set_legendTitle("1.5 < |#eta| < 2.4");
-  db->drawHisto( "response", "p_{T}/p_{T}^{#gamma} Response", "", "Events", log, 1, "eta1524");
-  db->drawHisto( "response", "p_{T}/p_{T}^{#gamma} Response", "", "Events", log, 1, "eta1524", (bool)true);
-  db->drawHisto( "responseMPF", "MPF Response", "", "Events", log, 1, "eta1524");
-  db->set_legendTitle("2.4 < |#eta| < 3");
-  db->drawHisto( "response", "p_{T}/p_{T}^{#gamma} Response", "", "Events", log, 1, "eta243");
-  db->drawHisto( "response", "p_{T}/p_{T}^{#gamma} Response", "", "Events", log, 1, "eta243", (bool)true);
-  db->drawHisto( "responseMPF", "MPF Response", "", "Events", log, 1, "eta243");
-  db->set_legendTitle("3 < |#eta| < 5");
-  db->drawHisto( "response", "p_{T}/p_{T}^{#gamma} Response", "", "Events", log, 1, "eta35");
-  db->drawHisto( "responseMPF", "MPF Response", "", "Events", log, 1, "eta35");
+//db->set_legendTitle("|#eta| < 1.3");
+//db->drawHisto( "response", "p_{T}/p_{T}^{#gamma} Response", "", "Events", log, 1, "eta013");
+  db->set_legendTitle("|#eta^{#gamma}| < 1.3");
+  db->set_rebin(10);
+  db->drawHisto( "response", "p_{T}/p_{T}^{#gamma} Response", "", "Events", log, 1, "eta013", (bool)true);
+  db->set_rebin(5);
+  db->drawHisto( "responseMPF", "MPF Response", "", "Events", log, 1, "eta013");
+//db->set_legendTitle("1.5 < |#eta| < 2.4");
+//db->drawHisto( "response", "p_{T}/p_{T}^{#gamma} Response", "", "Events", log, 1, "eta1524");
+//db->drawHisto( "response", "p_{T}/p_{T}^{#gamma} Response", "", "Events", log, 1, "eta1524", (bool)true);
+//db->drawHisto( "responseMPF", "MPF Response", "", "Events", log, 1, "eta1524");
+//db->set_legendTitle("2.4 < |#eta| < 3");
+//db->drawHisto( "response", "p_{T}/p_{T}^{#gamma} Response", "", "Events", log, 1, "eta243");
+//db->drawHisto( "response", "p_{T}/p_{T}^{#gamma} Response", "", "Events", log, 1, "eta243", (bool)true);
+//db->drawHisto( "responseMPF", "MPF Response", "", "Events", log, 1, "eta243");
+//db->set_legendTitle("3 < |#eta| < 5");
+//db->drawHisto( "response", "p_{T}/p_{T}^{#gamma} Response", "", "Events", log, 1, "eta35");
+//db->drawHisto( "responseMPF", "MPF Response", "", "Events", log, 1, "eta35");
 
   delete db;
   db = 0;
