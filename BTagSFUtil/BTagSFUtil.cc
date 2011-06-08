@@ -33,11 +33,12 @@ void BTagSFUtil::modifyBTagsWithSF( bool& isBTagged_loose, bool& isBTagged_mediu
     
 
     if( isBTagged_medium ){ 
-      if( coin > b_SF ) isBTagged_medium=false; //turn medium off, loose is still on
+      if( coin > b_SF ) {isBTagged_medium=false; isBTagged_loose=false;} //turn medium and loose off, 
     }
-    else if( isBTagged_loose ){
-      if( coin > b_SF_l ) isBTagged_loose=false; //
+    else if( isBTagged_loose && !isBTagged_medium ){  
+      if( coin > b_SF ) isBTagged_loose=false; //
     }
+
 
   // light quarks:
   } else if( abs( pdgIdPart)>0 ) { //in data it is 0 (save computing time)
