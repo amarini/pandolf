@@ -76,6 +76,7 @@ class TreeAnalyzer_PhotonJet : public TreeAnalyzer {
    Bool_t passed_Photon50_;
    Bool_t passed_Photon60_;
    Bool_t passed_Photon70_;
+   Bool_t passed_Photon75_;
 
    Float_t ePhotReco_;
    Float_t ptPhotReco_;

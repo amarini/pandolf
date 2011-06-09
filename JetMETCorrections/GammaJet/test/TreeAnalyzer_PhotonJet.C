@@ -115,6 +115,7 @@ void TreeAnalyzer_PhotonJet::CreateOutputFile() {
   jetTree_->Branch("passed_Photon50", &passed_Photon50_, "passed_Photon50_/O");
   jetTree_->Branch("passed_Photon60", &passed_Photon60_, "passed_Photon60_/O");
   jetTree_->Branch("passed_Photon70", &passed_Photon70_, "passed_Photon70_/O");
+  jetTree_->Branch("passed_Photon75", &passed_Photon75_, "passed_Photon75_/O");
 
   jetTree_->Branch("ePhotReco",  &ePhotReco_,  "ePhotReco_/F");
   jetTree_->Branch("ptPhotReco",  &ptPhotReco_,  "ptPhotReco_/F");
@@ -865,6 +866,7 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
      passed_Photon50_ = passedTrigger_regexp("HLT_Photon50_");
      passed_Photon60_ = passedTrigger_regexp("HLT_Photon60_");
      passed_Photon70_ = passedTrigger_regexp("HLT_Photon70_");
+     passed_Photon75_ = passedTrigger_regexp("HLT_Photon75_");
 
 
      bool eventOK = ( matchedToMC_ || isIsolated_veryloose_);
