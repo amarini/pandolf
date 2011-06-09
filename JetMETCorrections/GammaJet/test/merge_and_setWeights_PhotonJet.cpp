@@ -17,14 +17,14 @@ struct EventsAndLumi {
 
 
 
-EventsAndLumi addInput( const std::string& dataset, const std::string& algoName, const std::string& flags );
+EventsAndLumi addInput( const std::string& analyzerType, const std::string& dataset, const std::string& algoName, const std::string& flags );
 float getWeight( const std::string& dataset, int nEvents );
 
 
 int main( int argc, char* argv[] ) {
 
-  if( argc!=4 && argc!=5 ) {
-    std::cout << "USAGE: ./merge_and_setWeights_PhotonJet [dataset] [recoType] [jetAlgo] [flags=\"\"]" << std::endl;
+  if( argc!=4 && argc!=5 && argc!=6 ) {
+    std::cout << "USAGE: ./merge_and_setWeights_PhotonJet [dataset] [recoType] [jetAlgo] [analyzerType=\"PhotonJet\"] [flags=\"\"]" << std::endl;
     exit(917);
   }
 
@@ -32,9 +32,15 @@ int main( int argc, char* argv[] ) {
   std::string recoType = argv[2];
   std::string jetAlgo = argv[3];
 
-  std::string flags="";
+  std::string analyzerType="PhotonJet";
   if( argc==5 ) {
-    std::string flags_str(argv[4]);
+    std::string analyzerType_str(argv[4]);
+    analyzerType = analyzerType_str;
+  }
+
+  std::string flags="";
+  if( argc==6 ) {
+    std::string flags_str(argv[5]);
     flags = flags_str;
   }
 
@@ -46,7 +52,7 @@ int main( int argc, char* argv[] ) {
   tree = new TChain("jetTree");
 
   EventsAndLumi evlu;
-  evlu = addInput( dataset, algoName, flags );
+  evlu = addInput( analyzerType, dataset, algoName, flags );
 
   float weight = getWeight( dataset, evlu.nTotalEvents );
 
@@ -58,9 +64,9 @@ int main( int argc, char* argv[] ) {
 
   std::string outfilename;
   if( flags!="" )
-    outfilename = "PhotonJet_2ndLevelTreeW_"+dataset+"_"+algoName+"_"+flags+".root";
+    outfilename = analyzerType + "_2ndLevelTreeW_"+dataset+"_"+algoName+"_"+flags+".root";
   else
-    outfilename = "PhotonJet_2ndLevelTreeW_"+dataset+"_"+algoName+".root";
+    outfilename = analyzerType + "_2ndLevelTreeW_"+dataset+"_"+algoName+".root";
 
   TFile* outfile = new TFile(outfilename.c_str(), "recreate");
   outfile->cd();
@@ -104,15 +110,15 @@ int main( int argc, char* argv[] ) {
 }
 
 
-EventsAndLumi addInput( const std::string& dataset, const std::string& algoName, const std::string& flags ) {
+EventsAndLumi addInput( const std::string& analyzerType, const std::string& dataset, const std::string& algoName, const std::string& flags ) {
 
   TH1::AddDirectory(kFALSE);
 
   std::string infileName;
   if( flags!="" )
-    infileName = "files_PhotonJet_2ndLevel_" + dataset + "_" + algoName + "_" + flags + ".txt";
+    infileName = "files_" + analyzerType + "_2ndLevel_" + dataset + "_" + algoName + "_" + flags + ".txt";
   else
-    infileName = "files_PhotonJet_2ndLevel_" + dataset + "_" + algoName + ".txt";
+    infileName = "files_" + analyzerType + "_2ndLevel_" + dataset + "_" + algoName + ".txt";
   
   TH1F* h1_lumi;
   TH1F* h1_nCounter;
@@ -256,51 +262,51 @@ float getWeight( const std::string& dataset, int nEvents ) {
   } else if( dataset_tstr.BeginsWith("G_Pt_0to15") ) {
     xSection = 8.420e+07;
   //} else if( dataset=="G_Pt_15to30_TuneZ2_7TeV_pythia6" || dataset=="G_Pt_15to30_TuneZ2_7TeV_pythia6_CORR" ) {
-  } else if( dataset_tstr.BeginsWith("G_Pt_15to30") ) {
+  } else if( dataset_tstr.BeginsWith("G_Pt_15to30") || dataset_tstr.BeginsWith("G_Pt-15to30") ) {
     xSection = 1.717e+05;
-  } else if( dataset_tstr.BeginsWith("G_Pt_30to50") ) {
+  } else if( dataset_tstr.BeginsWith("G_Pt_30to50") || dataset_tstr.BeginsWith("G_Pt-30to50") ) {
     xSection = 1.669e+04;
-  } else if( dataset_tstr.BeginsWith("G_Pt_50to80") ) {
+  } else if( dataset_tstr.BeginsWith("G_Pt_50to80") || dataset_tstr.BeginsWith("G_Pt-50to80") ) {
     xSection = 2.722e+03;
-  } else if( dataset_tstr.BeginsWith("G_Pt_80to120") ) {
+  } else if( dataset_tstr.BeginsWith("G_Pt_80to120") || dataset_tstr.BeginsWith("G_Pt-80to120") ) {
     xSection = 4.472e+02;
-  } else if( dataset_tstr.BeginsWith("G_Pt_120to170") ) {
+  } else if( dataset_tstr.BeginsWith("G_Pt_120to170") || dataset_tstr.BeginsWith("G_Pt-120to170") ) {
     xSection = 8.417e+01;
-  } else if( dataset_tstr.BeginsWith("G_Pt_170to300") ) {
+  } else if( dataset_tstr.BeginsWith("G_Pt_170to300") || dataset_tstr.BeginsWith("G_Pt-170to300") ) {
     xSection = 2.264e+01;
-  } else if( dataset_tstr.BeginsWith("G_Pt_300to470") ) {
+  } else if( dataset_tstr.BeginsWith("G_Pt_300to470") || dataset_tstr.BeginsWith("G_Pt-300to470") ) {
     xSection = 1.493e+00;
-  } else if( dataset_tstr.BeginsWith("G_Pt_470to800") ) {
+  } else if( dataset_tstr.BeginsWith("G_Pt_470to800") || dataset_tstr.BeginsWith("G_Pt-470to800") ) {
     xSection = 1.323e-01;
-  } else if( dataset_tstr.BeginsWith("G_Pt_800to1400") ) {
+  } else if( dataset_tstr.BeginsWith("G_Pt_800to1400") || dataset_tstr.BeginsWith("G_Pt-800to1400") ) {
     xSection = 3.481e-03;
-  } else if( dataset_tstr.BeginsWith("G_Pt_1400to1800") ) {
+  } else if( dataset_tstr.BeginsWith("G_Pt_1400to1800") || dataset_tstr.BeginsWith("G_Pt-1400to1800") ) {
     xSection = 1.270e-05;
-  } else if( dataset_tstr.BeginsWith("G_Pt_1800toInf") ) {
+  } else if( dataset_tstr.BeginsWith("G_Pt_1800toInf") || dataset_tstr.BeginsWith("G_Pt-1800toInf") ) {
     xSection = 2.936e-07;
-  } else if( dataset_tstr.BeginsWith("QCD_Pt_15to30") ) {
+  } else if( dataset_tstr.BeginsWith("QCD_Pt_15to30") || dataset_tstr.BeginsWith("QCD_Pt-15to30") ) {
     xSection = 8.159e+08;
-  } else if( dataset_tstr.BeginsWith("QCD_Pt_30to50") ) {
+  } else if( dataset_tstr.BeginsWith("QCD_Pt_30to50") || dataset_tstr.BeginsWith("QCD_Pt-30to50")) {
     xSection = 5.312e+07;
-  } else if( dataset_tstr.BeginsWith("QCD_Pt_50to80") ) {
+  } else if( dataset_tstr.BeginsWith("QCD_Pt_50to80") || dataset_tstr.BeginsWith("QCD_Pt-50to80")) {
     xSection = 6.359e+06;
-  } else if( dataset_tstr.BeginsWith("QCD_Pt_80to120") ) {
+  } else if( dataset_tstr.BeginsWith("QCD_Pt_80to120") || dataset_tstr.BeginsWith("QCD_Pt-80to120")) {
     xSection = 7.843e+05;
-  } else if( dataset_tstr.BeginsWith("QCD_Pt_120to170") ) {
+  } else if( dataset_tstr.BeginsWith("QCD_Pt_120to170") || dataset_tstr.BeginsWith("QCD_Pt-120to170")) {
     xSection = 1.151e+05;
-  } else if( dataset_tstr.BeginsWith("QCD_Pt_170to300") ) {
+  } else if( dataset_tstr.BeginsWith("QCD_Pt_170to300") || dataset_tstr.BeginsWith("QCD_Pt-170to300")) {
     xSection = 2.426e+04;
-  } else if( dataset_tstr.BeginsWith("QCD_Pt_300to470") ) {
+  } else if( dataset_tstr.BeginsWith("QCD_Pt_300to470") || dataset_tstr.BeginsWith("QCD_Pt-300to470")) {
     xSection = 1.168e+03;
-  } else if( dataset_tstr.BeginsWith("QCD_Pt_470to600") ) {
+  } else if( dataset_tstr.BeginsWith("QCD_Pt_470to600") || dataset_tstr.BeginsWith("QCD_Pt-470to600")) {
     xSection = 7.022e+01;
-  } else if( dataset_tstr.BeginsWith("QCD_Pt_600to800") ) {
+  } else if( dataset_tstr.BeginsWith("QCD_Pt_600to800") || dataset_tstr.BeginsWith("QCD_Pt-600to800")) {
     xSection = 1.555e+01;
-  } else if( dataset_tstr.BeginsWith("QCD_Pt_800to1000") ) {
+  } else if( dataset_tstr.BeginsWith("QCD_Pt_800to1000") || dataset_tstr.BeginsWith("QCD_Pt-800to1000")) {
     xSection = 1.844e+00;
-  } else if( dataset_tstr.BeginsWith("QCD_Pt_1000to1400") ) {
+  } else if( dataset_tstr.BeginsWith("QCD_Pt_1000to1400") || dataset_tstr.BeginsWith("QCD_Pt-1000to1400")) {
     xSection = 3.321e-01;
-  } else if( dataset_tstr.BeginsWith("QCD_Pt_1400to1800") ) {
+  } else if( dataset_tstr.BeginsWith("QCD_Pt_1400to1800") || dataset_tstr.BeginsWith("QCD_Pt-1400to1800")) {
     xSection = 1.087e-02;
   } else if( dataset=="PhotonJet_Summer1036X_Pt5to15" ) {
     xSection = 4030000.;
