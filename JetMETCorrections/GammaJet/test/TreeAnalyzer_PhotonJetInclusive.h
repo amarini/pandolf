@@ -104,6 +104,7 @@ class TreeAnalyzer_PhotonJetInclusive : public TreeAnalyzer {
    Float_t etaJet_[100];
    Float_t  ptDJet_[100];
    Float_t  rmsCandJet_[100];
+   Float_t  trackCountingHighEffBJetTagsJetReco_[100];
 
    Float_t   ptJetGen_[100];
    Float_t    eJetGen_[100];
