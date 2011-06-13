@@ -63,6 +63,7 @@ void TreeAnalyzer_PhotonJetInclusive::CreateOutputFile() {
   jetTree_->Branch("event",&event_,"event_/I");
   jetTree_->Branch("nvertex",&nvertex_,"nvertex_/I");
 
+  jetTree_->Branch("nPU",&nPU_,"nPU_/I");
   jetTree_->Branch("ptHat",&ptHat_,"ptHat_/F");
 
   jetTree_->Branch("eventWeight",&eventWeight_,"eventWeight_/F");
@@ -138,7 +139,7 @@ void TreeAnalyzer_PhotonJetInclusive::CreateOutputFile() {
   jetTree_->Branch( "ptDJet",  ptDJet_,  "ptDJet_[nJet_]/F");
   jetTree_->Branch( "ptDJet",  ptDJet_,  "ptDJet_[nJet_]/F");
   jetTree_->Branch( "rmsCandJet",  rmsCandJet_,  "rmsCandJet_[nJet_]/F");
-  jetTree_->Branch("trackCountingHighEffBJetTagsJetReco",  trackCountingHighEffBJetTagsJetReco_,  "trackCountingHighEffBJetTagsJetReco_[nJet]/F");
+  jetTree_->Branch("trackCountingHighEffBJetTagsJet",  trackCountingHighEffBJetTagsJet_,  "trackCountingHighEffBJetTagsJet_[nJet_]/F");
   jetTree_->Branch(  "eJetGen",   eJetGen_,   "eJetGen_[nJet_]/F");
   jetTree_->Branch(  "ptJetGen",   ptJetGen_,   "ptJetGen_[nJet_]/F");
   jetTree_->Branch( "etaJetGen",  etaJetGen_,  "etaJetGen_[nJet_]/F");
@@ -219,6 +220,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      event_ = event;
      nvertex_ = nvertex;
      ptHat_ = genpt;
+     nPU_ = nPU;
 
      if( !isGoodLS() ) continue; //this takes care also of integrated luminosity
 
@@ -450,7 +452,7 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
        ptDJet_[nJet_] = ptDJet[iRecoJet];
        rmsCandJet_[nJet_] = rmsCandJet[iRecoJet];
 
-       trackCountingHighEffBJetTagsJetReco_[nJet_] = trackCountingHighEffBJetTags[iRecoJet];
+       trackCountingHighEffBJetTagsJet_[nJet_] = trackCountingHighEffBJetTags[iRecoJet];
    
        eChargedHadronsJet_[nJet_] = eChargedHadrons[iRecoJet];
        ePhotonsJet_[nJet_] = ePhotons[iRecoJet];

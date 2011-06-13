@@ -42,6 +42,7 @@ public :
 
    // Declaration of leaf types
    Float_t         genpt;
+   Int_t           nPU;
    Bool_t          isMC;
    Int_t           store;
    Int_t           lbn;
@@ -49,7 +50,6 @@ public :
    Int_t           orbit;
    Int_t           run;
    Int_t           event;
-   Int_t           nPU;
    Float_t         rhoCalo;
    Float_t         rhoPF;
    Int_t           nMC;
@@ -248,6 +248,7 @@ public :
 
    // List of branches
    TBranch        *b_genpt;   //!
+   TBranch        *b_nPU;   //!
    TBranch        *b_isMC;   //!
    TBranch        *b_store;   //!
    TBranch        *b_lbn;   //!
