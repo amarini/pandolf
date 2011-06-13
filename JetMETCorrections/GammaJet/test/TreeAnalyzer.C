@@ -341,6 +341,7 @@ void TreeAnalyzer::Init(TTree *tree)
    std::string branchName;
 
    fChain->SetBranchAddress("genpt", &genpt, &b_genpt);
+   fChain->SetBranchAddress("nPU", &nPU, &b_nPU);
    fChain->SetBranchAddress("isMC", &isMC, &b_isMC);
    fChain->SetBranchAddress("store", &store, &b_store);
    fChain->SetBranchAddress("lbn", &lbn, &b_lbn);
