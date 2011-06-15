@@ -87,6 +87,12 @@ class TreeAnalyzer_PhotonJetInclusive : public TreeAnalyzer {
    Float_t clusterMajPhotReco_;
    Float_t clusterMinPhotReco_;
    Int_t   hasPixelSeedPhotReco_;
+   Float_t pid_twrHCALPhotReco_;
+   Float_t pid_HoverEPhotReco_;
+   Float_t pid_jurECALPhotReco_;
+   Float_t pid_sIEtaIEtaPhotReco_;
+   Float_t pid_hlwTrackPhotReco_;
+   Float_t pid_hlwTrackNoDzPhotReco_;
 
    Float_t ePhotGen_;
    Float_t ptPhotGen_;
@@ -104,7 +110,7 @@ class TreeAnalyzer_PhotonJetInclusive : public TreeAnalyzer {
    Float_t etaJet_[100];
    Float_t  ptDJet_[100];
    Float_t  rmsCandJet_[100];
-   Float_t  trackCountingHighEffBJetTagsJetReco_[100];
+   Float_t  trackCountingHighEffBJetTagsJet_[100];
 
    Float_t   ptJetGen_[100];
    Float_t    eJetGen_[100];

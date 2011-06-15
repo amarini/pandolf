@@ -60,11 +60,13 @@ void TreeAnalyzer_PhotonJetInclusive::CreateOutputFile() {
   //(this is repeated for every algorithm)
 
   jetTree_->Branch("run",&run_,"run_/I");
+  jetTree_->Branch("LS",&LS_,"LS_/I");
   jetTree_->Branch("event",&event_,"event_/I");
   jetTree_->Branch("nvertex",&nvertex_,"nvertex_/I");
 
   jetTree_->Branch("nPU",&nPU_,"nPU_/I");
   jetTree_->Branch("ptHat",&ptHat_,"ptHat_/F");
+  jetTree_->Branch("rhoPF",&rhoPF_,"rhoPF_/F");
 
   jetTree_->Branch("eventWeight",&eventWeight_,"eventWeight_/F");
   jetTree_->Branch("eventWeight_medium",&eventWeight_medium_,"eventWeight_medium_/F");
@@ -122,6 +124,12 @@ void TreeAnalyzer_PhotonJetInclusive::CreateOutputFile() {
   jetTree_->Branch("clusterMajPhotReco",  &clusterMajPhotReco_,  "clusterMajPhotReco_/F");
   jetTree_->Branch("clusterMinPhotReco",  &clusterMinPhotReco_,  "clusterMinPhotReco_/F");
   jetTree_->Branch("hasPixelSeedPhotReco",  &hasPixelSeedPhotReco_,  "hasPixelSeedPhotReco_/I");
+  jetTree_->Branch("pid_twrHCALPhotReco",  &pid_twrHCALPhotReco_,  "pid_twrHCALPhotReco_/F");
+  jetTree_->Branch("pid_HoverEPhotReco",  &pid_HoverEPhotReco_,  "pid_HoverEPhotReco_/F");
+  jetTree_->Branch("pid_jurECALPhotReco",  &pid_jurECALPhotReco_,  "pid_jurECALPhotReco_/F");
+  jetTree_->Branch("pid_sIEtaIEtaPhotReco",  &pid_sIEtaIEtaPhotReco_,  "pid_sIEtaIEtaPhotReco_/F");
+  jetTree_->Branch("pid_hlwTrackPhotReco",  &pid_hlwTrackPhotReco_,  "pid_hlwTrackPhotReco_/F");
+  jetTree_->Branch("pid_hlwTrackNoDzPhotReco",  &pid_hlwTrackNoDzPhotReco_,  "pid_hlwTrackNoDzPhotReco_/F");
 
   jetTree_->Branch("ePhotGen",  &ePhotGen_,  "ePhotGen_/F");
   jetTree_->Branch("ptPhotGen",  &ptPhotGen_,  "ptPhotGen_/F");
@@ -218,9 +226,11 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
      run_ = run;
      event_ = event;
+     LS_ = lbn;
      nvertex_ = nvertex;
      ptHat_ = genpt;
      nPU_ = nPU;
+     rhoPF_ = rhoPF;
 
      if( !isGoodLS() ) continue; //this takes care also of integrated luminosity
 
@@ -268,6 +278,12 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        thisPhot.clusterMaj = sMajMajPhot[iPhot];
        thisPhot.clusterMin = sMinMinPhot[iPhot];
        thisPhot.hasPixelSeed = hasPixelSeedPhot[iPhot];
+       thisPhot.pid_twrHCAL = pid_twrHCAL[iPhot];
+       thisPhot.pid_jurECAL = pid_jurECAL[iPhot];
+       thisPhot.pid_HoverE = pid_HoverE[iPhot];
+       thisPhot.pid_hlwTrack = pid_hlwTrack[iPhot];
+       thisPhot.pid_hlwTrackNoDz = pid_hlwTrackNoDz[iPhot];
+       thisPhot.pid_etawid = pid_etawid[iPhot];
 
        //if( thisPhot.pt < 10. ) continue;
 
@@ -352,6 +368,12 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        foundPhot.clusterMaj = 0.;
        foundPhot.clusterMin = 0.;
        foundPhot.hasPixelSeed = 0;
+       foundPhot.pid_jurECAL = 0.;
+       foundPhot.pid_HoverE = 0.;
+       foundPhot.pid_twrHCAL = 0.;
+       foundPhot.pid_etawid = 0.;
+       foundPhot.pid_hlwTrack = 0.;
+       foundPhot.pid_hlwTrackNoDz = 0.;
        foundPhot.eGen = foundGenJet.eGen;
        foundPhot.ptGen = foundGenJet.ptGen;
        foundPhot.etaGen = foundGenJet.etaGen;
@@ -418,6 +440,12 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
      clusterMajPhotReco_ = foundPhot.clusterMaj;
      clusterMinPhotReco_ = foundPhot.clusterMin;
      hasPixelSeedPhotReco_ = foundPhot.hasPixelSeed;
+     pid_twrHCALPhotReco_ = foundPhot.pid_twrHCAL;
+     pid_HoverEPhotReco_ = foundPhot.pid_HoverE;
+     pid_jurECALPhotReco_ = foundPhot.pid_jurECAL;
+     pid_sIEtaIEtaPhotReco_ = foundPhot.pid_etawid;
+     pid_hlwTrackPhotReco_ = foundPhot.pid_hlwTrack;
+     pid_hlwTrackNoDzPhotReco_ = foundPhot.pid_hlwTrackNoDz;
      ePhotGen_ = foundPhot.eGen;
      ptPhotGen_ = foundPhot.ptGen;
      etaPhotGen_ = foundPhot.etaGen;
