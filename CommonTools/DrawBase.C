@@ -544,6 +544,22 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     } // if !nomc
 
 
+
+
+    std::vector<TH1D*> mcHistos_superimp;
+    TH1D* mcHisto0_superimp = 0;
+    if( mcFiles_superimp_.size()> 0 && mcFiles_superimp_[0].file!=0) 
+      mcHisto0_superimp = (TH1D*)mcFiles_superimp_[0].file->Get(histoName.c_str());
+    if( mcHisto0_superimp!=0 ) {
+      mcHistos_superimp.push_back(mcHisto0_superimp);
+      mcHistos_superimp[0]->SetLineColor( mcFiles_superimp_[0].lineColor );
+      mcHistos_superimp[0]->SetLineWidth(2);
+      mcHistos_superimp[0]->Scale(mcFiles_superimp_[0].weight );
+    }
+
+
+
+
     // normalize:
     if( scaleFactor_ > 0. ) {
 
@@ -551,6 +567,8 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
         mcHisto_sum->Scale(scaleFactor_);
         for( unsigned i=0; i<mcHistos.size(); ++i )
           mcHistos[i]->Scale(scaleFactor_);
+        for( unsigned i=0; i<mcHistos_superimp.size(); ++i )
+          mcHistos_superimp[i]->Scale(scaleFactor_);
       }
 
     } else { //scale factor < 0 --> normalize to shapes
@@ -672,6 +690,8 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
       else
         legend->AddEntry(mcHistos[i], (mcFiles_[i].legendName).c_str(), "P");
     }
+    for( unsigned i=0; i<mcHistos_superimp.size(); ++i ) 
+      legend->AddEntry(mcHistos_superimp[i], (mcFiles_superimp_[i].legendName).c_str(), "L");
 
     TH2D* h2_axes = new TH2D("axes", "", nBinsx, xMin, xMax, 10, yMin, yMax);
     if( xAxisMin_ != 9999. ) h2_axes->GetXaxis()->SetRangeUser(xAxisMin_, xMax);
@@ -713,6 +733,10 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     if( !noMC ) {
       if( !noStack_ ) {
         mcHisto_stack->Draw("histo same");
+        for( unsigned i=0; i<mcHistos_superimp.size(); ++i ) {
+          int backwardsIndex = mcHistos_superimp.size()-1-i; //backwards is prettier: bg on the back, signal in front
+          mcHistos_superimp[backwardsIndex]->Draw("h same");
+        }
       } else {
         for( unsigned i=0; i<mcHistos.size(); ++i ) {
           int backwardsIndex = mcHistos.size()-1-i; //backwards is prettier: bg on the back, signal in front
@@ -985,6 +1009,11 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
       if( !noMC ) {
         if( !noStack_ ) {
           mcHisto_stack->Draw("histo same");
+          for( unsigned i=0; i<mcHistos_superimp.size(); ++i ) {
+            int backwardsIndex = mcHistos_superimp.size()-1-i; //backwards is prettier: bg on the back, signal in front
+            mcHistos_superimp[backwardsIndex]->Draw("h same");
+          }
+
         } else {
           for( unsigned i=0; i<mcHistos.size(); ++i ) {
             int backwardsIndex = mcHistos.size()-1-i; //backwards is prettier: bg on the back, signal in front
@@ -2248,6 +2277,29 @@ void DrawBase::add_mcFile( TFile* mcFile, float weight, const std::string& datas
   mcFiles_.push_back( thisfile );
 
   std::cout << "-> Added MC file '" << mcFile->GetName()  << "'." << std::endl;
+}
+
+
+
+void DrawBase::add_mcFile_superimp( TFile* mcFile, const std::string& datasetName, const std::string& legendName, float multFactor, int lineColor, int lineWidth ) {
+
+  InputFile thisfile;
+  thisfile.file = mcFile;
+  thisfile.datasetName = datasetName;
+  thisfile.weight = multFactor;
+  thisfile.legendName = legendName;
+  thisfile.fillColor = 0;
+  thisfile.fillStyle=0;
+  thisfile.markerStyle=0;
+  thisfile.lineColor=lineColor;
+  thisfile.lineWidth=lineWidth;
+  if( mcFile == 0 ) {
+    std::cout << "File: '" << mcFile->GetName() << " does not exist! Skipping." << std::endl;
+    return;
+  }
+  mcFiles_superimp_.push_back( thisfile );
+
+  std::cout << "-> Added (superimposed) MC file '" << mcFile->GetName()  << "'." << std::endl;
 }
 
 
