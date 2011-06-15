@@ -969,22 +969,23 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
       if( !noMC ) {
         if( noStack_ ) {
           for(unsigned iHisto=0; iHisto<mcHistos.size(); ++iHisto) 
-            for( unsigned iBin=1; iBin<mcHistos[iHisto]->GetNbinsX(); ++iBin ) 
+            for( unsigned iBin=1; iBin<mcHistos[iHisto]->GetNbinsX()+1; ++iBin ) 
               if( mcHistos[iHisto]->GetBinContent(iBin)>0. && mcHistos[iHisto]->GetBinContent(iBin) < yMin_log ) 
                 yMin_log = mcHistos[iHisto]->GetBinContent(iBin);
         } else {
-            for( unsigned iBin=1; iBin<mcHisto_sum->GetNbinsX(); ++iBin ) 
+            for( unsigned iBin=1; iBin<mcHisto_sum->GetNbinsX()+1; ++iBin ) 
               if( mcHisto_sum->GetBinContent(iBin)>0. && mcHisto_sum->GetBinContent(iBin) < yMin_log ) 
                 yMin_log = mcHisto_sum->GetBinContent(iBin);
         }
       } // if nomc
       // second: data
       for(unsigned iHisto=0; iHisto<dataHistos.size(); ++iHisto) 
-        for( unsigned iBin=1; iBin<dataHistos[iHisto]->GetNbinsX(); ++iBin ) 
+        for( unsigned iBin=1; iBin<dataHistos[iHisto]->GetNbinsX()+1; ++iBin ) 
           if( dataHistos[iHisto]->GetBinContent(iBin)>0. && dataHistos[iHisto]->GetBinContent(iBin) < yMin_log ) 
             yMin_log = dataHistos[iHisto]->GetBinContent(iBin);
 
       TH2D* h2_axes_log = new TH2D("axes_log", "", nBinsx, xMin, xMax, 10, 0.1*yMin_log, yAxisMaxScaleLog_*yMax);
+      //TH2D* h2_axes_log = new TH2D("axes_log", "", nBinsx, xMin, xMax, 10, 0.1*yMin_log, 100.*yMax);
       if( xAxisMin_ != 9999. ) h2_axes_log->GetXaxis()->SetRangeUser(xAxisMin_, xMax);
       if( xAxisMax_ != 9999. ) h2_axes_log->GetXaxis()->SetRangeUser(xMin, xAxisMax_);
       if( yAxisMax_ != 9999. ) h2_axes_log->GetYaxis()->SetRangeUser(0.1*yMin_log, yAxisMaxScaleLog_*yAxisMax_);
