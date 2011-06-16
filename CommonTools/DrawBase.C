@@ -1099,8 +1099,8 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     gr_resolutionGEN_vs_pt->Write();
     graphFile->Close();
 
-    gStyle->SetPadTickX(1);
-    gStyle->SetPadTickY(1);
+  //gStyle->SetPadTickX(1);
+  //gStyle->SetPadTickY(1);
 
     TCanvas* c1 = new TCanvas("c1", "c1", 600, 800);
     c1->cd();
@@ -1491,8 +1491,8 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     delete c1;
     c1 = 0;
 
-    gStyle->SetPadTickX(0);
-    gStyle->SetPadTickY(0);
+  //gStyle->SetPadTickX(0);
+  //gStyle->SetPadTickY(0);
 
 
   } //if response
@@ -1914,8 +1914,8 @@ void DrawBase::drawStack(const std::string& varY, const std::string& varX, const
     h2_axes->GetXaxis()->SetNoExponent();
   }
 
-  if( varX != "eta" )
-    gStyle->SetPadTickY(1);
+//if( varX != "eta" )
+//  gStyle->SetPadTickY(1);
 
   TCanvas* c1 = new TCanvas("c1", "c1", 800, 800);
 //c1->SetLeftMargin(1.2);
@@ -1960,7 +1960,7 @@ void DrawBase::drawStack(const std::string& varY, const std::string& varX, const
   delete h1_Rhfhad_stack;
   delete h1_Rhfem_stack;
 
-  gStyle->SetPadTickY(0);
+  //gStyle->SetPadTickY(0);
 
 
 } //drawStack
@@ -2233,14 +2233,6 @@ void DrawBase::add_dataFile( TFile* dataFile, const std::string& datasetName, co
   thisFile.fillColor = markerColor;
   thisFile.markerStyle = markerStyle;
   thisFile.fillStyle = fillStyle;
-
-  TH1F* h1_lumi = (TH1F*)dataFile->Get("totalLumi");
-  if( h1_lumi==0 ) {
-    std::cout << "WARNING! Lumi histogram not found!" << std::endl;
-    lumi_ = 0.;
-  } else {
-    lumi_ = h1_lumi->GetBinContent(1);
-  }
 
   if( dataFile == 0 ) {
     std::cout << "File: '" << dataFile->GetName() << " does not exist! Skipping." << std::endl;
