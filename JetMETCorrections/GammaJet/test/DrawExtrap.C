@@ -13,6 +13,7 @@ DrawExtrap::DrawExtrap( const std::string& analysisType, const std::string& reco
   NOQ_ = false;
   INTPERC_ = 95.;
   FIXM_ = false;
+  EXCLUDE_FIRST_POINT_ = false;
 
 }
 
@@ -790,6 +791,9 @@ void DrawExtrap::drawResponseExtrap( const std::string& etaRegion, bool correcte
     std::cout << "MC: "  << std::endl;
     gr_reso_recoPhot->Fit(fit_extrapToZero_sqrt, "R");
 
+    if( EXCLUDE_FIRST_POINT_ ) {
+      gr_reso_DATA->RemovePoint(0);
+    }
     std::cout << "DATA: "  << std::endl;
     gr_reso_DATA->Fit(fit_extrapToZero_sqrt_DATA, "R");
 
@@ -1030,6 +1034,7 @@ void DrawExtrap::drawResponseExtrap( const std::string& etaRegion, bool correcte
     graphFileName = "PhotonJetExtrapGraphs_" + suffix + L2L3_text_2 + "_" + FIT_RMS_;
   if( NOQ_ ) graphFileName += "_NOQ";
   if( FIXM_ ) graphFileName += "_FIXM";
+  if( EXCLUDE_FIRST_POINT_ ) graphFileName += "_NOFIRSTP";
   graphFileName += ".root";
 
   TFile* graphFile = new TFile( graphFileName.c_str(), "recreate" );
