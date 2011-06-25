@@ -22,6 +22,7 @@ class DrawExtrap : public DrawBase {
   void set_NOQ( bool noq ) { NOQ_ = noq; };
   void set_INTPERC( float intperc ) { INTPERC_ = intperc; };
   void set_FIXM( bool fixm ) { FIXM_ = fixm; };
+  void set_EXCLUDEFIRSTPOINT( bool exclfirstpoint ) { EXCLUDE_FIRST_POINT_ = exclfirstpoint; };
 
   void drawResponseExtrap(const std::string& etaRegion, bool corrected=false, const std::string& recoGen="RecoRel");
 
@@ -38,6 +39,7 @@ class DrawExtrap : public DrawBase {
   std::string FIT_RMS_;
   float INTPERC_;
   bool FIXM_;
+  bool EXCLUDE_FIRST_POINT_;
 
 };
 
