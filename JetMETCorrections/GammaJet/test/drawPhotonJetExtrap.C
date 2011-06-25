@@ -5,7 +5,8 @@
 
 bool useMCassoc_ = false;
 bool NOQ=false;
-bool FIXM=true;
+bool FIXM=false;
+bool EXCLUDE_FIRST_POINT=true;
 
 
 
@@ -52,12 +53,13 @@ int main(int argc, char* argv[]) {
 
   std::string NOQtext = (NOQ) ? "_NOQ" : "";
   std::string FIXMtext = (FIXM) ? "_FIXM" : "";
+  std::string NOFIRSTPtext = (EXCLUDE_FIRST_POINT) ? "_NOFIRSTP" : "";
 
   char outputdir_char[200];
   if( mcFlags!="" ) {
-    sprintf( outputdir_char, "PhotonJetExtrapPlots_%s_vs_%s_%s_%s_%s%s%s", data_dataset.c_str(), mc_dataset.c_str(), algoType.c_str(), mcFlags.c_str(), FIT_RMS.c_str(), FIXMtext.c_str(), NOQtext.c_str());
+    sprintf( outputdir_char, "PhotonJetExtrapPlots_%s_vs_%s_%s_%s_%s%s%s%s", data_dataset.c_str(), mc_dataset.c_str(), algoType.c_str(), mcFlags.c_str(), FIT_RMS.c_str(), FIXMtext.c_str(), NOFIRSTPtext.c_str(), NOQtext.c_str());
   } else {
-    sprintf( outputdir_char, "PhotonJetExtrapPlots_%s_vs_%s_%s_%s%s%s", data_dataset.c_str(), mc_dataset.c_str(), algoType.c_str(), FIT_RMS.c_str(), FIXMtext.c_str(), NOQtext.c_str());
+    sprintf( outputdir_char, "PhotonJetExtrapPlots_%s_vs_%s_%s_%s%s%s%s", data_dataset.c_str(), mc_dataset.c_str(), algoType.c_str(), FIT_RMS.c_str(), FIXMtext.c_str(), NOFIRSTPtext.c_str(), NOQtext.c_str());
   }
   std::string outputdir_str(outputdir_char);
 
@@ -103,6 +105,7 @@ int main(int argc, char* argv[]) {
 
   db->set_NOQ( NOQ );
   db->set_FIXM( FIXM );
+  db->set_EXCLUDEFIRSTPOINT( EXCLUDE_FIRST_POINT );
  
   db->drawResponseExtrap("eta011");
   db->drawResponseExtrap("eta011", (bool)true);
