@@ -331,8 +331,16 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
   TRegexp respMPF_regexp("responseMPF");
   bool isMPF = name_tstr.Contains(respMPF_regexp);
 
+
   // if response will have to do a plot for each pt bin:
-  int number_of_plots = (draw_vs_pt_graphs) ? (ptPhot_binning.size()-1) : 1;
+//  int number_of_plots = (draw_vs_pt_graphs) ? (ptPhot_binning.size()-1) : 1;
+
+
+
+
+//CHANGEEEEEEEEEEEE 
+
+  int number_of_plots = (draw_vs_pt_graphs) ? (ptPhot_binning.size()-2) : 1;
 
   std::string ptPhotMean_name = "ptPhotMean";
   if( flags!= "" ) ptPhotMean_name = ptPhotMean_name + "_" + flags;
@@ -639,31 +647,6 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
 
 
 
-    std::string xAxis = axisName;
-    //if( correctedResponse ) xAxis = "Corrected " + xAxis;
-    if( units!="" ) xAxis += " [" + units + "]";
-
-    std::string yAxis = instanceName;
-
-    if( scaleFactor_<0. && (dataFiles_.size()==0||mcFiles_.size()==0) ) {
-      yAxis = "Normalized to Unity";
-    } else {
-      char yAxis_char[150];
-      bool equalBins=true;
-      for( unsigned ibin=1; ibin<refHisto->GetNbinsX(); ++ibin )
-        if( refHisto->GetBinWidth(ibin)!=refHisto->GetBinWidth(ibin+1) ) equalBins=false;
-
-      if( units!="" && equalBins ) {
-        if( ((int)(10.*refHisto->GetBinWidth(1)) % 10) == 0 )
-          sprintf( yAxis_char, "%s / (%.0f %s)", instanceName.c_str(), refHisto->GetBinWidth(1), units.c_str() );
-        else
-          sprintf( yAxis_char, "%s / (%.1f %s)", instanceName.c_str(), refHisto->GetBinWidth(1), units.c_str() );
-      } else {
-        sprintf( yAxis_char, "%s", instanceName.c_str());
-      }
-      std::string yAxis_str_tmp(yAxis_char);
-      yAxis = yAxis_str_tmp;
-    }
 
 
 
@@ -693,6 +676,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     for( unsigned i=0; i<mcHistos_superimp.size(); ++i ) 
       legend->AddEntry(mcHistos_superimp[i], (mcFiles_superimp_[i].legendName).c_str(), "L");
 
+    bool noBinLabels=true;
     TH2D* h2_axes = new TH2D("axes", "", nBinsx, xMin, xMax, 10, yMin, yMax);
     if( xAxisMin_ != 9999. ) h2_axes->GetXaxis()->SetRangeUser(xAxisMin_, xMax);
     if( xAxisMax_ != 9999. ) h2_axes->GetXaxis()->SetRangeUser(xMin, xAxisMax_);
@@ -700,12 +684,47 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     if( getBinLabels_ ) {
       for( unsigned iBinx=1; iBinx<nBinsx+1; ++iBinx ) {
         if( refHisto->GetXaxis()->GetBinLabel(iBinx) != "" )
+          noBinLabels = false;
           h2_axes->GetXaxis()->SetBinLabel(iBinx, refHisto->GetXaxis()->GetBinLabel(iBinx));
       }
     }
+
+
+    // axis titles:
+
+    std::string xAxis = axisName;
+    //if( correctedResponse ) xAxis = "Corrected " + xAxis;
+    if( units!="" ) xAxis += " [" + units + "]";
+
+    std::string yAxis = instanceName;
+
+    if( scaleFactor_<0. && (dataFiles_.size()==0||mcFiles_.size()==0) ) {
+      yAxis = "Normalized to Unity";
+    } else {
+      char yAxis_char[150];
+      bool equalBins=true;
+      for( unsigned ibin=1; ibin<refHisto->GetNbinsX(); ++ibin )
+        if( refHisto->GetBinWidth(ibin)!=refHisto->GetBinWidth(ibin+1) ) equalBins=false;
+
+      //if( units!="" && equalBins ) {
+      if( equalBins && noBinLabels) {
+        std::string units_text = (units!="") ? (" "+units) : "";
+        if( ((int)(10.*refHisto->GetBinWidth(1)) % 10) == 0 )
+          sprintf( yAxis_char, "%s / (%.0f%s)", instanceName.c_str(), refHisto->GetBinWidth(1), units_text.c_str() );
+        else
+          sprintf( yAxis_char, "%s / (%.1f%s)", instanceName.c_str(), refHisto->GetBinWidth(1), units_text.c_str() );
+      } else {
+        sprintf( yAxis_char, "%s", instanceName.c_str());
+      }
+      std::string yAxis_str_tmp(yAxis_char);
+      yAxis = yAxis_str_tmp;
+    }
+
+
     h2_axes->SetXTitle(xAxis.c_str());
     h2_axes->SetYTitle(yAxis.c_str());
 
+    if( !noBinLabels ) h2_axes->GetXaxis()->SetLabelSize(0.07);
 
     TPaveText* label_cms = get_labelCMS(0);
     TPaveText* label_sqrt = get_labelSqrt(0);
@@ -767,6 +786,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
       label_bonus->Draw("same");
     if( additionalLabel_!=0 )
       additionalLabel_->Draw("same");
+
 
     if( draw_vs_pt_graphs ) {  //store info for response vs. pt plots (to be done later)
 
@@ -993,6 +1013,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
       h2_axes_log->SetYTitle(yAxis.c_str());
     //h2_axes_log->GetXaxis()->SetTitleOffset(1.1);
     //h2_axes_log->GetYaxis()->SetTitleOffset(1.5);
+      if( !noBinLabels ) h2_axes_log->GetXaxis()->SetLabelSize(0.07);
       if( getBinLabels_ ) {
         for( unsigned iBinx=1; iBinx<nBinsx+1; ++iBinx ) {
           if( refHisto->GetXaxis()->GetBinLabel(iBinx)!="" )
@@ -1062,6 +1083,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     delete h2_axes;
 
   } //for n plots
+
 
 
   if( draw_vs_pt_graphs ) { // now draw the trends vs pt:
