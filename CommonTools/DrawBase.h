@@ -172,6 +172,7 @@ class DrawBase {
   bool logx_;
   bool getBinLabels_;
   std::string legendTitle_;
+  float legendTextSize_;
 
   bool poissonAsymmErrors_;
 
