@@ -64,6 +64,10 @@ public:
   static TH1D* getBand(TF1 *f, TMatrixD const& m, std::string name, bool getRelativeBand=false, int npx=100);
 
   static TGraphErrors* get_graphRatio( TGraphErrors* gr_data, TGraphErrors* gr_MC);
+  
+  static TGraphAsymmErrors* getGraphPoissonErrors( TH1D* histo, const std::string xerrType="sqrt12", float cl=0.6826 );
+
+
 
  private:
 

@@ -1,4 +1,4 @@
-#include "fitTools.h"
+#include "CommonTools/fitTools.h"
 #include <cmath>
 #include "TMinuit.h"
 
@@ -29,27 +29,30 @@ std::vector<float> fitTools::getPtPhot_binning() {
 
   std::vector<float> returnVector;
 
-//returnVector.push_back(10.);
-//returnVector.push_back(15.);
-//returnVector.push_back(21.);
-//returnVector.push_back(32.);
-//returnVector.push_back(46.);
-//returnVector.push_back(68.);
-//returnVector.push_back(100.);
-//returnVector.push_back(150.);
-//returnVector.push_back(3500.);
+////returnVector.push_back(10.);
+//  returnVector.push_back(15.);
+//  returnVector.push_back(22.);
+//  returnVector.push_back(32.);
+//  returnVector.push_back(47.);
+//  returnVector.push_back(70.);
+//  returnVector.push_back(100.);
+//  returnVector.push_back(150.);
+//  //returnVector.push_back(220.);
+//  returnVector.push_back(320.);
+//  returnVector.push_back(470.);
+//  returnVector.push_back(3500.);
 
-//returnVector.push_back(10.);
   returnVector.push_back(15.);
   returnVector.push_back(22.);
   returnVector.push_back(32.);
-  returnVector.push_back(47.);
-  returnVector.push_back(70.);
+  returnVector.push_back(53.);
+  returnVector.push_back(80.);
   returnVector.push_back(100.);
   returnVector.push_back(150.);
-  //returnVector.push_back(220.);
+  returnVector.push_back(220.);
   returnVector.push_back(320.);
   returnVector.push_back(470.);
+  returnVector.push_back(700.);
   returnVector.push_back(3500.);
 
 //returnVector.push_back(15.);
@@ -1291,3 +1294,51 @@ TGraphErrors* fitTools::get_graphRatio( TGraphErrors* gr_data, TGraphErrors* gr_
 
 }
 
+
+
+TGraphAsymmErrors* fitTools::getGraphPoissonErrors( TH1D* histo, const std::string xerrType, float cl ) {
+
+  
+  TGraphAsymmErrors* graph = new TGraphAsymmErrors(0);
+
+  for( unsigned iBin=1; iBin<(histo->GetXaxis()->GetNbins()+1); ++iBin ) {
+
+    int y; // these are data histograms, so y has to be integer
+    float x, xerr, yerrplus, yerrminus;
+    //xerr = 0.; //no xerr for now (maybe binwidth / sqrt(12)?)
+
+    x = histo->GetBinCenter(iBin);
+    if( xerrType=="0" )
+      xerr = 0.;
+    else if( xerrType=="binWidth" )
+      xerr = histo->GetBinWidth(iBin)/2.;
+    else if( xerrType=="sqrt12" )
+      xerr = histo->GetBinWidth(iBin)/sqrt(12.);
+    else {
+      std::cout << "Unkown xerrType '" << xerrType << "'. Setting to bin width." << std::endl;
+      xerr = histo->GetBinWidth(iBin);
+    }
+    y = (int)histo->GetBinContent(iBin);
+    
+    // and now poissonian errors (bayes flat prior):
+    if( y==0 ) {
+      yerrminus = 0.;
+      yerrplus = 0.5*TMath::ChisquareQuantile(cl, 2.*(y+1.) );
+    } else {  
+      //float lowL = 0.5*TMath::ChisquareQuantile(1.-cl/2., 2.*y);
+      //float upL = 0.5*TMath::ChisquareQuantile(cl/2., 2.*(y+1.) );
+      float lowL = 0.5*TMath::ChisquareQuantile(1.-cl, 2.*y);
+      float upL = 0.5*TMath::ChisquareQuantile(cl, 2.*(y+1.) );
+      yerrminus = y - lowL;
+      yerrplus = upL - y;
+    }
+
+    int thisPoint = graph->GetN();
+    graph->SetPoint( thisPoint, x, y );
+    graph->SetPointError( thisPoint, xerr, xerr, yerrminus, yerrplus );
+
+  }
+
+  return graph;
+
+}

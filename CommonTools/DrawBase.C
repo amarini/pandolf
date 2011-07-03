@@ -1,5 +1,5 @@
-#include "DrawBase.h"
-#include "fitTools.h"
+#include "CommonTools/DrawBase.h"
+#include "CommonTools/fitTools.h"
 #include "TRegexp.h"
 #include <iostream>
 #include <algorithm>
@@ -187,6 +187,8 @@ DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType
   markerSize_ = 1.6;
   getBinLabels_ = false;
   legendTitle_ = "";
+
+  poissonAsymmErrors_ = true;
 
   pdf_aussi_ = false;
   noStack_ = false;
@@ -466,6 +468,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     }
 
 
+
     std::vector<TH1D*> mcHistos;
     TH1D* mcHisto0 = 0;
     if( mcFiles_.size()> 0 && mcFiles_[0].file!=0) 
@@ -562,6 +565,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
       mcHistos_superimp.push_back(mcHisto0_superimp);
       mcHistos_superimp[0]->SetLineColor( mcFiles_superimp_[0].lineColor );
       mcHistos_superimp[0]->SetLineWidth(2);
+      mcHistos_superimp[0]->Rebin(rebin_);
       mcHistos_superimp[0]->Scale(mcFiles_superimp_[0].weight );
     }
 
@@ -689,6 +693,20 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
       }
     }
 
+   
+    // create data graph (poisson asymm errors):
+    TGraphAsymmErrors* graph_data_poisson = new TGraphAsymmErrors(0);
+    if( dataHistos.size()==1 && poissonAsymmErrors_ ) {
+      if( noBinLabels )
+        graph_data_poisson = fitTools::getGraphPoissonErrors(dataHistos[0]);
+      else 
+        graph_data_poisson = fitTools::getGraphPoissonErrors(dataHistos[0], "binWidth");
+      if( dataFiles_[0].markerStyle!=-1 )
+        graph_data_poisson->SetMarkerStyle(dataFiles_[0].markerStyle);
+      else 
+        graph_data_poisson->SetMarkerStyle(20);
+    }
+
 
     // axis titles:
 
@@ -709,7 +727,9 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
       //if( units!="" && equalBins ) {
       if( equalBins && noBinLabels) {
         std::string units_text = (units!="") ? (" "+units) : "";
-        if( ((int)(10.*refHisto->GetBinWidth(1)) % 10) == 0 )
+        if( (refHisto->GetBinWidth(1)) < 0.1 )
+          sprintf( yAxis_char, "%s / (%.2f%s)", instanceName.c_str(), refHisto->GetBinWidth(1), units_text.c_str() );
+        else if( ((int)(10.*refHisto->GetBinWidth(1)) % 10) == 0 )
           sprintf( yAxis_char, "%s / (%.0f%s)", instanceName.c_str(), refHisto->GetBinWidth(1), units_text.c_str() );
         else
           sprintf( yAxis_char, "%s / (%.1f%s)", instanceName.c_str(), refHisto->GetBinWidth(1), units_text.c_str() );
@@ -767,11 +787,15 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
       }
     } // if !nomc
     for( unsigned i=0; i<dataHistos.size(); ++i ) {
-      int backwardsIndex = dataHistos.size()-1-i; //backwards is prettier: bg on the back, signal in front
-      if( dataFiles_[backwardsIndex].fillStyle!=-1 )
-        dataHistos[backwardsIndex]->Draw("h same");
-      else
-        dataHistos[backwardsIndex]->Draw("e same");
+      if( dataHistos.size()==1 && poissonAsymmErrors_ ) {
+        graph_data_poisson->Draw("Psame");
+      } else {
+        int backwardsIndex = dataHistos.size()-1-i; //backwards is prettier: bg on the back, signal in front
+        if( dataFiles_[backwardsIndex].fillStyle!=-1 )
+          dataHistos[backwardsIndex]->Draw("h same");
+        else
+          dataHistos[backwardsIndex]->Draw("e same");
+      }
     //if( dataFiles_[i].fillStyle!=-1 )
     //  dataHistos[i]->Draw("h same");
     //else
@@ -1047,11 +1071,15 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
         }
       } // if !nomc
       for( unsigned i=0; i<dataHistos.size(); ++i ) {
-        int backwardsIndex = dataHistos.size()-1-i; //backwards is prettier: bg on the back, signal in front
-        if( dataFiles_[backwardsIndex].fillStyle!=-1 )
-          dataHistos[backwardsIndex]->Draw("h same");
-        else
-          dataHistos[backwardsIndex]->Draw("e same");
+        if( dataHistos.size()==1 && poissonAsymmErrors_ ) {
+          graph_data_poisson->Draw("Psame");
+        } else {
+          int backwardsIndex = dataHistos.size()-1-i; //backwards is prettier: bg on the back, signal in front
+          if( dataFiles_[backwardsIndex].fillStyle!=-1 )
+            dataHistos[backwardsIndex]->Draw("h same");
+          else
+            dataHistos[backwardsIndex]->Draw("e same");
+        }
       //if( dataFiles_[i].fillStyle!=-1 )
       //  dataHistos[i]->Draw("h same");
       //else
