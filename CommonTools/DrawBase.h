@@ -173,6 +173,8 @@ class DrawBase {
   bool getBinLabels_;
   std::string legendTitle_;
 
+  bool poissonAsymmErrors_;
+
   TPaveText* additionalLabel_;
 
   bool noStack_;
