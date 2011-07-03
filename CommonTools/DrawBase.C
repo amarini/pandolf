@@ -187,6 +187,7 @@ DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType
   markerSize_ = 1.6;
   getBinLabels_ = false;
   legendTitle_ = "";
+  legendTextSize_ = 0.038;
 
   poissonAsymmErrors_ = true;
 
@@ -665,7 +666,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
 
     TLegend* legend = new TLegend(lb.xMin, lb.yMin, lb.xMax, lb.yMax, legendTitle_.c_str());
     legend->SetFillColor(kWhite);
-    legend->SetTextSize(0.035);
+    legend->SetTextSize(legendTextSize_);
     for( unsigned i=0; i<dataHistos.size(); ++i ) 
       if( dataFiles_[i].fillStyle!=-1 )
         legend->AddEntry(dataHistos[i], (dataFiles_[i].legendName).c_str(), "F");
@@ -1257,7 +1258,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     TLegend* legend = new TLegend(0.5, 0.06, 0.85, 0.3, legendTitle_.c_str());
     legend->SetFillColor(kWhite);
     legend->SetFillStyle(0);
-    legend->SetTextSize(labelTextSize);
+    legend->SetTextSize(legendTextSize_);
     if( name=="response" ) {
       if( !noDATA )
         legend->AddEntry( gr_response_vs_pt, "Data (#gamma+Jet)", "P");
@@ -1607,7 +1608,7 @@ void DrawBase::drawProfile( const std::string& yVar, const std::string& xVar, in
 
   TLegend* legend = new TLegend(lb.xMin, lb.yMin, lb.xMax, lb.yMax);
   legend->SetFillColor(kWhite);
-  legend->SetTextSize(0.035);
+  legend->SetTextSize(legendTextSize_);
   legend->AddEntry(dataProfile, "Data", "P");
   legend->AddEntry(mcProfile, "Simulation", "F");
 
@@ -2063,7 +2064,7 @@ void DrawBase::compareDifferentHistos_singleFile( InputFile infile, const std::v
 
   TLegend* legend = new TLegend( lb.xMin, lb.yMin, lb.xMax, lb.yMax, legendTitle_.c_str() );
   legend->SetFillColor(0);
-  legend->SetTextSize(0.035);
+  legend->SetTextSize(legendTextSize_);
 
 
   float xMin, xMax, yMin, yMax;
@@ -2225,7 +2226,7 @@ void DrawBase::drawObjects( const std::vector< TObject* > objects, const std::st
 
   TLegend* legend = new TLegend( 0.45, 0.15, 0.88, 0.4, "|#eta| < 1.3" );
   legend->SetFillColor(kWhite);
-  legend->SetTextSize(0.035);
+  legend->SetTextSize(legendTextSize_);
   for( unsigned i=0; i<objects.size(); ++i ) 
     legend->AddEntry( objects[i], objects[i]->GetName(), "P");
 
@@ -2454,35 +2455,35 @@ LegendBox DrawBase::get_legendBox( int legendQuadrant, const std::vector<std::st
     LegendBox lb;
 
     if( legendQuadrant==1 ) {
-      lb.xMin = 0.65;
+      lb.xMin = 0.63;
       lb.yMax = 0.91;
-      lb.yMin = lb.yMax - 0.06*(float)nNames_total;
+      lb.yMin = lb.yMax - 0.07*(float)nNames_total;
       lb.xMax = 0.92;
     } else if( legendQuadrant==0 ) {
       lb.xMin = 0.5;
       lb.yMax = 0.88;
-      lb.yMin = lb.yMax - 0.06*(float)nNames_total;
+      lb.yMin = lb.yMax - 0.07*(float)nNames_total;
       lb.xMax = 0.73;
     } else if( legendQuadrant==2 ) {
       lb.xMin = 0.2;
       lb.yMax = 0.91;
-      lb.yMin = lb.yMax - 0.06*(float)nNames_total;
-      lb.xMax = 0.47;
+      lb.yMin = lb.yMax - 0.07*(float)nNames_total;
+      lb.xMax = 0.49;
     } else if( legendQuadrant==3 ) {
       lb.xMin = 0.18;
       lb.yMin = 0.15;
       lb.xMax = 0.41;
-      lb.yMax = lb.yMin + 0.06*(float)nNames_total;
+      lb.yMax = lb.yMin + 0.07*(float)nNames_total;
     } else if( legendQuadrant==4 ) {
       lb.xMin = 0.5;
       lb.yMin = 0.15;
       lb.xMax = 0.73;
-      lb.yMax = lb.yMin + 0.06*(float)nNames_total;
+      lb.yMax = lb.yMin + 0.07*(float)nNames_total;
     } else if( legendQuadrant==5 ) {
       lb.xMin = 0.4;
       lb.yMin = 0.15;
       lb.xMax = 0.6;
-      lb.yMax = lb.yMin + 0.06*(float)nNames_total;
+      lb.yMax = lb.yMin + 0.07*(float)nNames_total;
     }
 
     bool widen = false;
