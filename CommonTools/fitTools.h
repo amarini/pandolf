@@ -65,7 +65,8 @@ public:
 
   static TGraphErrors* get_graphRatio( TGraphErrors* gr_data, TGraphErrors* gr_MC);
   
-  static TGraphAsymmErrors* getGraphPoissonErrors( TH1D* histo, const std::string xerrType="sqrt12", float cl=0.6826 );
+  //static TGraphAsymmErrors* getGraphPoissonErrors( TH1D* histo, const std::string xerrType="binWidth", float cl=0.6826 );
+  static TGraphAsymmErrors* getGraphPoissonErrors( TH1D* histo, const std::string xerrType="binWidth", float nSigma=1. );
 
 
 

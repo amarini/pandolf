@@ -1,6 +1,7 @@
-#include "CommonTools/fitTools.h"
+#include "fitTools.h"
 #include <cmath>
 #include "TMinuit.h"
+#include "RooHistError.h"
 
 
 Double_t rpf(Double_t *x, Double_t *p);
@@ -1296,7 +1297,7 @@ TGraphErrors* fitTools::get_graphRatio( TGraphErrors* gr_data, TGraphErrors* gr_
 
 
 
-TGraphAsymmErrors* fitTools::getGraphPoissonErrors( TH1D* histo, const std::string xerrType, float cl ) {
+TGraphAsymmErrors* fitTools::getGraphPoissonErrors( TH1D* histo, const std::string xerrType, float nSigma ) {
 
   
   TGraphAsymmErrors* graph = new TGraphAsymmErrors(0);
@@ -1304,7 +1305,7 @@ TGraphAsymmErrors* fitTools::getGraphPoissonErrors( TH1D* histo, const std::stri
   for( unsigned iBin=1; iBin<(histo->GetXaxis()->GetNbins()+1); ++iBin ) {
 
     int y; // these are data histograms, so y has to be integer
-    float x, xerr, yerrplus, yerrminus;
+    double x, xerr, yerrplus, yerrminus;
     //xerr = 0.; //no xerr for now (maybe binwidth / sqrt(12)?)
 
     x = histo->GetBinCenter(iBin);
@@ -1319,7 +1320,14 @@ TGraphAsymmErrors* fitTools::getGraphPoissonErrors( TH1D* histo, const std::stri
       xerr = histo->GetBinWidth(iBin);
     }
     y = (int)histo->GetBinContent(iBin);
-    
+       
+    double ym, yp;
+    RooHistError::instance().getPoissonInterval(y,ym,yp,nSigma);
+
+    yerrplus = yp - y;
+    yerrminus = y - ym;
+
+/*
     // and now poissonian errors (bayes flat prior):
     if( y==0 ) {
       yerrminus = 0.;
@@ -1332,7 +1340,7 @@ TGraphAsymmErrors* fitTools::getGraphPoissonErrors( TH1D* histo, const std::stri
       yerrminus = y - lowL;
       yerrplus = upL - y;
     }
-
+*/
     int thisPoint = graph->GetN();
     graph->SetPoint( thisPoint, x, y );
     graph->SetPointError( thisPoint, xerr, xerr, yerrminus, yerrplus );
