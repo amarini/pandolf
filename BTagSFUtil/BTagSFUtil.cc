@@ -57,7 +57,7 @@ void BTagSFUtil::modifyBTagsWithSF( bool& isBTagged_loose, bool& isBTagged_mediu
       //btsf = getSF(sfFileName_+"M.txt", jetpt, jeteta, verbose);
       btsf = getSF("medium", jetpt);
     } else  {
-      btsf = getSF(sfFileName_+"L.txt", jetpt, jeteta, verbose);
+      //btsf = getSF(sfFileName_+"L.txt", jetpt, jeteta, verbose);
       btsf = getSF("loose", jetpt);
     }
 
