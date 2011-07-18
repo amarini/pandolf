@@ -4,16 +4,15 @@
 
 
 
-
 BTagSFUtil::BTagSFUtil( int seed ) {
-
   rand_ = new TRandom3(seed);
   setSFFileName("");
+  cachesUsed_=0;
 }
 
 
 
-void BTagSFUtil::modifyBTagsWithSF( bool& isBTagged_loose, bool& isBTagged_medium, float jetpt, float jeteta, int pdgIdPart, double Btageff_SF, double Btagmistag_SF, const std::string& tagger) {
+void BTagSFUtil::modifyBTagsWithSF( bool& isBTagged_loose, bool& isBTagged_medium, float jetpt, float jeteta, int pdgIdPart, double Btageff_SF, double Btagmistag_SF, const std::string& tagger, bool verbose) {
 
 
   // b quarks:
@@ -60,9 +59,9 @@ void BTagSFUtil::modifyBTagsWithSF( bool& isBTagged_loose, bool& isBTagged_mediu
     }    
 
     if( isBTagged_loose ) {
-      btsf = getSF(sfFileName_+"M.txt", jetpt, jeteta);
+      btsf = getSF(sfFileName_+"M.txt", jetpt, jeteta, verbose);
     } else  {
-      btsf = getSF(sfFileName_+"L.txt", jetpt, jeteta);
+      btsf = getSF(sfFileName_+"L.txt", jetpt, jeteta, verbose);
     }
 
     float sysSF = Btagmistag_SF;
@@ -87,43 +86,67 @@ void BTagSFUtil::modifyBTagsWithSF( bool& isBTagged_loose, bool& isBTagged_mediu
 
 
 
-BTagScaleFactor BTagSFUtil::getSF( const std::string& fileName, float jetpt, float jeteta ) {
+BTagScaleFactor BTagSFUtil::getSF( const std::string& fileName, float jetpt, float jeteta ,bool verbose) {
+  // set default values in case we abort or don't find proper values
+  BTagScaleFactor btsf_default;
+  btsf_default.SF = 1.;
+  btsf_default.SF_err = 0.;
+  btsf_default.eff = 1.;
+  btsf_default.eff_err = 0.;
+  btsf_default.etamax = -999.;
+  btsf_default.etamin = -999.;
+  btsf_default.ptmax  = -999.;
+  btsf_default.ptmin  = -999.;
+  
+  
+  std::map<std::string,int>::iterator cacheLine = cacheAssoc_.find(fileName);
+  
+  if(cacheLine == cacheAssoc_.end() ){// we haven't read this file yet.
+    if (cachesUsed_ == 5){// but we are out of further caches to use
+      std::cout<<"WARNING !Out of file chaches for Btag scaling "<<fileName.c_str()<<std::endl;
+      return btsf_default;
+    }
 
-   BTagScaleFactor btsf;
-
-   bool foundSF = false;
-
-   ifstream ifs(fileName.c_str());
-
-   if(!ifs.good()){
-     std::cout<<"WARNING ! Didn't find file "<<fileName.c_str()<<std::endl;
-   }
-
-   while( ifs.good() && !foundSF ) {
-
-     float etaMin, etaMax, ptMin, ptMax, eff, eff_err, SF, SF_err;
-     ifs >> etaMin >> etaMax >> ptMin >> ptMax >> eff >> eff_err >> SF >> SF_err;
-
-     if( fabs(jeteta)>=etaMin && fabs(jeteta)<etaMax && jetpt>=ptMin && (jetpt<ptMax||ptMax==999.) ) {
-       btsf.SF = SF;
-       btsf.SF_err = SF_err;
-       btsf.eff = eff;
-       btsf.eff_err = eff_err;
-       foundSF = true;
-     }
-
-   } // while
-
-   ifs.close();
-
-   if( !foundSF ) {
-     std::cout << "WARNING! Didn't find SF in file '" << fileName << "'. Setting it to 1." << std::endl;
-     btsf.SF = 1.;
-     btsf.SF_err = 0.;
-     btsf.eff = 1.;
-     btsf.eff_err = 0.;
-   }
-
-   return btsf;
-
+    ifstream ifs(fileName.c_str());
+    if(!ifs.good()){ // Warn and return default if file is not found.
+      std::cout<<"WARNING ! Didn't find file "<<fileName.c_str()<<std::endl;
+       return btsf_default;
+    }
+    BTagScaleFactor btsf;
+    // read the file and fill the cache     
+    while( ifs.good() ) {
+      float etaMin, etaMax, ptMin, ptMax, eff, eff_err, SF, SF_err;
+      ifs >> etaMin >> etaMax >> ptMin >> ptMax >> eff >> eff_err >> SF >> SF_err;
+      btsf.etamax =  etaMax;
+      btsf.etamin =  etaMin;
+      btsf.ptmax =  ptMax;
+      btsf.ptmin =  ptMin;
+      
+      btsf.SF = SF;
+      btsf.SF_err = SF_err;
+      btsf.eff = eff;
+      btsf.eff_err = eff_err;
+      
+      cache_[cachesUsed_].push_back(btsf);
+    }
+    ifs.close();
+    
+    // new cache to the table
+    cacheAssoc_.insert(std::pair<std::string,int>(fileName,cachesUsed_));
+    cachesUsed_++;
+    cacheLine = cacheAssoc_.find(fileName); // refresh
+    
+  }
+  
+  int cn = (*cacheLine).second;
+    
+  for(unsigned int i = 0 ; i < cache_[cn].size() ; ++i){
+    BTagScaleFactor btsf = cache_[cn].at(i);
+    if( fabs(jeteta)>=btsf.etamin && fabs(jeteta)<btsf.etamax && jetpt>=btsf.ptmin && (jetpt<btsf.ptmax||btsf.ptmax==999.) ) 
+      return btsf;    
+  }
+    
+  // This point can only be reached if we have the proper table but didn' find a proper entry
+  if(verbose) std::cout << "WARNING! Didn't find SF in file '" << fileName << "'. Setting it to 1." << std::endl; 
+  return btsf_default;  
 }
