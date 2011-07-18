@@ -15,8 +15,8 @@ BTagSFUtil::BTagSFUtil( int seed ) {
 void BTagSFUtil::modifyBTagsWithSF( bool& isBTagged_loose, bool& isBTagged_medium, float jetpt, float jeteta, int pdgIdPart, double Btageff_SF, double Btagmistag_SF, const std::string& tagger, bool verbose) {
 
 
-  // b quarks:
-  if( abs( pdgIdPart ) == 5 ) { 
+  // b quarks and c quarks:
+  if( abs( pdgIdPart ) == 5 || abs( pdgIdPart ) == 4) { 
 
     // no need to downgrade if is a b and not tagged
     if( !isBTagged_loose ) return;
@@ -26,15 +26,10 @@ void BTagSFUtil::modifyBTagsWithSF( bool& isBTagged_loose, bool& isBTagged_mediu
 
     float coin = rand_->Uniform(1.);
     
-    float eff_m = 0.7;
-    float eff_l = 0.8;
-    float b_SF_l = (b_SF*eff_l-eff_m)/(eff_l-eff_m);
-    
-
     if( isBTagged_medium ){ 
       if( coin > b_SF ) {isBTagged_medium=false; isBTagged_loose=false;} //turn medium and loose off, 
     }
-    else if( isBTagged_loose && !isBTagged_medium ){  
+    else if( isBTagged_loose && !isBTagged_medium ){
       if( coin > b_SF ) isBTagged_loose=false; //
     }
 
@@ -59,15 +54,15 @@ void BTagSFUtil::modifyBTagsWithSF( bool& isBTagged_loose, bool& isBTagged_mediu
     }    
 
     if( isBTagged_loose ) {
-      btsf = getSF(sfFileName_+"M.txt", jetpt, jeteta, verbose);
+      //btsf = getSF(sfFileName_+"M.txt", jetpt, jeteta, verbose);
+      btsf = getSF("medium", jetpt);
     } else  {
       btsf = getSF(sfFileName_+"L.txt", jetpt, jeteta, verbose);
+      btsf = getSF("loose", jetpt);
     }
 
     float sysSF = Btagmistag_SF;
-
-    float mistagPercent = ( (sysSF*btsf.SF)*btsf.eff - btsf.eff ) / ( 1. - btsf.eff );
-
+    float mistagPercent = sysSF*btsf.SF - 1.0;
     float coin = rand_->Uniform(1.);
 
     // for light quarks, the jet has to be upgraded:
@@ -79,9 +74,45 @@ void BTagSFUtil::modifyBTagsWithSF( bool& isBTagged_loose, bool& isBTagged_mediu
     }
     
 
-  } //if b-light quark
+  } //if light quark
 
 } //modifyBTagsWithSF
+
+
+
+
+//This method of getSF uses the functional form of the mistag SF based on 2011 data.
+BTagScaleFactor BTagSFUtil::getSF( const std::string& type, float jetpt ) {
+
+  BTagScaleFactor btsf;
+
+  float SFlight = -1;
+
+  if ( type == "medium"){
+  
+    SFlight = 1.23344 - 0.00033012*jetpt - 0.000000227661*jetpt*jetpt + 0.00000000154075*jetpt*jetpt*jetpt;
+    btsf.SF = SFlight;
+
+  }
+  else{
+    
+    SFlight = 1.14062 - 0.000456396*jetpt + 0.0000000838135*jetpt*jetpt;
+    btsf.SF = SFlight;
+
+  }
+
+  btsf.SF_err = 0.;
+  btsf.eff = 1.;
+  btsf.eff_err = 0.;
+  btsf.etamax = -999.;
+  btsf.etamin = -999.;
+  btsf.ptmax  = -999.;
+  btsf.ptmin  = -999.;
+
+  return btsf;
+
+
+}
 
 
 
