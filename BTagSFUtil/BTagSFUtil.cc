@@ -54,10 +54,18 @@ void BTagSFUtil::modifyBTagsWithSF( bool& isBTagged_loose, bool& isBTagged_mediu
     }    
 
     if( isBTagged_loose ) {
+
+      // If using 2010 mistags
       //btsf = getSF(sfFileName_+"M.txt", jetpt, jeteta, verbose);
+      
+      // If using 2011 mistags
       btsf = getSF("medium", jetpt);
     } else  {
+
+      // If using 2010 mistags
       //btsf = getSF(sfFileName_+"L.txt", jetpt, jeteta, verbose);
+
+      // If using 2011 mistags
       btsf = getSF("loose", jetpt);
     }
 
