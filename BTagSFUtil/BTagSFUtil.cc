@@ -1,3 +1,4 @@
+#include <iostream>
 #include <fstream>
 #include "BTagSFUtil.h"
 #include "TMath.h"
@@ -14,9 +15,60 @@ BTagSFUtil::BTagSFUtil( int seed ) {
 
 
 
+void BTagSFUtil::set_fileMedium( TFile* file ) {
+
+  fileMedium_ = file;
+
+  if( fileMedium_==0 ) {
+    std::cout << "WARNING!!! File '" << file->GetName() << "' does not exist!! Will not set histograms!!" << std::endl;
+    return;
+  }
+
+  h2_Medium_BTAGBEFFCORR_ = (TH2D*)fileMedium_->Get("BTAGBEFFCORR");
+  h2_Medium_BTAGLEFFCORR_ = (TH2D*)fileMedium_->Get("BTAGLEFFCORR");
+  h2_Medium_BTAGLEFF_     = (TH2D*)fileMedium_->Get("BTAGLEFF");
+
+  if( h2_Medium_BTAGBEFFCORR_ == 0 ) {
+    std::cout << "WARNING!!! Didn't find histogram 'BTAGBEFFCORR' in file '" << fileMedium_->GetName() << "'!!! Program will crash soon!" << std::endl;
+  }
+  if( h2_Medium_BTAGLEFFCORR_ == 0 ) {
+    std::cout << "WARNING!!! Didn't find histogram 'BTAGLEFFCORR' in file '" << fileMedium_->GetName() << "'!!! Program will crash soon!" << std::endl;
+  }
+  if( h2_Medium_BTAGLEFF_     == 0 ) {
+    std::cout << "WARNING!!! Didn't find histogram 'BTAGLEFF' in file '" << fileMedium_->GetName() << "'!!! Program will crash soon!" << std::endl;
+  }
+
+}
 
 
 
+
+void BTagSFUtil::set_fileLoose( TFile* file ) {
+
+  fileLoose_ = file;
+
+  if( fileLoose_==0 ) {
+    std::cout << "WARNING!!! File '" << file->GetName() << "' does not exist!! Will not set histograms!!" << std::endl;
+    return;
+  }
+
+  h2_Loose_BTAGBEFFCORR_ = (TH2D*)fileLoose_->Get("BTAGBEFFCORR");
+  h2_Loose_BTAGLEFFCORR_ = (TH2D*)fileLoose_->Get("BTAGLEFFCORR");
+  h2_Loose_BTAGLEFF_     = (TH2D*)fileLoose_->Get("BTAGLEFF");
+
+  if( h2_Loose_BTAGBEFFCORR_ == 0 ) {
+    std::cout << "WARNING!!! Didn't find histogram 'BTAGBEFFCORR' in file '" << fileLoose_->GetName() << "'!!! Program will crash soon!" << std::endl;
+  }
+  if( h2_Loose_BTAGLEFFCORR_ == 0 ) {
+    std::cout << "WARNING!!! Didn't find histogram 'BTAGLEFFCORR' in file '" << fileLoose_->GetName() << "'!!! Program will crash soon!" << std::endl;
+  }
+  if( h2_Loose_BTAGLEFF_     == 0 ) {
+    std::cout << "WARNING!!! Didn't find histogram 'BTAGLEFF' in file '" << fileLoose_->GetName() << "'!!! Program will crash soon!" << std::endl;
+  }
+
+}
+
+  
 
 void BTagSFUtil::modifyBTagsWithSF( bool& isBTagged_loose, bool& isBTagged_medium, int pdgIdPart, float Btageff_SF_l, float Btageff_SF_m, float Btagmistag_SF_l,float Btagmistag_SF_m, float Btagmistag_eff_l, float Btagmistag_eff_m) {
   
@@ -81,8 +133,13 @@ void BTagSFUtil::modifyBTagsWithSF( bool& isBTagged_loose, bool& isBTagged_mediu
 
 
 
-void BTagSFUtil::modifyBTagsWithSF( bool& isBTagged_loose, bool& isBTagged_medium, float jetpt, float jeteta, int pdgIdPart, double Btageff_SF, double Btagmistag_SF, const std::string& tagger) {
+void BTagSFUtil::modifyBTagsWithSF( bool& isBTagged_loose, bool& isBTagged_medium, float jetpt, float jeteta, int pdgIdPart, float sysSF) {
   
+
+  int iBin_pt = (jetpt<240.) ? h2_Medium_BTAGBEFFCORR_->GetXaxis()->FindBin(jetpt) : h2_Medium_BTAGBEFFCORR_->GetXaxis()->FindBin(239.);
+  int iBin_eta = h2_Medium_BTAGBEFFCORR_->GetYaxis()->FindBin(jeteta);
+
+
 
   // b quarks and c quarks:
   if( abs( pdgIdPart ) == 5 ||  abs( pdgIdPart ) == 4) { 
@@ -91,15 +148,16 @@ void BTagSFUtil::modifyBTagsWithSF( bool& isBTagged_loose, bool& isBTagged_mediu
     if( !isBTagged_loose ) return;
 
     // SF for b's
-    float b_SF = Btageff_SF;
+    float b_SF_Medium = h2_Medium_BTAGBEFFCORR_->GetBinContent( iBin_pt, iBin_eta );
+    float b_SF_Loose = h2_Loose_BTAGBEFFCORR_->GetBinContent( iBin_pt, iBin_eta );
 
     float coin = rand_->Uniform(1.);
     
     if( isBTagged_medium ){ 
-      if( coin > b_SF ) {isBTagged_medium=false; isBTagged_loose=false;} //turn medium and loose off, 
+      if( coin > b_SF_Medium ) {isBTagged_medium=false; isBTagged_loose=false;} //turn medium and loose off, 
     }
     else if( isBTagged_loose && !isBTagged_medium ){
-      if( coin > b_SF ) isBTagged_loose=false; //
+      if( coin > b_SF_Loose ) isBTagged_loose=false; //
     }
 
 
@@ -109,28 +167,27 @@ void BTagSFUtil::modifyBTagsWithSF( bool& isBTagged_loose, bool& isBTagged_mediu
     // no need to upgrade if is light and medium tagged
     if( isBTagged_medium ) return;
 
-    BTagScaleFactor btsf;
+    // SF for light quarks
+    float light_SF_Medium = h2_Medium_BTAGLEFFCORR_->GetBinContent( iBin_pt, iBin_eta );
+    float light_SF_Loose = h2_Loose_BTAGLEFFCORR_->GetBinContent( iBin_pt, iBin_eta );
 
-    if( isBTagged_loose ) {
-      btsf = getSF("medium", jetpt);
-    } else  {
-      btsf = getSF("loose", jetpt);
-    }
+    float light_eff_Medium = h2_Medium_BTAGLEFF_->GetBinContent( iBin_pt, iBin_eta );
+    float light_eff_Loose = h2_Loose_BTAGLEFF_->GetBinContent( iBin_pt, iBin_eta );
 
 
-    float sysSF = Btagmistag_SF;
+    float mistagPercent_Loose = ( light_SF_Loose*light_eff_Loose - light_eff_Loose ) / ( 1. - light_eff_Loose );
+    float mistagPercent_Medium = ( light_SF_Medium*light_eff_Medium - light_eff_Medium ) / ( 1. - light_eff_Medium );
 
-    float mistagPercent = sysSF*btsf.SF - 1.0;
+
     float coin = rand_->Uniform(1.);
 
     // for light quarks, the jet has to be upgraded:
-
-    if( coin < mistagPercent ) {
-
-      if( !isBTagged_loose ) {isBTagged_loose = true;}
-      else if( !isBTagged_medium ) {isBTagged_medium = true; }
-
+    if( !isBTagged_loose ) {
+      if( coin < mistagPercent_Loose ) isBTagged_loose = true;
+    } else if( !isBTagged_medium ) {
+      if( coin < mistagPercent_Medium ) isBTagged_medium = true; 
     }
+
     
   } //if light quark
 
