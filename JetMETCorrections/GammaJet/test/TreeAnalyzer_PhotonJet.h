@@ -34,8 +34,6 @@ class TreeAnalyzer_PhotonJet : public TreeAnalyzer {
    Float_t eventWeight_medium_;
    Float_t eventWeight_loose_;
 
-   Bool_t isIsolated_veryloose_;
-
    Bool_t isIsolated_hcal_loose_;
    Bool_t isIsolated_hcal_medium_;
    Bool_t isIsolated_hcal_tight_;
