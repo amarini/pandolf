@@ -74,7 +74,6 @@ void TreeAnalyzer_PhotonJet::CreateOutputFile() {
   jetTree_->Branch("eventWeight",&eventWeight_,"eventWeight_/F");
   jetTree_->Branch("eventWeight_medium",&eventWeight_medium_,"eventWeight_medium_/F");
   jetTree_->Branch("eventWeight_loose",&eventWeight_loose_,"eventWeight_loose_/F");
-  jetTree_->Branch("isIsolated_veryloose",&isIsolated_veryloose_, "isIsolated_veryloose_/O");
 
   jetTree_->Branch("isIsolated_hcal_loose",&isIsolated_hcal_loose_, "isIsolated_hcal_loose_/O");
   jetTree_->Branch("isIsolated_hcal_medium",&isIsolated_hcal_medium_, "isIsolated_hcal_medium_/O");
@@ -293,7 +292,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      AnalysisPhoton foundPhot;
 
 
-     //foundRecoPhot is the highest-pt photon candidate of the event:
+     //foundRecoPhot is the highest-pt photon candidate of the event which passes minimal photon ID:
      AnalysisPhoton foundRecoPhot;
 
      for( unsigned int iPhot=0; iPhot<nPhot; ++iPhot ) {
@@ -320,7 +319,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
        //if( thisPhot.pt < 10. ) continue;
 
-       if( thisPhot.pt > foundRecoPhot.pt )
+       if( thisPhot.pt>foundRecoPhot.pt && thisPhot.hcalIso<thisPhot.e && thisPhot.ptTrkIso<thisPhot.pt )
          foundRecoPhot = thisPhot;
 
      } //for reco photons
@@ -422,10 +421,6 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
 
      
-     isIsolated_veryloose_ = true;
-     if( foundPhot.hcalIso > foundPhot.e ) isIsolated_veryloose_ = false;
-     if( foundPhot.ptTrkIso > foundPhot.pt ) isIsolated_veryloose_ = false;
-
      isIsolated_hcal_loose_ =  foundPhot.isIsolated_hcal("loose");
      isIsolated_hcal_medium_ = foundPhot.isIsolated_hcal("medium");
      isIsolated_hcal_tight_ =  foundPhot.isIsolated_hcal("tight");
@@ -869,9 +864,10 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
      passed_Photon75_ = passedTrigger_regexp("HLT_Photon75_");
 
 
-     bool eventOK = ( matchedToMC_ || isIsolated_veryloose_);
+     //bool eventOK = ( matchedToMC_ || isIsolated_veryloose_);
 
-     if( eventOK && (ptPhotReco_>15.) )
+     //if( eventOK && (ptPhotReco_>15.) )
+     if( ptPhotReco_>15. )
        jetTree_->Fill(); 
 
      h1_ptPhot->Fill( ptPhotReco_, eventWeight_ );
