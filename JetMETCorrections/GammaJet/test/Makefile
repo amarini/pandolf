@@ -1,6 +1,17 @@
 CC = g++
 CFLAGS = -Wall -c
-ROOTFLAG = `${ROOTSYS}/bin/root-config --cflags --libs`
+
+ROOFIT_INCLUDE := $(shell cd $(CMSSW_BASE); scram tool info roofitcore | grep INCLUDE= | sed 's|INCLUDE=||')
+ROOFIT_LIBDIR := $(shell cd $(CMSSW_BASE); scram tool info roofitcore | grep LIBDIR= | sed 's|LIBDIR=||')
+
+INCLUDES = -I. -I$(ROOTSYS)/include  -I$(ROOFIT_INCLUDE)/ -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -I$(CMSSW_BASE)/src/UserCode/pandolf/
+
+ROOTSYS  ?= ERROR_RootSysIsNotDefined
+
+ROOTFLAG = `${ROOTSYS}/bin/root-config --cflags --libs` -lMinuit -lRooFitCore -lRooFit
+
+EXTRALIBS  :=  -L$(ROOTSYS)/lib -L$(ROOFIT_LIBDIR)/ -lHtml -lMathCore -lGenVector -lMinuit -lEG -lRooFitCore -lRooFit
+
 
 
 do2ndLevel_DiJet: AnalysisJet.o TreeAnalyzer.o TreeAnalyzer_DiJet.o
@@ -57,7 +68,13 @@ drawPhotonJet: fitTools.o DrawBase.o
 	$(CC) -Wall -o drawPhotonJet drawPhotonJet.C fitTools.o DrawBase.o $(ROOTFLAG) -lMinuit
 
 drawPhotonJet_2bkg: fitTools.o DrawBase.o drawPhotonJet_2bkg.C
-	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o drawPhotonJet_2bkg drawPhotonJet_2bkg.C fitTools.o DrawBase.o $(ROOTFLAG) -lMinuit
+	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o drawPhotonJet_2bkg drawPhotonJet_2bkg.C fitTools.o DrawBase.o $(ROOTFLAG) $(EXTRALIBS)
+
+drawEfficiencies_vs_QGCut: DrawBase.o fitTools.o drawEfficiencies_vs_QGCut.C
+	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/ -o drawEfficiencies_vs_QGCut drawEfficiencies_vs_QGCut.C DrawBase.o fitTools.o $(ROOTFLAG) -lMinuit
+
+drawQGStudies: fitTools.o DrawBase.o drawQGStudies.C
+	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/ -o drawQGStudies drawQGStudies.C fitTools.o DrawBase.o $(ROOTFLAG) -lMinuit
 
 drawPhotonJet_ONLYDATA: fitTools.o DrawBase.o drawPhotonJet_ONLYDATA.C
 	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o drawPhotonJet_ONLYDATA drawPhotonJet_ONLYDATA.C fitTools.o DrawBase.o $(ROOTFLAG) -lMinuit
@@ -69,7 +86,7 @@ drawPhotonJetExtrap: fitTools.o DrawBase.o DrawExtrap.o drawPhotonJetExtrap.C
 	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o drawPhotonJetExtrap drawPhotonJetExtrap.C fitTools.o DrawBase.o DrawExtrap.o $(ROOTFLAG) -lMinuit
 
 draw_all_methods_vs_pt: fitTools.o DrawBase.o draw_all_methods_vs_pt.C
-	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o draw_all_methods_vs_pt draw_all_methods_vs_pt.C fitTools.o DrawBase.o $(ROOTFLAG) -lMinuit
+	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o draw_all_methods_vs_pt draw_all_methods_vs_pt.C fitTools.o DrawBase.o $(ROOTFLAG) $(EXTRALIBS)
 
 draw_PhotonJet_vs_QCD_vs_pt: fitTools.o DrawBase.o draw_PhotonJet_vs_QCD_vs_pt.C
 	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o draw_PhotonJet_vs_QCD_vs_pt draw_PhotonJet_vs_QCD_vs_pt.C fitTools.o DrawBase.o $(ROOTFLAG) -lMinuit
@@ -86,11 +103,15 @@ drawResoBreakdown: fitTools.o DrawBase.o drawResoBreakdown.C
 drawMinBias: fitTools.o DrawBase.o
 	$(CC) -Wall -o drawMinBias drawMinBias.cpp fitTools.o DrawBase.o $(ROOTFLAG) -lMinuit
 
-DrawBase.o: $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/DrawBase.C
-	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/DrawBase.C $(ROOTFLAG)
+drawZGamma: fitTools.o DrawBase.o drawZGamma.cpp
+	$(CC) -Wall $(INCLUDES) -o drawZGamma drawZGamma.cpp fitTools.o DrawBase.o $(ROOTFLAG) $(EXTRALIBS)
+
+
+DrawBase.o: $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/DrawBase.C fitTools.o
+	$(CC) $(CFLAGS) $(INCLUDES) $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/DrawBase.C fitTools.o $(ROOTFLAG) $(EXTRALIBS)
 
 fitTools.o: $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/fitTools.C
-	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/fitTools.C $(ROOTFLAG) -lMinuit
+	$(CC) $(CFLAGS) $(INCLUDES) $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/fitTools.C $(ROOTFLAG) $(EXTRALIBS)
 
 DrawExtrap.o: DrawExtrap.C DrawBase.o
 	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools DrawExtrap.C DrawBase.o $(ROOTFLAG)
