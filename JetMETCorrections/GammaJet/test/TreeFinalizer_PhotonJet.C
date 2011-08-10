@@ -15,6 +15,7 @@
 
 #include "fitTools.C"
 
+#include "/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/emanuele/CommonTools/src/PUWeight.C"
 
 
 bool isAOD_ = true;
@@ -22,8 +23,6 @@ bool DEBUG_ = false;
 bool MCassoc_ = false;
 bool BINNINGFINO_ = false;
 bool ONEVTX_ = false;
-bool ONEVTX_2232_ = false;
-bool ONEVTX_2247_ = false;
 bool NO2ndJETABS = false;
 bool ADD12_ = false;
 bool HEMISPHERE_ = false;
@@ -42,6 +41,7 @@ std::vector<TH1F*> getResponseHistos(const std::string& name);
 std::vector< std::vector< TH1D* > > getExtrapHistoVector(const std::string& name, const std::string& abs_rel, Int_t nPoints, bool isL2L3=false, bool is_pt=false);
 void deleteExtrapHistoVector(std::vector< std::vector< TH1D* > > histoVector, int nPoints);
 
+float getWeight_adish( int nPU );
 
 
 
@@ -192,17 +192,29 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
   } else if( dataset=="G_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" ) {
 
-    addInput( "G_Pt_15to30_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
-    addInput( "G_Pt_30to50_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
-    addInput( "G_Pt_50to80_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
+//  addInput( "G_Pt_15to30_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
+//  addInput( "G_Pt_30to50_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
+//  addInput( "G_Pt_50to80_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
+//  addInput( "G_Pt_80to120_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
+//  addInput( "G_Pt_120to170_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
+//  addInput( "G_Pt_170to300_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
+//  addInput( "G_Pt_300to470_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
+//  addInput( "G_Pt_470to800_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
+//  addInput( "G_Pt_800to1400_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
+//  addInput( "G_Pt_1400to1800_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
+//  addInput( "G_Pt_1800_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
+
     addInput( "G_Pt_80to120_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
+    addInput( "G_Pt_0to15_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1-ntpv4" );
     addInput( "G_Pt_120to170_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
+    addInput( "G_Pt_15to30_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
     addInput( "G_Pt_170to300_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
-    addInput( "G_Pt_300to470_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
-    addInput( "G_Pt_470to800_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
-    addInput( "G_Pt_800to1400_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
-    addInput( "G_Pt_1400to1800_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
     addInput( "G_Pt_1800_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
+    addInput( "G_Pt_300to470_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
+    addInput( "G_Pt_30to50_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1-ntpv2" );
+    addInput( "G_Pt_470to800_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1-ntpv2" );
+    addInput( "G_Pt_50to80_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
+    addInput( "G_Pt_800to1400_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
 
   } else if( dataset=="G_QCD_TuneZ2_7TeV_pythia6_Fall10_ProbDist_2010Data" ) {
 
@@ -227,6 +239,42 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     addInput( "QCD_Pt_800to1000_TuneZ2_7TeV_pythia6_Fall10_ProbDist_2010Data" );
     addInput( "QCD_Pt_1000to1400_TuneZ2_7TeV_pythia6_Fall10_ProbDist_2010Data" );
     addInput( "QCD_Pt_1400to1800_TuneZ2_7TeV_pythia6_Fall10_ProbDist_2010Data" );
+
+  } else if( dataset=="G_Summer11" ) {
+
+    //addInput( "G_Pt-80to120_Tune23_7TeV_herwigpp_Summer11-PU_S3_START42_V11-v2" );
+    addInput( "G_Pt-80to120_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v1" );
+    //addInput( "G_Pt_0to15_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v2" );
+    addInput( "G_Pt-120to170_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v2" );
+    addInput( "G_Pt-15to30_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v2" );
+    addInput( "G_Pt-170to300_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v1" );
+    //addInput( "G_Pt-1800_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v2" );
+    addInput( "G_Pt-300to470_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v2" );
+    addInput( "G_Pt-30to50_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v2" );
+    addInput( "G_Pt-470to800_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v2" );
+    addInput( "G_Pt-50to80_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v2" );
+    //addInput( "G_Pt-800to1400_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v2" );
+
+  } else if( dataset=="G_Summer11_herwig" ) {
+
+    addInput( "G_Pt-80to120_Tune23_7TeV_herwigpp_Summer11-PU_S3_START42_V11-v2" );
+    addInput( "G_Pt-50to80_Tune23_7TeV_herwigpp_Summer11-PU_S3_START42_V11-v2" );
+    addInput( "G_Pt-30to50_Tune23_7TeV_herwigpp_Summer11-PU_S3_START42_V11-v2" );
+    addInput( "G_Pt-120to170_Tune23_7TeV_herwigpp_Summer11-PU_S3_START42_V11-v2" );
+    addInput( "G_Pt-170to300_Tune23_7TeV_herwigpp_Summer11-PU_S3_START42_V11-v2" );
+    addInput( "G_Pt-300to470_Tune23_7TeV_herwigpp_Summer11-PU_S3_START42_V11-v2" );
+
+
+
+  } else if( dataset=="DATA_Run2011A_extend1" ) {
+
+    addInput( "Photon_Run2011A-May10ReReco-v1" );
+    addInput( "Photon_Run2011A-PromptReco-v4_extend1" );
+
+  } else if( dataset=="DATA_Run2011A_1fb" ) {
+
+    addInput( "Photon_Run2011A-May10ReReco-v1" );
+    addInput( "Photon_Run2011A-PromptReco-v4_3" );
 
   } else if( dataset=="DATA_EG_35X" ) {
 
@@ -280,11 +328,13 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   TH1F* h1_totalLumi = new TH1F("totalLumi", "", 1, 0., 1.);
   h1_totalLumi->SetBinContent(1, totalLumi);
 
-  TH1F* h1_nvertex = new TH1F("nvertex", "", 11, -0.5, 10.5);
+  TH1F* h1_nvertex = new TH1F("nvertex", "", 26, -0.5, 25.5);
   h1_nvertex->Sumw2();
-  TH1F* h1_nvertex_passedID = new TH1F("nvertex_passedID", "", 11, -0.5, 10.5);
+  TH1F* h1_nvertexPU = new TH1F("nvertexPU", "", 26, -0.5, 25.5);
+  h1_nvertexPU->Sumw2();
+  TH1F* h1_nvertex_passedID = new TH1F("nvertex_passedID", "", 26, -0.5, 25.5);
   h1_nvertex_passedID->Sumw2();
-  TH1F* h1_nvertex_passedID_pt50 = new TH1F("nvertex_passedID_pt50", "", 11, -0.5, 10.5);
+  TH1F* h1_nvertex_passedID_pt50 = new TH1F("nvertex_passedID_pt50", "", 26, -0.5, 25.5);
   h1_nvertex_passedID_pt50->Sumw2();
 
   std::vector<float> ptPhot_binning = fitTools::getPtPhot_binning();
@@ -635,6 +685,8 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 //Bool_t passedPhotonID_medium;
 //tree->SetBranchAddress("passedPhotonID_medium", &passedPhotonID_medium);
 
+  Int_t nPU;
+  tree->SetBranchAddress("nPU", &nPU);
   Float_t ptHat;
   tree->SetBranchAddress("ptHat", &ptHat);
 
@@ -671,11 +723,11 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   Int_t hasPixelSeedPhotReco;
   tree->SetBranchAddress("hasPixelSeedPhotReco", &hasPixelSeedPhotReco);
   Float_t pid_twrHCAL;
-  tree->SetBranchAddress("pid_twrHCAL", &pid_twrHCAL);
+  tree->SetBranchAddress("pid_twrHCALPhotReco", &pid_twrHCAL);
   Float_t pid_HoverE;
-  tree->SetBranchAddress("pid_HoverE", &pid_HoverE);
+  tree->SetBranchAddress("pid_HoverEPhotReco", &pid_HoverE);
   Float_t pid_jurECAL;
-  tree->SetBranchAddress("pid_jurECAL", &pid_jurECAL);
+  tree->SetBranchAddress("pid_jurECALPhotReco", &pid_jurECAL);
 
 
   Bool_t matchedToMC;
@@ -749,13 +801,18 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   tree->SetBranchAddress("passed_Photon35", &passed_Photon35);
 //Bool_t passed_Photon40;
 //tree->SetBranchAddress("passed_Photon40", &passed_Photon40);
-//Bool_t passed_Photon50;
-//tree->SetBranchAddress("passed_Photon50", &passed_Photon50);
+  Bool_t passed_Photon50;
+  tree->SetBranchAddress("passed_Photon50", &passed_Photon50);
 //Bool_t passed_Photon60;
 //tree->SetBranchAddress("passed_Photon60", &passed_Photon60);
-//Bool_t passed_Photon70;
-//tree->SetBranchAddress("passed_Photon70", &passed_Photon70);
+  Bool_t passed_Photon70;
+  tree->SetBranchAddress("passed_Photon70", &passed_Photon70);
+  Bool_t passed_Photon75;
+  tree->SetBranchAddress("passed_Photon75", &passed_Photon75);
 
+
+
+  PUWeight* fPUWeight = new PUWeight();
 
 
 
@@ -775,6 +832,20 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
     h1_nvertex->Fill( nvertex, correctWeight);
 
+    bool isMC = run<5;
+    if( isMC ) {
+
+      // PU reweighting:
+      //if( dataset_tstr.Contains("Summer11") && dataset_tstr.Contains("PU_S4") )
+      //  correctWeight *= getWeight_adish(nPU);
+      //else
+        correctWeight *= fPUWeight->GetWeight(nPU);
+if(nvertex==1) std::cout << fPUWeight->GetWeight(nPU) << std::endl;
+    }
+
+    h1_nvertexPU->Fill( nvertex, correctWeight);
+
+
     if( ONEVTX_ && dataset!="QCD_Spring10" ) {
       if( nvertex>1 ) continue;
     }
@@ -788,19 +859,20 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
 
     // trigger selection, only on data, to solve bias in response:
-    bool isMC = run<5;
     if( !isMC ) {
 
       if( ptPhotReco<22. ) {
         if( !passed_Photon15 && !passed_Photon10 ) continue;
-      } else if( ptPhotReco<32. ) {
-        if( !passed_Photon20 && !passed_Photon25 ) continue;
-      } else if( ptPhotReco<47. ) {
-        if( !passed_Photon30 /*&& !passed_Photon35*/ ) continue;
+      } else if( ptPhotReco<33. ) {
+        if( !passed_Photon20 ) continue;
+      } else if( ptPhotReco<53. ) {
+        if( !passed_Photon30 ) continue;
+      } else if( ptPhotReco<80. ) {
+        if( !passed_Photon50 ) continue;
+      } else if( ptPhotReco<150. ) {
+        if( !passed_Photon75 ) continue;
       }
 
-      if( ONEVTX_2232_ ) if( ptPhotReco>22. && ptPhotReco<32. && nvertex>1 ) continue;
-      if( ONEVTX_2247_ ) if( ptPhotReco>22. && ptPhotReco<47. && nvertex>1 ) continue;
 
     //// select only Run2010A for first bins to avoid trigger prescale related issues:
     //if( ptPhotReco < 47. && run>145000. ) continue;
@@ -848,8 +920,8 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
     if( NO2ndJETABS )
       secondJetOK = ( pt2ndJetReco < secondJetThreshold*ptPhotReco );
     else
-      //secondJetOK = ( ptCorr2ndJetReco < secondJetThreshold*ptPhotReco || pt2ndJetReco < 5. );
-      secondJetOK = ( pt2ndJetReco < secondJetThreshold*ptPhotReco || pt2ndJetReco < 5. );
+      secondJetOK = ( ptCorr2ndJetReco < secondJetThreshold*ptPhotReco || ptCorr2ndJetReco < 5. );
+      //secondJetOK = ( pt2ndJetReco < secondJetThreshold*ptPhotReco || pt2ndJetReco < 5. );
 
 
     // do them by hand just to be sure:
@@ -984,9 +1056,11 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
       Float_t percStep = h1_pt2ndJetRecoRelMean_eta011[theBin][0]->GetXaxis()->GetXmax()  - minPerc;
       Float_t minPercL2L3 = h1_pt2ndJetL2L3RecoRelMean_eta011[theBin][0]->GetXaxis()->GetXmin();
       Float_t percStepL2L3 = h1_pt2ndJetL2L3RecoRelMean_eta011[theBin][0]->GetXaxis()->GetXmax()  - minPercL2L3;
-      Double_t pt2ndJetRecoRel = 100.*pt2ndJetReco/ptPhotReco; //in percentage
+      Double_t pt2ndJetRecoRel = pt2ndJetReco/ptPhotReco;
+      //Double_t pt2ndJetRecoRel = 100.*pt2ndJetReco/ptPhotReco; //in percentage
       int iRecoRel = (int)floor((pt2ndJetRecoRel-minPerc)/percStep);
-      Double_t ptCorr2ndJetRecoRel = 100.*ptCorr2ndJetReco/ptPhotReco; //in percentage
+      Double_t ptCorr2ndJetRecoRel = ptCorr2ndJetReco/ptPhotReco;
+      //Double_t ptCorr2ndJetRecoRel = 100.*ptCorr2ndJetReco/ptPhotReco; //in percentage
       int iRecoRelL2L3 = (int)floor((ptCorr2ndJetRecoRel-minPercL2L3)/percStepL2L3);
       //int iRecoRelL2L3 = iRecoRel;
     
@@ -1308,8 +1382,6 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   if( PARTTYPE_!="" ) outfileName = outfileName + "_" + PARTTYPE_;
   if( BINNINGFINO_ ) outfileName = outfileName + "_BINNINGFINO";
   if( ONEVTX_ ) outfileName = outfileName + "_ONEVTX";
-  if( ONEVTX_2232_ ) outfileName = outfileName + "_ONEVTX2232";
-  if( ONEVTX_2247_ ) outfileName = outfileName + "_ONEVTX2247";
   if( DELTAPHI_ != 1. ) {
     char outfileName_char[300];
     sprintf( outfileName_char, "%s_DPHI%d", outfileName.c_str(), (int)(10.*DELTAPHI_));
@@ -1334,6 +1406,7 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
   h1_totalLumi->Write();
   h1_nvertex->Write();
+  h1_nvertexPU->Write();
   h1_nvertex_passedID->Write();
   h1_nvertex_passedID_pt50->Write();
 
@@ -1908,6 +1981,11 @@ std::vector< std::vector< TH1D* > > getExtrapHistoVector(const std::string& name
       if( isL2L3 && ptPhot_binning[i_ptBin]<=40. ) minPt+=2.*ptStep;
       if( isL2L3 && ptPhot_binning[i_ptBin]<=30. ) minPt+=ptStep;
     }
+
+    // not in percent anymore:
+    minPt /= 100.;
+    ptStep /= 100.;
+
  
     double iPt = minPt;
     Int_t nBins = 50;
@@ -1951,5 +2029,43 @@ void deleteExtrapHistoVector(std::vector< std::vector< TH1D* > > histoVector, in
 
     }
   }
+
+}
+
+
+float getWeight_adish( int nPU ) {
+
+  float weights[] = {0.110043,
+                     0.457365,
+                     0.98622,
+                     1.60429,
+                     2.06065,
+                     2.22437,
+                     2.1078,
+                     1.76987,
+                     1.37698,
+                     0.99556,
+                     0.693361,
+                     0.458662,
+                     0.295982,
+                     0.185586,
+                     0.113966,
+                     0.068645,
+                     0.041019,
+                     0.0239427,
+                     0.0139931,
+                     0.00810005,
+                     0.00473432,
+                     0.0026347,
+                     0.00152847,
+                     0.000864942,
+                     0.000756823};
+
+  float returnWeight;
+
+  if( nPU <=24 ) returnWeight = weights[nPU];
+  else returnWeight = 0.;
+
+  return returnWeight;
 
 }
