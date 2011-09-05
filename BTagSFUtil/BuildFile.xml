@@ -1,5 +1,6 @@
 <use name="rootcore"/>                                                         
 <use name="rootrflx"/>
+<use name="rootgpad"/>
 
 <export>
   <lib   name="1"/>
