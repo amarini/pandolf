@@ -124,12 +124,12 @@ std::cout << "flags set." << std::endl;
 //db->add_mcFile( mcWenuFile, "W #rightarrow e #nu MC", 8 );
 
 
-  if( norm=="LUMI" )
-    db->set_lumiNormalization(36.);
+  if( norm=="LUMI" ) 
+    db->set_lumiNormalization(1000.);
   else
     db->set_shapeNormalization();
 
-  db->set_lumi(36.);
+  db->set_lumi(191.);
 
   if( ONEVTX ) {
     flags += "_ONEVTX";
@@ -144,7 +144,8 @@ std::cout << "outputdir set." << std::endl;
   db->drawHisto( "ptPhot", "Photon Transverse Momentum", "GeV", "Events", log, 1, "passedID");
   db->drawHisto( "ptPhot", "Photon Transverse Momentum", "GeV", "Events", log);
 
-//db->drawHisto( "nvertex", "Number of Reconstructed Vertexes", "", "Events", log);
+  db->drawHisto( "nvertex", "Number of Reconstructed Vertexes", "", "Events", log);
+  db->drawHisto( "nvertexPU", "Number of Reconstructed Vertexes", "", "Events", log);
 //db->drawHisto( "nvertex_passedID", "Number of Reconstructed Vertexes", "", "Events", log);
 //db->drawHisto( "nvertex_passedID_pt50", "Number of Reconstructed Vertexes", "", "Events", log);
 
@@ -199,27 +200,25 @@ std::cout << "outputdir set." << std::endl;
   db->drawHisto( "met", metName, "GeV", "Events", log, 1, "");
   db->drawHisto( "met_noSmaj", (std::string)(metName+" (no cut on S_{maj})"), "GeV", "Events", log, 1, "");
 
-  db->set_rebin(10);
-  db->set_legendTitle("|#eta| < 1.1");
-  db->drawHisto( "response", "p_{T}/p_{T}^{#gamma} Response", "", "Events", log, 1, "eta011");
-  db->drawHisto( "response", "p_{T}/p_{T}^{#gamma} Response", "", "Events", log, 1, "eta011", (bool)true);
   db->set_rebin(5);
+  db->set_legendTitle("|#eta| < 1.1");
+  db->drawHisto( "response", "Balancing Response", "", "Events", log, 1, "eta011");
+  db->drawHisto( "response", "Balancing Response", "", "Events", log, 1, "eta011", (bool)true);
   db->drawHisto( "responseMPF", "MPF Response", "", "Events", log, 1, "eta011");
 //db->set_legendTitle("|#eta| < 1.3");
 //db->drawHisto( "response", "p_{T}/p_{T}^{#gamma} Response", "", "Events", log, 1, "eta013");
   db->set_legendTitle("|#eta^{#gamma}| < 1.3");
-  db->set_rebin(10);
-  db->drawHisto( "response", "p_{T}/p_{T}^{#gamma} Response", "", "Events", log, 1, "eta013", (bool)true);
-  db->set_rebin(5);
+  db->drawHisto( "response", "Balancing Response", "", "Events", log, 1, "eta013");
+  db->drawHisto( "response", "Balancing Response", "", "Events", log, 1, "eta013", (bool)true);
   db->drawHisto( "responseMPF", "MPF Response", "", "Events", log, 1, "eta013");
-//db->set_legendTitle("1.5 < |#eta| < 2.4");
-//db->drawHisto( "response", "p_{T}/p_{T}^{#gamma} Response", "", "Events", log, 1, "eta1524");
-//db->drawHisto( "response", "p_{T}/p_{T}^{#gamma} Response", "", "Events", log, 1, "eta1524", (bool)true);
-//db->drawHisto( "responseMPF", "MPF Response", "", "Events", log, 1, "eta1524");
-//db->set_legendTitle("2.4 < |#eta| < 3");
-//db->drawHisto( "response", "p_{T}/p_{T}^{#gamma} Response", "", "Events", log, 1, "eta243");
-//db->drawHisto( "response", "p_{T}/p_{T}^{#gamma} Response", "", "Events", log, 1, "eta243", (bool)true);
-//db->drawHisto( "responseMPF", "MPF Response", "", "Events", log, 1, "eta243");
+  db->set_legendTitle("1.5 < |#eta| < 2.4");
+  db->drawHisto( "response", "Balancing Response", "", "Events", log, 1, "eta1524");
+  db->drawHisto( "response", "Balancing Response", "", "Events", log, 1, "eta1524", (bool)true);
+  db->drawHisto( "responseMPF", "MPF Response", "", "Events", log, 1, "eta1524");
+  db->set_legendTitle("2.4 < |#eta| < 3");
+  db->drawHisto( "response", "Balancing Response", "", "Events", log, 1, "eta243");
+  db->drawHisto( "response", "Balancing Response", "", "Events", log, 1, "eta243", (bool)true);
+  db->drawHisto( "responseMPF", "MPF Response", "", "Events", log, 1, "eta243");
 //db->set_legendTitle("3 < |#eta| < 5");
 //db->drawHisto( "response", "p_{T}/p_{T}^{#gamma} Response", "", "Events", log, 1, "eta35");
 //db->drawHisto( "responseMPF", "MPF Response", "", "Events", log, 1, "eta35");
