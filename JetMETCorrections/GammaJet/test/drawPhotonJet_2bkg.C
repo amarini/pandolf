@@ -207,7 +207,7 @@ std::cout << "outputdir set." << std::endl;
   db->drawHisto( "responseMPF", "MPF Response", "", "Events", log, 1, "eta011");
 //db->set_legendTitle("|#eta| < 1.3");
 //db->drawHisto( "response", "p_{T}/p_{T}^{#gamma} Response", "", "Events", log, 1, "eta013");
-  db->set_legendTitle("|#eta^{#gamma}| < 1.3");
+  db->set_legendTitle("|#eta| < 1.3");
   db->drawHisto( "response", "Balancing Response", "", "Events", log, 1, "eta013");
   db->drawHisto( "response", "Balancing Response", "", "Events", log, 1, "eta013", (bool)true);
   db->drawHisto( "responseMPF", "MPF Response", "", "Events", log, 1, "eta013");
