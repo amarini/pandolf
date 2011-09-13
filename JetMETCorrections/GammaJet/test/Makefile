@@ -64,8 +64,6 @@ TreeAnalyzer_ZGamma.o: TreeAnalyzer_ZGamma.C
 TreeAnalyzer_DiJet.o: TreeAnalyzer_DiJet.C
 	$(CC) $(CFLAGS) TreeAnalyzer_DiJet.C $(ROOTFLAG)
 
-drawPhotonJet: fitTools.o DrawBase.o
-	$(CC) -Wall -o drawPhotonJet drawPhotonJet.C fitTools.o DrawBase.o $(ROOTFLAG) -lMinuit
 
 drawPhotonJet_2bkg: fitTools.o DrawBase.o drawPhotonJet_2bkg.C
 	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o drawPhotonJet_2bkg drawPhotonJet_2bkg.C fitTools.o DrawBase.o $(ROOTFLAG) $(EXTRALIBS)
@@ -83,7 +81,7 @@ draw_Calo_vs_PF: fitTools.o DrawBase.o draw_Calo_vs_PF.C
 	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o draw_Calo_vs_PF draw_Calo_vs_PF.C fitTools.o DrawBase.o $(ROOTFLAG) -lMinuit
 
 drawPhotonJetExtrap: fitTools.o DrawBase.o DrawExtrap.o drawPhotonJetExtrap.C
-	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o drawPhotonJetExtrap drawPhotonJetExtrap.C fitTools.o DrawBase.o DrawExtrap.o $(ROOTFLAG) -lMinuit
+	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o drawPhotonJetExtrap drawPhotonJetExtrap.C fitTools.o DrawBase.o DrawExtrap.o $(ROOTFLAG) $(EXTRALIBS)
 
 draw_all_methods_vs_pt: fitTools.o DrawBase.o draw_all_methods_vs_pt.C
 	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o draw_all_methods_vs_pt draw_all_methods_vs_pt.C fitTools.o DrawBase.o $(ROOTFLAG) $(EXTRALIBS)
