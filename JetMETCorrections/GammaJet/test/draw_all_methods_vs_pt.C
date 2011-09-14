@@ -94,9 +94,13 @@ int main( int argc, char* argv[] ) {
   if( data_dataset_tstr.Contains("2010") ) {
     intLumi = 34.;
   } else if( data_dataset_tstr.Contains("2011") ) {
-    intLumi = 50.;
+    intLumi = 191.;
   } 
 
+  if( data_dataset=="DATA_Run2011A_extend1" )
+    intLumi = 600.;
+  if( data_dataset=="DATA_Run2011A_1fb" )
+    intLumi = 1000.;
 
   db->set_lumiNormalization(intLumi);
   //db->set_shapeNormalization();
@@ -118,6 +122,18 @@ int main( int argc, char* argv[] ) {
   draw_vs_pt_plots("resolution", "eta013", fit_rms, db, (bool)true);
   draw_vs_pt_plots("response",   "eta013", fit_rms, db, (bool)true, "RecoRelRaw");
   draw_vs_pt_plots("resolution", "eta013", fit_rms, db, (bool)true, "RecoRelRaw");
+  draw_vs_pt_plots("response",   "eta1524", fit_rms, db);
+  draw_vs_pt_plots("resolution", "eta1524", fit_rms, db);
+  draw_vs_pt_plots("response",   "eta1524", fit_rms, db, (bool)true);
+  draw_vs_pt_plots("resolution", "eta1524", fit_rms, db, (bool)true);
+  draw_vs_pt_plots("response",   "eta1524", fit_rms, db, (bool)true, "RecoRelRaw");
+  draw_vs_pt_plots("resolution", "eta1524", fit_rms, db, (bool)true, "RecoRelRaw");
+  draw_vs_pt_plots("response",   "eta243", fit_rms, db);
+  draw_vs_pt_plots("resolution", "eta243", fit_rms, db);
+  draw_vs_pt_plots("response",   "eta243", fit_rms, db, (bool)true);
+  draw_vs_pt_plots("resolution", "eta243", fit_rms, db, (bool)true);
+  draw_vs_pt_plots("response",   "eta243", fit_rms, db, (bool)true, "RecoRelRaw");
+  draw_vs_pt_plots("resolution", "eta243", fit_rms, db, (bool)true, "RecoRelRaw");
 //draw_vs_pt_plots("response",   "eta243", "RMS99", db);
 //draw_vs_pt_plots("resolution", "eta243", "RMS99", db);
 //draw_vs_pt_plots("response",   "eta243", "RMS99", db, (bool)true);
@@ -184,7 +200,8 @@ void draw_vs_pt_plots( const std::string& resp_reso, const std::string& etaRegio
   std::vector< float > ptPhot_binning = fitTools::getPtPhot_binning();
   float xMin = (resp_reso=="response") ? ptPhot_binning[1] : ptPhot_binning[2];
   //if( db->get_recoType()=="calo" ) xMin = ptPhot_binning[1];
-  float xMax = ptPhot_binning[ ptPhot_binning.size()-3 ];
+  //float xMax = ptPhot_binning[ ptPhot_binning.size()-3 ];
+  float xMax = (etaRegion=="eta013" && resp_reso=="response") ? ptPhot_binning[ ptPhot_binning.size()-2 ] : ptPhot_binning[ ptPhot_binning.size()-3 ];
 
   int markerSize = 2.;
 
@@ -311,7 +328,7 @@ std::cout << "responseBALANCINGMC points: " << gr_responseBALANCINGMC_vs_pt->Get
     ymax = (db->get_recoType()=="jpt") ? 1.15 : 1.05;
     if( correctedPt ) {
       ymin = 0.7;
-      ymax = 1.25;
+      ymax = 1.15;
     //ymin = (db->get_recoType()=="calo") ? 0.3 : 0.7;
     //ymax = (db->get_recoType()=="calo") ? 1.3 : 1.2;
     }
@@ -324,7 +341,7 @@ std::cout << "responseBALANCINGMC points: " << gr_responseBALANCINGMC_vs_pt->Get
   std::string plotVarName = (resp_reso=="response") ? "Response" : "Resolution";
 
   TH2D* axes = new TH2D( "axes", "", 10, xMin, xMax, 10, ymin, ymax);
-  axes->SetXTitle( "Photon p_{T} [GeV/c]" );
+  axes->SetXTitle( "Photon p_{T} [GeV]" );
   std::string yTitle = plotVarName;
   if( correctedPt ) { 
     if( resp_reso=="response" ) yTitle = "Corrected " + yTitle;
@@ -342,7 +359,8 @@ std::cout << "responseBALANCINGMC points: " << gr_responseBALANCINGMC_vs_pt->Get
     legend_xmin = 0.52;
     legend_ymin = 0.2;
     legend_xmax = 0.9;
-    legend_ymax = (correctedPt) ? 0.45 : 0.5;
+    //legend_ymax = (correctedPt) ? 0.45 : 0.5;
+    legend_ymax = 0.5;
   } else {
     if( db->get_recoType()=="calo" ) {
       legend_xmin = 0.17;
@@ -360,6 +378,8 @@ std::cout << "responseBALANCINGMC points: " << gr_responseBALANCINGMC_vs_pt->Get
 
   //bool drawStars = !( resp_reso=="response" &&  db->get_recoType()!="jpt" ) || ( etaRegion!="eta011" && etaRegion!="eta013" && etaRegion!="eta1524" );
   bool drawStars = ( resp_reso=="response" &&  db->get_recoType()=="jpt" ) || ( etaRegion!="eta011" && etaRegion!="eta013" && etaRegion!="eta1524" );
+drawStars=true;
+if( resp_reso=="resolution" ) drawStars=false;
 
   std::string legendTitle = "  " + etaRegion_str;
   TLegend* legend = new TLegend( legend_xmin, legend_ymin, legend_xmax, legend_ymax, legendTitle.c_str());
@@ -368,13 +388,16 @@ std::cout << "responseBALANCINGMC points: " << gr_responseBALANCINGMC_vs_pt->Get
   legend->SetTextSize(0.033);
   if( resp_reso=="response" ) {
     legend->AddEntry( gr_responseBALANCING_vs_pt, "#gamma+Jet Balancing", "P");
+    legend->AddEntry( gr_responseBALANCINGMC_vs_pt, "#gamma+Jet Balancing (MC)", "P");
     if( !correctedPt ) {
       legend->AddEntry( gr_responseMPF_vs_pt, "#gamma+Jet MPF", "P");
-      //legend->AddEntry( gr_responseMPFMC_vs_pt, "#gamma+Jet MPF (MC)", "P");
+      legend->AddEntry( gr_responseMPFMC_vs_pt, "#gamma+Jet MPF (MC)", "P");
     }
   }
-  legend->AddEntry( gr_responseEXTRAP_vs_pt, "#gamma+Jet Extrapolation", "P");
-  legend->AddEntry( gr_responseEXTRAPMC_vs_pt, "#gamma+Jet Extrap. (MC)", "P");
+  if( correctedPt ) {
+    legend->AddEntry( gr_responseEXTRAP_vs_pt, "#gamma+Jet Extrapolation", "P");
+    legend->AddEntry( gr_responseEXTRAPMC_vs_pt, "#gamma+Jet Extrap. (MC)", "P");
+  }
   if( ELIF_ && resp_reso=="resolution" )
     legend->AddEntry( gr_responseELIF_vs_pt, "#gamma+Jet Subtraction", "P");
   std::string legendTrue = "True " + plotVarName;
@@ -411,17 +434,20 @@ std::cout << "responseBALANCINGMC points: " << gr_responseBALANCINGMC_vs_pt->Get
 
   if( resp_reso=="response" ) {
     gr_responseBALANCING_vs_pt->Draw("psame");
+    gr_responseBALANCINGMC_vs_pt->Draw("psame");
     if( !correctedPt ) {
       gr_responseMPF_vs_pt->Draw("psame");
-      //gr_responseMPFMC_vs_pt->Draw("psame");
+      gr_responseMPFMC_vs_pt->Draw("psame");
     }
   }
   legend->Draw("same");
   label_cms->Draw("same");
   label_sqrt->Draw("same");
   label_algo->Draw("same");
-  gr_responseEXTRAPMC_vs_pt->Draw("psame");
-  gr_responseEXTRAP_vs_pt->Draw("psame");
+  if( correctedPt ) {
+    gr_responseEXTRAPMC_vs_pt->Draw("psame");
+    gr_responseEXTRAP_vs_pt->Draw("psame");
+  }
   if( ELIF_ && resp_reso=="resolution" )
     gr_responseELIF_vs_pt->Draw("psame");
 
@@ -446,13 +472,13 @@ std::cout << "responseBALANCINGMC points: " << gr_responseBALANCINGMC_vs_pt->Get
   // and now data/MC comparisons:
 
   c1->Clear();
-  float dataMC_ymin = (resp_reso=="response") ? 0.65 : 0.;
-  float dataMC_ymax = (resp_reso=="response") ? 1.2 : 2.5;
+  float dataMC_ymin = (resp_reso=="response") ? 0.8 : 0.;
+  float dataMC_ymax = (resp_reso=="response") ? 1.1 : 2.5;
   //if( resp_reso=="resolution" && db->get_recoType()=="calo") dataMC_ymax=3.;
   //float xMin_dataMC = (ELIF_) ? 22. : xMin;
   float xMin_dataMC = xMin;
   TH2D* axes2 = new TH2D( "axes2", "", 10, xMin_dataMC, xMax, 10, dataMC_ymin, dataMC_ymax);
-  axes2->SetXTitle( "Photon p_{T} [GeV/c]" );
+  axes2->SetXTitle( "Photon p_{T} [GeV]" );
   axes2->SetYTitle( "Data / MC" );
   axes2->GetXaxis()->SetMoreLogLabels();
   axes2->GetXaxis()->SetNoExponent();
@@ -498,9 +524,10 @@ std::cout << "responseBALANCINGMC points: " << gr_responseBALANCINGMC_vs_pt->Get
   f_const_MPF->SetLineColor(38);
   gr_dataMC_MPF->Fit(f_const_MPF, "QR");
 
-  if( etaRegion=="eta243"||etaRegion=="eta1524" ) xMax_fit = 200.;
+  //if( etaRegion=="eta243"||etaRegion=="eta1524" ) xMax_fit = 200.;
   TF1* f_const_EXTRAP = new TF1("const_EXTRAP", "[0]", xMin_dataMC, xMax_fit);
   //TF1* f_const_EXTRAP = new TF1("const_EXTRAP", "[0]", 20., 150.);
+  if( correctedPt && db->get_recoType()=="calo" ) f_const_EXTRAP->SetRange(35., xMax_fit);
   f_const_EXTRAP->SetParameter(0, 1.);
   f_const_EXTRAP->SetLineStyle(2);
   f_const_EXTRAP->SetLineColor(46);
@@ -560,7 +587,8 @@ std::cout << "responseBALANCINGMC points: " << gr_responseBALANCINGMC_vs_pt->Get
     if( !correctedPt )
       legend2->AddEntry( gr_dataMC_MPF, mpfText, "P");
   }
-  legend2->AddEntry( gr_dataMC_EXTRAP, extrapText, "P");
+  if( correctedPt )
+    legend2->AddEntry( gr_dataMC_EXTRAP, extrapText, "P");
   if( ELIF_ && resp_reso=="resolution" )
     legend2->AddEntry( gr_dataMC_ELIF, elifText, "P");
 
@@ -604,7 +632,8 @@ std::cout << "responseBALANCINGMC points: " << gr_responseBALANCINGMC_vs_pt->Get
   label_cms->Draw("same");
   label_sqrt->Draw("same");
   label_algo2->Draw("same");
-  gr_dataMC_EXTRAP->Draw("p same");
+  if( correctedPt ) 
+    gr_dataMC_EXTRAP->Draw("p same");
   if( ELIF_ && resp_reso=="resolution" ) gr_dataMC_ELIF->Draw("p same");
   gPad->RedrawAxis();
 
@@ -621,6 +650,36 @@ std::cout << "responseBALANCINGMC points: " << gr_responseBALANCINGMC_vs_pt->Get
   name_png = thisName + "vs_pt.png";
   c1->SaveAs(name_eps.c_str());
   c1->SaveAs(name_png.c_str());
+
+
+  // additional plot requested by mikko:
+  if( correctedPt && resp_reso=="response" ) {
+  
+    c1->Clear();
+
+    TLegend* legend3 = new TLegend( 0.15, 0.2, 0.73, legend_yMax2, legendTitle.c_str());
+    legend3->SetFillColor(kWhite);
+    legend3->SetTextSize(0.03);
+    legend3->AddEntry( gr_dataMC_MPF, mpfText, "P");
+    legend3->AddEntry( gr_dataMC_EXTRAP, extrapText, "P");
+
+    axes2->Draw();
+    legend3->Draw("same");
+    line_one->Draw("same");
+    gr_dataMC_MPF->Draw("p same");
+    gr_dataMC_EXTRAP->Draw("p same");
+    label_cms->Draw("same");
+    label_sqrt->Draw("same");
+    label_algo2->Draw("same");
+    gPad->RedrawAxis();
+
+    thisName = name_base + "_MPFvsEXTRAP_";
+    name_eps = thisName + "vs_pt.eps";
+    name_png = thisName + "vs_pt.png";
+    c1->SaveAs(name_eps.c_str());
+    c1->SaveAs(name_png.c_str());
+
+  }
 
 
 
@@ -706,7 +765,7 @@ std::cout << "responseBALANCINGMC points: " << gr_responseBALANCINGMC_vs_pt->Get
     legend3->AddEntry( gr_squareDiff_EXTRAP, extrapText, "P");
 
     TH2D* axes3 = new TH2D( "axes3", "", 10, xMin, xMax, 10, 0., 0.3);
-    axes3->SetXTitle( "Photon p_{T} [GeV/c]" );
+    axes3->SetXTitle( "Photon p_{T} [GeV]" );
     axes3->SetYTitle( "#sqrt{Data^{2} - MC^{2}}" );
     axes3->GetXaxis()->SetMoreLogLabels();
     axes3->GetXaxis()->SetNoExponent();
@@ -833,7 +892,7 @@ std::cout << "responseBALANCINGMC points: " << gr_responseBALANCINGMC_vs_pt->Get
     c1->Clear();
 
     TH2D* axes4 = new TH2D( "axes4", "", 10, 20., 1400., 10, 0., 30.);
-    axes4->SetXTitle( "Photon p_{T} [GeV/c]" );
+    axes4->SetXTitle( "Photon p_{T} [GeV]" );
     axes4->SetYTitle( "Relative Uncertainty [%]");
     axes4->GetXaxis()->SetMoreLogLabels();
     axes4->GetXaxis()->SetNoExponent();
