@@ -37,9 +37,12 @@ struct InputFile {
 };
 
 
-struct HistoAndName {
+class HistoAndName {
+ public:
+  HistoAndName(int markerstyle=-1) { markerStyle=markerstyle; };
   std::string histoName;
   std::string legendName;
+  int markerStyle;
 };
 
 

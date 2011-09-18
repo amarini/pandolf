@@ -1,10 +1,16 @@
-#include "CommonTools/DrawBase.h"
-#include "CommonTools/fitTools.h"
+#include "DrawBase.h"
+#include "fitTools.h"
+
+#include "RooRealVar.h"
+#include "RooDataHist.h"
+#include "RooPlot.h"
+
 #include "TRegexp.h"
 #include <iostream>
 #include <algorithm>
 
 
+using namespace RooFit;
 
 
 DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType, const std::string& jetAlgo, const std::string& flags ) {
@@ -520,7 +526,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
       if( mcFiles_.size()>1 ) {
         for( unsigned i=1; i<mcFiles_.size(); ++i ) {
           mcFiles_[i].file->cd();
-          mcHistos.push_back((TH1D*)(mcFiles_[i].file->Get(histoName.c_str())));
+          mcHistos.push_back((TH1D*)(mcFiles_[i].file->Get(histoName.c_str())->Clone()));
           if( mcHistos[i]==0 ) {
             std::cout << "Didn't find MC histo '" << histoName << "'. Continuing." << std::endl;
             return;
@@ -554,7 +560,6 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
         } //for mc files
       } //if mc files size > 1
     } // if !nomc
-
 
 
 
@@ -625,8 +630,9 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     // create stack:
     THStack* mcHisto_stack = new THStack();
     int nHistos = mcHistos.size();
-    for( unsigned i=0; i<nHistos; ++i )
+    for( unsigned i=0; i<nHistos; ++i ) {
       mcHisto_stack->Add( (TH1D*)(mcHistos[nHistos-i-1]->Clone()), "HISTO" );
+    }
     mcHisto_stack->SetName("stack");
 
     TH1D* refHisto = (noDATA) ? mcHistos[0] : dataHistos[0];
@@ -707,6 +713,8 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
       else 
         graph_data_poisson->SetMarkerStyle(20);
     }
+
+
 
 
     // axis titles:
@@ -790,6 +798,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     for( unsigned i=0; i<dataHistos.size(); ++i ) {
       if( dataHistos.size()==1 && poissonAsymmErrors_ ) {
         graph_data_poisson->Draw("Psame");
+        //xframe->Draw("same");
       } else {
         int backwardsIndex = dataHistos.size()-1-i; //backwards is prettier: bg on the back, signal in front
         if( dataFiles_[backwardsIndex].fillStyle!=-1 )
@@ -1110,6 +1119,8 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     delete c1;
     delete legend;
     delete h2_axes;
+    delete mcHisto_stack;
+    delete mcHisto_sum;
 
   } //for n plots
 
@@ -1547,6 +1558,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
 
 
   } //if response
+
 
 
 } //drawHisto
@@ -2100,18 +2112,20 @@ void DrawBase::compareDifferentHistos_singleFile( InputFile infile, const std::v
 
     // 2. set fill colors and styles
     if( !stacked ) histos[iHisto]->SetFillStyle( 3004+iHisto );
-    if( iHisto<fillColors.size() ) {
-      histos[iHisto]->SetFillColor( fillColors[iHisto] );
-      if( !stacked ) histos[iHisto]->SetLineColor( fillColors[iHisto] );
-    } else {
-      histos[iHisto]->SetFillColor( iHisto );
-      if( !stacked ) histos[iHisto]->SetLineColor( iHisto );
+    int colorIndex = (iHisto<fillColors.size()) ? fillColors[iHisto] : iHisto;
+    histos[iHisto]->SetFillColor( colorIndex );
+    if( !stacked ) histos[iHisto]->SetLineColor( colorIndex );
+    histos[iHisto]->SetLineWidth(3);
+   
+    if( histosandnames[iHisto].markerStyle != -1 ) {
+      histos[iHisto]->SetMarkerStyle(histosandnames[iHisto].markerStyle);
+      histos[iHisto]->SetMarkerColor(colorIndex);
     }
-    histos[iHisto]->SetLineWidth(2);
 
     
     // 3. add to legend
-    legend->AddEntry( histos[iHisto], (histosandnames[iHisto].legendName).c_str() , "F");
+    if( histos[iHisto]->GetMarkerStyle()==1 ) legend->AddEntry( histos[iHisto], (histosandnames[iHisto].legendName).c_str() , "F");
+    else legend->AddEntry( histos[iHisto], (histosandnames[iHisto].legendName).c_str() , "P");
 
 
     // add to stack (useful if stacked):
@@ -2174,14 +2188,31 @@ void DrawBase::compareDifferentHistos_singleFile( InputFile infile, const std::v
   if( stacked ) {
     stack->Draw("histo same");
   } else {
+    std::vector<int> toBeDrawnLater;
     for(unsigned i=0; i<histos.size(); ++i ) {
+      int thisHisto = histos.size()-i-1;
+      // skip ones for which markerstyle is defined (draw on top later):
+      if( histos[thisHisto]->GetMarkerStyle()!=1 ) {//default
+        toBeDrawnLater.push_back(thisHisto);
+        continue;
+      }
+
       // reverse order is prettier:
       if( normalized ) {
-        histos[histos.size()-i-1]->DrawNormalized("histo same");
+        histos[thisHisto]->DrawNormalized("histo same");
       } else {
-        histos[histos.size()-i-1]->Draw("histo same");
+        histos[thisHisto]->Draw("histo same");
       }
-    }
+    } //for histos
+   
+    for( unsigned i=0; i<toBeDrawnLater.size(); ++i ) {
+      if( normalized ) {
+        histos[toBeDrawnLater[i]]->DrawNormalized("p same");
+      } else {
+        histos[toBeDrawnLater[i]]->Draw("p same");
+      }
+    } //for later histos
+
   } // if stacked
   legend->Draw("same");
   label_CMS->Draw("same");
