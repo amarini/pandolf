@@ -69,7 +69,9 @@ class DrawBase {
   void set_sameInstanceNormalization();
 
   //void drawHisto( const std::string& name, const std::string& etaRegion, const std::string& flags, const std::string& axisName="", const std::string& units="", int legendQuadrant=1, bool log_aussi=false);
-  void drawHisto( const std::string& name, const std::string& axisName, const std::string& units="", const std::string& instanceName="Entries", bool log_aussi=false, int legendQuadrant=1, const std::string& flags="", bool correctedResponse=false, const std::string& labelText="" );
+  void drawHisto_vs_pt( int nBinsPt, float* ptBins, const std::string& name, const std::string& axisName, const std::string& units="", const std::string& instanceName="Entries", bool log_aussi=false, int legendQuadrant=1, std::string flags="", const std::string& labelText="" );
+  void drawHisto_vs_pt( std::vector<float> ptBins, const std::string& name, const std::string& axisName, const std::string& units="", const std::string& instanceName="Entries", bool log_aussi=false, int legendQuadrant=1, std::string flags="", const std::string& labelText="" );
+  void drawHisto( const std::string& name, const std::string& axisName, const std::string& units="", const std::string& instanceName="Entries", bool log_aussi=false, int legendQuadrant=1, const std::string& flags="", const std::string& labelText="", bool add_jetAlgoText=false );
   void drawProfile( const std::string& yVar, const std::string& xVar, int legendQuadrant=1);
   void drawStack(const std::string& varY, const std::string& varX, const std::string& RECO_GEN, bool isData) const { this->drawStack( varY, varX, "", RECO_GEN, isData); };
   void drawStack(const std::string& varY, const std::string& varX, const std::string& etaRegion, const std::string& RECO_GEN, bool isData) const;
@@ -153,6 +155,11 @@ class DrawBase {
   std::vector< InputFile > dataFiles_;
   std::vector< InputFile > mcFiles_;
   std::vector< InputFile > mcFiles_superimp_;
+  
+  TH1D* lastHistos_mcHistoSum_;
+  std::vector< TH1D* > lastHistos_data_;
+  std::vector< TH1D* > lastHistos_mc_;
+  std::vector< TH1D* > lastHistos_mc_superimp_;
   
   Float_t scaleFactor_;
 
