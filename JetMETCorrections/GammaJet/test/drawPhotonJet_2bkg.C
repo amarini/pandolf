@@ -192,6 +192,7 @@ std::cout << "outputdir set." << std::endl;
 ////db->drawHisto_onlyData( "deltaPhi", "", "clusterOK_isolated", "", 1);
 
 //db->drawHisto( "response_loose", "Response", "", "Events", log);
+
   std::string metName;
   if( recoType=="pf" ) metName = "PF Missing E_{T}";
   if( recoType=="calo" ) metName = "PF Missing E_{T}";
@@ -200,28 +201,32 @@ std::cout << "outputdir set." << std::endl;
   db->drawHisto( "met", metName, "GeV", "Events", log, 1, "");
   db->drawHisto( "met_noSmaj", (std::string)(metName+" (no cut on S_{maj})"), "GeV", "Events", log, 1, "");
 
+
+  std::vector<float> ptPhot_binning = fitTools::getPtPhot_binning();
+
   db->set_rebin(5);
   db->set_legendTitle("|#eta| < 1.1");
-  db->drawHisto( "response", "Balancing Response", "", "Events", log, 1, "eta011");
-  db->drawHisto( "response", "Balancing Response", "", "Events", log, 1, "eta011", (bool)true);
-  db->drawHisto( "responseMPF", "MPF Response", "", "Events", log, 1, "eta011");
+  db->drawHisto_vs_pt( ptPhot_binning, "response", "Balancing Response", "", "Events", log, 1, "eta011");
+  db->drawHisto_vs_pt( ptPhot_binning, "response_L2L3", "Corrected Balancing Response", "", "Events", log, 1, "eta011");
+  db->drawHisto_vs_pt( ptPhot_binning, "responseMPF", "MPF Response", "", "Events", log, 1, "eta011");
 //db->set_legendTitle("|#eta| < 1.3");
 //db->drawHisto( "response", "p_{T}/p_{T}^{#gamma} Response", "", "Events", log, 1, "eta013");
   db->set_legendTitle("|#eta| < 1.3");
-  db->drawHisto( "response", "Balancing Response", "", "Events", log, 1, "eta013");
-  db->drawHisto( "response", "Balancing Response", "", "Events", log, 1, "eta013", (bool)true);
-  db->drawHisto( "responseMPF", "MPF Response", "", "Events", log, 1, "eta013");
+  db->drawHisto_vs_pt( ptPhot_binning, "response", "Balancing Response", "", "Events", log, 1, "eta013");
+  db->drawHisto_vs_pt( ptPhot_binning, "response_L2L3", "Corrected Balancing Response", "", "Events", log, 1, "eta013");
+  db->drawHisto_vs_pt( ptPhot_binning, "responseMPF", "MPF Response", "", "Events", log, 1, "eta013");
   db->set_legendTitle("1.5 < |#eta| < 2.4");
-  db->drawHisto( "response", "Balancing Response", "", "Events", log, 1, "eta1524");
-  db->drawHisto( "response", "Balancing Response", "", "Events", log, 1, "eta1524", (bool)true);
-  db->drawHisto( "responseMPF", "MPF Response", "", "Events", log, 1, "eta1524");
+  db->drawHisto_vs_pt( ptPhot_binning, "response", "Balancing Response", "", "Events", log, 1, "eta1524");
+  db->drawHisto_vs_pt( ptPhot_binning, "response_L2L3", "Corrected Balancing Response", "", "Events", log, 1, "eta1524");
+  db->drawHisto_vs_pt( ptPhot_binning, "responseMPF", "MPF Response", "", "Events", log, 1, "eta1524");
   db->set_legendTitle("2.4 < |#eta| < 3");
-  db->drawHisto( "response", "Balancing Response", "", "Events", log, 1, "eta243");
-  db->drawHisto( "response", "Balancing Response", "", "Events", log, 1, "eta243", (bool)true);
-  db->drawHisto( "responseMPF", "MPF Response", "", "Events", log, 1, "eta243");
+  db->drawHisto_vs_pt( ptPhot_binning, "response", "Balancing Response", "", "Events", log, 1, "eta243");
+  db->drawHisto_vs_pt( ptPhot_binning, "response_L2L3", "Corrected Balancing Response", "", "Events", log, 1, "eta243");
+  db->drawHisto_vs_pt( ptPhot_binning, "responseMPF", "MPF Response", "", "Events", log, 1, "eta243");
 //db->set_legendTitle("3 < |#eta| < 5");
 //db->drawHisto( "response", "p_{T}/p_{T}^{#gamma} Response", "", "Events", log, 1, "eta35");
 //db->drawHisto( "responseMPF", "MPF Response", "", "Events", log, 1, "eta35");
+
 
   delete db;
   db = 0;
