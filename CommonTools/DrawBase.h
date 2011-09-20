@@ -18,6 +18,7 @@
 #include "TF1.h"
 #include "TGraphErrors.h"
 #include "TFile.h"
+#include "TTree.h"
 #include "TStyle.h"
 #include "TLegend.h"
 #include "TPaveText.h"
@@ -73,6 +74,7 @@ class DrawBase {
   void drawHisto_vs_pt( std::vector<float> ptBins, const std::string& name, const std::string& axisName, const std::string& units="", const std::string& instanceName="Entries", bool log_aussi=false, int legendQuadrant=1, std::string flags="", const std::string& labelText="" );
   void drawHisto( const std::string& name, const std::string& axisName, const std::string& units="", const std::string& instanceName="Entries", bool log_aussi=false, int legendQuadrant=1, const std::string& flags="", const std::string& labelText="", bool add_jetAlgoText=false );
   void drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<TH1D*> mcHistos, std::vector<TH1D*> mcHistos_superimp, const std::string& name, const std::string& axisName, const std::string& units="", const std::string& instanceName="Entries", bool log_aussi=false, int legendQuadrant=1, const std::string& flags="", const std::string& labelText="", bool add_jetAlgoText=false );
+  void drawHisto_fromTree( const std::string& treeName, const std::string& varName, const std::string& selection, int nBins, float xMin, float xMax, const std::string& name, const std::string& axisName, const std::string& units="", const std::string& instanceName="Entries", bool log_aussi=false, int legendQuadrant=1, const std::string& flags="", const std::string& labelText="", bool add_jetAlgoText=false );
   void drawProfile( const std::string& yVar, const std::string& xVar, int legendQuadrant=1);
   void drawStack(const std::string& varY, const std::string& varX, const std::string& RECO_GEN, bool isData) const { this->drawStack( varY, varX, "", RECO_GEN, isData); };
   void drawStack(const std::string& varY, const std::string& varX, const std::string& etaRegion, const std::string& RECO_GEN, bool isData) const;
