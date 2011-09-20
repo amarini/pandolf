@@ -1065,21 +1065,74 @@ void DrawBase::drawHisto_vs_pt( std::vector<float> ptBins, const std::string& na
 
 void DrawBase::drawHisto( const std::string& name, const std::string& axisName, const std::string& units, const std::string& instanceName, bool log_aussi, int legendQuadrant, const std::string& flags, const std::string& labelText, bool add_jetAlgoText  ) {
 
+  bool noDATA = false;
+  bool noMC = false;
+
+
+  std::string histoName = name;
+  if( flags!="" ) histoName = histoName + "_" + flags;
+
+  std::vector<TH1D*> dataHistos;
+  for( unsigned int iData=0; iData<dataFiles_.size(); iData++ )
+    dataHistos.push_back( (TH1D*)dataFiles_[iData].file->Get(histoName.c_str()) );
+
+  std::vector<TH1D*> mcHistos;
+  TH1D* mcHisto0 = 0;
+  if( mcFiles_.size()> 0 && mcFiles_[0].file!=0) 
+    mcHisto0 = (TH1D*)mcFiles_[0].file->Get(histoName.c_str());
+  if( mcHisto0==0 ) noMC = true;
+
+  if( noDATA && noMC ) {
+    std::cout << "Didn't find histo '" << histoName << "'. Skipping." << std::endl;
+    return;
+  }
+
+  mcHistos.push_back(mcHisto0);
+
+  if( mcFiles_.size()>1 ) {
+    for( unsigned i=1; i<mcFiles_.size(); ++i ) {
+      mcFiles_[i].file->cd();
+      mcHistos.push_back((TH1D*)(mcFiles_[i].file->Get(histoName.c_str())->Clone()));
+      if( mcHistos[i]==0 ) {
+        std::cout << "Didn't find MC histo '" << histoName << "'. Continuing." << std::endl;
+        return;
+      }
+    } //for mc files
+  } // if mcfiles > 1
+
+
+  std::vector<TH1D*> mcHistos_superimp;
+  TH1D* mcHisto0_superimp = 0;
+  if( mcFiles_superimp_.size()> 0 && mcFiles_superimp_[0].file!=0) 
+    mcHisto0_superimp = (TH1D*)mcFiles_superimp_[0].file->Get(histoName.c_str());
+  if( mcHisto0_superimp!=0 ) {
+    mcHistos_superimp.push_back(mcHisto0_superimp);
+    mcHistos_superimp[0]->SetLineColor( mcFiles_superimp_[0].lineColor );
+    mcHistos_superimp[0]->SetLineWidth(2);
+    mcHistos_superimp[0]->Rebin(rebin_);
+    mcHistos_superimp[0]->Scale(mcFiles_superimp_[0].weight );
+  }
+
+  drawHisto_fromHistos( dataHistos, mcHistos, mcHistos_superimp, name, axisName, units, instanceName, log_aussi, legendQuadrant, flags, labelText, add_jetAlgoText );
+
+} //drawhistos
+
+
+
+
+void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<TH1D*> mcHistos, std::vector<TH1D*> mcHistos_superimp, const std::string& name, const std::string& axisName, const std::string& units, const std::string& instanceName, bool log_aussi, int legendQuadrant, const std::string& flags, const std::string& labelText, bool add_jetAlgoText  ) {
+
 
   bool noDATA = false;
   bool noMC = false;
 
 
-    std::string histoName = name;
-    if( flags!="" ) histoName = histoName + "_" + flags;
-
-
-    std::vector<TH1D*> dataHistos;
-    for( unsigned int iData=0; iData<dataFiles_.size(); iData++ )
-      dataHistos.push_back( (TH1D*)dataFiles_[iData].file->Get(histoName.c_str()) );
-
     if( dataHistos.size()==0 ) {
       noDATA = true;
+    }
+
+    if( mcHistos.size()==0 ) {
+      noMC = true;
     }
 
 
@@ -1113,24 +1166,12 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
 
 
 
-    std::vector<TH1D*> mcHistos;
-    TH1D* mcHisto0 = 0;
-    if( mcFiles_.size()> 0 && mcFiles_[0].file!=0) 
-      mcHisto0 = (TH1D*)mcFiles_[0].file->Get(histoName.c_str());
-    if( mcHisto0==0 ) noMC = true;
-
-    if( noDATA && noMC ) {
-      std::cout << "Didn't find histo '" << histoName << "'. Skipping." << std::endl;
-      return;
-    }
-
 
     // SECOND: SET BASIC AESTHETICS FOR MC HISTO(S) and CREATE MC HISTO SUM
     TH1D* mcHisto_sum = 0;
     float fillColor_default=1;
     float fillStyle_default=3004;
     if( !noMC ) {
-      mcHistos.push_back(mcHisto0);
       if( mcFiles_[0].fillColor==-1 )
         mcHistos[0]->SetFillColor( fillColor_default++ ); //so that it changes at every histo
       else
@@ -1160,14 +1201,8 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
       mcHisto_sum = new TH1D(*((TH1D*)mcHistos[0]->Clone()));
 
 
-      if( mcFiles_.size()>1 ) {
-        for( unsigned i=1; i<mcFiles_.size(); ++i ) {
-          mcFiles_[i].file->cd();
-          mcHistos.push_back((TH1D*)(mcFiles_[i].file->Get(histoName.c_str())->Clone()));
-          if( mcHistos[i]==0 ) {
-            std::cout << "Didn't find MC histo '" << histoName << "'. Continuing." << std::endl;
-            return;
-          }
+      if( mcHistos.size()>1 ) {
+        for( unsigned i=1; i<mcHistos.size(); ++i ) {
           mcHistos[i]->Rebin(rebin_);
           mcHistos[i]->Scale(mcFiles_[i].weight );
           mcHisto_sum->Add( (TH1D*)(mcHistos[i]->Clone()) );
@@ -1199,18 +1234,6 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     } // if !nomc
 
 
-
-    std::vector<TH1D*> mcHistos_superimp;
-    TH1D* mcHisto0_superimp = 0;
-    if( mcFiles_superimp_.size()> 0 && mcFiles_superimp_[0].file!=0) 
-      mcHisto0_superimp = (TH1D*)mcFiles_superimp_[0].file->Get(histoName.c_str());
-    if( mcHisto0_superimp!=0 ) {
-      mcHistos_superimp.push_back(mcHisto0_superimp);
-      mcHistos_superimp[0]->SetLineColor( mcFiles_superimp_[0].lineColor );
-      mcHistos_superimp[0]->SetLineWidth(2);
-      mcHistos_superimp[0]->Rebin(rebin_);
-      mcHistos_superimp[0]->Scale(mcFiles_superimp_[0].weight );
-    }
 
 
 
