@@ -1105,17 +1105,103 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
   TH1D* mcHisto0_superimp = 0;
   if( mcFiles_superimp_.size()> 0 && mcFiles_superimp_[0].file!=0) 
     mcHisto0_superimp = (TH1D*)mcFiles_superimp_[0].file->Get(histoName.c_str());
-  if( mcHisto0_superimp!=0 ) {
+  if( mcHisto0_superimp!=0 )
     mcHistos_superimp.push_back(mcHisto0_superimp);
-    mcHistos_superimp[0]->SetLineColor( mcFiles_superimp_[0].lineColor );
-    mcHistos_superimp[0]->SetLineWidth(2);
-    mcHistos_superimp[0]->Rebin(rebin_);
-    mcHistos_superimp[0]->Scale(mcFiles_superimp_[0].weight );
+
+  drawHisto_fromHistos( dataHistos, mcHistos, mcHistos_superimp, name, axisName, units, instanceName, log_aussi, legendQuadrant, flags, labelText, add_jetAlgoText );
+
+} //drawhisto
+
+
+
+
+
+void DrawBase::drawHisto_fromTree( const std::string& treeName, const std::string& varName, const std::string& selection, int nBins, float xMin, float xMax, const std::string& name, const std::string& axisName, const std::string& units, const std::string& instanceName, bool log_aussi, int legendQuadrant, const std::string& flags, const std::string& labelText, bool add_jetAlgoText  ) {
+
+  bool noDATA = false;
+  bool noMC = false;
+
+
+  std::string histoName = name;
+  if( flags!="" ) histoName = histoName + "_" + flags;
+
+  std::vector<TH1D*> dataHistos;
+  for( unsigned int iData=0; iData<dataFiles_.size(); iData++ ) {
+    TTree* tree = (TTree*)dataFiles_[iData].file->Get(treeName.c_str());
+    if( tree==0 ) {
+      std::cout << "Didn't find tree '" << treeName << "' in data file: " << dataFiles_[iData].file->GetName() << std::endl;
+      std::cout << "Skipping." << std::endl;
+      continue;
+    }
+    char histoName[500];
+    sprintf(histoName, "%s_%d", name.c_str(), iData);
+    TH1D* newHisto = new TH1D(histoName, "", nBins, xMin, xMax);
+    tree->Project(histoName, varName.c_str(), selection.c_str());
+    dataHistos.push_back( newHisto );
+  }
+
+  noDATA = (dataHistos.size()==0);
+
+
+  std::vector<TH1D*> mcHistos;
+  TTree* treeMC = (TTree*)mcFiles_[0].file->Get(treeName.c_str());
+  if( treeMC==0 ) {
+    std::cout << "Didn't find tree '" << treeName << "' in MC file: " << mcFiles_[0].file->GetName() << std::endl;
+    std::cout << "Skipping." << std::endl;
+  } else {
+    char histoNameMC[500];
+    sprintf(histoNameMC, "%sMC_0", name.c_str());
+    TH1D* mcHisto0 = new TH1D(histoNameMC, "", nBins, xMin, xMax);
+    treeMC->Project(histoNameMC, varName.c_str(), selection.c_str());
+    mcHistos.push_back( mcHisto0 );
+  }
+
+  noMC = (mcHistos.size()==0);
+
+
+  if( noDATA && noMC ) {
+    std::cout << "Didn't find histo '" << histoName << "'. Skipping." << std::endl;
+    return;
+  }
+
+
+  if( mcFiles_.size()>1 ) {
+    for( unsigned int iMC=1; iMC<mcFiles_.size(); iMC++ ) {
+      TTree* tree = (TTree*)mcFiles_[iMC].file->Get(treeName.c_str());
+      if( tree==0 ) {
+        std::cout << "Didn't find tree '" << treeName << "' in MC file: " << mcFiles_[iMC].file->GetName() << std::endl;
+        std::cout << "Skipping." << std::endl;
+        continue;
+      }
+      char histoNameMC[500];
+      sprintf(histoNameMC, "%sMC_%d", name.c_str(), iMC);
+      TH1D* newHisto = new TH1D(histoNameMC, "", nBins, xMin, xMax);
+      tree->Project(histoNameMC, varName.c_str(), selection.c_str());
+      mcHistos.push_back( newHisto );
+    } //for mc files
+  } // if mcfiles > 1
+
+
+  // superimposed mc histos (for now only one):
+  std::vector<TH1D*> mcHistos_superimp;
+  TH1D* mcHisto0_superimp = 0;
+  if( mcFiles_superimp_.size()> 0 && mcFiles_superimp_[0].file!=0) {
+    TTree* tree = (TTree*)mcFiles_superimp_[0].file->Get(treeName.c_str());
+    if( tree==0 ) {
+      std::cout << "Didn't find tree '" << treeName << "' in superimposed MC file: " << mcFiles_superimp_[0].file->GetName() << std::endl;
+      std::cout << "Skipping." << std::endl;
+    } else {
+      char histoNameMC[500];
+      sprintf(histoNameMC, "%sMCsuperimp_0", name.c_str());
+      TH1D* newHisto = new TH1D(histoNameMC, "", nBins, xMin, xMax);
+      tree->Project(histoNameMC, varName.c_str(), selection.c_str());
+      mcHistos_superimp.push_back( newHisto );
+    }
   }
 
   drawHisto_fromHistos( dataHistos, mcHistos, mcHistos_superimp, name, axisName, units, instanceName, log_aussi, legendQuadrant, flags, labelText, add_jetAlgoText );
 
-} //drawhistos
+} //drawhisto_fromTree
 
 
 
@@ -1233,6 +1319,15 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
       } //if mc files size > 1
     } // if !nomc
 
+
+
+    // superimposed MC histos (for now only one):
+    if( mcHistos_superimp.size()>0 ) {
+      mcHistos_superimp[0]->SetLineColor( mcFiles_superimp_[0].lineColor );
+      mcHistos_superimp[0]->SetLineWidth(2);
+      mcHistos_superimp[0]->Rebin(rebin_);
+      mcHistos_superimp[0]->Scale(mcFiles_superimp_[0].weight );
+    }
 
 
 
