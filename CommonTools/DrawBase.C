@@ -324,11 +324,6 @@ void DrawBase::set_isCMSArticle( bool set ) {
 }
 
 
-//void DrawBase::drawHistoFromTree( const std::string& treeName, const std::string& varName, const std::string& selection, int nBins, float xMin, float xMax, const std::string& units, const std::string& instanceName, bool log_aussi, int legendQuadrant, const std::string& flags, bool correctedResponse, const std::string& labelText ) {
-//
-//
-//
-//}
 
 
 void DrawBase::drawHisto_vs_pt( int nBinsPt, float* ptBins, const std::string& name, const std::string& axisName, const std::string& units, const std::string& instanceName, bool log_aussi, int legendQuadrant, std::string flags, const std::string& labelText ) {
@@ -1118,6 +1113,11 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
 
 void DrawBase::drawHisto_fromTree( const std::string& treeName, const std::string& varName, const std::string& selection, int nBins, float xMin, float xMax, const std::string& name, const std::string& axisName, const std::string& units, const std::string& instanceName, bool log_aussi, int legendQuadrant, const std::string& flags, const std::string& labelText, bool add_jetAlgoText  ) {
 
+
+  // need this = true here. love these root features.
+  TH1F::AddDirectory(kTRUE);
+
+
   bool noDATA = false;
   bool noMC = false;
 
@@ -1176,7 +1176,6 @@ void DrawBase::drawHisto_fromTree( const std::string& treeName, const std::strin
       char histoNameMC[500];
       sprintf(histoNameMC, "%sMC_%d", name.c_str(), iMC);
       TH1D* newHisto = new TH1D(histoNameMC, "", nBins, xMin, xMax);
-      tree->Project(histoNameMC, varName.c_str(), selection.c_str());
       mcHistos.push_back( newHisto );
     } //for mc files
   } // if mcfiles > 1
@@ -1198,6 +1197,10 @@ void DrawBase::drawHisto_fromTree( const std::string& treeName, const std::strin
       mcHistos_superimp.push_back( newHisto );
     }
   }
+
+
+  // put it back to false:
+  TH1F::AddDirectory(kTRUE);
 
   drawHisto_fromHistos( dataHistos, mcHistos, mcHistos_superimp, name, axisName, units, instanceName, log_aussi, legendQuadrant, flags, labelText, add_jetAlgoText );
 
