@@ -1176,6 +1176,7 @@ void DrawBase::drawHisto_fromTree( const std::string& treeName, const std::strin
       char histoNameMC[500];
       sprintf(histoNameMC, "%sMC_%d", name.c_str(), iMC);
       TH1D* newHisto = new TH1D(histoNameMC, "", nBins, xMin, xMax);
+      treeMC->Project(histoNameMC, varName.c_str(), selection.c_str());
       mcHistos.push_back( newHisto );
     } //for mc files
   } // if mcfiles > 1
