@@ -14,21 +14,18 @@
 #include "TF1.h"
 
 #include "make_roofitfiles.C"
-#include "HiggsCSandWidth.cc"
+//#include "HiggsCSandWidth.cc"
 
-const int nbtag=3; //btag0, btag1 and btag2
 const int nprod=2; //VBF and gg
 const int nchan=2;//2e2j and 2m2j
 const float lumiee=1.556; //fb^-1, NEW!
 const float lumimm=1.615; //fb^-1, NEW!
-const int nmass=15;
+const int nmass=3;
 const bool isSM4=false; // if true add .15 to CSgg and CSvbf errors 
-const float mass[nmass]={190.0,200.0,210.0,230.0,250.0, 
-                         300.0,350.0,400.0,425.0,450.0,
-                         500.0,525.0,550.0,575.0,600.0};
+const float mass[nmass]={350., 450., 550.};
 
 
-float exp_sig_yields[nbtag][nchan][nmass];
+float exp_sig_yields[nchan][nmass];
 //float exp_sig_yields_ee[nbtag][nmass];
 //float exp_sig_yields_mm[nbtag][nmass];
 
@@ -39,14 +36,12 @@ float gen_sig_yields[nmass];
 //  102857, 286612, 292613, 299930, 109977
 //};
 
-const int maxNbkg[nbtag]={1,1,1};//for every btag, there are MAX==2 different types of bkg (only one for btag0 and 1, ttbar +all the rest for btag2)
-float obs_bkg[nbtag][nchan]={//from real data
-  307, 359,//btag0, first 2e2j, then 2m2j
-  351, 396,
-  30,  25
- };
+const int maxNbkg=1;//for every btag, there are MAX==2 different types of bkg (only one for btag0 and 1, ttbar +all the rest for btag2)
+float obs_bkg[nchan]={//from real data
+  307, 359}; //changeeeeee
 
-float exp_bkg[nbtag][nchan];
+
+float exp_bkg[nchan];
 //={//from sideband procedure 
 //  286.4, 345.7,//btag0, first 2e2j, then 2m2j
 //  334.7, 376.4,//btag1
@@ -55,36 +50,40 @@ float exp_bkg[nbtag][nchan];
  
 //const float NLOxsect[nmass]={ 144.1,106.3, 80.2, 76.9, 55.3, 35.3, 22.4, 8.4};//in fb
 //const float meas_lumi[nmass]={ 757.2,1034.6, 1360.4, 1418.4, 1987.8, 3113.5, 4591.8,109977/ 8.4};//in fb^-1
-vector<float> btag0_ee_eff_pars,  btag1_ee_eff_pars, btag2_ee_eff_pars; //we store the parameters of the dependence of the eff on the Mzz
-vector<float> btag0_mm_eff_pars,  btag1_mm_eff_pars, btag2_mm_eff_pars; //we store the parameters of the dependence of the eff on the Mzz
+vector<float> ele_eff_pars, mu_eff_pars; //we store the parameters of the dependence of the eff on the Mzz
 const float maxDiffSyst=0.01;
-HiggsCSandWidth *myCSW;
+//HiggsCSandWidth *myCSW;
 
 //vector<float>aux;
 
 
-string make_ratestring(float mymass, vector<float> myxsect, int ibtag,int chan, float expbkg=-99.9);
-string make_theorunc(float mymass,float myerrp, float myerrm,bool is_ggH=true, int ibtag=0);  
+string make_ratestring(float mymass, vector<float> myxsect, int chan, float expbkg=-99.9);
+string make_theorunc(float mymass,float myerrp, float myerrm,bool is_ggH=true);
 string make_theorunc(float mymass,float myerrCSp, float myerrCSm, float myerrVBFp, float myerrVBFm);
-string make_pdftheorunc(float mymass,float myerrp, float myerrm,bool is_ggH=true, int ibtag=0);  
+string make_pdftheorunc(float mymass,float myerrp, float myerrm,bool is_ggH=true);
 string make_theorgammaunc(float mymass);
-string make_btagunc(float mymass,int ibtag, int ich); 
+string make_btagunc(float mymass, int ich); 
 string make_JESunc(float mymass);
-string make_bakcgrNormErrLine(double expyields, int ibtag, int ich); 
-string make_obsstring(int btag);
-string make_obsstring(int btag, int obs);
-vector<float> eff_fit(int mybtag,int chan);
-vector<double> calculate_CBpars(int btag,double mH);
+string make_backgrNormErrLine(const std::string& dataDataset,double expyields, int ich); 
+string make_obsstring();
+string make_obsstring(int obs);
+vector<float> eff_fit(int chan);
+vector<double> calculate_CBpars(double mH);
 int get_mass_index(float mymass);
 void extract_exp_sig_yields(float mymass,float mywidth);//,vector<float> ee_y , vector<float> mm_y);
 void get_gen_yields();
-int make_datacards();
-int get_signal_gen(float mymass);
-int make_datacards(){
+int make_datacards(const std::string& dataDataset="DATA_6july");
+//int get_signal_gen(float mymass);
+
+
+
+
+
+int make_datacards(const std::string& dataDataset){
 
   // gROOT->ProcessLine(".L make_roofitfiles.C++");
 
-  myCSW = new HiggsCSandWidth();
+//  myCSW = new HiggsCSandWidth();
 
   // return 1;
  
@@ -97,14 +96,14 @@ int make_datacards(){
 
   if (! xsect_file.is_open()){ cout<<"Failed to open file with xsections"<<endl;}
   float mH, CSgg, CSgg_p, CSgg_m, CSpdfgg_p,CSpdfgg_m,CSvbf, CSvbf_p, CSvbf_m,CSpdfvbf_p,CSpdfvbf_m, 
-        Gamma, BRHZZ, BRZZ2l2q;
+        Gamma, BRHWW, BRWWlvqq;
 
   string outDir="datacards/";
 
   //calculate expected yields
   get_gen_yields();
   while(xsect_file.good()){
-    xsect_file >> mH>> CSgg>> CSgg_p >> CSgg_m >>  CSpdfgg_p>>CSpdfgg_m>>CSvbf >> CSvbf_p >> CSvbf_m >>  CSpdfvbf_p>>CSpdfvbf_m>>Gamma >> BRHZZ >> BRZZ2l2q;
+    xsect_file >> mH>> CSgg>> CSgg_p >> CSgg_m >>  CSpdfgg_p>>CSpdfgg_m>>CSvbf >> CSvbf_p >> CSvbf_m >>  CSpdfvbf_p>>CSpdfvbf_m>>Gamma >> BRHWW >> BRWWlvqq;
 
     //    cout<<mH<<"  "<<CSgg<<endl;
     //if(mH<250.0) continue;
@@ -118,19 +117,14 @@ int make_datacards(){
  }
 
   //parametrize efficiencies
-  btag0_ee_eff_pars=eff_fit(0,0);
-  //  cout<<"In main: "<<btag0_eff_pars.at(0)<<"    "<<btag0_eff_pars.at(1)<<endl;
-  btag1_ee_eff_pars=eff_fit(1,0);
-  btag2_ee_eff_pars=eff_fit(2,0);
-  btag0_mm_eff_pars=eff_fit(0,1);
-  btag1_mm_eff_pars=eff_fit(1,1);
-  btag2_mm_eff_pars=eff_fit(2,1);
+  mu_eff_pars=eff_fit(0);
+  ele_eff_pars=eff_fit(1);
  
   xsect_file.clear();
   xsect_file.seekg (0);
 
   while(xsect_file.good()){
-    xsect_file >> mH>> CSgg>> CSgg_p >> CSgg_m >>  CSpdfgg_p>>CSpdfgg_m>>CSvbf >> CSvbf_p >> CSvbf_m >>  CSpdfvbf_p>>CSpdfvbf_m>>Gamma >> BRHZZ >> BRZZ2l2q;
+    xsect_file >> mH>> CSgg>> CSgg_p >> CSgg_m >>  CSpdfgg_p>>CSpdfgg_m>>CSvbf >> CSvbf_p >> CSvbf_m >>  CSpdfvbf_p>>CSpdfvbf_m>>Gamma >> BRHWW >> BRWWlvqq;
     //    cout<<mH<<"  "<<CSgg<<endl;
 
     // ========   add additional uncertainty to cs for SM4
@@ -153,8 +147,8 @@ int make_datacards(){
       //break;
     }
 
-    float CSggxs =1000.0*CSgg  *BRHZZ *BRZZ2l2q;
-    float CSvbfxs=1000.0*CSvbf*BRHZZ  *BRZZ2l2q;
+    float CSggxs =1000.0*CSgg  *BRHWW * BRWWlvqq;
+    float CSvbfxs=1000.0*CSvbf* BRHWW  *BRWWlvqq;
     //   cout<<"THEOR xsect: "<<CSgg<<" , Vbf= "<<CSvbf<<"  BRHZZ="<<BRHZZ<<"  BRZZ2L2q="<<BRZZ2l2q<<endl;
     vector<float> myxsect;
     myxsect.push_back(CSggxs);
@@ -170,41 +164,38 @@ int make_datacards(){
     float vbfPDFErrm=CSpdfvbf_m;
   //cout<<"MH = "<<mH<<"    "<<test1.c_str()<<endl;  
 
-    string str_ch[2]={"ee","mm"};
-    string str_btag[3]={"0b","1b","2b"};
-      //loop over btag categories
-    for(int ibtag=0;ibtag<nbtag;ibtag++){
+    string str_ch[2]={"mu","ele"};
    
-      string theorErrLine_ggH=make_theorunc(mH, ggRelErrp, ggRelErrm, true,ibtag);  
-      string theorErrLine_VBF=make_theorunc(mH, vbfRelErrp, vbfRelErrm, false,ibtag);  
-      string pdfErrLine_ggH=make_pdftheorunc(mH, ggPDFErrp, ggPDFErrm, true,ibtag); 
-      string pdfErrLine_VBF=make_pdftheorunc(mH, vbfPDFErrp, vbfPDFErrm, false,ibtag);  
+      string theorErrLine_ggH=make_theorunc(mH, ggRelErrp, ggRelErrm, true);
+      string theorErrLine_VBF=make_theorunc(mH, vbfRelErrp, vbfRelErrm, false);
+      string pdfErrLine_ggH=make_pdftheorunc(mH, ggPDFErrp, ggPDFErrm, true);
+      string pdfErrLine_VBF=make_pdftheorunc(mH, vbfPDFErrp, vbfPDFErrm, false);
       string gammaErrLine=make_theorgammaunc(mH);
 
       string jesLine=make_JESunc(mH);
       //loop over decay channels
       for(int ich=0;ich<nchan;ich++){
  
-	string beffLine=make_btagunc(mH,ibtag,ich);
-  	string str_id=str_ch[ich]+str_btag[ibtag];
+	string beffLine=make_btagunc(mH,ich);
+  	string str_id=str_ch[ich];
 
-      ifstream tpl_file(("./hzz2l2q_"+ str_id+".tpl").c_str(),ios::in);
+      ifstream tpl_file(("./hwwlvqq_"+ str_id+".tpl").c_str(),ios::in);
 
 	std::ostringstream mass_str;
 	mass_str<<mH;
 
 	//ok, now produce the root file wit hthe workspace
-	vector<double> cbpars =calculate_CBpars(ibtag,mH);
+	vector<double> cbpars =calculate_CBpars(mH);
 	double expyields=0.0;// exp_bkg[ibtag][ich];
 	double obsyields=0.0;
-	make_roofitfiles(ibtag,ich,mH,Gamma, obsyields, expyields,cbpars);
-	exp_bkg[ibtag][ich]=expyields;
-	cout<<"\n\n~~~~~~~~~~Btag "<< ibtag<<"   Expected MAKEDATACARDS "<<expyields<<endl;
-	string expRateLine=make_ratestring(mH,myxsect,ibtag,ich,expyields);
-	string obsLine=make_obsstring(ibtag, int(obsyields));
-	string bakcgrNormErrLine = make_bakcgrNormErrLine(expyields,ibtag,ich);
+	make_roofitfiles(ich,mH,Gamma, obsyields, expyields,cbpars);
+	exp_bkg[ich]=expyields;
+	cout<<"\n\n~~~~~~~~~~Expected MAKEDATACARDS "<<expyields<<endl;
+	string expRateLine=make_ratestring(mH,myxsect,ich,expyields);
+	string obsLine=make_obsstring(int(obsyields));
+	string backgrNormErrLine = make_backgrNormErrLine(dataDataset, expyields,ich);
 
-	string datacard_name=outDir+ossDir.str()+"/hzz2l2q_"+str_id+"."+mass_str.str() +".txt";
+	string datacard_name=outDir+ossDir.str()+"/hwwlvqq_"+str_id+"."+mass_str.str() +".txt";
 	ofstream datacard_new(datacard_name.c_str(),ios::out);
 	string tpl_line;
 	string str_ratetag("<dummy1>");
@@ -217,18 +208,18 @@ int make_datacards(){
 	string str_pdftheorggHtag("<dummypdfggH>");
 	string str_pdftheorVBFtag("<dummypdfqqH>");
 	string str_bakcgrNorm("<dummybnorm>");
-	string str_bckgShape_0b_1("CMS_hzz2l2q_bkg0bp1");
-	string str_bckgShape_0b_2("CMS_hzz2l2q_bkg0bp2");
-	string str_bckgShape_0b_3("CMS_hzz2l2q_bkg0bp3");
-	string str_bckgShape_0b_4("CMS_hzz2l2q_bkg0bp4");
-	string str_bckgShape_1b_1("CMS_hzz2l2q_bkg1bp1");
-	string str_bckgShape_1b_2("CMS_hzz2l2q_bkg1bp2");
-	string str_bckgShape_1b_3("CMS_hzz2l2q_bkg1bp3");
-	string str_bckgShape_1b_4("CMS_hzz2l2q_bkg1bp4");
-	string str_bckgShape_2b_1("CMS_hzz2l2q_bkg2bp1");
-	string str_bckgShape_2b_2("CMS_hzz2l2q_bkg2bp2");
-	string str_bckgShape_2b_3("CMS_hzz2l2q_bkg2bp3");
-	string str_bckgShape_2b_4("CMS_hzz2l2q_bkg2bp4");
+	string str_bckgShape_0b_1("CMS_hwwlvqq_bkg0bp1");
+	string str_bckgShape_0b_2("CMS_hwwlvqq_bkg0bp2");
+	string str_bckgShape_0b_3("CMS_hwwlvqq_bkg0bp3");
+	string str_bckgShape_0b_4("CMS_hwwlvqq_bkg0bp4");
+	string str_bckgShape_1b_1("CMS_hwwlvqq_bkg1bp1");
+	string str_bckgShape_1b_2("CMS_hwwlvqq_bkg1bp2");
+	string str_bckgShape_1b_3("CMS_hwwlvqq_bkg1bp3");
+	string str_bckgShape_1b_4("CMS_hwwlvqq_bkg1bp4");
+	string str_bckgShape_2b_1("CMS_hwwlvqq_bkg2bp1");
+	string str_bckgShape_2b_2("CMS_hwwlvqq_bkg2bp2");
+	string str_bckgShape_2b_3("CMS_hwwlvqq_bkg2bp3");
+	string str_bckgShape_2b_4("CMS_hwwlvqq_bkg2bp4");
 	bool found=false;
 	while(tpl_file.good()){
 	  getline (tpl_file,tpl_line);
@@ -281,7 +272,7 @@ int make_datacards(){
 	    datacard_new<<pdfErrLine_VBF<<endl;
 	  }
 	   else if(posbnorm_found!=string::npos){
-	    datacard_new<<bakcgrNormErrLine<<endl;
+	    datacard_new<<backgrNormErrLine<<endl;
 	   }
 	  /*else if(pos_bckgShape_0b_1_found!=string::npos  || pos_bckgShape_0b_2_found!=string::npos ||
 		  pos_bckgShape_0b_3_found!=string::npos  || pos_bckgShape_0b_4_found!=string::npos ||
@@ -301,7 +292,6 @@ int make_datacards(){
 
 
       }//end loop on channels
-    }//end loop on btag
   }//end loop over xsect file (-> loop over mass points)
   
 
@@ -312,7 +302,7 @@ int make_datacards(){
 ///////////////////////////////////////////
 ///////////////////////////////////////////
 
-string make_ratestring(float mymass,vector<float> myxsect, int ibtag, int chan,float expbkg){
+string make_ratestring(float mymass,vector<float> myxsect, int chan,float expbkg){
 
   //vector of signal eff: btag0_2e2j_VBF,  btag0_2e2j_gg,  btag0_2m2j_VBF,  btag0_2m2j_gg,  btag1_2e2j_VBF, ...  btag2_2m2j_gg = 12 entries
   vector<float> sig_eff;
@@ -323,53 +313,17 @@ string make_ratestring(float mymass,vector<float> myxsect, int ibtag, int chan,f
   float eff=0.0;
   float mya=0.0, myb=0.0, myc=0.0,myd=0.0;
   if(chan==0){
-    if(ibtag==0){
-      mya=btag0_ee_eff_pars.at(0);
-      myb=btag0_ee_eff_pars.at(1);
-      myc=btag0_ee_eff_pars.at(2);
-      myd=btag0_ee_eff_pars.at(3);
-    }
-    else if(ibtag==1){
-      mya=btag1_ee_eff_pars.at(0);
-      myb=btag1_ee_eff_pars.at(1);
-      myc=btag1_ee_eff_pars.at(2);
-      myd=btag1_ee_eff_pars.at(3);
-    }
-    else if(ibtag==2){
-      mya=btag2_ee_eff_pars.at(0);
-      myb=btag2_ee_eff_pars.at(1);
-      myc=btag2_ee_eff_pars.at(2);
-      myd=btag2_ee_eff_pars.at(3);
-    }
-    else{
-      cout<<"\n\nERROR !! Btag index out of range!"<<endl<<endl<<endl;
-      return "dummy";
-    }
+    mya=mu_eff_pars.at(0);
+    myb=mu_eff_pars.at(1);
+    myc=mu_eff_pars.at(2);
+    myd=mu_eff_pars.at(3);
     lumi=lumiee;
   }
-  else{//chan==1 -> muons
-    if(ibtag==0){
-      mya=btag0_mm_eff_pars.at(0);
-      myb=btag0_mm_eff_pars.at(1);
-      myc=btag0_mm_eff_pars.at(2);
-      myd=btag0_mm_eff_pars.at(3);
-    }
-    else if(ibtag==1){
-      mya=btag1_mm_eff_pars.at(0);
-      myb=btag1_mm_eff_pars.at(1);
-      myc=btag1_mm_eff_pars.at(2);
-      myd=btag1_mm_eff_pars.at(3);
-    }
-    else if(ibtag==2){
-      mya=btag2_mm_eff_pars.at(0);
-      myb=btag2_mm_eff_pars.at(1);
-      myc=btag2_mm_eff_pars.at(2);
-      myd=btag2_mm_eff_pars.at(3);
-    }
-    else{
-      cout<<"\n\nERROR !! Btag index out of range!"<<endl<<endl<<endl;
-      return "dummy";
-    }
+  else{//chan==1 -> electrons
+    mya=ele_eff_pars.at(0);
+    myb=ele_eff_pars.at(1);
+    myc=ele_eff_pars.at(2);
+    myd=ele_eff_pars.at(3);
     lumi=lumimm;
   }
   //  eff=mya + myb*mymass;
@@ -395,7 +349,7 @@ string make_ratestring(float mymass,vector<float> myxsect, int ibtag, int chan,f
       
       // for(int ibkg=0;ibkg<maxNbkg[ibtag];ibkg++){//not necessary any more, all bkg lumped into one also for 2btag
 	std::ostringstream ossbkg;
-	if(expbkg<0.0)ossbkg<<exp_bkg[ibtag][chan];
+	if(expbkg<0.0)ossbkg<<exp_bkg[chan];
 	else ossbkg<<expbkg;
 	string bkg_str=ossbkg.str() ;
 	rate_str+=("    "+bkg_str);
@@ -412,7 +366,7 @@ string make_ratestring(float mymass,vector<float> myxsect, int ibtag, int chan,f
 
 
 
-string make_theorunc(float mymass, float myerrp, float myerrm, bool is_ggH, int ibtag){
+string make_theorunc(float mymass, float myerrp, float myerrm, bool is_ggH){
   //ERRORS SHOULD BE RELATIVE AND NETTO, I.E.: for a 6% syst, pass 0.06 AND NOT 1.06 
   string theor_str;
   if(is_ggH)  theor_str="QCDscale_ggH    lnN       ";
@@ -467,8 +421,6 @@ string make_theorunc(float mymass,float myerrCSp, float myerrCSm, float myerrVBF
  //ERRORS SHOULD BE RELATIVE AND NETTO, I.E.: for a 6% syst, pass 0.06 AND NOT 1.06 
   string theor_str;
   theor_str="QCDscale_ggH    lnN       ";
- //loop over btag categories
-  for(int ibtag=0;ibtag<nbtag;ibtag++){
     //loop over decay channels
     for(int ich=0;ich<nchan;ich++){
       //float therrp=0., therrm=0.0;
@@ -509,12 +461,11 @@ string make_theorunc(float mymass,float myerrCSp, float myerrCSm, float myerrVBF
 	}
       }//end  for(int iprod
     }//end  for(int ich=0;
-  }//end  for(int ibtag
 
   return theor_str;
 }//end make_theorunc
 
-string make_pdftheorunc(float mymass, float myerrp, float myerrm, bool is_ggH, int ibtag){
+string make_pdftheorunc(float mymass, float myerrp, float myerrm, bool is_ggH){
  //ERRORS SHOULD BE RELATIVE AND NETTO, I.E.: for a 6% syst, pass 0.06 AND NOT 1.06 
   string theor_str;
   if(is_ggH)  theor_str="pdf_gg   lnN       ";
@@ -603,17 +554,17 @@ string make_theorgammaunc(float mymass){
 }
 
 
-string make_obsstring(int btag){//superseded !!!!!
+string make_obsstring(){//superseded !!!!!
   string obs_str="observation   ";
 
   std::ostringstream ossp;
-  ossp<<int(exp_bkg[btag][0]/2.0);
+  ossp<<int(exp_bkg[0]/2.0);
   obs_str+=ossp.str() ;
 
   return obs_str;
 }
 
-string make_obsstring(int btag, int obs){
+string make_obsstring(int obs){
   string obs_str="observation   ";
 
   std::ostringstream ossp;
@@ -623,7 +574,11 @@ string make_obsstring(int btag, int obs){
   return obs_str;
 }
 
-string make_btagunc(float mymass,int ibtag, int ich){
+string make_btagunc(float mymass,int ich){
+return string("");
+}
+
+/*
   string b_str="CMS_eff_b	lnN";
   float p0=0.0, p1=0.0;
   float m0=0.0, m1=0.0;
@@ -709,6 +664,7 @@ string make_btagunc(float mymass,int ibtag, int ich){
   b_str+=("  "+tmp_str+"      "+tmp_str+"      1.0");
   return b_str;
 }
+*/
 
 string make_JESunc(float mymass){
 
@@ -740,85 +696,41 @@ string make_JESunc(float mymass){
   return jes_str;
 }
 
-string make_bakcgrNormErrLine(double expyields, int btag, int ich){
-  string str_btag,str_chann,str_neventsSB, str_alpha;
-  double alpha;
-  if(ich==0)
-    str_chann="ee";
-  else if(ich==1)
-    str_chann="mm";
-  if(btag==0){
-    str_btag="0b";
-    if(ich==0){ //electrons
-      str_neventsSB="529";
-      alpha=expyields/529.;
-      std::ostringstream ossa;
-      ossa<<alpha;
-      str_alpha=ossa.str();
-    }
-    else if(ich==1){ //muons
-      str_neventsSB="621";
-      alpha=expyields/621.;
-      std::ostringstream ossa;
-      ossa<<alpha;
-      str_alpha=ossa.str();
-    }
-  }
-  else if(btag==1){
-    str_btag="1b";
-    if(ich==0) {//electrons
-      str_neventsSB="534";
-      alpha=expyields/534.;
-      std::ostringstream ossa;
-      ossa<<alpha;
-      str_alpha=ossa.str();
-    }
-    else if(ich==1){ //muons
-      str_neventsSB="615";
-      alpha=expyields/615.;
-      std::ostringstream ossa;
-      ossa<<alpha;
-      str_alpha=ossa.str();
-    }
-  }
-  else if(btag==2){
-    str_btag="2b";
-    if(ich==0) {//electrons
-      str_neventsSB="37";
-      alpha=expyields/37.;
-      std::ostringstream ossa;
-      ossa<<alpha;
-      str_alpha=ossa.str();
-    }
-    else if(ich==1) {//muons
-      str_neventsSB="44"; 
-      alpha=expyields/44.;
-      std::ostringstream ossa;
-      ossa<<alpha;
-      str_alpha=ossa.str();
-    }  
-  }
-  string bNorm_str="CMS_hzz2l2q_bkg"+str_btag+str_chann+"p0    gmN   "+str_neventsSB+" ----  -----  "+str_alpha;
+string make_backgrNormErrLine(const std::string& daataDataset,double expyields, int ich){
+
+  std::string fileName = "HWWlvjj_"+daataDataset+"_helicity_ALL.root";
+  TFile* file_data = TFile::Open(fileName.c_str());
+  TTree* tree = (TTree*)file_data->Get("Tree_FITUL");
+  char selection[400];
+  sprintf(selection, "((mJJ>40 && mJJ<60.) || (mJJ>100. && mJJ<160.)) && leptType==%d", ich);
+  float nEvents_sidebands = tree->GetEntries(selection);
+  char nEvents_sidebands_char[100];
+  sprintf(nEvents_sidebands_char, "%.0f", nEvents_sidebands);
+  std::string str_neventsSB(nEvents_sidebands_char);
+  double alpha=expyields/nEvents_sidebands;
+  std::ostringstream ossa;
+  ossa<<alpha;
+  std::string str_alpha=ossa.str();
+  std::string str_chann = (ich==0) ? "mu" : "ele";
+  string bNorm_str="CMS_hzz2l2q_bkg"+str_chann+"p0    gmN   "+str_neventsSB+" ----  -----  "+str_alpha;
   return bNorm_str;
 }
 
-vector<float> eff_fit(int mybtag,int chan){
-  cout<<"\n~~~~~~~ Eff fit for btag="<<mybtag<<" chan = "<<chan<<endl;
+vector<float> eff_fit(int chan){
+  cout<<"\n~~~~~~~ Eff fit for chan = "<<chan<<endl;
   std::ostringstream ossm;
-  ossm<<mybtag;
-  string btag_str="btag"+ossm.str();
-  string chan_str= (chan==0)?"ee" : "mm";
+  string chan_str= (chan==0)?"mm" : "ee";
   float myeff[nmass];
   for(int im=0;im<nmass;im++){
     //  myeff[im]=exp_eff[mybtag][im];
 
-    float brZtoL=0.0;
-    if(get_signal_gen(mass[im])==0){//for powheg samples, Z->ll with l=e,mu,tau; in jhu, Z->ll with l=e,mu
-      brZtoL=1.0/3.0;
-    }
-    else brZtoL=0.5;
+    float brZtoL=1./3.;
+  //if(get_signal_gen(mass[im])==0){//for powheg samples, Z->ll with l=e,mu,tau; in jhu, Z->ll with l=e,mu
+  //  brZtoL=1.0/3.0;
+  //}
+  //else brZtoL=0.5;
    
-    myeff[im]=exp_sig_yields[mybtag][chan][im]/(gen_sig_yields[im]*brZtoL);  //(lumi*NLOxsect[im]);
+    myeff[im]=exp_sig_yields[chan][im]/(gen_sig_yields[im]*brZtoL);  //(lumi*NLOxsect[im]);
     //  cout<<"Calc EFF: im="<<im<<"  chan="<<chan<<" "<<mybtag<<"b  EXP="<<exp_sig_yields[mybtag][chan][im]<<"  GEN="<<gen_sig_yields[im]<<"  brZtoL="<<brZtoL<<" ---> EFF: "<<myeff[im]<<endl;
     //if(chan==0)  myeff[im]=exp_sig_yields[mybtag][chan][im]/(gen_sig_yields[im]/2.0);  //(lumi*NLOxsect[im]);
     //else  myeff[im]=exp_sig_yields_mm[mybtag][im]/(gen_sig_yields[im]/2.0);//(lumi*NLOxsect[im]);
@@ -826,15 +738,15 @@ vector<float> eff_fit(int mybtag,int chan){
   }
 
   TGraph *gr_eff=new TGraph(nmass,mass,myeff);
-  gr_eff->SetName(("effgr_"+btag_str+chan_str).c_str());
-  gr_eff->SetTitle(("Efficiency vs Mass ("+chan_str+" , "+btag_str+")").c_str());
+  gr_eff->SetName(("effgr_"+chan_str).c_str());
+  gr_eff->SetTitle(("Efficiency vs Mass ("+chan_str+")").c_str());
   gr_eff->SetMarkerStyle(21);
   gr_eff->SetMinimum(0.0);
 
   // TF1 *f1 = new TF1("fit_pol1","pol1",1,2);
   // TF1 *f1 = new TF1("fit_sqrt","[0]+[1]*sqrt(x)",1,2);
   // TF1 *f1 = new TF1("fit_log","[0]+[1]*log(x)",150.0,800.0);
-  string f1name="fit_poly3_"+btag_str+chan_str;
+  string f1name="fit_poly3_"+chan_str;
   TF1 *f1 = new TF1(f1name.c_str(),"pol3",150.0,700.0);
   gr_eff->Fit(f1name.c_str(),"Q");
   vector<float> fit_res;
@@ -842,13 +754,13 @@ vector<float> eff_fit(int mybtag,int chan){
   fit_res.push_back(f1->GetParameter(1) );
   fit_res.push_back(f1->GetParameter(2) );
   fit_res.push_back(f1->GetParameter(3) );
-  cout<<"\n\nFit results for BTAG "<<mybtag<<"  (eff= a + b*Mzz + c*Mzz^2 + d*Mzz^3):"<<endl;
+  cout<<"\n\nFit results  (eff= a + b*Mzz + c*Mzz^2 + d*Mzz^3):"<<endl;
   cout<<" a = "<<fit_res.at(0)<<" +/- "<<f1->GetParError(0) <<endl;
   cout<<" b = "<<fit_res.at(1)<<" +/- "<<f1->GetParError(1) <<endl;
   cout<<" c = "<<fit_res.at(2)<<" +/- "<<f1->GetParError(2) <<endl;
   cout<<" d = "<<fit_res.at(3)<<" +/- "<<f1->GetParError(3) <<endl<<endl;
 
-  string canname="c_fitfunc_"+btag_str+chan_str;
+  string canname="c_fitfunc_"+chan_str;
   TCanvas *c1=new TCanvas(canname.c_str(),"CANFIT", 900,900);
   c1->SetFillColor(kWhite);
   c1->SetBorderMode(0);
@@ -858,7 +770,7 @@ vector<float> eff_fit(int mybtag,int chan){
   gr_eff->GetYaxis()->SetTitle("#varepsilon");
   gr_eff->GetYaxis()->SetTitleOffset(1.0);
   gr_eff->Draw("AP");
-  c1->SaveAs( ("eff_param_newHLT_"+btag_str +chan_str+".root").c_str()  );
+  c1->SaveAs( ("eff_param_newHLT_"+chan_str+".root").c_str()  );
 
   delete c1;
   canname+=canname+"-ext";
@@ -871,8 +783,8 @@ vector<float> eff_fit(int mybtag,int chan){
   f1->GetYaxis()->SetTitleOffset(1.0);
   f1->Draw("L");
   gr_eff->Draw("Psame");
-  c1f->SaveAs( ("eff_param_newHLT_"+btag_str +chan_str+"-extrange.root").c_str()  );
-  c1f->SaveAs( ("eff_param_newHLT_"+btag_str +chan_str+"-extrange.C").c_str()  );
+  c1f->SaveAs( ("eff_param_newHLT_"+chan_str+"-extrange.root").c_str()  );
+  c1f->SaveAs( ("eff_param_newHLT_"+chan_str+"-extrange.C").c_str()  );
   // gr_eff->Write();
 
   TFile *outf1=new TFile("./convertedTree_LP_20110811.root","UPDATE");
@@ -887,10 +799,9 @@ vector<float> eff_fit(int mybtag,int chan){
 }//end eff_fit
 
 
-vector<double> calculate_CBpars(int ibtag,double mH){
+vector<double> calculate_CBpars(double mH){
   vector<double>outpars;
   double CB_mean,CB_sigma,CB_alpha,CB_n,poly0, poly1;
-  if(ibtag==0){
 
     CB_mean = -2.92969 + 0.0444168*mH;
     CB_sigma = -1.17027 + .0394395*mH;
@@ -898,25 +809,6 @@ vector<double> calculate_CBpars(int ibtag,double mH){
     CB_n = .618079 + .000493633*mH;
     poly0 = -2.08918 - .158074*mH + .000334758*mH*mH;
     poly1 = 0.11238;
-  }
-  else if(ibtag==1){
-    CB_mean= -4.63689+0.0514951*mH;
-    CB_sigma= -8.64727+0.066107*mH;
-    CB_alpha= .477979+0.00485747*mH- 0.00000542886*mH*mH;
-    CB_n= 0.264879+.00105916*mH;
-    poly0= -6.64749-0.13105*mH+0.000297844*mH*mH;
-    poly1= 0.110152;
-  }
-  else if(ibtag==2){ 
-
-    CB_mean = -2.77113 + .0442444*mH;
-    CB_sigma = -1.31594 + .0375571*mH ;
-    CB_alpha = 1.07316 + .0014977*mH;
-    CB_n = 2.57449 - .0029208*mH;
-    poly0 = -21.0;
-    poly1 = .1095;
-  }
-  else cout<<"How many btags do you think to have??? "<<ibtag<<endl;
 
   outpars.push_back(CB_mean);
   outpars.push_back(CB_sigma);
@@ -936,34 +828,24 @@ void extract_exp_sig_yields(float mymass,float mywidth){
 
  ///////////CHANGE THIS DIR NAME ALSO IN get_gen_yields() 
   //string myDir="/afs/cern.ch/user/s/sbologne/scratch0/CMSSW/CMSSW_4_2_4/src/HiggsAnalysis/CombinedLimit/test/rotatedEPSForLP/treeFromFrancesco/";
-  string myDir="/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/HZZlljj/HZZlljjAnalyzer/test/analysis/FIT/";
+  string myDir="/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/pandolf/HWWlvjj/HWWlvjjAnalyzer/";
   //1nvfb_trigfix//";//dir with Francesco's tree //960invpb/
 
   //signal file
-  int powheg_jhu = get_signal_gen(mymass);
-  string prefix;
-  string suffix;
-  if(powheg_jhu==0){
-    prefix="HZZlljjRM_GluGluToHToZZTo2L2Q_M-";
-    suffix="_7TeV-powheg-pythia6_Summer11-PU_S4_START42_V11-v1_optLD_looseBTags_v2_ALL.root";
-  }
-  else{
-    prefix="HZZlljjRM_SMHiggsToZZTo2L2Q_M-";
-    suffix="_7TeV-jhu-pythia6_Spring11-PU_S1_START311_V1G1-v1_Spring11_v2_optLD_looseBTags_v2_ALL.root";
-  }
+  char fileName[1000];
+  sprintf(fileName, "HWWlvjj_GluGluToHToWWToLNuQQ_M-%.0f_7TeV-powheg-pythia6_Spring11-PU_S1_START311_V1G1-v1_helicity_ALL.root", mymass);
   std::ostringstream ossm;
   ossm<<mass[im];
-  string filename=myDir+prefix+ossm.str()+suffix;
-  cout << "Opening file: " << filename << " for calculating number of selected signal events" << endl;
-  TFile *f=new TFile(filename.c_str(),"READ");
-  TTree *t=(TTree*)f->Get("tree_passedEvents");
+  cout << "Opening file: " << fileName << " for calculating number of selected signal events" << endl;
+  TFile *f=new TFile(fileName,"READ");
+  TTree *t=(TTree*)f->Get("Tree_FITUL");
 
   //bkg file
   /*string filebkg=myDir+"HZZlljjRM_DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1_optLD_looseBTags_v2_ALL.root";
   TFile *fbkg=new TFile(filebkg.c_str(),"READ");
   TTree *tbkg=(TTree*)f->Get("tree_passedEvents");*/
 
-  string baseline_sel="mZjj>75&&mZjj<105&&mZZ>183.0";
+  string baseline_sel="mJJ>75. && mJJ<105. && mWW>183.";
   // cout<<"MyWidth "<<mymass<<" OLD: "<<mywidth<<flush;
   //mywidth = myCSW->HiggsWidth(0,mymass);
   // cout<<"  NEW: "<<mywidth<<endl;
@@ -988,32 +870,22 @@ void extract_exp_sig_yields(float mymass,float mywidth){
   oss1<<lowMZZ;
   std::ostringstream oss2;
   oss2<<hiMZZ;
-  string massCut="&&mZZ>"+oss1.str()+" && mZZ<"+oss2.str();
+  string massCut="&&mWW>"+oss1.str()+" && mWW<"+oss2.str();
   baseline_sel+=massCut;
 
  
-  for(int ib=0;ib<nbtag;ib++){
-    string sel="dumm";
-    if(ib==0)sel=baseline_sel+"&&nBTags==0";
-    else if(ib==1)sel=baseline_sel+"&&nBTags==1";
-    else if(ib==2)sel=baseline_sel+"&&nBTags==2";
-    string sel2="dumsel2";
     for(int ich=0;ich<nchan;ich++){
+      char sel[500];
+      sprintf( sel, "(%s && leptType==%d)", baseline_sel.c_str(), ich); 
       cout << "CUTSTRING - " << sel << endl;
-      if(ich==0)sel2="("+sel+"&&leptType==1.0)*HLTSF";//*HLTSF  electrons, trees have different convention than this code    
-      else sel2="("+sel+"&&leptType==0.0)*HLTSF";//*HLTSF
-      //      cout<<"M"<<mymass<<", "<<ib<<"b, "<<(ich==0 ? "ee" : "mm") <<"\tSelection string "<<sel2.c_str()<<endl;
-
-
-      float nexp=float(t->Draw("mZZ>>mzzrescaled(400,183.0,1200.0)",sel2.c_str(),"goff"));//sel2 contains tighter mzz cut
+      float nexp=float(t->Draw("mWW>>mzzrescaled(400,183.0,1200.0)",sel,"goff"));//sel2 contains tighter mzz cut
       TH1F *mzztmp=(TH1F*)gDirectory->Get("mzzrescaled");
       nexp=float( mzztmp->Integral()  );
-      exp_sig_yields[ib][ich][im]=nexp;
+      exp_sig_yields[ich][im]=nexp;
       cout << "number of selected events for " << mymass << " is: " << nexp << endl;
       delete mzztmp;
       //cout<<"MH-"<<mymass<<" "<<ib<<"b, ee only -> "<<im<<" Selecting : "<<sel2.c_str()<<"  Exp Sig "<<exp_sig_yields[ib][ich][im]<<"  ExpBkg "<<exp_bkg[ib][ich]<<endl;
     }
-  }//end loop on btag
 
   delete t;delete f;
 
@@ -1025,24 +897,14 @@ void get_gen_yields(){
   string myDir="/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/HZZlljj/HZZlljjAnalyzer/test/analysis/FIT/";
   //signal file
   for(int im=0;im<nmass;im++){
-   int powheg_jhu = get_signal_gen(mass[im]);
-  string prefix;
-  string suffix;
-  if(powheg_jhu==0){
-    prefix="HZZlljjRM_GluGluToHToZZTo2L2Q_M-";
-    suffix="_7TeV-powheg-pythia6_Summer11-PU_S4_START42_V11-v1_optLD_looseBTags_v2_ALL.root";
-  }
-  else{
-    prefix="HZZlljjRM_SMHiggsToZZTo2L2Q_M-";
-    suffix="_7TeV-jhu-pythia6_Spring11-PU_S1_START311_V1G1-v1_Spring11_v2_optLD_looseBTags_v2_ALL.root";
-  }
+  char fileName[1000];
+  sprintf(fileName, "HWWlvjj_GluGluToHToWWToLNuQQ_M-%.0f_7TeV-powheg-pythia6_Spring11-PU_S1_START311_V1G1-v1_helicity_ALL.root", mass[im]);
    std::ostringstream ossm;
     ossm<<mass[im];
-    string filename=myDir+prefix+ossm.str()+suffix;
 
     //-------------------- AJW ---------------
-    cout << "Opening: " << filename << " for extracting number of generated events." << endl;
-    TFile *f=new TFile(filename.c_str(),"READ");
+    cout << "Opening: " << fileName << " for extracting number of generated events." << endl;
+    TFile *f=new TFile(fileName,"READ");
     TH1F *h=(TH1F*)f->Get("nCounter");
     gen_sig_yields[im]=h->GetBinContent(1);
     cout << "the generated number of events for " << mass[im] << " is: " << gen_sig_yields[im] << endl;
@@ -1054,22 +916,16 @@ void get_gen_yields(){
 
 }
 
+/*
 int get_signal_gen(float mymass){
   int genID=-1;//0=powheg; 1=JHUGEN
-  /*
- if(mymass==190.0||mymass==200.0||mymass==210.0||
-    mymass==230.0||mymass==300.0||mymass==425.0||
-    mymass==525.0||mymass==550.0||mymass==575.0||
-    mymass==600.0) genID=0;
- else genID=1;
-  */
-
   if(mymass==250.0||mymass==300.0||mymass==350.0||mymass==400.0||
      mymass==450.0||mymass==500.0) genID=1;
   else genID=0;
   return genID;
 
 }
+*/
 int get_mass_index(float mymass){
   int index=-1;
   //  cout<<"Mass "<<mymass<<flush;
