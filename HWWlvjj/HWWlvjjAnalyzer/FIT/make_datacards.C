@@ -20,9 +20,9 @@ const int nprod=2; //VBF and gg
 const int nchan=2;//2e2j and 2m2j
 const float lumiee=1.556; //fb^-1, NEW!
 const float lumimm=1.615; //fb^-1, NEW!
-const int nmass=3;
+const int nmass=7;
 const bool isSM4=false; // if true add .15 to CSgg and CSvbf errors 
-const float mass[nmass]={350., 450., 550.};
+const float mass[nmass]={200., 300., 350., 400., 450., 500., 550.};
 
 
 float exp_sig_yields[nchan][nmass];
@@ -67,7 +67,7 @@ string make_JESunc(float mymass);
 string make_backgrNormErrLine(const std::string& dataDataset,double expyields, int ich); 
 string make_obsstring();
 string make_obsstring(int obs);
-vector<float> eff_fit(int chan);
+vector<float> eff_fit(const std::string& dataDataset, int chan);
 vector<double> calculate_CBpars(double mH);
 int get_mass_index(float mymass);
 void extract_exp_sig_yields(float mymass,float mywidth);//,vector<float> ee_y , vector<float> mm_y);
@@ -105,20 +105,14 @@ int make_datacards(const std::string& dataDataset){
   while(xsect_file.good()){
     xsect_file >> mH>> CSgg>> CSgg_p >> CSgg_m >>  CSpdfgg_p>>CSpdfgg_m>>CSvbf >> CSvbf_p >> CSvbf_m >>  CSpdfvbf_p>>CSpdfvbf_m>>Gamma >> BRHWW >> BRWWlvqq;
 
-    //    cout<<mH<<"  "<<CSgg<<endl;
-    //if(mH<250.0) continue;
-    if(mH==420)mH=425.;
-    if(mH==460)mH=450.;
-    if(mH==520)mH=525.;
-    if(mH==560)mH=550.;
-    if(mH==580)mH=575.;
-    extract_exp_sig_yields(mH,Gamma);//exp_sig_yields_ee,exp_sig_yields_mm);
+    std::cout << "mass: " << mH << std::endl; 
+    if( mH!=350. && mH!=400. && mH!=450. && mH!=500. && mH!=550. ) continue;
     extract_exp_sig_yields(mH,Gamma);//exp_sig_yields_ee,exp_sig_yields_mm);
  }
 
   //parametrize efficiencies
-  mu_eff_pars=eff_fit(0);
-  ele_eff_pars=eff_fit(1);
+  mu_eff_pars=eff_fit(dataDataset, 0);
+  ele_eff_pars=eff_fit(dataDataset, 1);
  
   xsect_file.clear();
   xsect_file.seekg (0);
@@ -716,10 +710,10 @@ string make_backgrNormErrLine(const std::string& daataDataset,double expyields, 
   return bNorm_str;
 }
 
-vector<float> eff_fit(int chan){
+vector<float> eff_fit(const std::string& dataDataset, int chan){
   cout<<"\n~~~~~~~ Eff fit for chan = "<<chan<<endl;
   std::ostringstream ossm;
-  string chan_str= (chan==0)?"mm" : "ee";
+  string chan_str= (chan==0)?"mu" : "ele";
   float myeff[nmass];
   for(int im=0;im<nmass;im++){
     //  myeff[im]=exp_eff[mybtag][im];
@@ -754,7 +748,7 @@ vector<float> eff_fit(int chan){
   fit_res.push_back(f1->GetParameter(1) );
   fit_res.push_back(f1->GetParameter(2) );
   fit_res.push_back(f1->GetParameter(3) );
-  cout<<"\n\nFit results  (eff= a + b*Mzz + c*Mzz^2 + d*Mzz^3):"<<endl;
+  cout<<"\n\nFit results  (eff= a + b*Mww + c*Mww^2 + d*Mww^3):"<<endl;
   cout<<" a = "<<fit_res.at(0)<<" +/- "<<f1->GetParError(0) <<endl;
   cout<<" b = "<<fit_res.at(1)<<" +/- "<<f1->GetParError(1) <<endl;
   cout<<" c = "<<fit_res.at(2)<<" +/- "<<f1->GetParError(2) <<endl;
@@ -787,7 +781,7 @@ vector<float> eff_fit(int chan){
   c1f->SaveAs( ("eff_param_newHLT_"+chan_str+"-extrange.C").c_str()  );
   // gr_eff->Write();
 
-  TFile *outf1=new TFile("./convertedTree_LP_20110811.root","UPDATE");
+  TFile *outf1=new TFile("./convertedTree_PROVA.root","UPDATE");
   outf1->cd();
   gr_eff->Write();
   f1->Write();
@@ -845,31 +839,27 @@ void extract_exp_sig_yields(float mymass,float mywidth){
   TFile *fbkg=new TFile(filebkg.c_str(),"READ");
   TTree *tbkg=(TTree*)f->Get("tree_passedEvents");*/
 
-  string baseline_sel="mJJ>75. && mJJ<105. && mWW>183.";
+  string baseline_sel="mJJ>60. && mJJ<100. && mWW>150.";
   // cout<<"MyWidth "<<mymass<<" OLD: "<<mywidth<<flush;
   //mywidth = myCSW->HiggsWidth(0,mymass);
   // cout<<"  NEW: "<<mywidth<<endl;
   double effWidth=sqrt(mywidth*mywidth+100);  // effective width used for defining window
   cout << "MYWIDTH: " << mywidth << endl;
   cout << "EFFECTIVE WIDTH: " << effWidth << endl;
-  double lowMZZ=99.;
-  double hiMZZ=101.0; 
+  double lowMWW=99.;
+  double hiMWW=101.0; 
 
-  if((mymass-10*effWidth)<183.0)  lowMZZ=183.0;
-  else lowMZZ=mymass-10*effWidth;
+  if((mymass-10*effWidth)<150.0)  lowMWW=150.0;
+  else lowMWW=mymass-10*effWidth;
 
-  if((mymass+10*effWidth)>800.0)  hiMZZ=800.;
-  else hiMZZ=mymass+10*effWidth;
+  if((mymass+10*effWidth)>800.0)  hiMWW=800.;
+  else hiMWW=mymass+10*effWidth;
 
 
-  //float lowMZZ= mymass-sqrt(mywidth*mywidth+100.0)*10.0;
-  //float hiMZZ = mymass+sqrt(mywidth*mywidth+100.0)*10.0;
-  //if(lowMZZ<183.0)lowMZZ=183.0;
-  //if(hiMZZ>800.0)hiMZZ=800.0;
   std::ostringstream oss1;
-  oss1<<lowMZZ;
+  oss1<<lowMWW;
   std::ostringstream oss2;
-  oss2<<hiMZZ;
+  oss2<<hiMWW;
   string massCut="&&mWW>"+oss1.str()+" && mWW<"+oss2.str();
   baseline_sel+=massCut;
 
@@ -878,12 +868,12 @@ void extract_exp_sig_yields(float mymass,float mywidth){
       char sel[500];
       sprintf( sel, "(%s && leptType==%d)", baseline_sel.c_str(), ich); 
       cout << "CUTSTRING - " << sel << endl;
-      float nexp=float(t->Draw("mWW>>mzzrescaled(400,183.0,1200.0)",sel,"goff"));//sel2 contains tighter mzz cut
-      TH1F *mzztmp=(TH1F*)gDirectory->Get("mzzrescaled");
-      nexp=float( mzztmp->Integral()  );
+      float nexp=float(t->Draw("mWW>>mwwrescaled(400,150.0,1200.0)",sel,"goff"));//sel2 contains tighter mww cut
+      TH1F *mwwtmp=(TH1F*)gDirectory->Get("mwwrescaled");
+      nexp=float( mwwtmp->Integral()  );
       exp_sig_yields[ich][im]=nexp;
       cout << "number of selected events for " << mymass << " is: " << nexp << endl;
-      delete mzztmp;
+      delete mwwtmp;
       //cout<<"MH-"<<mymass<<" "<<ib<<"b, ee only -> "<<im<<" Selecting : "<<sel2.c_str()<<"  Exp Sig "<<exp_sig_yields[ib][ich][im]<<"  ExpBkg "<<exp_bkg[ib][ich]<<endl;
     }
 
