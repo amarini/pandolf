@@ -905,7 +905,7 @@ void get_gen_yields(){
     //-------------------- AJW ---------------
     cout << "Opening: " << fileName << " for extracting number of generated events." << endl;
     TFile *f=new TFile(fileName,"READ");
-    TH1F *h=(TH1F*)f->Get("nCounter");
+    TH1F *h=(TH1F*)f->Get("Ev_nCounter");
     gen_sig_yields[im]=h->GetBinContent(1);
     cout << "the generated number of events for " << mass[im] << " is: " << gen_sig_yields[im] << endl;
     if(gen_sig_yields[im]<=0.0){
