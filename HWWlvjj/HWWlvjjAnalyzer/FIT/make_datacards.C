@@ -132,7 +132,6 @@ int make_datacards(const std::string& dataDataset){
 
     float CSggxs =1000.0*CSgg  *BRHWW * BRWWlvqq;
     float CSvbfxs=1000.0*CSvbf* BRHWW  *BRWWlvqq;
-    //   cout<<"THEOR xsect: "<<CSgg<<" , Vbf= "<<CSvbf<<"  BRHZZ="<<BRHZZ<<"  BRZZ2L2q="<<BRZZ2l2q<<endl;
     vector<float> myxsect;
     myxsect.push_back(CSggxs);
     myxsect.push_back(CSvbfxs);
@@ -749,7 +748,7 @@ string make_backgrNormErrLine(const std::string& daataDataset,double expyields, 
   ossa<<alpha;
   std::string str_alpha=ossa.str();
   std::string str_chann = (ich==0) ? "mu" : "ele";
-  string bNorm_str="CMS_hzz2l2q_bkg"+str_chann+"p0    gmN   "+str_neventsSB+" ----  -----  "+str_alpha;
+  string bNorm_str="CMS_hwwlvqq_bkg"+str_chann+"p0    gmN   "+str_neventsSB+" ----  -----  "+str_alpha;
   return bNorm_str;
 }
 
@@ -760,11 +759,12 @@ vector<float> eff_fit(const std::string& dataDataset, int chan){
   float myeff[nmass];
   for(int im=0;im<nmass;im++){
 
-    float brZtoL=1./3.;
+    //float brZtoL=1./3.;
+    float brWtoL=0.5; //only e,mu
    
     float signalYield = get_signalYield(chan, mass[im]);
     float gen_signalYield = get_genSignalYield(mass[im]);
-    myeff[im]=signalYield/(gen_signalYield*brZtoL);  //(lumi*NLOxsect[im]);
+    myeff[im]=signalYield/(gen_signalYield*brWtoL);  //(lumi*NLOxsect[im]);
 
     //myeff[im]=exp_sig_yields[chan][im]/(gen_sig_yields[im]*brZtoL);  //(lumi*NLOxsect[im]);
     //  cout<<"Calc EFF: im="<<im<<"  chan="<<chan<<" "<<mybtag<<"b  EXP="<<exp_sig_yields[mybtag][chan][im]<<"  GEN="<<gen_sig_yields[im]<<"  brZtoL="<<brZtoL<<" ---> EFF: "<<myeff[im]<<endl;
@@ -861,15 +861,7 @@ vector<double> calculate_CBpars(double mH){
 
 float  extract_exp_sig_yields(int ichannel, float mymass,float mywidth){
 
-//int im=get_mass_index(mymass);
-//if(im<0)return;
 
- ///////////CHANGE THIS DIR NAME ALSO IN get_gen_yields() 
-  //string myDir="/afs/cern.ch/user/s/sbologne/scratch0/CMSSW/CMSSW_4_2_4/src/HiggsAnalysis/CombinedLimit/test/rotatedEPSForLP/treeFromFrancesco/";
-  string myDir="/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/pandolf/HWWlvjj/HWWlvjjAnalyzer/";
-  //1nvfb_trigfix//";//dir with Francesco's tree //960invpb/
-
-  //signal file
   char fileName[1000];
   sprintf(fileName, "HWWlvjj_GluGluToHToWWToLNuQQ_M-%.0f_7TeV-powheg-pythia6_Spring11-PU_S1_START311_V1G1-v1_helicity_ALL.root", mymass);
   std::ostringstream ossm;
@@ -878,10 +870,6 @@ float  extract_exp_sig_yields(int ichannel, float mymass,float mywidth){
   TFile *f=new TFile(fileName,"READ");
   TTree *t=(TTree*)f->Get("Tree_FITUL");
 
-  //bkg file
-  /*string filebkg=myDir+"HZZlljjRM_DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1_optLD_looseBTags_v2_ALL.root";
-  TFile *fbkg=new TFile(filebkg.c_str(),"READ");
-  TTree *tbkg=(TTree*)f->Get("tree_passedEvents");*/
 
   string baseline_sel="mJJ>60. && mJJ<100. && mWW>150.";
   // cout<<"MyWidth "<<mymass<<" OLD: "<<mywidth<<flush;
@@ -925,15 +913,12 @@ float  extract_exp_sig_yields(int ichannel, float mymass,float mywidth){
 
 
 float get_genSignalYield(float imass){
-  //string myDir="/afs/cern.ch/user/s/sbologne/scratch0/CMSSW/CMSSW_4_2_4/src/HiggsAnalysis/CombinedLimit/test/rotatedEPSForLP/treeFromFrancesco/";
-  string myDir="/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/HZZlljj/HZZlljjAnalyzer/test/analysis/FIT/";
-  //signal file
+
   char fileName[1000];
   sprintf(fileName, "HWWlvjj_GluGluToHToWWToLNuQQ_M-%.0f_7TeV-powheg-pythia6_Spring11-PU_S1_START311_V1G1-v1_helicity_ALL.root", imass);
   std::ostringstream ossm;
   ossm<<imass;
 
-  //-------------------- AJW ---------------
   cout << "Opening: " << fileName << " for extracting number of generated events." << endl;
   TFile *f=new TFile(fileName,"READ");
   TH1F *h=(TH1F*)f->Get("Ev_nCounter");
@@ -942,16 +927,8 @@ float get_genSignalYield(float imass){
 
 }
 
-/*
-int get_signal_gen(float mymass){
-  int genID=-1;//0=powheg; 1=JHUGEN
-  if(mymass==250.0||mymass==300.0||mymass==350.0||mymass==400.0||
-     mymass==450.0||mymass==500.0) genID=1;
-  else genID=0;
-  return genID;
 
-}
-*/
+
 int get_mass_index(float mymass){
   int index=-1;
   //  cout<<"Mass "<<mymass<<flush;
