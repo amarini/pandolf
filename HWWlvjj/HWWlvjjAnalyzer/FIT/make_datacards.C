@@ -20,16 +20,16 @@ const int nprod=2; //VBF and gg
 const int nchan=2;//2e2j and 2m2j
 const float lumiee=1.556; //fb^-1, NEW!
 const float lumimm=1.615; //fb^-1, NEW!
-const int nmass=7;
+const int nmass=6;
 const bool isSM4=false; // if true add .15 to CSgg and CSvbf errors 
-const float mass[nmass]={200., 300., 350., 400., 450., 500., 550.};
+const float mass[nmass]={300., 350., 400., 450., 500., 550.};
 
 
-float exp_sig_yields[nchan][nmass];
+//float exp_sig_yields[nchan][nmass];
 //float exp_sig_yields_ee[nbtag][nmass];
 //float exp_sig_yields_mm[nbtag][nmass];
 
-float gen_sig_yields[nmass];
+//float gen_sig_yields[nmass];
 //={//no mass cut here
 //  264741, 284748, 291226, 109981,
 //  296279, 109076, 109924, 291650, 109906,
@@ -70,8 +70,9 @@ string make_obsstring(int obs);
 vector<float> eff_fit(const std::string& dataDataset, int chan);
 vector<double> calculate_CBpars(double mH);
 int get_mass_index(float mymass);
-void extract_exp_sig_yields(float mymass,float mywidth);//,vector<float> ee_y , vector<float> mm_y);
-void get_gen_yields();
+float get_signalYield( int ichannel, float imass );
+float extract_exp_sig_yields(int ichannel, float mymass,float mywidth);//,vector<float> ee_y , vector<float> mm_y);
+float get_genSignalYield(float imass);
 int make_datacards(const std::string& dataDataset="DATA_6july");
 //int get_signal_gen(float mymass);
 
@@ -81,12 +82,15 @@ int make_datacards(const std::string& dataDataset="DATA_6july");
 
 int make_datacards(const std::string& dataDataset){
 
-  // gROOT->ProcessLine(".L make_roofitfiles.C++");
 
-//  myCSW = new HiggsCSandWidth();
+  string outDir="datacards/";
 
-  // return 1;
- 
+  //get_gen_yields();
+
+  //parametrize efficiencies
+  mu_eff_pars=eff_fit(dataDataset, 0);
+  ele_eff_pars=eff_fit(dataDataset, 1);
+
   string nameXsecFile;
   if(isSM4)
     nameXsecFile="./xsect_higgs_173points_4generation.txt";
@@ -95,24 +99,9 @@ int make_datacards(const std::string& dataDataset){
   ifstream xsect_file(nameXsecFile.c_str(),ios::in);
 
   if (! xsect_file.is_open()){ cout<<"Failed to open file with xsections"<<endl;}
+
   float mH, CSgg, CSgg_p, CSgg_m, CSpdfgg_p,CSpdfgg_m,CSvbf, CSvbf_p, CSvbf_m,CSpdfvbf_p,CSpdfvbf_m, 
         Gamma, BRHWW, BRWWlvqq;
-
-  string outDir="datacards/";
-
-  //calculate expected yields
-  get_gen_yields();
-  while(xsect_file.good()){
-    xsect_file >> mH>> CSgg>> CSgg_p >> CSgg_m >>  CSpdfgg_p>>CSpdfgg_m>>CSvbf >> CSvbf_p >> CSvbf_m >>  CSpdfvbf_p>>CSpdfvbf_m>>Gamma >> BRHWW >> BRWWlvqq;
-
-    std::cout << "mass: " << mH << std::endl; 
-    if( mH!=350. && mH!=400. && mH!=450. && mH!=500. && mH!=550. ) continue;
-    extract_exp_sig_yields(mH,Gamma);//exp_sig_yields_ee,exp_sig_yields_mm);
- }
-
-  //parametrize efficiencies
-  mu_eff_pars=eff_fit(dataDataset, 0);
-  ele_eff_pars=eff_fit(dataDataset, 1);
  
   xsect_file.clear();
   xsect_file.seekg (0);
@@ -295,6 +284,60 @@ int make_datacards(const std::string& dataDataset){
 ///////////////////////////////////////////
 ///////////////////////////////////////////
 ///////////////////////////////////////////
+
+
+float get_signalYield( int ichannel, float imass ) {
+
+  string nameXsecFile;
+  if(isSM4)
+    nameXsecFile="./xsect_higgs_173points_4generation.txt";
+  else
+    nameXsecFile="./xsect_higgs_173points_new.txt";
+  ifstream xsect_file(nameXsecFile.c_str(),ios::in);
+
+  if (! xsect_file.is_open()){ cout<<"Failed to open file with xsections"<<endl;}
+  float mH, CSgg, CSgg_p, CSgg_m, CSpdfgg_p,CSpdfgg_m,CSvbf, CSvbf_p, CSvbf_m,CSpdfvbf_p,CSpdfvbf_m, 
+        Gamma, BRHWW, BRWWlvqq;
+  float mH_old, CSgg_old, CSgg_p_old, CSgg_m_old, CSpdfgg_p_old,CSpdfgg_m_old,CSvbf_old, CSvbf_p_old, CSvbf_m_old,CSpdfvbf_p_old,CSpdfvbf_m_old, 
+        Gamma_old, BRHWW_old, BRWWlvqq_old;
+
+
+  //calculate expected yields
+  while(xsect_file.good()){
+
+    mH_old = mH;
+    CSgg_old = CSgg;
+    CSgg_p_old = CSgg_p;
+    CSgg_m_old = CSgg_m;
+    CSpdfgg_p_old = CSpdfgg_p;
+    CSpdfgg_m_old = CSpdfgg_m;
+    CSvbf_old = CSvbf;
+    CSvbf_p_old = CSvbf_p;
+    CSvbf_m_old = CSvbf_m;
+    CSpdfvbf_p_old = CSpdfvbf_p;
+    CSpdfvbf_m_old = CSpdfvbf_m;
+    Gamma_old = Gamma;
+    BRHWW_old = BRHWW;
+    BRWWlvqq_old = BRWWlvqq;
+
+    xsect_file >> mH>> CSgg>> CSgg_p >> CSgg_m >>  CSpdfgg_p>>CSpdfgg_m>>CSvbf >> CSvbf_p >> CSvbf_m >>  CSpdfvbf_p>>CSpdfvbf_m>>Gamma >> BRHWW >> BRWWlvqq;
+
+    std::cout << "mass: " << mH << std::endl; 
+    if( mH==imass ) return extract_exp_sig_yields(ichannel, imass,Gamma);
+    else if( mH>imass && mH_old<imass ) {
+      // linear interpolation:
+      float iGamma = Gamma_old + ( Gamma-Gamma_old ) * ( imass-mH_old ) / ( mH-mH_old );
+      return extract_exp_sig_yields(ichannel, imass,iGamma);
+    }
+    
+  }
+
+  std::cout << "Didn't find mass: " << imass << "!!!! Using Gamma=0!!" << std::endl;
+  extract_exp_sig_yields(ichannel, imass,0.); 
+
+}
+
+
 
 string make_ratestring(float mymass,vector<float> myxsect, int chan,float expbkg){
 
@@ -716,15 +759,14 @@ vector<float> eff_fit(const std::string& dataDataset, int chan){
   string chan_str= (chan==0)?"mu" : "ele";
   float myeff[nmass];
   for(int im=0;im<nmass;im++){
-    //  myeff[im]=exp_eff[mybtag][im];
 
     float brZtoL=1./3.;
-  //if(get_signal_gen(mass[im])==0){//for powheg samples, Z->ll with l=e,mu,tau; in jhu, Z->ll with l=e,mu
-  //  brZtoL=1.0/3.0;
-  //}
-  //else brZtoL=0.5;
    
-    myeff[im]=exp_sig_yields[chan][im]/(gen_sig_yields[im]*brZtoL);  //(lumi*NLOxsect[im]);
+    float signalYield = get_signalYield(chan, mass[im]);
+    float gen_signalYield = get_genSignalYield(mass[im]);
+    myeff[im]=signalYield/(gen_signalYield*brZtoL);  //(lumi*NLOxsect[im]);
+
+    //myeff[im]=exp_sig_yields[chan][im]/(gen_sig_yields[im]*brZtoL);  //(lumi*NLOxsect[im]);
     //  cout<<"Calc EFF: im="<<im<<"  chan="<<chan<<" "<<mybtag<<"b  EXP="<<exp_sig_yields[mybtag][chan][im]<<"  GEN="<<gen_sig_yields[im]<<"  brZtoL="<<brZtoL<<" ---> EFF: "<<myeff[im]<<endl;
     //if(chan==0)  myeff[im]=exp_sig_yields[mybtag][chan][im]/(gen_sig_yields[im]/2.0);  //(lumi*NLOxsect[im]);
     //else  myeff[im]=exp_sig_yields_mm[mybtag][im]/(gen_sig_yields[im]/2.0);//(lumi*NLOxsect[im]);
@@ -816,9 +858,11 @@ vector<double> calculate_CBpars(double mH){
 }//end vector<double> calculate_CBpars
 
 
-void extract_exp_sig_yields(float mymass,float mywidth){
-  int im=get_mass_index(mymass);
-  if(im<0)return;
+
+float  extract_exp_sig_yields(int ichannel, float mymass,float mywidth){
+
+//int im=get_mass_index(mymass);
+//if(im<0)return;
 
  ///////////CHANGE THIS DIR NAME ALSO IN get_gen_yields() 
   //string myDir="/afs/cern.ch/user/s/sbologne/scratch0/CMSSW/CMSSW_4_2_4/src/HiggsAnalysis/CombinedLimit/test/rotatedEPSForLP/treeFromFrancesco/";
@@ -829,7 +873,7 @@ void extract_exp_sig_yields(float mymass,float mywidth){
   char fileName[1000];
   sprintf(fileName, "HWWlvjj_GluGluToHToWWToLNuQQ_M-%.0f_7TeV-powheg-pythia6_Spring11-PU_S1_START311_V1G1-v1_helicity_ALL.root", mymass);
   std::ostringstream ossm;
-  ossm<<mass[im];
+  ossm<<mymass;
   cout << "Opening file: " << fileName << " for calculating number of selected signal events" << endl;
   TFile *f=new TFile(fileName,"READ");
   TTree *t=(TTree*)f->Get("Tree_FITUL");
@@ -864,45 +908,37 @@ void extract_exp_sig_yields(float mymass,float mywidth){
   baseline_sel+=massCut;
 
  
-    for(int ich=0;ich<nchan;ich++){
-      char sel[500];
-      sprintf( sel, "(%s && leptType==%d)", baseline_sel.c_str(), ich); 
-      cout << "CUTSTRING - " << sel << endl;
-      float nexp=float(t->Draw("mWW>>mwwrescaled(400,150.0,1200.0)",sel,"goff"));//sel2 contains tighter mww cut
-      TH1F *mwwtmp=(TH1F*)gDirectory->Get("mwwrescaled");
-      nexp=float( mwwtmp->Integral()  );
-      exp_sig_yields[ich][im]=nexp;
-      cout << "number of selected events for " << mymass << " is: " << nexp << endl;
-      delete mwwtmp;
-      //cout<<"MH-"<<mymass<<" "<<ib<<"b, ee only -> "<<im<<" Selecting : "<<sel2.c_str()<<"  Exp Sig "<<exp_sig_yields[ib][ich][im]<<"  ExpBkg "<<exp_bkg[ib][ich]<<endl;
-    }
-
+  char sel[500];
+  sprintf( sel, "(%s && leptType==%d)", baseline_sel.c_str(), ichannel); 
+  cout << "CUTSTRING - " << sel << endl;
+  float nexp=float(t->Draw("mWW>>mwwrescaled(400,150.0,1200.0)",sel,"goff"));//sel2 contains tighter mww cut
+  TH1F *mwwtmp=(TH1F*)gDirectory->Get("mwwrescaled");
+  nexp=float( mwwtmp->Integral()  );
+  delete mwwtmp;
   delete t;delete f;
 
+  return nexp;
 
 }//extract_exp_sig_yields
 
-void get_gen_yields(){
+
+
+
+float get_genSignalYield(float imass){
   //string myDir="/afs/cern.ch/user/s/sbologne/scratch0/CMSSW/CMSSW_4_2_4/src/HiggsAnalysis/CombinedLimit/test/rotatedEPSForLP/treeFromFrancesco/";
   string myDir="/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/HZZlljj/HZZlljjAnalyzer/test/analysis/FIT/";
   //signal file
-  for(int im=0;im<nmass;im++){
   char fileName[1000];
-  sprintf(fileName, "HWWlvjj_GluGluToHToWWToLNuQQ_M-%.0f_7TeV-powheg-pythia6_Spring11-PU_S1_START311_V1G1-v1_helicity_ALL.root", mass[im]);
-   std::ostringstream ossm;
-    ossm<<mass[im];
+  sprintf(fileName, "HWWlvjj_GluGluToHToWWToLNuQQ_M-%.0f_7TeV-powheg-pythia6_Spring11-PU_S1_START311_V1G1-v1_helicity_ALL.root", imass);
+  std::ostringstream ossm;
+  ossm<<imass;
 
-    //-------------------- AJW ---------------
-    cout << "Opening: " << fileName << " for extracting number of generated events." << endl;
-    TFile *f=new TFile(fileName,"READ");
-    TH1F *h=(TH1F*)f->Get("Ev_nCounter");
-    gen_sig_yields[im]=h->GetBinContent(1);
-    cout << "the generated number of events for " << mass[im] << " is: " << gen_sig_yields[im] << endl;
-    if(gen_sig_yields[im]<=0.0){
-      cout<<"WARNING!!! # gen events for mass "<<mass[im]<<"  == "<<gen_sig_yields[im]<<"  . Setting to -1."<<endl;
-      gen_sig_yields[im]=-1.0;
-    }
-  }
+  //-------------------- AJW ---------------
+  cout << "Opening: " << fileName << " for extracting number of generated events." << endl;
+  TFile *f=new TFile(fileName,"READ");
+  TH1F *h=(TH1F*)f->Get("Ev_nCounter");
+  float gen_sig_yields=h->GetBinContent(1);
+  return gen_sig_yields;
 
 }
 
