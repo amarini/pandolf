@@ -228,7 +228,7 @@ void make_roofitfiles(int chan, double massH, double sigmaH, double &obs_yield, 
   stringstream ossmww2;
   ossmww2 << float(fitRangeHigh);
   mwwcut+="&&CMS_hwwlvqq_mWW<"+ossmww2.str();
-  cout<<"$$$$$$ TEMP SEL:  "<<mwwcut.c_str()<<"  $$$$$$$$$$$$$$$$$$$$$$ "<<fitRangeLow<<" - "<< fitRangeHigh<<endl;
+  cout<<"****** TEMP SEL:  "<<mwwcut.c_str()<<"  ********************** "<<fitRangeLow<<" - "<< fitRangeHigh<<endl;
   tree_sel+=" && "+mwwcut;
  
  
@@ -242,9 +242,10 @@ void make_roofitfiles(int chan, double massH, double sigmaH, double &obs_yield, 
   //RooDataSet *data_b = background.generate(x,int(obs_yield));
   cout<<"\nBTAG "<<btag<<"   OBS_YIELDS: "<<obs_yield<<" ->   "<<int(obs_yield)<<endl<<endl;*/
 
-  TFile* file = new TFile("./convertedTree_LP_20110811.root");
+  std::string fileName = "convertedTree_PROVA.root";
+  TFile* file = new TFile(fileName.c_str());
   RooFormulaVar cut1("mycut1",tree_sel.c_str(),RooArgList(CMS_hwwlvqq_mWW,mJJ,leptType));
-  RooDataSet *dataset_obs_orig=new RooDataSet("dataset_obs_orig","dataset_obs_orig",(TTree*)file->Get("tree_passedEvents"),
+  RooDataSet *dataset_obs_orig=new RooDataSet("dataset_obs_orig","dataset_obs_orig",(TTree*)file->Get("Tree_FITUL"),
 					      RooArgSet(CMS_hwwlvqq_mWW,mJJ,leptType),
 					      cut1,"eventWeight");
 
