@@ -321,7 +321,6 @@ float get_signalYield( int ichannel, float imass ) {
 
     xsect_file >> mH>> CSgg>> CSgg_p >> CSgg_m >>  CSpdfgg_p>>CSpdfgg_m>>CSvbf >> CSvbf_p >> CSvbf_m >>  CSpdfvbf_p>>CSpdfvbf_m>>Gamma >> BRHWW >> BRWWlvqq;
 
-    std::cout << "mass: " << mH << std::endl; 
     if( mH==imass ) return extract_exp_sig_yields(ichannel, imass,Gamma);
     else if( mH>imass && mH_old<imass ) {
       // linear interpolation:
