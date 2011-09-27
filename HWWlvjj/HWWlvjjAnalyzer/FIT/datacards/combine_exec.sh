@@ -16,8 +16,8 @@ algo="MarkovChainMC"
 hint="ProfileLikelihood" # before the algo method, run the hint method for restricting integration field
 label="lvqq"
 ntoys=5
-WORKDIR=${RELDIR}/HZZlljj/HZZlljjAnalyzer/test/analysis/FIT/${OUTDIR}/${mass}/
-datacard="CMS_hwwlvqq_${mass}_2channels.txt" #"counting-twochannel-2l2j.txt"  
+WORKDIR=${RELDIR}/UserCode/pandolf/HWWlvjj/HWWlvjjAnalyzer/FIT/${OUTDIR}/${mass}/
+datacard="CMS_hwwlvqq_${mass}_2channels.txt" 
 OUTDIR="combine_${label}_${algo}_"$( basename $datacard .txt )
 
 cd $RELDIR
@@ -50,7 +50,7 @@ echo "Datacard: $datacard"
 
 #if algo="MarkovChainMC" and function RooCB
 #expected
-combine -M $algo -n $label -m $mass  -s $myrand -d $WORKDIR/$datacard  -H $hint  -t $ntoys -U -L /cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/HZZlljj/HZZlljjAnalyzer/test/analysis/FIT/PDFs/RooCB_cc.so 
+combine -M $algo -n $label -m $mass  -s $myrand -d $WORKDIR/$datacard  -H $hint  -t $ntoys -U -L /cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/HWWlvjj/HWWlvjjAnalyzer/FIT/PDFs/RooCB_cc.so 
 #observed
 #combine -M $algo -n $label -m $mass  -s $myrand -d $WORKDIR/$datacard  -H $hint  -U -L  /afs/cern.ch/user/s/sbologne/scratch0/CMSSW/CMSSW_4_2_4/src/HiggsAnalysis/CombinedLimit/test/rotatedEps/PDFs/RooCB_cc.so
 

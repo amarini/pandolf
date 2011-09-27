@@ -17,6 +17,7 @@ float minMWW=0.;
 
 TStyle *tdrStyle ;
 void setTDRStyle() ;
+
 void sidebands(int isElectron=1){
 
 setTDRStyle() ;
@@ -27,15 +28,15 @@ setTDRStyle() ;
  float mass_points[nMass]={200.0,250.0,300.0,350.0,400.0,450.0,500.0, 600.0, 700.0, 800.0};
 
   vector<string> bkg_filenames;
-  bkg_filenames.push_back("../HWWlvjj_DY_TuneZ2_7TeV-pythia6_helicity_ALL.root");
-  bkg_filenames.push_back("../HWWlvjj_GJet_TuneZ2_7TeV-alpgen_helicity_ALL.root");
+  bkg_filenames.push_back("HWWlvjj_DY_TuneZ2_7TeV-pythia6_helicity_ALL.root");
+  bkg_filenames.push_back("HWWlvjj_GJet_TuneZ2_7TeV-alpgen_helicity_ALL.root");
   //bkg_filenames.push_back("../HWWlvjj_QCD_BCtoE_TuneZ2_7TeV-pythia6_helicity_ALL.root");
   //bkg_filenames.push_back("../HWWlvjj_QCD_EMEnriched_TuneZ2_7TeV-pythia6_3_helicity_ALL.root");
-  bkg_filenames.push_back("../HWWlvjj_QCD_Pt-20_MuEnrichedPt-15_TuneZ2_7TeV-pythia6_helicity_ALL.root");
-  bkg_filenames.push_back("../HWWlvjj_TTJets_TuneZ2_7TeV-madgraph-tauola_helicity_ALL.root");
-  bkg_filenames.push_back("../HWWlvjj_TToBLNu_TuneZ2_7TeV-madgraph_helicity_ALL.root");
-  bkg_filenames.push_back("../HWWlvjj_VVtoAnything_TuneZ2_7TeV-pythia6-tauola_helicity_ALL.root");
-  bkg_filenames.push_back("../HWWlvjj_WJetsToLNu_TuneZ2_7TeV-madgraph-tauola_helicity_ALL.root");
+  bkg_filenames.push_back("HWWlvjj_QCD_Pt-20_MuEnrichedPt-15_TuneZ2_7TeV-pythia6_helicity_ALL.root");
+  bkg_filenames.push_back("HWWlvjj_TTJets_TuneZ2_7TeV-madgraph-tauola_helicity_ALL.root");
+  bkg_filenames.push_back("HWWlvjj_TToBLNu_TuneZ2_7TeV-madgraph_helicity_ALL.root");
+  bkg_filenames.push_back("HWWlvjj_VVtoAnything_TuneZ2_7TeV-pythia6-tauola_helicity_ALL.root");
+  bkg_filenames.push_back("HWWlvjj_WJetsToLNu_TuneZ2_7TeV-madgraph-tauola_helicity_ALL.root");
   string MCname="MADGRAPH";
   //  filenames.push_back(""); 
   const int nBkg=bkg_filenames.size();
@@ -48,12 +49,14 @@ setTDRStyle() ;
   //   tbkg[ibkg]=(TTree*)   fbkg[ibkg]->Get("tree_passedEvent");
   // }
 
-  TH1F *hmc_sr=new TH1F("mc_sigreg","MC (TOTAL) distribtuion of M_{ZZ} in signal region;M_{ZZ} [GeV];#evt / 10 GeV",65, 150.0, 800.0);
-  TH1F *hmc_sb=new TH1F("mc_sbreg","MC (TOTAL) distribtuion of M_{ZZ} in sideband region;M_{ZZ} [GeV];#evt / 10 GeV",65, 150.0, 800.0);
-  TH1F *halpha=new TH1F("alpha","Ratio SignalRegion / SidebandRegion from MC;M_{ZZ} [GeV];#evt / 10 GeV",65, 150.0, 800.0);
-  TH1F *hdata_sr=new TH1F("data_sigreg","DATA (175 inv pb) distribtuion of M_{ZZ} in signal region;M_{ZZ} [GeV];#evt / 10 GeV",65, 150.0, 800.0);
-  TH1F *hdata_sb=new TH1F("data_sbreg","DATA (175 inv pb) distribtuion of M_{ZZ} in sideband region;M_{ZZ} [GeV];#evt / 10 GeV",65, 150.0, 800.0);
-  TH1F *hdata_pred=new TH1F("data_pred","DATA (175 inv pb) distribtuion of M_{ZZ} in signal region predicted from sidebands;M_{ZZ} [GeV];#evt / 10 GeV",65, 150.0, 800.0);
+  float maxMWW = 500.;
+
+  TH1F *hmc_sr=new TH1F("mc_sigreg","MC (TOTAL) distribtuion of M_{ZZ} in signal region;M_{ZZ} [GeV];#evt / 10 GeV",65, 150.0, maxMWW);
+  TH1F *hmc_sb=new TH1F("mc_sbreg","MC (TOTAL) distribtuion of M_{ZZ} in sideband region;M_{ZZ} [GeV];#evt / 10 GeV",65, 150.0, maxMWW);
+  TH1F *halpha=new TH1F("alpha","Ratio SignalRegion / SidebandRegion from MC;M_{ZZ} [GeV];#evt / 10 GeV",65, 150.0, maxMWW);
+  TH1F *hdata_sr=new TH1F("data_sigreg","DATA (175 inv pb) distribtuion of M_{ZZ} in signal region;M_{ZZ} [GeV];#evt / 10 GeV",65, 150.0, maxMWW);
+  TH1F *hdata_sb=new TH1F("data_sbreg","DATA (175 inv pb) distribtuion of M_{ZZ} in sideband region;M_{ZZ} [GeV];#evt / 10 GeV",65, 150.0, maxMWW);
+  TH1F *hdata_pred=new TH1F("data_pred","DATA (175 inv pb) distribtuion of M_{ZZ} in signal region predicted from sidebands;M_{ZZ} [GeV];#evt / 10 GeV",65, 150.0, maxMWW);
 
   hmc_sr->Sumw2();
   hmc_sb->Sumw2();
@@ -179,10 +182,9 @@ setTDRStyle() ;
   c2->cd();
   halpha->Draw("histE0");
 
-  //return;
   //take data
-  TFile *fdata=new TFile( "../HWWlvjj_DATA_6july_helicity_ALL.root");
-  TTree *tdata=(TTree*)fdata->Get("tree_passedEvents");
+  TFile *fdata=new TFile( "HWWlvjj_DATA_6july_helicity_ALL.root");
+  TTree *tdata=(TTree*)fdata->Get("Tree_FITUL");
   bool isSB=true;
   int leptType;
   float mww, ew,mjj;
@@ -199,11 +201,11 @@ setTDRStyle() ;
     tdata->GetEntry(i);
     if( leptType!=0 ) continue; //for now only muons!!! (EM enriched QCD has problematic statistics)
     if(mww<minMWW)continue;
-    if(((mjj > SBlowCut && mjj <60.) || (mjj < SBhighCut && mjj > 100.))&& isElectron == leptType){
+    if((mjj > SBlowCut && mjj <60.) || (mjj < SBhighCut && mjj > 100.)) {
       hdata_sb->Fill(mww,ew);
       nDATAsb++;
     }
-    else if(mjj>60. && mjj<100. && leptType==isElectron){
+    else if(mjj>60. && mjj<100.){
       hdata_sr->Fill(mww,ew);
       nDATAsr++;
     }
@@ -231,6 +233,13 @@ setTDRStyle() ;
   hdata_sr->Draw("PE0sames");
   hdata_pred->Draw("PE0sames");
   ldata->Draw();
+  c3->SaveAs("dataSB.eps");
+TFile* fileProva = TFile::Open("PROVA.root", "recreate");
+fileProva->cd();
+hdata_sb->Write();
+hdata_sr->Write();
+hdata_pred->Write();
+fileProva->Close();
 
   f_alpha->cd();
   hdata_sb->Scale(1/hdata_sb->Integral());

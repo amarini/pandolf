@@ -2,36 +2,33 @@ void convert_FP_tree(){
 
   // TFile *dfile = new TFile("/afs/cern.ch/cms/CAF/CMSALCA/ALCA_TRACKERALIGN/HIP/bonato/HtoZZto2L2J-crab/trees_FP_Summer11/HZZlljjRM_DATA_800pb_optLD_looseBTags_v2_ALL_FP.root");
   // TFile *dfile = new TFile("/afs/cern.ch/user/w/whitbeck/scratch0/HZZlljjRM_DATA_1fb_optLD_looseBTags_v2_ALL.root");//859
-  TFile *dfile = new TFile("treeFromFrancesco/HZZlljjRM_DATA_LP11_optLD_looseBTags_v2_ALL.root","READ");//1000
- TTree *t=(TTree*)dfile->Get("tree_passedEvents");
+ TFile *dfile = new TFile("HWWlvjj_DATA_6july_helicity_ALL.root","READ");//1000
+ TTree *t=(TTree*)dfile->Get("Tree_FITUL");
  cout<<"Loaded tree "<<t->GetName()<<endl;
- int leptTypeIN, nBTagsIN;
- float mZZIN, mZjjIN,eventWeightIN;
+ int leptTypeIN;
+ float mWWIN, mJJIN,eventWeightIN;
  cout<<"addressing"<<endl;
- t->SetBranchAddress("mZZ", &mZZIN);
- t->SetBranchAddress("mZjj", &mZjjIN);
- t->SetBranchAddress("nBTags", &nBTagsIN);
+ t->SetBranchAddress("mWW", &mWWIN);
+ t->SetBranchAddress("mJJ", &mJJIN);
  t->SetBranchAddress("leptType", &leptTypeIN);
  t->SetBranchAddress("eventWeight", &eventWeightIN);
 
 
- double leptTypeOUT, nBTagsOUT;
- double mZZOUT, mZjjOUT,eventWeightOUT;
- TFile *fout=new TFile("./convertedTree_LP_20110811.root","RECREATE");
- TTree *tout=new TTree("tree_passedEvents","Converted from FP");
- tout->Branch("CMS_hzz2l2q_mZZ",&mZZOUT,"CMS_hzz2l2q_ZZ/D");
- tout->Branch("mZjj",&mZjjOUT,"mZjj/D");
+ double leptTypeOUT;
+ double mWWOUT, mJJOUT,eventWeightOUT;
+ TFile *fout=new TFile("./convertedTree_PROVA.root","RECREATE");
+ TTree *tout=new TTree("Tree_FITUL","Converted from FP");
+ tout->Branch("CMS_hwwlvqq_WW",&mWWOUT,"CMS_wwlvqq_WW/D");
+ tout->Branch("mJJ",&mJJOUT,"mJJ/D");
  tout->Branch("leptType",&leptTypeOUT,"leptType/D");
- tout->Branch("nBTags",&nBTagsOUT,"nBTags/D");
  tout->Branch("eventWeight",&eventWeightOUT,"eventWeight/D");
 
  cout<<"start"<<endl;
  for(int i=0;i<t->GetEntries();i++){
    t->GetEntry(i);
    leptTypeOUT=double(leptTypeIN);
-   nBTagsOUT=double(nBTagsIN);
-   mZZOUT=double(mZZIN);
-   mZjjOUT=double(mZjjIN);
+   mWWOUT=double(mWWIN);
+   mJJOUT=double(mJJIN);
    eventWeightOUT=double(eventWeightIN);
    tout->Fill();
  }
