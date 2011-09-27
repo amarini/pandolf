@@ -204,6 +204,8 @@ DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType
 
   additionalLabel_ = 0;
 
+  lastHistos_mcHistoSum_=0;
+
   // this is needed to avoid the same-histogram problem:
   TH1F::AddDirectory(kFALSE);
 
@@ -1103,7 +1105,9 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
   if( mcHisto0_superimp!=0 )
     mcHistos_superimp.push_back(mcHisto0_superimp);
 
+
   drawHisto_fromHistos( dataHistos, mcHistos, mcHistos_superimp, name, axisName, units, instanceName, log_aussi, legendQuadrant, flags, labelText, add_jetAlgoText );
+
 
 } //drawhisto
 
@@ -1217,6 +1221,7 @@ void DrawBase::drawHisto_fromTree( const std::string& treeName, const std::strin
 void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<TH1D*> mcHistos, std::vector<TH1D*> mcHistos_superimp, const std::string& name, const std::string& axisName, const std::string& units, const std::string& instanceName, bool log_aussi, int legendQuadrant, const std::string& flags, const std::string& labelText, bool add_jetAlgoText  ) {
 
 
+
   bool noDATA = false;
   bool noMC = false;
 
@@ -1257,6 +1262,7 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
       }
 
     }
+
 
 
 
@@ -1326,6 +1332,7 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
         } //for mc files
       } //if mc files size > 1
     } // if !nomc
+
 
 
 
@@ -1424,6 +1431,7 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
 
 
 
+
     LegendBox lb = get_legendBox(legendQuadrant);
     int totalNfiles = mcFiles_.size() + dataFiles_.size();
 //    if( dataFile_.file!=0 ) totalNfiles++;
@@ -1512,6 +1520,7 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
     }
 
 
+
     h2_axes->SetXTitle(xAxis.c_str());
     h2_axes->SetYTitle(yAxis.c_str());
 
@@ -1594,6 +1603,7 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
     std::string canvasName = outputdir_ + "/" + name;
     if( flags!="" )
       canvasName = canvasName + "_" + flags;
+
 
 
     std::string canvasName_eps = canvasName + ".eps";
@@ -1705,8 +1715,11 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
     }
 
 
-    delete lastHistos_mcHistoSum_;
+
+    if( lastHistos_mcHistoSum_!=0 ) delete lastHistos_mcHistoSum_;
+
     lastHistos_mcHistoSum_ = new TH1D(*mcHisto_sum);
+
 
     lastHistos_data_.clear();
     lastHistos_mc_.clear();
@@ -1716,16 +1729,19 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
       TH1D* newHisto = new TH1D(*(dataHistos[iHisto]));
       lastHistos_data_.push_back(newHisto);
     }
+
     for( unsigned iHisto=0; iHisto<mcHistos.size(); ++iHisto ) {
       TH1D* newHisto = new TH1D(*(mcHistos[iHisto]));
       lastHistos_mc_.push_back(newHisto);
     }
+
     for( unsigned iHisto=0; iHisto<mcHistos_superimp.size(); ++iHisto ) {
       TH1D* newHisto = new TH1D(*(mcHistos_superimp[iHisto]));
       lastHistos_mc_superimp_.push_back(newHisto);
     }
 
       
+
     delete c1;
     delete legend;
     delete h2_axes;
