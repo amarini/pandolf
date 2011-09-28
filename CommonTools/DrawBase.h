@@ -9,6 +9,8 @@
 #ifndef DrawBase_h
 #define DrawBase_h
 
+#include <vector>
+
 #include "TCanvas.h"
 #include "TPad.h"
 #include "TH1F.h"
@@ -104,7 +106,7 @@ class DrawBase {
   void set_xAxisMax( float xAxisMax=9999. ) { xAxisMax_ = xAxisMax;};
   void set_yAxisMax( float yAxisMax=9999. ) { yAxisMax_ = yAxisMax;};
   void set_yAxisMaxScale( float yAxisMaxScale=1.4 ) { yAxisMaxScale_ = yAxisMaxScale;};
-  void set_yAxisMaxScaleLog( float yAxisMaxScale ) { yAxisMaxScaleLog_ = yAxisMaxScale;};
+  void set_yAxisMaxScaleLog( float yAxisMaxScale=5. ) { yAxisMaxScaleLog_ = yAxisMaxScale;};
   void set_noStack( bool set=true ) { noStack_ = set; };
   void set_isCMSArticle( bool set=true );
   void set_rebin( int rebin ) { rebin_ = rebin; };
