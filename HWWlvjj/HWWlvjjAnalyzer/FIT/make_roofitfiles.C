@@ -45,8 +45,8 @@ void make_roofitfiles(int chan, double massH, double sigmaH, double &obs_yield, 
 
 
   string str_chan="dummychan";
-  if(chan==0)str_chan="ele";
-  else if(chan==1)str_chan="mu";
+  if(chan==0)str_chan="mu";
+  else if(chan==1)str_chan="ele";
   else cout<<"Unrecognized number of channels: "<<chan<<endl;
 
 
