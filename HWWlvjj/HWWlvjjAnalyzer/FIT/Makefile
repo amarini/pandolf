@@ -170,8 +170,8 @@ drawLeptIsoStudies: DrawBase.o fitTools.o drawLeptIsoStudies.cpp
 doLatexYieldTable: doLatexYieldTable.cpp
 	$(CC) -Wall -o doLatexYieldTable doLatexYieldTable.cpp $(ROOTFLAG)
 
-fitSidebands: fitSidebands.cpp 
-	$(CC) -Wall $(INCLUDES) -o fitSidebands fitSidebands.cpp $(ROOTFLAG) $(EXTRALIBS)
+fitSidebands: fitSidebands.cpp DrawBase.o fitTools.o
+	$(CC) -Wall $(INCLUDES) -o fitSidebands fitSidebands.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
 
 
 

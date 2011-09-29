@@ -25,6 +25,8 @@ void fitSidebands( TTree* treeMC, TTree* treeDATA, int leptType);
 int main() {
 
 
+  DrawBase* db = new DrawBase("prova");
+
   TFile* file_DY         = TFile::Open("HWWlvjj_DY_TuneZ2_7TeV-pythia6_helicity_ALL.root");
   TFile* file_GJet       = TFile::Open("HWWlvjj_GJet_TuneZ2_7TeV-alpgen_helicity_ALL.root");
   TFile* file_QCD_BCtoE  = TFile::Open("HWWlvjj_QCD_BCtoE_TuneZ2_7TeV-pythia6_helicity_ALL.root");
@@ -91,9 +93,6 @@ void fitSidebands( TTree* treeMC, TTree* treeDATA, int leptType ) {
   TFile* outfile = TFile::Open(outfilename.c_str(), "recreate");
   outfile->cd();
 
-  char ofs_name[400];
-  sprintf( ofs_name, "FitSidebands/fitresults_%s.txt", leptType_str.c_str());
-  ofstream ofs(ofs_name);
 
 
 
@@ -146,7 +145,6 @@ void fitSidebands( TTree* treeMC, TTree* treeDATA, int leptType ) {
   // save value/error of parameter:
   float a_exp_sidebandsMC = a_exp.getVal();
   float a_exp_sidebandsMC_error = a_exp.getError();
-  ofs << "a_sidebandsMC: \t" << a_exp_sidebandsMC << "\t+-" << a_exp.getError() << std::endl;
 
   RooPlot *plot_sidebandsMC = mWW->frame();
 
@@ -202,7 +200,6 @@ void fitSidebands( TTree* treeMC, TTree* treeDATA, int leptType ) {
   // save value/error of parameter:
   float a_exp_signalMC = a_exp.getVal();
   float a_exp_signalMC_error = a_exp.getError();
-  ofs << "a_signalMC: \t" << a_exp_signalMC << "\t+-" << a_exp.getError() << std::endl;
 
   RooPlot *plot_signalMC = mWW->frame();
 
@@ -235,26 +232,8 @@ void fitSidebands( TTree* treeMC, TTree* treeDATA, int leptType ) {
   c1->SaveAs(canvasName_eps.c_str());
 
 
-  std::string cut_sidebands_weight(cut_sidebands);
-  cut_sidebands_weight = "eventWeight*"+cut_sidebands_weight;
-
-  std::string cut_signal_weight(cut_signal);
-  cut_signal_weight = "eventWeight*"+cut_signal_weight;
-
-  TH1D* h1_sidebandsMC = new TH1D("sidebandsMC", "", nBins, mWW_min, mWW_max);
-  treeMC->Project("sidebandsMC", "mWW", cut_sidebands_weight.c_str());
-
-  TH1D* h1_signalMC = new TH1D("signalMC", "", nBins, mWW_min, mWW_max);
-  treeMC->Project("signalMC", "mWW", cut_signal_weight.c_str());
-
-  h1_expSlope_signalMC->Write();
-  h1_expSlope_sidebandsMC->Write();
-  h1_signalMC->Write();
-  h1_sidebandsMC->Write();
-  outfile->Close();
 
 
-/*
   // THIRD: define alpha:
 
   float alpha = a_exp_sidebandsMC - a_exp_signalMC;
@@ -263,7 +242,7 @@ void fitSidebands( TTree* treeMC, TTree* treeDATA, int leptType ) {
 
   std::cout << std::endl << std::endl;
   std::cout << "-----------------------------------------------" << std::endl;
-  std::cout << "  THIRD STEP: FIT DATA SIDEBANDS (" << btagCategory << " btags)" << std::endl;
+  std::cout << "  THIRD STEP: FIT DATA SIDEBANDS " << std::endl;
   std::cout << "-----------------------------------------------" << std::endl;
   std::cout << std::endl << std::endl;
 
@@ -272,13 +251,14 @@ void fitSidebands( TTree* treeMC, TTree* treeDATA, int leptType ) {
   c1->SetLogy(false);
 
   RooFitResult *r_sidebandsDATA = exp.fitTo(sidebandsDATA);
-  RooFitResult *r_sidebandsDATA2 = landau_exp.fitTo(sidebandsDATA);
-  //RooFitResult *r_sidebandsDATA = exp.fitTo(sidebandsDATA,SumW2Error(kFALSE),InitialHesse(kTRUE),Save());
+  TH1D* h1_expSlope_sidebandsDATA = new TH1D("expSlope_sidebandsDATA", "", 1, 0., 1.);
+  h1_expSlope_sidebandsDATA->SetBinContent(1, a_exp.getVal());
+  h1_expSlope_sidebandsDATA->SetBinError(1, a_exp.getError());
+
 
   // save value/error of parameter:
   float a_exp_sidebandsDATA = a_exp.getVal();
   float a_exp_sidebandsDATA_error = a_exp.getError();
-  ofs << "a_sidebandsDATA: \t" << a_exp_sidebandsDATA << "\t+-" << a_exp.getError() << std::endl;
 
   RooPlot *plot_sidebandsDATA = mWW->frame();
 
@@ -287,19 +267,18 @@ void fitSidebands( TTree* treeMC, TTree* treeDATA, int leptType ) {
 
   a_exp_plusSigma = new RooRealVar("a_exp_plusSigma", "a_exp_plusSigma", a_exp.getVal()+a_exp.getError(), -1., 0.);
   exp_plusSigma = new RooExponential("exp_plusSigma", "exp_plusSigma",*mWW,*a_exp_plusSigma);
-  //exp_plusSigma->plotOn(plot_sidebandsDATA,LineColor(38),LineStyle(2));
+  exp_plusSigma->plotOn(plot_sidebandsDATA,LineColor(38),LineStyle(2));
 
   a_exp_minusSigma = new RooRealVar("a_exp_minusSigma", "a_exp_minusSigma", a_exp.getVal()-a_exp.getError(), -1., 0.);
   exp_minusSigma = new RooExponential("exp_minusSigma", "exp_minusSigma",*mWW,*a_exp_minusSigma);
-  //exp_minusSigma->plotOn(plot_sidebandsDATA,LineColor(38),LineStyle(2));
+  exp_minusSigma->plotOn(plot_sidebandsDATA,LineColor(38),LineStyle(2));
 
-  //exp.plotOn(plot_sidebandsDATA, LineColor(kRed));
-  landau_exp.plotOn(plot_sidebandsDATA, LineColor(kGreen));
+  exp.plotOn(plot_sidebandsDATA, LineColor(kRed));
   sidebandsDATA.plotOn(plot_sidebandsDATA, Binning(nBins));
 
   plot_sidebandsDATA->Draw();
 
-  sprintf( canvasName, "FitSidebands/mWW_sidebandsDATA_%dbtag_%s", btagCategory, leptType.c_str());
+  sprintf( canvasName, "FitSidebands/mWW_sidebandsDATA_%s", leptType_str.c_str());
   canvasName_str = new std::string(canvasName);
   canvasName_eps = *canvasName_str + ".eps";
   c1->SaveAs(canvasName_eps.c_str());
@@ -315,7 +294,7 @@ void fitSidebands( TTree* treeMC, TTree* treeDATA, int leptType ) {
 
   std::cout << std::endl << std::endl;
   std::cout << "-----------------------------------------------" << std::endl;
-  std::cout << "  FOURTH STEP: FIT DATA SIGNAL (" << btagCategory << " btags)" << std::endl;
+  std::cout << "  FOURTH STEP: FIT DATA SIGNAL " << std::endl;
   std::cout << "-----------------------------------------------" << std::endl;
   std::cout << std::endl << std::endl;
 
@@ -326,13 +305,15 @@ void fitSidebands( TTree* treeMC, TTree* treeDATA, int leptType ) {
   RooRealVar a_exp_data("a_exp_data","a_exp_data", -alpha+a_exp_sidebandsDATA, -1., 0.);
   a_exp_data.setConstant(kTRUE);
   RooExponential exp_data("exp_data","exp_data",*mWW,a_exp_data);
+  TH1D* h1_expSlope_signalDATA = new TH1D("expSlope_signalDATA", "", 1, 0., 1.);
+  h1_expSlope_signalDATA->SetBinContent(1, a_exp_data.getVal());
+  h1_expSlope_signalDATA->SetBinError(1, a_exp_data.getError());
 
   float a_exp_data_error = sqrt( a_exp_sidebandsMC_error*a_exp_sidebandsMC_error + 
                                  a_exp_signalMC_error*a_exp_signalMC_error +
                                  a_exp_sidebandsDATA_error*a_exp_sidebandsDATA_error );
 
 
-  ofs << "a_signalDATA: \t" << a_exp_data.getVal() << "\t+-" << a_exp_data_error << std::endl;
 
   RooFitResult *r_signalDATA = exp_data.fitTo(signalDATA);
 
@@ -341,18 +322,18 @@ void fitSidebands( TTree* treeMC, TTree* treeDATA, int leptType ) {
 
   a_exp_plusSigma = new RooRealVar("a_exp_plusSigma", "a_exp_plusSigma", a_exp_data.getVal()+a_exp_data_error, -1., 0.);
   exp_plusSigma = new RooExponential("exp_plusSigma", "exp_plusSigma",*mWW,*a_exp_plusSigma);
-  //exp_plusSigma->plotOn(plot_signalDATA,LineColor(38),LineStyle(2));
+  exp_plusSigma->plotOn(plot_signalDATA,LineColor(38),LineStyle(2));
 
   a_exp_minusSigma = new RooRealVar("a_exp_minusSigma", "a_exp_minusSigma", a_exp_data.getVal()-a_exp_data_error, -1., 0.);
   exp_minusSigma = new RooExponential("exp_minusSigma", "exp_minusSigma",*mWW,*a_exp_minusSigma);
-  //exp_minusSigma->plotOn(plot_signalDATA,LineColor(38),LineStyle(2));
+  exp_minusSigma->plotOn(plot_signalDATA,LineColor(38),LineStyle(2));
 
-  //exp_data.plotOn(plot_signalDATA, LineColor(kRed));
+  exp_data.plotOn(plot_signalDATA, LineColor(kRed));
   signalDATA.plotOn(plot_signalDATA, Binning(nBins));
 
   plot_signalDATA->Draw();
 
-  sprintf( canvasName, "FitSidebands/mWW_signalDATA_%dbtag_%s", btagCategory, leptType.c_str());
+  sprintf( canvasName, "FitSidebands/mWW_signalDATA_%s", leptType_str.c_str());
   canvasName_str = new std::string(canvasName);
   canvasName_eps = *canvasName_str + ".eps";
   c1->SaveAs(canvasName_eps.c_str());
@@ -362,20 +343,47 @@ void fitSidebands( TTree* treeMC, TTree* treeDATA, int leptType ) {
   canvasName_eps = *canvasName_str + ".eps";
   c1->SaveAs(canvasName_eps.c_str());
 
-  std::cout << std::endl << std::endl;
-  std::cout << "++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
-  std::cout << " -- " << btagCategory << " btags" << std::endl;
-  std::cout << " a_exp_sidebandsMC: " << a_exp_sidebandsMC << std::endl;
-  std::cout << " a_exp_signalMC: " << a_exp_signalMC << std::endl;
-  std::cout << " a_exp_sidebandsDATA: " << a_exp_sidebandsDATA << std::endl;
-  std::cout << " Alpha: " << alpha << std::endl;
-  std::cout << " alpha/a_sidebandsDATA: " << alpha/a_exp_sidebandsDATA << std::endl;
-  std::cout << "++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
-  std::cout << std::endl << std::endl;
+  std::string cut_sidebands_weight(cut_sidebands);
+  cut_sidebands_weight = "eventWeight*"+cut_sidebands_weight;
 
-  ofs.close();
+  std::string cut_signal_weight(cut_signal);
+  cut_signal_weight = "eventWeight*"+cut_signal_weight;
 
-*/
+  TH1D* h1_sidebandsMC = new TH1D("sidebandsMC", "", nBins, mWW_min, mWW_max);
+  treeMC->Project("sidebandsMC", "mWW", cut_sidebands_weight.c_str());
+
+  TH1D* h1_sidebandsDATA = new TH1D("sidebandsDATA", "", nBins, mWW_min, mWW_max);
+  treeDATA->Project("sidebandsDATA", "mWW", cut_sidebands_weight.c_str());
+
+  TH1D* h1_signalMC = new TH1D("signalMC", "", nBins, mWW_min, mWW_max);
+  treeMC->Project("signalMC", "mWW", cut_signal_weight.c_str());
+
+  TH1D* h1_signalDATA = new TH1D("signalDATA", "", nBins, mWW_min, mWW_max);
+  treeDATA->Project("signalDATA", "mWW", cut_signal_weight.c_str());
+
+  h1_expSlope_signalMC->Write();
+  h1_expSlope_sidebandsMC->Write();
+  h1_expSlope_signalDATA->Write();
+  h1_expSlope_sidebandsDATA->Write();
+  h1_signalMC->Write();
+  h1_signalDATA->Write();
+  h1_sidebandsMC->Write();
+  h1_sidebandsDATA->Write();
+  outfile->Close();
+
+
+//std::cout << std::endl << std::endl;
+//std::cout << "++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
+//std::cout << " a_exp_sidebandsMC: " << a_exp_sidebandsMC << std::endl;
+//std::cout << " a_exp_signalMC: " << a_exp_signalMC << std::endl;
+//std::cout << " a_exp_sidebandsDATA: " << a_exp_sidebandsDATA << std::endl;
+//std::cout << " Alpha: " << alpha << std::endl;
+//std::cout << " alpha/a_sidebandsDATA: " << alpha/a_exp_sidebandsDATA << std::endl;
+//std::cout << "++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
+//std::cout << std::endl << std::endl;
+
+
+
 
   delete eventWeight;
   delete mWW;
