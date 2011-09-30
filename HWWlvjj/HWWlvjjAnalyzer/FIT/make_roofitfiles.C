@@ -34,10 +34,21 @@ using namespace std;
 using namespace RooFit;
 
 
+struct CrystalBallParams {
+  float mean;
+  float sigma;
+  float alpha1;
+  float alpha2;
+  float n1;
+  float n2;
+};
+
 //inputs: btag category, observed bkg yield (-> expected one for MC limit calc)
 //        mass of Higgs, sigma of Higgs, 4 parameters of CB (depend on mass)
 
 void make_roofitfiles(int chan, double massH, double sigmaH, double &obs_yield, double &exp_yield, vector<double> cb_pars){
+
+
 
   gSystem->Load("libRooFit");
   cout<<"Trying to load custom PDFS ..."<<flush<<endl;
@@ -59,16 +70,16 @@ void make_roofitfiles(int chan, double massH, double sigmaH, double &obs_yield, 
   /*if(massH-10*effWidth<230.0)  fitRangeLow=230.0;
   else fitRangeLow=massH-10*effWidth;
 
-  if(massH+10*effWidth>800.0)  fitRangeHigh=800.;
+  if(massH+10*effWidth>840.0)  fitRangeHigh=840.;
   else fitRangeHigh=massH+10*effWidth;
   cout<<"----- FIT RANGE : "<<fitRangeLow<<" - "<< fitRangeHigh<<endl;*/
   /////////////////////////////////////////////////////////////////////
 
   //////////////////////////eps functions /////////////////////////////
-  if(massH-10*effWidth<183.0)  fitRangeLow=183.0;
+  if(massH-10*effWidth<240.0)  fitRangeLow=240.0;
   else fitRangeLow=massH-10*effWidth;
 
-  if(massH+10*effWidth>800.0)  fitRangeHigh=800.;
+  if(massH+10*effWidth>840.0)  fitRangeHigh=840.;
   else fitRangeHigh=massH+10*effWidth;
 
   cout<<"----- FIT RANGE : "<<fitRangeLow<<" - "<< fitRangeHigh<<endl;
@@ -119,7 +130,7 @@ void make_roofitfiles(int chan, double massH, double sigmaH, double &obs_yield, 
     BKGparam.push_back(646.467);   //alpha
   }
   // ------------------------ fermi ------------------------------
-  RooRealVar cutOff("cutOff","position of fermi",BKGparam.at(0),0,1000);
+  RooRealVar cutOff("cutOff","position of fermi",BKGparam.at(0),0,840);
   cutOff.setConstant(kTRUE);
   RooRealVar beta("beta","width of fermi",BKGparam.at(1),0,50);
   beta.setConstant(kTRUE);
@@ -129,11 +140,11 @@ void make_roofitfiles(int chan, double massH, double sigmaH, double &obs_yield, 
   string bkgp1name="CMS_hww2l2q_bkg"+str_btag+"p1";
   string bkgp2name="CMS_hww2l2q_bkg"+str_btag+"p2";
   string bkgp3name="CMS_hww2l2q_bkg"+str_btag+"p3";
-  RooRealVar m(bkgp1name.c_str(),bkgp1name.c_str(),BKGparam.at(2),200,1000);
+  RooRealVar m(bkgp1name.c_str(),bkgp1name.c_str(),BKGparam.at(2),200,840);
   m.setConstant(kTRUE);
-  RooRealVar wdth(bkgp2name.c_str(),bkgp2name.c_str(),BKGparam.at(3),0,1000);
+  RooRealVar wdth(bkgp2name.c_str(),bkgp2name.c_str(),BKGparam.at(3),0,840);
   wdth.setConstant(kTRUE);
-  RooRealVar alpha(bkgp3name.c_str(),bkgp3name.c_str(),BKGparam.at(4),200,1000); 
+  RooRealVar alpha(bkgp3name.c_str(),bkgp3name.c_str(),BKGparam.at(4),200,840); 
   alpha.setConstant(kTRUE);
 
   RooRodenbach Rod("Rod","Rod",CMS_hwwlvqq_mWW,m,wdth,alpha);
@@ -169,7 +180,7 @@ void make_roofitfiles(int chan, double massH, double sigmaH, double &obs_yield, 
     BKGparam.push_back(166.6);   //CB_mean                                       
     BKGparam.push_back(94.7425);  //CB_wdth   --- uncorrelated     
     BKGparam.push_back(6.5670);  //CB_n                                                                                           
-    BKGparam.push_back(.26330 );  //CB_alpha   --- uncorrelated  
+    BKGparam.push_back(.26330 )varB_alpha   --- uncorrelated  
     BKGparam.push_back(.0183  );  //theta                                         
     }
   if(btag==2){
@@ -184,7 +195,7 @@ void make_roofitfiles(int chan, double massH, double sigmaH, double &obs_yield, 
   */
 
   // -------------------- fermi ---------------------------
-  RooRealVar cutOff_BKG("cutOff_BKG","position of fermi",BKGparam.at(0),0,1000);
+  RooRealVar cutOff_BKG("cutOff_BKG","position of fermi",BKGparam.at(0),0,840);
   cutOff_BKG.setConstant(kTRUE);
   RooRealVar beta_BKG("beta_BKG","width of fermi",BKGparam.at(1),0,50);
   beta_BKG.setConstant(kTRUE);
@@ -192,11 +203,11 @@ void make_roofitfiles(int chan, double massH, double sigmaH, double &obs_yield, 
   RooFermi fermi_BKG("fermi_BKG","fermi function",CMS_hwwlvqq_mWW,cutOff_BKG,beta_BKG);
  // -------------------- double gauss ---------------------------
   //par0 will be the overall bkgd normalization, used in the datacard
-  string bkgp1name="CMS_hwwlvqq_bkg_p1"; //m
-  string bkgp2name="CMS_hwwlvqq_bkg_p2"; //width
-  string bkgp3name="CMS_hwwlvqq_bkg_p3"; //n
-  string bkgp4name="CMS_hwwlvqq_bkg_p4"; //alpha
-  string bkgp5name="CMS_hwwlvqq_bkg_p5"; //theta (rotation)
+  string bkgp1name="CMS_hwwlvqq_bkg_p1_OLD"; //m
+  string bkgp2name="CMS_hwwlvqq_bkg_p2_OLD"; //width
+  string bkgp3name="CMS_hwwlvqq_bkg_p3_OLD"; //n
+  string bkgp4name="CMS_hwwlvqq_bkg_p4_OLD"; //alpha
+  string bkgp5name="CMS_hwwlvqq_bkg_p5_OLD"; //theta (rotation)
 
   RooRealVar m(bkgp1name.c_str(),bkgp1name.c_str(),BKGparam.at(2),100.,1000.);
   m.setConstant(kTRUE);
@@ -210,8 +221,31 @@ void make_roofitfiles(int chan, double massH, double sigmaH, double &obs_yield, 
   theta.setConstant(kTRUE);
 
   RooCB CB_BKG("CB_BKG","Crystal ball",CMS_hwwlvqq_mWW,m,wdth,alpha,n, theta);
-  RooProdPdf background("background","background",RooArgSet(fermi_BKG,CB_BKG));
+
+
+
+  char backgroundFileName[300];
+  sprintf(backgroundFileName, "BackgroundFile_DATA_%s.root", str_chan.c_str());
+  TFile* backgroundFile = TFile::Open(backgroundFileName);
+  TH1D* h1_sidebandsDATA_alpha = (TH1D*)backgroundFile->Get("sidebandsDATA_alpha");
+  double EvtNorm = h1_sidebandsDATA_alpha->Integral(1, h1_sidebandsDATA_alpha->GetXaxis()->GetNbins()); 
+
+
+  TH1D* h1_expSlope = (TH1D*)backgroundFile->Get("expSlope_DATA");
+  double expSlope = h1_expSlope->GetBinContent(1);
+
+
+  // --------- EXPONENTIAL ------------------------------------
+
+
+  char varName_expSlope[400];
+  sprintf( varName_expSlope, "CMS_hwwlvqq_bkg%sp1", str_chan.c_str());
+  RooRealVar a_exp(varName_expSlope, varName_expSlope,expSlope, -2., 1.);
+  RooExponential exp("exp","exp",CMS_hwwlvqq_mWW,a_exp);
   
+  RooProdPdf background("background","background",RooArgSet(exp));
+  //RooProdPdf background("background","background",RooArgSet(fermi_BKG,CB_BKG));
+
   ///////////////////////////////////////////////////////////////////////////////////
 
   ////Fill dataset with REAL DATA 
@@ -220,7 +254,7 @@ void make_roofitfiles(int chan, double massH, double sigmaH, double &obs_yield, 
   RooRealVar mJJ("mJJ","mJJ",0,160.);
   RooRealVar leptType("leptType","lepton type",-1,2);
 
-  string lept_sel= chan==0 ? "leptType==0" :"leptType==1" ;//opposite convention btw Francesco and me
+  string lept_sel= chan==0 ? "leptType==0" :"leptType==1" ;
   string tree_sel= "mJJ>60.0 && mJJ<100.0 && "+lept_sel;
   stringstream ossmww1;
   ossmww1 << float(fitRangeLow);
@@ -259,30 +293,47 @@ void make_roofitfiles(int chan, double massH, double sigmaH, double &obs_yield, 
 
   // ====================== defining signal PDF =========================
 
-  vector<double> param;
-    param.push_back(70.6146-.697703*massH+0.00212559*massH*massH-0.00000180624*massH*massH*massH);
-    param.push_back(-5.967+0.05885*massH-0.00006977*massH*massH);
-    param.push_back(1.0);
-    param.push_back(3.38183-0.00421732*massH);
-    param.push_back(1.0);
-    param.push_back(-1.37066+0.0190719*massH-0.0000250673*massH*massH);
+  char signalParamFile[600];
+  sprintf( signalParamFile, "HWWlvjj_signal_%.0fGeV_parameters.txt", massH );
 
-    for(int i=0; i<param.size(); i++){
-    cout << "param[" << i << "]: " << param.at(i) << endl;
+  ifstream ifs_signal(signalParamFile, ifstream::in);
+  std::string varName;
+  float var, varErr;
+  CrystalBallParams cbParams;
+  
+  while( ifs_signal.good() ) {
+
+    ifs_signal >> varName >> var >> varErr;
+    if( varName=="CB_mean") cbParams.mean = var;
+    if( varName=="CB_sigma") cbParams.sigma = var;
+    if( varName=="CB_alpha1") cbParams.alpha1 = var;
+    if( varName=="CB_alpha2") cbParams.alpha2 = var;
+    if( varName=="CB_n1") cbParams.n1 = var;
+    if( varName=="CB_n2") cbParams.n2 = var;
+
   }
+
+//vector<double> param;
+//  param.push_back(70.6146-.697703*massH+0.00212559*massH*massH-0.00000180624*massH*massH*massH);
+//  param.push_back(-5.967+0.05885*massH-0.00006977*massH*massH);
+//  param.push_back(1.0);
+//  param.push_back(3.38183-0.00421732*massH);
+//  param.push_back(1.0);
+//  param.push_back(-1.37066+0.0190719*massH-0.0000250673*massH*massH);
+
 
   // -------------------- fermi ------------------------
   
-  RooRealVar cutOff_SIG("cutOff_SIG","cutOff",190-32.5+65*massH/400,0,1000); 
+  RooRealVar cutOff_SIG("cutOff_SIG","cutOff",190.-32.5+65.*massH/400.,0.,1000.); 
   cutOff_SIG.setConstant(kTRUE);  
-  RooRealVar g_SIG("g_SIG","g",5-12.5+25*massH/400,0,100); 
+  RooRealVar g_SIG("g_SIG","g",5.-12.5+25.*massH/400.,0.,100.); 
   g_SIG.setConstant(kTRUE);
 
   RooFermi fermi_SIG("fermi_SIG","fermi",CMS_hwwlvqq_mWW,cutOff_SIG,g_SIG);
 
   // ------------------- fermi for high mass cutoff --------------
 
-  RooRealVar cutOff2_SIG("cutOff2_SIG","cutOff2",700,0,1000);
+  RooRealVar cutOff2_SIG("cutOff2_SIG","cutOff2",700.,0.,1000.);
   cutOff2_SIG.setConstant(kTRUE);
   RooRealVar g2_SIG("g2_SIG","g2",-70.0,-100.0,0.0);
   g2_SIG.setConstant(kTRUE);
@@ -304,17 +355,17 @@ void make_roofitfiles(int chan, double massH, double sigmaH, double &obs_yield, 
   // ------------------- Crystal Ball -------------------------------
   string sigp1name="CMS_hwwlvqq_sig_p1"; //m
   string sigp2name="CMS_hwwlvqq_sig_p2"; //width
-   RooRealVar CB_mean(sigp1name.c_str(),sigp1name.c_str(),param[0],0.,100.);
+   RooRealVar CB_mean(sigp1name.c_str(),sigp1name.c_str(),cbParams.mean,0.,100.);
   CB_mean.setConstant(kTRUE);
-  RooRealVar CB_sigma(sigp2name.c_str(),sigp2name.c_str(),param[1],0.,100.);
+  RooRealVar CB_sigma(sigp2name.c_str(),sigp2name.c_str(),cbParams.sigma,0.,100.);
   CB_sigma.setConstant(kTRUE);
-  RooRealVar CB_alpha1("CB_alpha1","param 3 of CB",param[2],0.,100.);
+  RooRealVar CB_alpha1("CB_alpha1","param 3 of CB",cbParams.alpha1,0.,100.);
   CB_alpha1.setConstant(kTRUE);
-  RooRealVar CB_n1("CB_n1","param 4 of CB",param[3],0.,100.);
+  RooRealVar CB_n1("CB_n1","param 4 of CB",cbParams.n1,0.,100.);
   CB_n1.setConstant(kTRUE);
-  RooRealVar CB_alpha2("CB_alpha2","param 3 of CB",param[4],0.,100.);
+  RooRealVar CB_alpha2("CB_alpha2","param 3 of CB",cbParams.alpha2,0.,100.);
   CB_alpha2.setConstant(kTRUE);
-  RooRealVar CB_n2("CB_n2","param 4 of CB",param[5],0.,100.);
+  RooRealVar CB_n2("CB_n2","param 4 of CB",cbParams.n2,0.,100.);
   CB_n2.setConstant(kTRUE);
 
   RooDoubleCB CB_SIG("CB_SIG","Crystal Ball",CMS_hwwlvqq_mWW,CB_mean,CB_sigma,CB_alpha1,CB_n1,CB_alpha2,CB_n2);
@@ -365,36 +416,24 @@ void make_roofitfiles(int chan, double massH, double sigmaH, double &obs_yield, 
 
   //calculate expected bkg events
   //eps functions ////////////////////////////
-  RooRealVar CMS_hwwlvqq_mWWfull("CMS_hwwlvqq_mWWfull", "ww inv mass",183.0 ,800.0);
+  RooRealVar CMS_hwwlvqq_mWWfull("CMS_hwwlvqq_mWWfull", "ww inv mass",240.0 ,840.0);
   //expo functions
-  //RooRealVar CMS_hwwlvqq_mWWfull("CMS_hwwlvqq_mWWfull", "ww inv mass",230.0 ,800.0);
+  //RooRealVar CMS_hwwlvqq_mWWfull("CMS_hwwlvqq_mWWfull", "ww inv mass",230.0 ,840.0);
 
   //expo////////////////////////////////////////////////////////////
   //RooExponential backgroundFull("backgroundFull","Exponential background over Full range",CMS_hwwlvqq_mWWfull,slope);
   
-  //eps ////////////////////////////////////////////////////////////////////////////////////////
-  RooGenericPdf fermiFull("fermiFull","fermi function","1/(1+exp((@1-@0)/@2))",RooArgList(CMS_hwwlvqq_mWWfull,cutOff_BKG,beta_BKG));
-  RooCB CBbkgFull("CBbkgFull","Crystal ball for background",CMS_hwwlvqq_mWWfull,m,wdth,alpha,n, theta);
-  RooProdPdf backgroundFull("backgroundFull","backgroundFull",RooArgSet(fermiFull,CBbkgFull));
 
-  //new shape andrew////////////////////////////////////////////////////////////////////////////////
-  /*RooRodenbach RodFull("RodFull","Rod",CMS_hwwlvqq_mWWfull,m,wdth,alpha);
-  RooGenericPdf fermiFull("fermiFull","fermi function","1/(1+exp((@1-@0)/@2))",RooArgList(CMS_hwwlvqq_mWWfull,cutOff,beta));
-  RooProdPdf backgroundFull("backgroundFull","backgroundFull",RooArgSet(fermiFull,RodFull));
-  */
-  //first muon then electrons ///for expo /////////////////////////////////
-  
-  /*EvtNorm.push_back(chan==1? 228.10 : 200.12 );  // 0btag 
-  EvtNorm.push_back(chan==1? 230.80 : 195.80 );  // 1btag 
-  EvtNorm.push_back(chan==1?  16.82 :  13.79 );  // 2btag
-  */
-  //for eps///////////////////////////
-  /*EvtNorm.push_back(chan==1? 345.7 : 286.4 );  // 0btag 
-  EvtNorm.push_back(chan==1? 376.4 : 334.7 );  // 1btag 
-  EvtNorm.push_back(chan==1? 24.3 : 20.3 );  // 2btag*/
+  // -------------------- exponential ---------------------------
+  RooRealVar a_expFull("a_expFull","a_exp",expSlope, -2., 1.);
+  RooExponential expFull("expFull","expFull",CMS_hwwlvqq_mWWfull,a_expFull);
 
-  //for LP
-  double EvtNorm = (chan==1) ? 575.85 : 490.54;  // 0btag //changeeeeee
+
+  //RooGenericPdf fermiFull("fermiFull","fermi function","1/(1+exp((@1-@0)/@2))",RooArgList(CMS_hwwlvqq_mWWfull,cutOff_BKG,beta_BKG));
+  //RooCB CBbkgFull("CBbkgFull","Crystal ball for background",CMS_hwwlvqq_mWWfull,m,wdth,alpha,n, theta);
+  //RooProdPdf backgroundFull("backgroundFull","backgroundFull",RooArgSet(fermiFull,CBbkgFull));
+  RooProdPdf backgroundFull("backgroundFull","backgroundFull",RooArgSet(expFull));
+
 
   string mwwcut2="CMS_hwwlvqq_mWWfull>"+ossmww1.str(); 
   mwwcut2+="&&CMS_hwwlvqq_mWWfull<"+ossmww2.str();
