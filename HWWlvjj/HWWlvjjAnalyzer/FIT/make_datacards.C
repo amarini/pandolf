@@ -18,8 +18,8 @@
 
 const int nprod=2; //VBF and gg
 const int nchan=2;//2e2j and 2m2j
-const float lumiee=1.556; //fb^-1, NEW!
-const float lumimm=1.615; //fb^-1, NEW!
+const float lumiee=1.0; //fb^-1, NEW!
+const float lumimm=1.0; //fb^-1, NEW!
 const int nmass=6;
 const bool isSM4=false; // if true add .15 to CSgg and CSvbf errors 
 const float mass[nmass]={300., 350., 400., 450., 500., 550.};
@@ -65,6 +65,7 @@ string make_theorgammaunc(float mymass);
 string make_btagunc(float mymass, int ich); 
 string make_JESunc(float mymass);
 string make_backgrNormErrLine(const std::string& dataDataset,double expyields, int ich); 
+string make_backgrSlopeParameterLine(int ich); 
 string make_obsstring();
 string make_obsstring(int obs);
 vector<float> eff_fit(const std::string& dataDataset, int chan);
@@ -176,6 +177,7 @@ int make_datacards(const std::string& dataDataset){
 	string expRateLine=make_ratestring(mH,myxsect,ich,expyields);
 	string obsLine=make_obsstring(int(obsyields));
 	string backgrNormErrLine = make_backgrNormErrLine(dataDataset, expyields,ich);
+	string backgrSlopeParameterLine = make_backgrSlopeParameterLine(ich);
 
 	string datacard_name=outDir+ossDir.str()+"/hwwlvqq_"+str_id+"."+mass_str.str() +".txt";
 	ofstream datacard_new(datacard_name.c_str(),ios::out);
@@ -190,18 +192,9 @@ int make_datacards(const std::string& dataDataset){
 	string str_pdftheorggHtag("<dummypdfggH>");
 	string str_pdftheorVBFtag("<dummypdfqqH>");
 	string str_bakcgrNorm("<dummybnorm>");
-	string str_bckgShape_0b_1("CMS_hwwlvqq_bkg0bp1");
-	string str_bckgShape_0b_2("CMS_hwwlvqq_bkg0bp2");
-	string str_bckgShape_0b_3("CMS_hwwlvqq_bkg0bp3");
-	string str_bckgShape_0b_4("CMS_hwwlvqq_bkg0bp4");
-	string str_bckgShape_1b_1("CMS_hwwlvqq_bkg1bp1");
-	string str_bckgShape_1b_2("CMS_hwwlvqq_bkg1bp2");
-	string str_bckgShape_1b_3("CMS_hwwlvqq_bkg1bp3");
-	string str_bckgShape_1b_4("CMS_hwwlvqq_bkg1bp4");
-	string str_bckgShape_2b_1("CMS_hwwlvqq_bkg2bp1");
-	string str_bckgShape_2b_2("CMS_hwwlvqq_bkg2bp2");
-	string str_bckgShape_2b_3("CMS_hwwlvqq_bkg2bp3");
-	string str_bckgShape_2b_4("CMS_hwwlvqq_bkg2bp4");
+      char bkgp1_name[100];
+      sprintf( bkgp1_name, "CMS_hwwlvqq_bkg%sp1", str_id.c_str() );
+	string str_bckgShape_1(bkgp1_name);
 	bool found=false;
 	while(tpl_file.good()){
 	  getline (tpl_file,tpl_line);
@@ -215,18 +208,7 @@ int make_datacards(const std::string& dataDataset){
 	  size_t pospdfggH_found=tpl_line.find(str_pdftheorggHtag);
 	  size_t pospdfVBF_found=tpl_line.find(str_pdftheorVBFtag);
 	  size_t posbnorm_found=tpl_line.find(str_bakcgrNorm);
-	  size_t pos_bckgShape_0b_1_found=tpl_line.find(str_bckgShape_0b_1);
-	  size_t pos_bckgShape_0b_2_found=tpl_line.find(str_bckgShape_0b_2);
-	  size_t pos_bckgShape_0b_3_found=tpl_line.find(str_bckgShape_0b_3);
-	  size_t pos_bckgShape_0b_4_found=tpl_line.find(str_bckgShape_0b_4);
-	  size_t pos_bckgShape_1b_1_found=tpl_line.find(str_bckgShape_1b_1);
-	  size_t pos_bckgShape_1b_2_found=tpl_line.find(str_bckgShape_1b_2);
-	  size_t pos_bckgShape_1b_3_found=tpl_line.find(str_bckgShape_1b_3);
-	  size_t pos_bckgShape_1b_4_found=tpl_line.find(str_bckgShape_1b_4);
-	  size_t pos_bckgShape_2b_1_found=tpl_line.find(str_bckgShape_2b_1);
-	  size_t pos_bckgShape_2b_2_found=tpl_line.find(str_bckgShape_2b_2);
-	  size_t pos_bckgShape_2b_3_found=tpl_line.find(str_bckgShape_2b_3);
-	  size_t pos_bckgShape_2b_4_found=tpl_line.find(str_bckgShape_2b_4);
+	  size_t pos_bckgShape_1_found=tpl_line.find(str_bckgShape_1);
 	  if(posrate_found!=string::npos){
 	    //	 cout<<tpl_line.c_str()<<endl;
 	    found=true;
@@ -255,6 +237,9 @@ int make_datacards(const std::string& dataDataset){
 	  }
 	   else if(posbnorm_found!=string::npos){
 	    datacard_new<<backgrNormErrLine<<endl;
+	   }
+	   else if(pos_bckgShape_1_found!=string::npos){
+	    datacard_new<<backgrSlopeParameterLine<<endl;
 	   }
 	  /*else if(pos_bckgShape_0b_1_found!=string::npos  || pos_bckgShape_0b_2_found!=string::npos ||
 		  pos_bckgShape_0b_3_found!=string::npos  || pos_bckgShape_0b_4_found!=string::npos ||
@@ -331,7 +316,7 @@ float get_signalYield( int ichannel, float imass ) {
   }
 
   std::cout << "Didn't find mass: " << imass << "!!!! Using Gamma=0!!" << std::endl;
-  extract_exp_sig_yields(ichannel, imass,0.); 
+  return extract_exp_sig_yields(ichannel, imass,0.); 
 
 }
 
@@ -731,9 +716,23 @@ string make_JESunc(float mymass){
   return jes_str;
 }
 
-string make_backgrNormErrLine(const std::string& daataDataset,double expyields, int ich){
+string make_backgrSlopeParameterLine(int ich){
 
-  std::string fileName = "HWWlvjj_"+daataDataset+"_helicity_ALL.root";
+  std::string leptType_str = (ich==0) ? "mu" : "ele";
+  std::string backgroundFileName = "BackgroundFile_DATA_"+leptType_str+".root";
+  TFile* backgroundFile = TFile::Open(backgroundFileName.c_str());
+  TH1D* h1_slope = (TH1D*)backgroundFile->Get("expSlope_DATA");
+  float slope = h1_slope->GetBinContent(1);
+  float slopeErr = h1_slope->GetBinError(1);
+  char line[600];
+  sprintf( line, "CMS_hwwlvqq_bkg%sp1   param   %f   %f", leptType_str.c_str(), slope, slopeErr);
+  std::string line_str(line);
+  return line_str;
+}
+
+string make_backgrNormErrLine(const std::string& dataDataset,double expyields, int ich){
+
+  std::string fileName = "HWWlvjj_"+dataDataset+"_helicity_ALL.root";
   TFile* file_data = TFile::Open(fileName.c_str());
   TTree* tree = (TTree*)file_data->Get("Tree_FITUL");
   char selection[400];
@@ -835,15 +834,15 @@ vector<float> eff_fit(const std::string& dataDataset, int chan){
 
 
 vector<double> calculate_CBpars(double mH){
-  vector<double>outpars;
-  double CB_mean,CB_sigma,CB_alpha,CB_n,poly0, poly1;
 
-    CB_mean = -2.92969 + 0.0444168*mH;
-    CB_sigma = -1.17027 + .0394395*mH;
-    CB_alpha = 1.6114;
-    CB_n = .618079 + .000493633*mH;
-    poly0 = -2.08918 - .158074*mH + .000334758*mH*mH;
-    poly1 = 0.11238;
+  vector<double>outpars;
+
+  double CB_mean = -2.92969 + 0.0444168*mH;
+  double CB_sigma = -1.17027 + .0394395*mH;
+  double CB_alpha = 1.6114;
+  double CB_n = .618079 + .000493633*mH;
+  double poly0 = -2.08918 - .158074*mH + .000334758*mH*mH;
+  double poly1 = 0.11238;
 
   outpars.push_back(CB_mean);
   outpars.push_back(CB_sigma);
