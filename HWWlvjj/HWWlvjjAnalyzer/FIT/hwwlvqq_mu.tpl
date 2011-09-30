@@ -31,12 +31,5 @@ CMS_scale_j	<dummyJES>
 CMS_eff_b 	<dummybeff>
 CMS_hwwlvqq_pu	lnN		1.02	        1.02		1.0			      	
 CMS_hwwlvqq_qgsep   lnN	1.046            1.046          1.0
-#CMS_hwwlvqq_sigp0
-#...                                                  <developing...>
-#CMS_hwwlvqq_sigp5
 CMS_hwwlvqq_bkgmup0   <dummybnorm>
-#CMS_hwwlvqq_bkgp1        param  222.72  ---
-CMS_hwwlvqq_bkgp2         param -0.116428   0.0453989
-#CMS_hwwlvqq_bkgp3      param   13.3992   ----
-CMS_hwwlvqq_bkgp4         param 54.7039  6.792
-
+CMS_hwwlvqq_bkgmup1   -13.
