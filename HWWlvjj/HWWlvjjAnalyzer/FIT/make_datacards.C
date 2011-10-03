@@ -20,9 +20,9 @@ const int nprod=2; //VBF and gg
 const int nchan=2;//2e2j and 2m2j
 const float lumiee=1.0; //fb^-1, NEW!
 const float lumimm=1.0; //fb^-1, NEW!
-const int nmass=6;
+const int nmass=15;
 const bool isSM4=false; // if true add .15 to CSgg and CSvbf errors 
-const float mass[nmass]={300., 350., 400., 450., 500., 550.};
+const float mass[nmass]={300., 325., 350., 375., 400., 420., 440., 460., 480., 500., 520., 540., 560., 580., 600.};
 
 
 //float exp_sig_yields[nchan][nmass];
@@ -37,8 +37,6 @@ const float mass[nmass]={300., 350., 400., 450., 500., 550.};
 //};
 
 const int maxNbkg=1;//for every btag, there are MAX==2 different types of bkg (only one for btag0 and 1, ttbar +all the rest for btag2)
-float obs_bkg[nchan]={//from real data
-  307, 359}; //changeeeeee
 
 
 float exp_bkg[nchan];
