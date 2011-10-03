@@ -18,7 +18,7 @@ void convert_FP_tree(){
  double mWWOUT, mJJOUT,eventWeightOUT;
  TFile *fout=new TFile("./convertedTree_PROVA.root","RECREATE");
  TTree *tout=new TTree("Tree_FITUL","Converted from FP");
- tout->Branch("CMS_hwwlvqq_WW",&mWWOUT,"CMS_wwlvqq_WW/D");
+ tout->Branch("CMS_hwwlvqq_mWW",&mWWOUT,"CMS_hwwlvqq_mWW/D");
  tout->Branch("mJJ",&mJJOUT,"mJJ/D");
  tout->Branch("leptType",&leptTypeOUT,"leptType/D");
  tout->Branch("eventWeight",&eventWeightOUT,"eventWeight/D");
