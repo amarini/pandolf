@@ -174,10 +174,16 @@ void FitUL(int leptType){
   myc1->SaveAs("peak_side_log2.eps");
 
 
+  float mWW_min = 240.;
+  float mWW_max = 800.;
+  float binWidth = 20.;
+  int nBins = (int)(mWW_max-mWW_min)/binWidth;
+
+
   char sidebandsCut[300];
-  sprintf( sidebandsCut, "(mJJ>40. && mJJ<60.)||(mJJ>100.&&mJJ<160.) && leptType==%d", leptType);
+  sprintf( sidebandsCut, "mWW>%f && ((mJJ>40. && mJJ<60.)||(mJJ>100.&&mJJ<160.)) && leptType==%d", mWW_min, leptType);
   char signalCut[300];
-  sprintf( signalCut, "mJJ>60. && mJJ<100. && leptType==%d", leptType);
+  sprintf( signalCut, "mWW>%f && mJJ>60. && mJJ<100. && leptType==%d", mWW_min, leptType);
 
 
   std::cout << "Correcting MC: " << std::endl;
@@ -190,10 +196,6 @@ TFile* fileprova = TFile::Open("PROVA.root", "recreate");
 tree_sidebandsMC_alpha->Write();
 fileprova->Close();
 
-  float mWW_min = 240.;
-  float mWW_max = 800.;
-  float binWidth = 20.;
-  int nBins = (int)(mWW_max-mWW_min)/binWidth;
 
   RooRealVar* eventWeight = new RooRealVar("eventWeight", "event weight", 0., 2., "");
   RooRealVar* eventWeight_alpha = new RooRealVar("eventWeight_alpha", "alpha corrected weight", 0., 2., "");
@@ -224,6 +226,10 @@ fileprova->Close();
   tree_signalDATA->SetName("tree_signalDATA");
   TTree* tree_sidebandsDATA = chDATA.CopyTree(sidebandsCut);
   tree_sidebandsDATA->SetName("tree_sidebandsDATA");
+
+  std::cout << "+++                          " << tree_signalDATA->GetEntries() << std::endl;
+  std::cout << "+++                          " << tree_sidebandsDATA->GetEntries() << std::endl;
+
   //TTree* tree_sidebandsDATA_alpha = correctTreeWithAlpha( tree_sidebandsDATA , myfit, "tree_sidebandsDATA_alpha");
 
 //std::cout << tree_sidebandsDATA_alpha->GetEntries() << std::endl;
@@ -241,7 +247,8 @@ fileprova->Close();
 std::cout << "AAJAJAJAJA" << std::endl;
   //tree_sidebandsDATA_alpha->Project("sidebandsDATA_alpha", "mWW", "eventWeight_alpha");
   tree_sidebandsDATA->Project("sidebandsDATA_alpha", "mWW", "eventWeight");
-std::cout << "ajajajaj" << std::endl;
+std::cout << "h1_signalDATA->GetEntries(): " << h1_signalDATA->GetEntries() << std::endl;
+std::cout << "h1_sidebandsDATA_alpha->GetEntries(): " << h1_sidebandsDATA_alpha->GetEntries() << std::endl;
 
   float integral_ratio = h1_signalDATA->Integral()/h1_sidebandsDATA_alpha->Integral();
   h1_sidebandsDATA_alpha->Scale(integral_ratio);
@@ -250,7 +257,7 @@ std::cout << "ajajajaj" << std::endl;
   //RooDataSet sidebandsDATA_alpha("sidebandsDATA_alpha","sidebandsDATA_alpha",tree_sidebandsDATA_alpha,RooArgSet(*mWW,*mJJ),"");
   //RooDataSet sidebandsDATA_alpha("sidebandsDATA_alpha","sidebandsDATA_alpha",RooArgSet(*eventWeight_alpha,*mWW,*mJJ),Import(*tree_sidebandsDATA_alpha),WeightVar("eventWeight_alpha"));
 
-  RooDataSet sidebandsDATA_alpha("sidebandsDATA_alpha","sidebandsDATA_alpha",RooArgSet(*eventWeight_alpha,*mWW,*mJJ),Import(*tree_sidebandsDATA),WeightVar("eventWeight_alpha"));
+  RooDataSet sidebandsDATA_alpha("sidebandsDATA_alpha","sidebandsDATA_alpha",RooArgSet(*eventWeight_alpha,*mWW,*mJJ),Import(*tree_sidebandsDATA),WeightVar("eventWeight"));
   //RooDataSet sidebandsDATA_alpha("sidebandsDATA_alpha","sidebandsDATA_alpha",RooArgSet(*eventWeight_alpha,*mWW,*mJJ),Import(*tree_sidebandsDATA_alpha),WeightVar("eventWeight_alpha"));
   //RooDataSet sidebandsDATA("sidebandsDATA","sidebandsDATA",tree_sidebandsDATA,RooArgSet(*eventWeight,*mWW,*mJJ),"","eventWeight");
   RooDataSet signalDATA("signalDATA","signalDATA",RooArgSet(*eventWeight,*mWW,*mJJ),Import(*tree_signalDATA),WeightVar("eventWeight"));
