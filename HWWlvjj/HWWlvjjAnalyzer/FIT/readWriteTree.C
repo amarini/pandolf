@@ -21,15 +21,18 @@ void readWriteTree(string fileName, string treeName){
   float wght;
   bool isSidebands;
   int isSB;
+  int leptType;
 
   t->SetBranchAddress("mWW",&mWW);
   t->SetBranchAddress("mJJ",&mJJ);
   t->SetBranchAddress("eventWeight",&wght);
+  t->SetBranchAddress("leptType",&leptType);
   
   string tempFile = "NEW_"+fileName;
   TFile *outFile  = new TFile(tempFile.c_str(),"RECREATE");
   TTree* selectedEvents = new TTree("selectedEvents","selectedEvents");
 
+  selectedEvents->Branch("leptType",&leptType);
   selectedEvents->Branch("mWW",&mWW);
   selectedEvents->Branch("mJJ",&mJJ);
   selectedEvents->Branch("isSB",&isSB);

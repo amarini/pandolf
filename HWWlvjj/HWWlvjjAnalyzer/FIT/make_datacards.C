@@ -20,9 +20,10 @@ const int nprod=2; //VBF and gg
 const int nchan=2;//2e2j and 2m2j
 const float lumiee=1.0; //fb^-1, NEW!
 const float lumimm=1.0; //fb^-1, NEW!
-const int nmass=15;
+const int nmass=6;
 const bool isSM4=false; // if true add .15 to CSgg and CSvbf errors 
-const float mass[nmass]={300., 325., 350., 375., 400., 420., 440., 460., 480., 500., 520., 540., 560., 580., 600.};
+//const float mass[nmass]={300., 325., 350., 375., 400., 420., 440., 460., 480., 500., 520., 540., 560., 580., 600.};
+const float mass[nmass]={300., 350., 400., 450., 500., 550.};
 
 
 //float exp_sig_yields[nchan][nmass];
@@ -593,68 +594,17 @@ string make_obsstring(int obs){
 }
 
 string make_btagunc(float mymass,int ich){
-return string("");
-}
 
-/*
+
   string b_str="CMS_eff_b	lnN";
   float p0=0.0, p1=0.0;
   float m0=0.0, m1=0.0;
   float errp=999.0, errm=-9999.0;
-  if(ich==0){ //electrons
-    if(ibtag==0){
-      p0=0.983256647923;
-      p1=-0.0000883532570978;
-      m0=1.02907356239;
-      m1=0.0000713061639147;
-    }
-    else if(ibtag==1){
-      p0=1.04446110956;
-      p1=-0.0000195508160829;
-      m0=0.940063743731;
-      m1=0.0000737044467898;
-    }
-    else if(ibtag==2){
-      p0=1.13365470372;
-      p1=0.00000584572717646;
-      m0=0.82161771535;
-      m1=-0.0000161054152592;
-    }
-    else{
-      cout<<"Wrong # btags to make_btagunc"<<endl;
-    }
-  }
-  else if(ich==1){ //muons
-    if(ibtag==0){
-      p0=0.984636818312;
-      p1=-0.0000898705296203;
-      m0=1.02836905579;
-      m1= 0.0000726807344479;
-    }
-    else if(ibtag==1){
-      p0=1.04385580002;
-      p1=0.0000206096278947;
-      m0=0.942713582987;
-      m1=0.0000719882385098;
-    }
-    else if(ibtag==2){
-      p0=1.1333366687;
-      p1=0.00000462542786413;
-      m0=0.813316607701;
-      m1=-0.00000205840248842;
-    }
-    else{
-      cout<<"Wrong # btags to make_btagunc"<<endl;
-    }
-  }
-  else{
-      cout<<"Wrong # channel to make_btagunc"<<endl;
-    }
-  cout<<"p0 "<<p0<<endl;
-  cout<<"p1 "<<p1<<endl;
-  cout<<"m0 "<<m0<<endl;
-  cout<<"m1 "<<m1<<endl;
-  cout<<"mymass "<<mymass<<endl;
+  p0=0.983256647923;
+  p1=-0.0000883532570978;
+  m0=1.02907356239;
+  m1=0.0000713061639147;
+  
   errp=p1*mymass+p0;
   errm=m1*mymass+m0;
   cout<<"errp "<<errp<<endl;
@@ -682,7 +632,7 @@ return string("");
   b_str+=("  "+tmp_str+"      "+tmp_str+"      1.0");
   return b_str;
 }
-*/
+
 
 string make_JESunc(float mymass){
 

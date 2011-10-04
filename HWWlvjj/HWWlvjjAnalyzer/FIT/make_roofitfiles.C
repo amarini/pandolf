@@ -284,6 +284,7 @@ void make_roofitfiles(int chan, double massH, double sigmaH, double &obs_yield, 
 					      cut1,"eventWeight");
 
   obs_yield=double(dataset_obs_orig->numEntries());
+std::cout << "+++ CUT: " << tree_sel << std::endl;
 
   RooArgSet *newMwwargset= new RooArgSet(CMS_hwwlvqq_mWW);
   RooDataSet *dataset_obs=(RooDataSet*) dataset_obs_orig->reduce(*newMwwargset);
