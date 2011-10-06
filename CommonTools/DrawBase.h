@@ -102,6 +102,9 @@ class DrawBase {
   void set_pdf_aussi( bool pdf_aussi ) { pdf_aussi_ = pdf_aussi; };
   void set_logx( bool logx=true ) { logx_ = logx; };
   void set_scaleFactor( float scaleFactor ) { scaleFactor_ = scaleFactor;};
+  void set_xAxisRange( float xAxisMin=9999., float xAxisMax=9999. ) { 
+    xAxisMin_ = xAxisMin;
+    xAxisMax_ = xAxisMax;};
   void set_xAxisMin( float xAxisMin=9999. ) { xAxisMin_ = xAxisMin;};
   void set_xAxisMax( float xAxisMax=9999. ) { xAxisMax_ = xAxisMax;};
   void set_yAxisMax( float yAxisMax=9999. ) { yAxisMax_ = yAxisMax;};
