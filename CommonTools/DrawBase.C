@@ -1359,7 +1359,7 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
           mcHistos_superimp[i]->Scale(scaleFactor_);
       }
 
-    } else { //scale factor < 0 --> normalize to shapes
+    } else if( scaleFactor_ < 0. ) { //scale factor < 0 --> normalize to shapes
 
       if( !noDATA && !noMC ) { //normalize mc to data shape
         // default: choose first data histo:
@@ -1394,7 +1394,8 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
     //} else {
     //  std::cout << "DATA and MC files not properly initialized. Will not normalize." << std::endl;
       }
-    } //if scalefactor
+
+    } //if scalefactor is = 0 dont do anything
 
 
     // create stack:
