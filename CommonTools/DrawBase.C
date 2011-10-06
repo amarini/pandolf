@@ -1458,10 +1458,13 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
     for( unsigned i=0; i<mcHistos_superimp.size(); ++i ) 
       legend->AddEntry(mcHistos_superimp[i], (mcFiles_superimp_[i].legendName).c_str(), "L");
 
+
+    if( xAxisMin_ != 9999. ) xMin = xAxisMin_;
+    if( xAxisMax_ != 9999. ) xMax = xAxisMax_;
+
+
     bool noBinLabels=true;
     TH2D* h2_axes = new TH2D("axes", "", nBinsx, xMin, xMax, 10, yMin, yMax);
-    if( xAxisMin_ != 9999. ) h2_axes->GetXaxis()->SetRangeUser(xAxisMin_, xMax);
-    if( xAxisMax_ != 9999. ) h2_axes->GetXaxis()->SetRangeUser(xMin, xAxisMax_);
     if( yAxisMax_ != 9999. ) h2_axes->GetYaxis()->SetRangeUser(yMin, yAxisMax_);
     if( getBinLabels_ ) {
       for( unsigned iBinx=1; iBinx<nBinsx+1; ++iBinx ) {
@@ -1637,10 +1640,10 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
           if( dataHistos[iHisto]->GetBinContent(iBin)>0. && dataHistos[iHisto]->GetBinContent(iBin) < yMin_log ) 
             yMin_log = dataHistos[iHisto]->GetBinContent(iBin);
 
+
+
       TH2D* h2_axes_log = new TH2D("axes_log", "", nBinsx, xMin, xMax, 10, 0.1*yMin_log, yAxisMaxScaleLog_*yMax);
       //TH2D* h2_axes_log = new TH2D("axes_log", "", nBinsx, xMin, xMax, 10, 0.1*yMin_log, 100.*yMax);
-      if( xAxisMin_ != 9999. ) h2_axes_log->GetXaxis()->SetRangeUser(xAxisMin_, xMax);
-      if( xAxisMax_ != 9999. ) h2_axes_log->GetXaxis()->SetRangeUser(xMin, xAxisMax_);
       if( yAxisMax_ != 9999. ) h2_axes_log->GetYaxis()->SetRangeUser(0.1*yMin_log, yAxisMaxScaleLog_*yAxisMax_);
       h2_axes_log->SetXTitle(xAxis.c_str());
       h2_axes_log->SetYTitle(yAxis.c_str());
@@ -2325,6 +2328,9 @@ void DrawBase::compareDifferentHistos_singleFile( InputFile infile, const std::v
 
   yMax *= yAxisMaxScale_;
   if( histos.size()>=4 ) yMax *= 1.15;
+
+  if( xAxisMin_ != 9999. ) xMin = xAxisMin_;
+  if( xAxisMax_ != 9999. ) xMax = xAxisMax_;
 
   TH2D* h2_axes = new TH2D("axes", "", 10, xMin, xMax, 10, yMin, yMax);
   std::string xAxisName_full(xAxisName);
