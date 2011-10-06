@@ -1558,7 +1558,7 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
     h2_axes->Draw("");
     legend->Draw("same");
     if( !noMC ) {
-      if( !noStack_ ) {
+      if( !noStack_ && mcFiles_.size()>1 ) { //no need to stack if only one MC file
         mcHisto_stack->Draw("histo same");
         for( unsigned i=0; i<mcHistos_superimp.size(); ++i ) {
           int backwardsIndex = mcHistos_superimp.size()-1-i; //backwards is prettier: bg on the back, signal in front
@@ -1666,7 +1666,7 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
       h2_axes_log->Draw("");
       legend->Draw("same");
       if( !noMC ) {
-        if( !noStack_ ) {
+        if( !noStack_ && mcFiles_.size()>1 ) { //no need to stack if only one MC file
           mcHisto_stack->Draw("histo same");
           for( unsigned i=0; i<mcHistos_superimp.size(); ++i ) {
             int backwardsIndex = mcHistos_superimp.size()-1-i; //backwards is prettier: bg on the back, signal in front
