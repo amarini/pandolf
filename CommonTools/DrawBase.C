@@ -1075,8 +1075,10 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
 
   std::vector<TH1D*> mcHistos;
   TH1D* mcHisto0 = 0;
-  if( mcFiles_.size()> 0 && mcFiles_[0].file!=0) 
+  if( mcFiles_.size()> 0 && mcFiles_[0].file!=0) {
     mcHisto0 = (TH1D*)mcFiles_[0].file->Get(histoName.c_str());
+    mcHistos.push_back(mcHisto0);
+  }
   if( mcHisto0==0 ) noMC = true;
 
   if( noDATA && noMC ) {
@@ -1084,7 +1086,6 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     return;
   }
 
-  mcHistos.push_back(mcHisto0);
 
   if( mcFiles_.size()>1 ) {
     for( unsigned i=1; i<mcFiles_.size(); ++i ) {
@@ -1722,7 +1723,7 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
 
     if( lastHistos_mcHistoSum_!=0 ) delete lastHistos_mcHistoSum_;
 
-    lastHistos_mcHistoSum_ = new TH1D(*mcHisto_sum);
+    if( mcHisto_sum!=0 ) lastHistos_mcHistoSum_ = new TH1D(*mcHisto_sum);
 
 
     lastHistos_data_.clear();
@@ -1749,8 +1750,8 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
     delete c1;
     delete legend;
     delete h2_axes;
-    delete mcHisto_stack;
-    delete mcHisto_sum;
+    if( mcHisto_stack!=0 ) delete mcHisto_stack;
+    if( mcHisto_sum!=0 ) delete mcHisto_sum;
 
 
 } //drawHisto
