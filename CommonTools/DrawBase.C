@@ -2714,15 +2714,16 @@ LegendBox DrawBase::get_legendBox( int legendQuadrant, const std::vector<std::st
     }
 
     bool widen = false;
-    if( legendTitle_.size()>13 ) widen=true;
+    int wide_thresh = 10;
+    if( legendTitle_.size()>wide_thresh ) widen=true;
     if( legendNames!=0 ) {
       for( unsigned i=0;i<legendNames->size(); ++i )
-        if( legendNames->at(i).length() > 12 ) widen=true;
+        if( legendNames->at(i).length() > wide_thresh ) widen=true;
     } else {
       for( unsigned i=0;i<dataFiles_.size(); ++i )
-        if( dataFiles_[i].legendName.length() > 13 ) widen=true;
+        if( dataFiles_[i].legendName.length() > wide_thresh ) widen=true;
       for( unsigned i=0;i<mcFiles_.size(); ++i )
-        if( mcFiles_[i].legendName.length() > 13 ) widen=true;
+        if( mcFiles_[i].legendName.length() > wide_thresh ) widen=true;
     }
 
     if( widen ) {
