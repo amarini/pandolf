@@ -147,6 +147,11 @@ class DrawBase {
   std::string get_outputSuffix() const;
   std::string get_fullSuffix() const;
 
+  std::vector< TH1D* > get_lastHistos_data() const { return lastHistos_data_; };
+  std::vector< TH1D* > get_lastHistos_mc() const { return lastHistos_mc_; };
+  std::vector< TH1D* > get_lastHistos_mc_superimp() const { return lastHistos_mc_superimp_; };
+
+
  private:
 
   TGraphErrors* get_graphRatio( TGraphErrors* gr_data, TGraphErrors* gr_MC);
