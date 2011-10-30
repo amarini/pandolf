@@ -130,8 +130,8 @@ class DrawBase {
   std::string get_recoType() const { return recoType_; };
   std::string get_flags() const { return flags_; };
   std::string get_legendTitle() const { return legendTitle_; };
-  TFile* get_dataFile( int i ) const { return dataFiles_[i].file; };
-  TFile* get_mcFile( int i ) const { return mcFiles_[i].file; };
+  InputFile get_dataFile( int i ) const { return dataFiles_[i]; };
+  InputFile get_mcFile( int i ) const { return mcFiles_[i]; };
   std::string get_outputdir() const { return outputdir_; };
   Int_t get_pt_thresh() const { return pt_thresh_; };
   Float_t get_etamax() const { return etamax_; };
