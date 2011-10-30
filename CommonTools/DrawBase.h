@@ -112,7 +112,7 @@ class DrawBase {
   void set_yAxisMaxScaleLog( float yAxisMaxScale=5. ) { yAxisMaxScaleLog_ = yAxisMaxScale;};
   void set_noStack( bool set=true ) { noStack_ = set; };
   void set_isCMSArticle( bool set=true );
-  void set_rebin( int rebin ) { rebin_ = rebin; };
+  void set_rebin( int rebin=1 ) { rebin_ = rebin; };
   void set_mcMarkers( bool set=true );
   void set_markerSize( float markerSize ) { markerSize_ = markerSize; };
   void set_getBinLabels( bool getBinL=true ) { getBinLabels_ = getBinL; };
