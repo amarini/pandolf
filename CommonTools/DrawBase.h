@@ -151,6 +151,8 @@ class DrawBase {
   std::vector< TH1D* > get_lastHistos_mc() const { return lastHistos_mc_; };
   std::vector< TH1D* > get_lastHistos_mc_superimp() const { return lastHistos_mc_superimp_; };
 
+  float get_xAxisMin() const { return xAxisMin_; };
+  float get_xAxisMax() const { return xAxisMax_; };
 
  private:
 
