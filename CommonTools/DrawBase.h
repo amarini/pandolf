@@ -89,6 +89,7 @@ class DrawBase {
 
   void set_analysisType( const std::string analysisType ) { analysisType_ = analysisType; };
   void add_dataFile( TFile* dataFile, const std::string& datasetName, const std::string& legendName="Data", int markerColor=-1, int markerStyle=-1, int fillStyle=-1 );
+  void add_dataFile( TFile* dataFile, float weight, const std::string& datasetName, const std::string& legendName="Data", int markerColor=-1, int markerStyle=-1, int fillStyle=-1 );
   void add_mcFile( TFile* mcFile, const std::string& datasetName, const std::string& legendName, int fillColor=-1, int fillStyle=-1, int markerStyle=-1, int lineColor=-1, int lineWidth=-1 );
   void add_mcFile_superimp( TFile* mcFile, const std::string& datasetName, const std::string& legendName, float multFactor=1., int lineColor=-1, int lineWidth=-1 );
   // in the following function weight must be cross_section(in pb) / Nevents:

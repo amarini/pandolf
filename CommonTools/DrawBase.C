@@ -30,31 +30,31 @@ DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType
   style_->cd();
 
   // For the canvas:
-    style_->SetCanvasBorderMode(0);
-    style_->SetCanvasColor(kWhite);
-    style_->SetCanvasDefH(600); //Height of canvas
-    style_->SetCanvasDefW(600); //Width of canvas
-    style_->SetCanvasDefX(0);   //POsition on screen
-    style_->SetCanvasDefY(0);
+  style_->SetCanvasBorderMode(0);
+  style_->SetCanvasColor(kWhite);
+  style_->SetCanvasDefH(600); //Height of canvas
+  style_->SetCanvasDefW(600); //Width of canvas
+  style_->SetCanvasDefX(0);   //POsition on screen
+  style_->SetCanvasDefY(0);
 
   // For the Pad:
-    style_->SetPadBorderMode(0);
-    // style_->SetPadBorderSize(Width_t size = 1);
-    style_->SetPadColor(kWhite);
-    style_->SetPadGridX(false);
-    style_->SetPadGridY(false);
-    style_->SetGridColor(0);
-    style_->SetGridStyle(3);
-    style_->SetGridWidth(1);
+  style_->SetPadBorderMode(0);
+  // style_->SetPadBorderSize(Width_t size = 1);
+  style_->SetPadColor(kWhite);
+  style_->SetPadGridX(false);
+  style_->SetPadGridY(false);
+  style_->SetGridColor(0);
+  style_->SetGridStyle(3);
+  style_->SetGridWidth(1);
 
   // For the frame:
-    style_->SetFrameBorderMode(0);
-    style_->SetFrameBorderSize(1);
-    style_->SetFrameFillColor(0);
-    style_->SetFrameFillStyle(0);
-    style_->SetFrameLineColor(1);
-    style_->SetFrameLineStyle(1);
-    style_->SetFrameLineWidth(1);
+  style_->SetFrameBorderMode(0);
+  style_->SetFrameBorderSize(1);
+  style_->SetFrameFillColor(0);
+  style_->SetFrameFillStyle(0);
+  style_->SetFrameLineColor(1);
+  style_->SetFrameLineStyle(1);
+  style_->SetFrameLineWidth(1);
 
 //// For the histo:
 //  // style_->SetHistFillColor(1);
@@ -99,52 +99,52 @@ DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType
 //  // style_->SetStatY(Float_t y = 0);
 
   // Margins:
-    style_->SetPadTopMargin(0.05);
-    style_->SetPadBottomMargin(0.15);//0.13);
-    style_->SetPadLeftMargin(0.15);//0.16);
-    style_->SetPadRightMargin(0.05);//0.02);
+  style_->SetPadTopMargin(0.05);
+  style_->SetPadBottomMargin(0.15);//0.13);
+  style_->SetPadLeftMargin(0.15);//0.16);
+  style_->SetPadRightMargin(0.05);//0.02);
 
   // For the Global title:
 
-    style_->SetOptTitle(0);
-    style_->SetTitleFont(42);
-    style_->SetTitleColor(1);
-    style_->SetTitleTextColor(1);
-    style_->SetTitleFillColor(10);
-    style_->SetTitleFontSize(0.05);
-    // style_->SetTitleH(0); // Set the height of the title box
-    // style_->SetTitleW(0); // Set the width of the title box
-    // style_->SetTitleX(0); // Set the position of the title box
-    // style_->SetTitleY(0.985); // Set the position of the title box
-    // style_->SetTitleStyle(Style_t style = 1001);
-    // style_->SetTitleBorderSize(2);
+  style_->SetOptTitle(0);
+  style_->SetTitleFont(42);
+  style_->SetTitleColor(1);
+  style_->SetTitleTextColor(1);
+  style_->SetTitleFillColor(10);
+  style_->SetTitleFontSize(0.05);
+  // style_->SetTitleH(0); // Set the height of the title box
+  // style_->SetTitleW(0); // Set the width of the title box
+  // style_->SetTitleX(0); // Set the position of the title box
+  // style_->SetTitleY(0.985); // Set the position of the title box
+  // style_->SetTitleStyle(Style_t style = 1001);
+  // style_->SetTitleBorderSize(2);
 
   // For the axis titles:
 
-    style_->SetTitleColor(1, "XYZ");
-    style_->SetTitleFont(42, "XYZ");
-    style_->SetTitleSize(0.05, "XYZ");
-    // style_->SetTitleXSize(Float_t size = 0.02); // Another way to set the size?
-    // style_->SetTitleYSize(Float_t size = 0.02);
-    style_->SetTitleXOffset(1.15);//0.9);
-    style_->SetTitleYOffset(1.4); // => 1.15 if exponents
-    // style_->SetTitleOffset(1.1, "Y"); // Another way to set the Offset
+  style_->SetTitleColor(1, "XYZ");
+  style_->SetTitleFont(42, "XYZ");
+  style_->SetTitleSize(0.05, "XYZ");
+  // style_->SetTitleXSize(Float_t size = 0.02); // Another way to set the size?
+  // style_->SetTitleYSize(Float_t size = 0.02);
+  style_->SetTitleXOffset(1.15);//0.9);
+  style_->SetTitleYOffset(1.4); // => 1.15 if exponents
+  // style_->SetTitleOffset(1.1, "Y"); // Another way to set the Offset
 
   // For the axis labels:
 
-    style_->SetLabelColor(1, "XYZ");
-    style_->SetLabelFont(42, "XYZ");
-    style_->SetLabelOffset(0.007, "XYZ");
-    style_->SetLabelSize(0.045, "XYZ");
+  style_->SetLabelColor(1, "XYZ");
+  style_->SetLabelFont(42, "XYZ");
+  style_->SetLabelOffset(0.007, "XYZ");
+  style_->SetLabelSize(0.045, "XYZ");
 
   // For the axis:
 
-    style_->SetAxisColor(1, "XYZ");
-    style_->SetStripDecimals(kTRUE);
-    style_->SetTickLength(0.03, "XYZ");
-    style_->SetNdivisions(510, "XYZ");
-    style_->SetPadTickX(1);  // To get tick marks on the opposite side of the frame
-    style_->SetPadTickY(1);
+  style_->SetAxisColor(1, "XYZ");
+  style_->SetStripDecimals(kTRUE);
+  style_->SetTickLength(0.03, "XYZ");
+  style_->SetNdivisions(510, "XYZ");
+  style_->SetPadTickX(1);  // To get tick marks on the opposite side of the frame
+  style_->SetPadTickY(1);
 
 //// Change for log plots:
 //  style_->SetOptLogx(0);
@@ -1241,6 +1241,7 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
     int markerColor_default=1;
     for( unsigned iData=0; iData<dataHistos.size(); ++iData ) {
       dataHistos[iData]->Rebin(rebin_);
+      dataHistos[iData]->Scale(dataFiles_[iData].weight);
 
       if( dataFiles_[iData].markerStyle!=-1 )
         dataHistos[iData]->SetMarkerStyle(dataFiles_[iData].markerStyle);
@@ -1409,13 +1410,13 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
 
     TH1D* refHisto = (noDATA) ? mcHistos[0] : dataHistos[0];
 
-  //Float_t yAxisMaxScale_ = (name=="phiJet" || name=="etaJet" || name=="ptSecondJetRel" || name=="phiPhot" || name=="etaPhot" ) ? 1.8 : 1.6;
-  //if( name=="phiPhot" || name=="etaPhot" ) yAxisMaxScale_=2.;
-  //if(name=="clusterMajPhotReco" || name=="clusterMinPhotReco") yAxisMaxScale_ = 2.;
     Int_t nBinsx = refHisto->GetNbinsX();
     Float_t xMin = refHisto->GetXaxis()->GetXmin();
     Float_t xMax = refHisto->GetXaxis()->GetXmax();
-    Float_t yMax_data = (noDATA) ? 0. : dataHistos[0]->GetMaximum();
+    Float_t yMax_data = 0.;
+    for( unsigned i=0; i<dataHistos.size(); ++i ) {
+        if( dataHistos[i]->GetMaximum() > yMax_data ) yMax_data = dataHistos[i]->GetMaximum();
+    }
     //Float_t yMax_mc = (noMC) ? 0. : mcHisto_sum->GetMaximum();
     std::string nostack_str = (noStack_) ? "nostack" : "";
     Float_t yMax_mc = (noMC) ? 0. : mcHisto_stack->GetMaximum(nostack_str.c_str());
@@ -1427,10 +1428,6 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
     }
     Float_t yMax = (yMax_data>yMax_mc) ? yAxisMaxScale_*yMax_data : yAxisMaxScale_*yMax_mc;
     Float_t yMin = 0.;
-
-
-
-
 
 
 
@@ -2503,11 +2500,18 @@ void DrawBase::drawObjects( const std::vector< TObject* > objects, const std::st
 
 void DrawBase::add_dataFile( TFile* dataFile, const std::string& datasetName, const std::string& legendName, int markerColor, int markerStyle, int fillStyle ) {
 
+  this->add_dataFile( dataFile, 1., datasetName, legendName, markerColor, markerStyle, fillStyle );
+
+}
+
+
+void DrawBase::add_dataFile( TFile* dataFile, float weight, const std::string& datasetName, const std::string& legendName, int markerColor, int markerStyle, int fillStyle ) {
+
   InputFile thisFile;
   thisFile.file = dataFile;
   thisFile.datasetName = datasetName;
   thisFile.legendName = legendName;
-  thisFile.weight = 1.;
+  thisFile.weight = weight;
   thisFile.fillColor = markerColor;
   thisFile.markerStyle = markerStyle;
   thisFile.fillStyle = fillStyle;
@@ -2617,6 +2621,9 @@ void DrawBase::set_outputdir( const std::string& outputdir ) {
     outputdir_ = analysisType_ + "Plots_" + this->get_fullSuffix();
 
   }
+
+  std::string outputdir_command = "mkdir -p " + outputdir_;
+  system(outputdir_command.c_str());
 
 }
 
