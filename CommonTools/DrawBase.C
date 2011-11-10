@@ -206,10 +206,6 @@ DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType
 
   lastHistos_mcHistoSum_=0;
 
-  // this is needed to avoid the same-histogram problem:
-  TH1F::AddDirectory(kFALSE);
-
-
 }
 
 
@@ -1209,9 +1205,6 @@ void DrawBase::drawHisto_fromTree( const std::string& treeName, const std::strin
   }
 
 
-  // put it back to false:
-  TH1F::AddDirectory(kTRUE);
-
   drawHisto_fromHistos( dataHistos, mcHistos, mcHistos_superimp, name, axisName, units, instanceName, log_aussi, legendQuadrant, flags, labelText, add_jetAlgoText );
 
 } //drawhisto_fromTree
@@ -1221,6 +1214,10 @@ void DrawBase::drawHisto_fromTree( const std::string& treeName, const std::strin
 
 void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<TH1D*> mcHistos, std::vector<TH1D*> mcHistos_superimp, const std::string& name, const std::string& axisName, const std::string& units, const std::string& instanceName, bool log_aussi, int legendQuadrant, const std::string& flags, const std::string& labelText, bool add_jetAlgoText  ) {
 
+
+  // need this in order to avoid the same-histogram problem
+  // (love ROOT)
+  TH1F::AddDirectory(kFALSE);
 
 
   bool noDATA = false;
@@ -1749,6 +1746,10 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
     delete h2_axes;
     if( mcHisto_stack!=0 ) delete mcHisto_stack;
     if( mcHisto_sum!=0 ) delete mcHisto_sum;
+
+
+  // put it back as it was
+  TH1F::AddDirectory(kTRUE);
 
 
 } //drawHisto
