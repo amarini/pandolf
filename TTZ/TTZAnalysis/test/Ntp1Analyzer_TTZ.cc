@@ -1062,7 +1062,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      nPart_ = 0;
 
 
-     for( unsigned iJet=0; iJet<leadJets.size(); ++iJet ) {
+     for( unsigned iJet=0; iJet<leadJets.size() && nJets_<30; ++iJet ) {
 
        eJet_[nJets_] = leadJets[iJet].Energy();
        ptJet_[nJets_] = leadJets[iJet].Pt();
@@ -1103,7 +1103,9 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        phiPartJet_[nJets_] = leadJets[iJet].phiPart;
        pdgIdPartJet_[nJets_] = leadJets[iJet].pdgIdPart;
 
+       nJets_++;
 
+     }
 
 
      if( isMC_ ) {
@@ -1161,39 +1163,3 @@ double trackDxyPV(float PVx, float PVy, float PVz, float eleVx, float eleVy, flo
   return ( - (eleVx-PVx)*elePy + (eleVy-PVy)*elePx ) / elePt;
 }
 
-float getWeightPU(int nPU) {
-
-  float weights[] = {0.110043,
-                     0.457365,
-                     0.98622,
-                     1.60429,
-                     2.06065,
-                     2.22437,
-                     2.1078,
-                     1.76987,
-                     1.37698,
-                     0.99556,
-                     0.693361,
-                     0.458662,
-                     0.295982,
-                     0.185586,
-                     0.113966,
-                     0.068645,
-                     0.041019,
-                     0.0239427,
-                     0.0139931,
-                     0.00810005,
-                     0.00473432,
-                     0.0026347,
-                     0.00152847,
-                     0.000864942,
-                     0.000756823};
-
-  float returnWeight;
-
-  if( nPU <=24 ) returnWeight = weights[nPU];
-  else returnWeight = 0.;
-
-  return returnWeight;
-
-}
