@@ -17,11 +17,11 @@ merge_and_setWeights: merge_and_setWeights.cpp
 	$(CC) -Wall $(INCLUDES) -o merge_and_setWeights merge_and_setWeights.cpp $(ROOTFLAG) $(EXTRALIBS)
 
 
-do2ndLevel_TTZ: Ntp1Analyzer.o Ntp1Analyzer_TTZ.o AnalysisElectron.o AnalysisMuon.o PUWeight.o do2ndLevel_TTZ.cpp
-	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o do2ndLevel_TTZ do2ndLevel_TTZ.cpp Ntp1Analyzer.o PUWeight.o Ntp1Analyzer_TTZ.o AnalysisElectron.o AnalysisMuon.o $(ROOTFLAG) 
+do2ndLevel_TTZ: Ntp1Analyzer.o Ntp1Analyzer_TTZ.o AnalysisElectron.o AnalysisMuon.o AnalysisJet.o PUWeight.o do2ndLevel_TTZ.cpp
+	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o do2ndLevel_TTZ do2ndLevel_TTZ.cpp Ntp1Analyzer.o PUWeight.o Ntp1Analyzer_TTZ.o AnalysisElectron.o AnalysisMuon.o AnalysisJet.o $(ROOTFLAG) 
 
-do2ndLevel_TTZ_DATA: Ntp1Analyzer.o Ntp1Analyzer_TTZ.o AnalysisElectron.o AnalysisMuon.o PUWeight.o do2ndLevel_TTZ_DATA.cpp
-	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o do2ndLevel_TTZ_DATA do2ndLevel_TTZ_DATA.cpp Ntp1Analyzer.o Ntp1Analyzer_TTZ.o AnalysisElectron.o AnalysisMuon.o PUWeight.o $(ROOTFLAG)
+do2ndLevel_TTZ_DATA: Ntp1Analyzer.o Ntp1Analyzer_TTZ.o AnalysisElectron.o AnalysisMuon.o AnalysisJet.o PUWeight.o do2ndLevel_TTZ_DATA.cpp
+	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o do2ndLevel_TTZ_DATA do2ndLevel_TTZ_DATA.cpp Ntp1Analyzer.o Ntp1Analyzer_TTZ.o AnalysisElectron.o AnalysisMuon.o AnalysisJet.o PUWeight.o $(ROOTFLAG)
 
 
 
@@ -42,8 +42,8 @@ drawTTZ_DATA: DrawBase.o fitTools.o drawTTZ_DATA.cpp
 Ntp1Analyzer.o: $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/Ntp1Analyzer.C
 	$(CC) $(CFLAGS) $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/Ntp1Analyzer.C $(ROOTFLAG)
 
-Ntp1Analyzer_TTZ.o: Ntp1Analyzer_TTZ.C
-	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -I$(CMSSW_BASE)/src/UserCode/emanuele/CommonTools Ntp1Analyzer_TTZ.C $(ROOTFLAG)
+Ntp1Analyzer_TTZ.o: Ntp1Analyzer_TTZ.cc
+	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -I$(CMSSW_BASE)/src/UserCode/emanuele/CommonTools Ntp1Analyzer_TTZ.cc $(ROOTFLAG)
 
 
 TFitParticleEtEtaPhi.o: $(CMSSW_BASE)/src/UserCode/pandolf/KinematicFit/TFitParticleEtEtaPhi.cc
@@ -116,8 +116,8 @@ RooCruijffPdf.o: RooCruijffPdf.cc
 BTagSFUtil.o: $(CMSSW_BASE)/src/UserCode/pandolf/BTagSFUtil/BTagSFUtil.cc
 	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/BTagSFUtil/ $(CMSSW_BASE)/src/UserCode/pandolf/BTagSFUtil/BTagSFUtil.cc $(ROOTFLAG)
 
-PUWeight.o: PUWeight.C
-	$(CC) $(CFLAGS) PUWeight.C $(ROOTFLAG)
+PUWeight.o: $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/PUWeight.C
+	$(CC) $(CFLAGS) $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/PUWeight.C $(ROOTFLAG)
 
 
 AnalysisJet.o: $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/AnalysisJet.cc 
