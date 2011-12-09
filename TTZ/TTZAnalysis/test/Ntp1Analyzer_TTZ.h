@@ -48,211 +48,99 @@ class Ntp1Analyzer_TTZ : public Ntp1Analyzer {
    int leptType_; //0: muon; 1: electron
    int leptTypeMC_; //0: muon; 1: electron
 
-   Float_t eZqqMC_;
-   Float_t ptZqqMC_;
-   Float_t etaZqqMC_;
-   Float_t phiZqqMC_;
-
    Float_t eZllMC_;
    Float_t ptZllMC_;
    Float_t etaZllMC_;
    Float_t phiZllMC_;
 
-   Float_t eHiggsMC_;
-   Float_t ptHiggsMC_;
-   Float_t etaHiggsMC_;
-   Float_t phiHiggsMC_;
+   Float_t eLeptZ1_;
+   Float_t ptLeptZ1_;
+   Float_t etaLeptZ1_;
+   Float_t phiLeptZ1_;
+   Int_t   chargeLeptZ1_;
 
-   Float_t eLept1_;
-   Float_t ptLept1_;
-   Float_t etaLept1_;
-   Float_t phiLept1_;
-   Int_t   chargeLept1_;
+   Float_t eLeptZ1Gen_;
+   Float_t ptLeptZ1Gen_;
+   Float_t etaLeptZ1Gen_;
+   Float_t phiLeptZ1Gen_;
 
-   Float_t eLept1Gen_;
-   Float_t ptLept1Gen_;
-   Float_t etaLept1Gen_;
-   Float_t phiLept1Gen_;
+   Float_t eLeptZ2_;
+   Float_t ptLeptZ2_;
+   Float_t etaLeptZ2_;
+   Float_t phiLeptZ2_;
+   Int_t   chargeLeptZ2_;
 
-   Float_t eLept2_;
-   Float_t ptLept2_;
-   Float_t etaLept2_;
-   Float_t phiLept2_;
-   Int_t   chargeLept2_;
+   Float_t eLeptZ2Gen_;
+   Float_t ptLeptZ2Gen_;
+   Float_t etaLeptZ2Gen_;
+   Float_t phiLeptZ2Gen_;
 
-   Float_t eLept2Gen_;
-   Float_t ptLept2Gen_;
-   Float_t etaLept2Gen_;
-   Float_t phiLept2Gen_;
+   int nLept_;
+   Int_t   leptTypeLept_[10];
+   Float_t eLept_[10];
+   Float_t ptLept_[10];
+   Float_t etaLept_[10];
+   Float_t phiLept_[10];
+   Int_t   chargeLept_[10];
 
-
-   Int_t nPairs_;
-
-   Int_t  iJet1_[50];
-   Float_t  ptJet1_[50];
-   Float_t   eJet1_[50];
-   Float_t phiJet1_[50];
-   Float_t etaJet1_[50];
-
-   Float_t ptDJet1_[50];
-   Float_t rmsCandJet1_[50];
-   Int_t nChargedJet1_[50];
-   Int_t nNeutralJet1_[50];
-   Float_t QGlikelihoodJet1_[50];
-
-   Float_t  eChargedHadronsJet1_[50];
-   Float_t  ePhotonsJet1_[50];
-   Float_t  eNeutralEmJet1_[50];
-   Float_t  eNeutralHadronsJet1_[50];
-   Float_t  eMuonsJet1_[50];
-   Float_t  eElectronsJet1_[50];
-   Float_t  eHFHadronsJet1_[50];
-   Float_t  eHFEMJet1_[50];
-
-   Int_t  nChargedHadronsJet1_[50];
-   Int_t  nPhotonsJet1_[50];
-   Int_t  nNeutralHadronsJet1_[50];
-   Int_t  nMuonsJet1_[50];
-   Int_t  nElectronsJet1_[50];
-   Int_t  nHFHadronsJet1_[50];
-   Int_t  nHFEMJet1_[50];
-
-   Float_t trackCountingHighEffBJetTagJet1_[50];
-   Float_t trackCountingHighPurBJetTagJet1_[50];
-   Float_t simpleSecondaryVertexHighEffBJetTagJet1_[50];
-   Float_t simpleSecondaryVertexHighPurBJetTagJet1_[50];
-   Float_t jetBProbabilityBJetTagJet1_[50];
-   Float_t jetProbabilityBJetTagJet1_[50];
-
-   Float_t SFTCHEJet1_[50];
-   Float_t SFerrTCHEJet1_[50];
-
-   Float_t  ptGenJet1_[50];
-   Float_t   eGenJet1_[50];
-   Float_t phiGenJet1_[50];
-   Float_t etaGenJet1_[50];
-
-   Float_t  ptPartJet1_[50];
-   Float_t   ePartJet1_[50];
-   Float_t phiPartJet1_[50];
-   Float_t etaPartJet1_[50];
-   Int_t pdgIdPartJet1_[50];
-
-   Int_t  nPFCand1_;
-   Float_t  ePFCand1_[100];
-   Float_t  ptPFCand1_[100];
-   Float_t  etaPFCand1_[100];
-   Float_t  phiPFCand1_[100];
-   Int_t  particleTypePFCand1_[100];
-
-   Int_t  iJet2_[50];
-   Float_t  ptJet2_[50];
-   Float_t   eJet2_[50];
-   Float_t phiJet2_[50];
-   Float_t etaJet2_[50];
-
-   Float_t ptDJet2_[50];
-   Float_t rmsCandJet2_[50];
-   Int_t nChargedJet2_[50];
-   Int_t nNeutralJet2_[50];
-   Float_t QGlikelihoodJet2_[50];
-
-   Float_t  eChargedHadronsJet2_[50];
-   Float_t  ePhotonsJet2_[50];
-   Float_t  eNeutralEmJet2_[50];
-   Float_t  eNeutralHadronsJet2_[50];
-   Float_t  eMuonsJet2_[50];
-   Float_t  eElectronsJet2_[50];
-   Float_t  eHFHadronsJet2_[50];
-   Float_t  eHFEMJet2_[50];
-
-   Int_t  nChargedHadronsJet2_[50];
-   Int_t  nPhotonsJet2_[50];
-   Int_t  nNeutralHadronsJet2_[50];
-   Int_t  nMuonsJet2_[50];
-   Int_t  nElectronsJet2_[50];
-   Int_t  nHFHadronsJet2_[50];
-   Int_t  nHFEMJet2_[50];
-
-   Float_t trackCountingHighEffBJetTagJet2_[50];
-   Float_t trackCountingHighPurBJetTagJet2_[50];
-   Float_t simpleSecondaryVertexHighEffBJetTagJet2_[50];
-   Float_t simpleSecondaryVertexHighPurBJetTagJet2_[50];
-   Float_t jetBProbabilityBJetTagJet2_[50];
-   Float_t jetProbabilityBJetTagJet2_[50];
-
-   Float_t SFTCHEJet2_[50];
-   Float_t SFerrTCHEJet2_[50];
-
-   Float_t  ptGenJet2_[50];
-   Float_t   eGenJet2_[50];
-   Float_t phiGenJet2_[50];
-   Float_t etaGenJet2_[50];
-
-   Float_t  ptPartJet2_[50];
-   Float_t   ePartJet2_[50];
-   Float_t phiPartJet2_[50];
-   Float_t etaPartJet2_[50];
-   Int_t pdgIdPartJet2_[50];
+   Float_t eLeptGen_[10];
+   Float_t ptLeptGen_[10];
+   Float_t etaLeptGen_[10];
+   Float_t phiLeptGen_[10];
 
 
-   Int_t  iJetRecoil_[50];
-   Float_t  ptJetRecoil_[50];
-   Float_t   eJetRecoil_[50];
-   Float_t phiJetRecoil_[50];
-   Float_t etaJetRecoil_[50];
+   Int_t nJets_;
 
-   Float_t ptDJetRecoil_[50];
-   Float_t rmsCandJetRecoil_[50];
-   Int_t nChargedJetRecoil_[50];
-   Int_t nNeutralJetRecoil_[50];
-   Float_t QGlikelihoodJetRecoil_[50];
+   Float_t  ptJet_[50];
+   Float_t   eJet_[50];
+   Float_t phiJet_[50];
+   Float_t etaJet_[50];
 
-   Float_t  eChargedHadronsJetRecoil_[50];
-   Float_t  ePhotonsJetRecoil_[50];
-   Float_t  eNeutralEmJetRecoil_[50];
-   Float_t  eNeutralHadronsJetRecoil_[50];
-   Float_t  eMuonsJetRecoil_[50];
-   Float_t  eElectronsJetRecoil_[50];
-   Float_t  eHFHadronsJetRecoil_[50];
-   Float_t  eHFEMJetRecoil_[50];
+   Float_t ptDJet_[50];
+   Float_t rmsCandJet_[50];
+   Int_t nChargedJet_[50];
+   Int_t nNeutralJet_[50];
+   Float_t QGlikelihoodJet_[50];
 
-   Int_t  nChargedHadronsJetRecoil_[50];
-   Int_t  nPhotonsJetRecoil_[50];
-   Int_t  nNeutralHadronsJetRecoil_[50];
-   Int_t  nMuonsJetRecoil_[50];
-   Int_t  nElectronsJetRecoil_[50];
-   Int_t  nHFHadronsJetRecoil_[50];
-   Int_t  nHFEMJetRecoil_[50];
+   Float_t  eChargedHadronsJet_[50];
+   Float_t  ePhotonsJet_[50];
+   Float_t  eNeutralEmJet_[50];
+   Float_t  eNeutralHadronsJet_[50];
+   Float_t  eMuonsJet_[50];
+   Float_t  eElectronsJet_[50];
+   Float_t  eHFHadronsJet_[50];
+   Float_t  eHFEMJet_[50];
 
-   Float_t trackCountingHighEffBJetTagJetRecoil_[50];
-   Float_t trackCountingHighPurBJetTagJetRecoil_[50];
-   Float_t simpleSecondaryVertexHighEffBJetTagJetRecoil_[50];
-   Float_t simpleSecondaryVertexHighPurBJetTagJetRecoil_[50];
-   Float_t jetBProbabilityBJetTagJetRecoil_[50];
-   Float_t jetProbabilityBJetTagJetRecoil_[50];
+   Int_t  nChargedHadronsJet_[50];
+   Int_t  nPhotonsJet_[50];
+   Int_t  nNeutralHadronsJet_[50];
+   Int_t  nMuonsJet_[50];
+   Int_t  nElectronsJet_[50];
+   Int_t  nHFHadronsJet_[50];
+   Int_t  nHFEMJet_[50];
 
-   Float_t SFTCHEJetRecoil_[50];
-   Float_t SFerrTCHEJetRecoil_[50];
+   Float_t trackCountingHighEffBJetTagJet_[50];
+   Float_t trackCountingHighPurBJetTagJet_[50];
+   Float_t simpleSecondaryVertexHighEffBJetTagJet_[50];
+   Float_t simpleSecondaryVertexHighPurBJetTagJet_[50];
+   Float_t jetBProbabilityBJetTagJet_[50];
+   Float_t jetProbabilityBJetTagJet_[50];
 
-   Float_t  ptGenJetRecoil_[50];
-   Float_t   eGenJetRecoil_[50];
-   Float_t phiGenJetRecoil_[50];
-   Float_t etaGenJetRecoil_[50];
+   Float_t SFTCHEJet_[50];
+   Float_t SFerrTCHEJet_[50];
 
-   Float_t  ptPartJetRecoil_[50];
-   Float_t   ePartJetRecoil_[50];
-   Float_t phiPartJetRecoil_[50];
-   Float_t etaPartJetRecoil_[50];
-   Int_t pdgIdPartJetRecoil_[50];
+   Float_t  ptGenJet_[50];
+   Float_t   eGenJet_[50];
+   Float_t phiGenJet_[50];
+   Float_t etaGenJet_[50];
+
+   Float_t  ptPartJet_[50];
+   Float_t   ePartJet_[50];
+   Float_t phiPartJet_[50];
+   Float_t etaPartJet_[50];
+   Int_t pdgIdPartJet_[50];
 
 
-   Int_t  nPFCand2_;
-   Float_t  ePFCand2_[100];
-   Float_t  ptPFCand2_[100];
-   Float_t  etaPFCand2_[100];
-   Float_t  phiPFCand2_[100];
-   Int_t  particleTypePFCand2_[100];
 
    Int_t nPart_;
    Float_t  ptPart_[20];
@@ -272,24 +160,7 @@ class Ntp1Analyzer_TTZ : public Ntp1Analyzer {
    TH1D* h1_nCounter_Zee_;
    TH1D* h1_nCounter_Zmumu_;
 
-   TH1F* h1_nEvents_vs_ptEle; 
-   TH1F* h1_nEvents_vs_ptMuon; 
-   TH1F* h1_passed_vs_ptEle; 
-   TH1F* h1_passed_vs_ptMuon; 
-   TH1F* h1_deltaRmatching_muons; 
-   TH1F* h1_deltaRmatching_electrons; 
-   TH1F* h1_deltaRmatching_jet_parton; 
-   TH1F* h1_deltaRmatching_genjet_parton; 
-   TH1F* h1_deltaRmatching_jet_genjet; 
-   TH1F* h1_deltaRmatching_jet_leptonParton;
    TH1F* h1_nJets30;
-// TH1F* h1_indexMatchedJet;
-// TH1F* h1_indexMatched05Jet;
-// TH1F* h1_nMatched_per_event;
-// TH1F* h1_nMatched05_per_event;
-// TH1F* h1_pdgIdParton2;
-// TH1F* h1_ptHadronicZ; 
-// TH1F* h1_deltaRqq; 
 
    bool DEBUG_VERBOSE_;
 
