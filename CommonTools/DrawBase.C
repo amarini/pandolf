@@ -1265,10 +1265,9 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
 
 
 
-
     // SECOND: SET BASIC AESTHETICS FOR MC HISTO(S) and CREATE MC HISTO SUM
     TH1D* mcHisto_sum = 0;
-    float fillColor_default=1;
+    float fillColor_default=0;
     float fillStyle_default=3004;
     if( !noMC ) {
       if( mcFiles_[0].fillColor==-1 )
@@ -1461,6 +1460,10 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
 
     bool noBinLabels=true;
     TH2D* h2_axes = new TH2D("axes", "", nBinsx, xMin, xMax, 10, yMin, yMax);
+    if( yMax>10000. ) {
+      h2_axes->GetYaxis()->SetTitleOffset(1.55);
+      h2_axes->GetYaxis()->SetLabelSize(0.04);
+    }
     if( yAxisMax_ != 9999. ) h2_axes->GetYaxis()->SetRangeUser(yMin, yAxisMax_);
     if( getBinLabels_ ) {
       for( unsigned iBinx=1; iBinx<nBinsx+1; ++iBinx ) {
@@ -2732,6 +2735,8 @@ LegendBox DrawBase::get_legendBox( int legendQuadrant, const std::vector<std::st
         if( dataFiles_[i].legendName.length() > wide_thresh ) widen=true;
       for( unsigned i=0;i<mcFiles_.size(); ++i )
         if( mcFiles_[i].legendName.length() > wide_thresh ) widen=true;
+      for( unsigned i=0;i<mcFiles_superimp_.size(); ++i )
+        if( mcFiles_superimp_[i].legendName.length() > wide_thresh ) widen=true;
     }
 
     if( widen ) {
