@@ -84,27 +84,37 @@ void Ntp1Analyzer_TTZ::CreateOutputFile() {
   reducedTree_->Branch("etaZllMC",  &etaZllMC_,  "etaZllMC_/F");
   reducedTree_->Branch("phiZllMC",  &phiZllMC_,  "phiZllMC_/F");
 
-  reducedTree_->Branch("eLept1",  &eLept1_,  "eLept1_/F");
-  reducedTree_->Branch("ptLept1",  &ptLept1_,  "ptLept1_/F");
-  reducedTree_->Branch("etaLept1",  &etaLept1_,  "etaLept1_/F");
-  reducedTree_->Branch("phiLept1",  &phiLept1_,  "phiLept1_/F");
-  reducedTree_->Branch("chargeLept1",  &chargeLept1_,  "chargeLept1_/I");
+  reducedTree_->Branch("eLeptZ1",  &eLeptZ1_,  "eLeptZ1_/F");
+  reducedTree_->Branch("ptLeptZ1",  &ptLeptZ1_,  "ptLeptZ1_/F");
+  reducedTree_->Branch("etaLeptZ1",  &etaLeptZ1_,  "etaLeptZ1_/F");
+  reducedTree_->Branch("phiLeptZ1",  &phiLeptZ1_,  "phiLeptZ1_/F");
+  reducedTree_->Branch("chargeLeptZ1",  &chargeLeptZ1_,  "chargeLeptZ1_/I");
 
-  reducedTree_->Branch("eLept1Gen",  &eLept1Gen_,  "eLept1Gen_/F");
-  reducedTree_->Branch("ptLept1Gen",  &ptLept1Gen_,  "ptLept1Gen_/F");
-  reducedTree_->Branch("etaLept1Gen",  &etaLept1Gen_,  "etaLept1Gen_/F");
-  reducedTree_->Branch("phiLept1Gen",  &phiLept1Gen_,  "phiLept1Gen_/F");
+  reducedTree_->Branch("eLeptZ1Gen",  &eLeptZ1Gen_,  "eLeptZ1Gen_/F");
+  reducedTree_->Branch("ptLeptZ1Gen",  &ptLeptZ1Gen_,  "ptLeptZ1Gen_/F");
+  reducedTree_->Branch("etaLeptZ1Gen",  &etaLeptZ1Gen_,  "etaLeptZ1Gen_/F");
+  reducedTree_->Branch("phiLeptZ1Gen",  &phiLeptZ1Gen_,  "phiLeptZ1Gen_/F");
 
-  reducedTree_->Branch("eLept2",  &eLept2_,  "eLept2_/F");
-  reducedTree_->Branch("ptLept2",  &ptLept2_,  "ptLept2_/F");
-  reducedTree_->Branch("etaLept2",  &etaLept2_,  "etaLept2_/F");
-  reducedTree_->Branch("phiLept2",  &phiLept2_,  "phiLept2_/F");
-  reducedTree_->Branch("chargeLept2",  &chargeLept2_,  "chargeLept2_/I");
+  reducedTree_->Branch("eLeptZ2",  &eLeptZ2_,  "eLeptZ2_/F");
+  reducedTree_->Branch("ptLeptZ2",  &ptLeptZ2_,  "ptLeptZ2_/F");
+  reducedTree_->Branch("etaLeptZ2",  &etaLeptZ2_,  "etaLeptZ2_/F");
+  reducedTree_->Branch("phiLeptZ2",  &phiLeptZ2_,  "phiLeptZ2_/F");
+  reducedTree_->Branch("chargeLeptZ2",  &chargeLeptZ2_,  "chargeLeptZ2_/I");
 
-  reducedTree_->Branch("eLept2Gen",  &eLept2Gen_,  "eLept2Gen_/F");
-  reducedTree_->Branch("ptLept2Gen",  &ptLept2Gen_,  "ptLept2Gen_/F");
-  reducedTree_->Branch("etaLept2Gen",  &etaLept2Gen_,  "etaLept2Gen_/F");
-  reducedTree_->Branch("phiLept2Gen",  &phiLept2Gen_,  "phiLept2Gen_/F");
+  reducedTree_->Branch("eLeptZ2Gen",  &eLeptZ2Gen_,  "eLeptZ2Gen_/F");
+  reducedTree_->Branch("ptLeptZ2Gen",  &ptLeptZ2Gen_,  "ptLeptZ2Gen_/F");
+  reducedTree_->Branch("etaLeptZ2Gen",  &etaLeptZ2Gen_,  "etaLeptZ2Gen_/F");
+  reducedTree_->Branch("phiLeptZ2Gen",  &phiLeptZ2Gen_,  "phiLeptZ2Gen_/F");
+
+  reducedTree_->Branch("nLept", &nLept_, "nLept_/I");
+
+  reducedTree_->Branch("leptTypeLept", leptTypeLept_, "leptTypeLept_[nLept_]/I");
+  reducedTree_->Branch("eLept",  eLept_,  "eLept_[nLept_]/F");
+  reducedTree_->Branch( "ptLept",  ptLept_,  "ptLept_[nLept_]/F");
+  reducedTree_->Branch("etaLept", etaLept_, "etaLept_[nLept_]/F");
+  reducedTree_->Branch("phiLept", phiLept_, "phiLept_[nLept_]/F");
+  reducedTree_->Branch("chargeLept", chargeLept_, "chargeLept_[nLept_]/I");
+
 
   reducedTree_->Branch("nJets", &nJets_, "nJets_/I");
 
@@ -169,28 +179,7 @@ void Ntp1Analyzer_TTZ::CreateOutputFile() {
   reducedTree_->Branch("phipfMet",&phipfMet_,"phipfMet_/F");
 
   
-  int nBins_eff = 20;
-  float ptMin_eff = 10.;
-  float ptMax_eff = 150.;
-  h1_nEvents_vs_ptEle = new TH1F("nEvents_vs_ptEle", "", nBins_eff, ptMin_eff, ptMax_eff);
-  h1_nEvents_vs_ptMuon = new TH1F("nEvents_vs_ptMuon", "", nBins_eff, ptMin_eff, ptMax_eff);
-  h1_passed_vs_ptEle = new TH1F("passed_vs_ptEle", "", nBins_eff, ptMin_eff, ptMax_eff);
-  h1_passed_vs_ptMuon = new TH1F("passed_vs_ptMuon", "", nBins_eff, ptMin_eff, ptMax_eff);
-  h1_deltaRmatching_muons = new TH1F("deltaRmatching_muons", "", 100, 0., 0.01);
-  h1_deltaRmatching_electrons = new TH1F("deltaRmatching_electrons", "", 100, 0., 0.01);
-  h1_deltaRmatching_jet_parton = new TH1F("deltaRmatching_jet_parton", "", 100, 0., 0.6);
-  h1_deltaRmatching_genjet_parton = new TH1F("deltaRmatching_genjet_parton", "", 100, 0., 0.6);
-  h1_deltaRmatching_jet_genjet = new TH1F("deltaRmatching_jet_genjet", "", 100, 0., 0.6);
-  h1_deltaRmatching_jet_leptonParton = new TH1F("deltaRmatching_leptonParton", "", 100, 0., 4.);
   h1_nJets30 = new TH1F("nJets30", "", 31, -0.5, 30.5);
-//h1_indexMatchedJet = new TH1F("indexMatchedJet", "", 6, -0.5, 5.5);
-//h1_indexMatched05Jet = new TH1F("indexMatched05Jet", "", 6, -0.5, 5.5);
-//h1_nMatched_per_event = new TH1F("nMatched_per_event", "", 6, -0.5, 5.5);
-//h1_nMatched05_per_event = new TH1F("nMatched05_per_event", "", 6, -0.5, 5.5);
-//h1_pdgIdParton1 = new TH1F("pdgIdParton1", "", 36, -10.5, 25.5);
-//h1_pdgIdParton2 = new TH1F("pdgIdParton2", "", 36, -10.5, 25.5);
-//h1_ptHadronicZ = new TH1F("ptHadronicZ", "", 50, 0., 400.);
-//h1_deltaRqq = new TH1F("deltaRqq", "", 50, 0., 3.);
 
 } 
 
@@ -598,15 +587,15 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
          if( muons.size()==0 ) {
            muons.push_back(muonsPlus[iMuonPlus]);
            muons.push_back(muonsMinus[iMuonMinus]);
-           iMuonPlus_found = iMuonsPlus;
-           iMuonMinus_found = iMuonsMinus;
+           iMuonPlus_found = iMuonPlus;
+           iMuonMinus_found = iMuonMinus;
            bestMZ_muons = dimuon.M();
          } else if( fabs(dimuon.M()-mZ) < fabs(bestMZ_muons-mZ) ) { //already found a pair
            muons.clear();
            muons.push_back(muonsPlus[iMuonPlus]);
            muons.push_back(muonsMinus[iMuonMinus]);
-           iMuonPlus_found = iMuonsPlus;
-           iMuonMinus_found = iMuonsMinus;
+           iMuonPlus_found = iMuonPlus;
+           iMuonMinus_found = iMuonMinus;
            bestMZ_muons = dimuon.M();
          }
        }  //for muons minus
@@ -767,9 +756,9 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        TLorentzVector Zee = electrons[0] + electrons[1];
        TLorentzVector Zmm = muons[0] + muons[1];
 
-       if( fabs(Zee.M()-MZ) < fabs(Zmm.M()-MZ) ) {
+       if( fabs(Zee.M()-mZ) < fabs(Zmm.M()-mZ) ) {
 
-         leptType==1;
+         leptType_=1;
          if( electrons[0].Pt() > electrons[1].Pt() ) {
            leptons.push_back( electrons[0] );
            leptons.push_back( electrons[1] );
@@ -780,7 +769,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
        } else { 
 
-         leptType==0;
+         leptType_=0;
          if( muons[0].Pt() > muons[1].Pt() ) {
            leptons.push_back( muons[0] );
            leptons.push_back( muons[1] );
@@ -845,49 +834,49 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
 
      // save other leptons:
-     iLept_=0;
-     for( unsigned iMuonPlus=0; iMuonPlus<muonsPlus.size() && iLept_<10; ++iMuonPlus ) {
+     nLept_=0;
+     for( unsigned iMuonPlus=0; iMuonPlus<muonsPlus.size() && nLept_<10; ++iMuonPlus ) {
        if( iMuonPlus!=iMuonPlus_found ) {
-         leptTypeLept_[iLept_] = 0;
-         eLept_[iLept_] = muonsPlus[iMuonPlus].Energy();
-         ptLept_[iLept_] = muonsPlus[iMuonPlus].Pt();
-         etaLept_[iLept_] = muonsPlus[iMuonPlus].Eta();
-         phiLept_[iLept_] = muonsPlus[iMuonPlus].Phi();
-         chargeLept_[iLept_] = muonsPlus[iMuonPlus].charge;
-         iLept_++;
+         leptTypeLept_[nLept_] = 0;
+         eLept_[nLept_] = muonsPlus[iMuonPlus].Energy();
+         ptLept_[nLept_] = muonsPlus[iMuonPlus].Pt();
+         etaLept_[nLept_] = muonsPlus[iMuonPlus].Eta();
+         phiLept_[nLept_] = muonsPlus[iMuonPlus].Phi();
+         chargeLept_[nLept_] = muonsPlus[iMuonPlus].charge;
+         nLept_++;
        }
      }
-     for( unsigned iMuonMinus=0; iMuonMinus<muonsMinus.size() && iLept_<10; ++iMuonMinus ) {
+     for( unsigned iMuonMinus=0; iMuonMinus<muonsMinus.size() && nLept_<10; ++iMuonMinus ) {
        if( iMuonMinus!=iMuonMinus_found ) {
-         leptTypeLept_[iLept_] = 0;
-         eLept_[iLept_] = muonsMinus[iMuonMinus].Energy();
-         ptLept_[iLept_] = muonsMinus[iMuonMinus].Pt();
-         etaLept_[iLept_] = muonsMinus[iMuonMinus].Eta();
-         phiLept_[iLept_] = muonsMinus[iMuonMinus].Phi();
-         chargeLept_[iLept_] = muonsMinus[iMuonMinus].charge;
-         iLept_++;
+         leptTypeLept_[nLept_] = 0;
+         eLept_[nLept_] = muonsMinus[iMuonMinus].Energy();
+         ptLept_[nLept_] = muonsMinus[iMuonMinus].Pt();
+         etaLept_[nLept_] = muonsMinus[iMuonMinus].Eta();
+         phiLept_[nLept_] = muonsMinus[iMuonMinus].Phi();
+         chargeLept_[nLept_] = muonsMinus[iMuonMinus].charge;
+         nLept_++;
        }
      }
-     for( unsigned iElectronPlus=0; iElectronPlus<electronsPlus.size() && iLept_<10; ++iElectronPlus ) {
-       if( iElectronPlus!=iElectronPlus_found ) {
-         leptTypeLept_[iLept_] = 1;
-         eLept_[iLept_] = electronsPlus[iElectronPlus].Energy();
-         ptLept_[iLept_] = electronsPlus[iElectronPlus].Pt();
-         etaLept_[iLept_] = electronsPlus[iElectronPlus].Eta();
-         phiLept_[iLept_] = electronsPlus[iElectronPlus].Phi();
-         chargeLept_[iLept_] = electronsPlus[iElectronPlus].charge;
-         iLept_++;
+     for( unsigned iElectronPlus=0; iElectronPlus<electronsPlus.size() && nLept_<10; ++iElectronPlus ) {
+       if( iElectronPlus!=iElePlus_found ) {
+         leptTypeLept_[nLept_] = 1;
+         eLept_[nLept_] = electronsPlus[iElectronPlus].Energy();
+         ptLept_[nLept_] = electronsPlus[iElectronPlus].Pt();
+         etaLept_[nLept_] = electronsPlus[iElectronPlus].Eta();
+         phiLept_[nLept_] = electronsPlus[iElectronPlus].Phi();
+         chargeLept_[nLept_] = electronsPlus[iElectronPlus].charge;
+         nLept_++;
        }
      }
-     for( unsigned iElectronMinus=0; iElectronMinus<electronsMinus.size() && iLept_<10; ++iElectronMinus ) {
-       if( iElectronMinus!=iElectronMinus_found ) {
-         leptTypeLept_[iLept_] = 1;
-         eLept_[iLept_] = electronsMinus[iElectronMinus].Energy();
-         ptLept_[iLept_] = electronsMinus[iElectronMinus].Pt();
-         etaLept_[iLept_] = electronsMinus[iElectronMinus].Eta();
-         phiLept_[iLept_] = electronsMinus[iElectronMinus].Phi();
-         chargeLept_[iLept_] = electronsMinus[iElectronMinus].charge;
-         iLept_++;
+     for( unsigned iElectronMinus=0; iElectronMinus<electronsMinus.size() && nLept_<10; ++iElectronMinus ) {
+       if( iElectronMinus!=iEleMinus_found ) {
+         leptTypeLept_[nLept_] = 1;
+         eLept_[nLept_] = electronsMinus[iElectronMinus].Energy();
+         ptLept_[nLept_] = electronsMinus[iElectronMinus].Pt();
+         etaLept_[nLept_] = electronsMinus[iElectronMinus].Eta();
+         phiLept_[nLept_] = electronsMinus[iElectronMinus].Phi();
+         chargeLept_[nLept_] = electronsMinus[iElectronMinus].charge;
+         nLept_++;
        }
      }
 
@@ -1062,7 +1051,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      nPart_ = 0;
 
 
-     for( unsigned iJet=0; iJet<leadJets.size() && nJets_<30; ++iJet ) {
+     for( unsigned iJet=0; iJet<leadJets.size() && nJets_<50; ++iJet ) {
 
        eJet_[nJets_] = leadJets[iJet].Energy();
        ptJet_[nJets_] = leadJets[iJet].Pt();
