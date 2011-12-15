@@ -198,6 +198,7 @@ DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType
   poissonAsymmErrors_ = true;
 
   pdf_aussi_ = false;
+  root_aussi_ = false;
   noStack_ = false;
 
   isCMSArticle_ = false;
@@ -1624,8 +1625,11 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
     std::string canvasName_png = canvasName + ".png";
     c1->SaveAs(canvasName_png.c_str());
     std::string canvasName_pdf = canvasName + ".pdf";
+    std::string canvasName_root = canvasName + ".root";
     if( pdf_aussi_ )
       c1->SaveAs(canvasName_pdf.c_str());
+    if( root_aussi_ )
+      c1->SaveAs(canvasName_root.c_str());
 
     if( log_aussi ) {
 
@@ -1722,8 +1726,11 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
       canvasName_png = canvasName_log + ".png";
       c1->SaveAs(canvasName_png.c_str());
       canvasName_pdf = canvasName_log + ".pdf";
+      canvasName_root = canvasName_log + ".root";
       if( pdf_aussi_ )
         c1->SaveAs(canvasName_pdf.c_str());
+      if( root_aussi_ )
+        c1->SaveAs(canvasName_root.c_str());
       delete h2_axes_log;
     }
 
