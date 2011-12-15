@@ -223,48 +223,48 @@ void Ntp1Finalizer_TTZTriplepton::finalize() {
   Int_t nJets;
   tree_->SetBranchAddress("nJets", &nJets);
 
-  Float_t eJet1[50];
-  tree_->SetBranchAddress("eJet1", eJet1);
-  Float_t ptJet1[50];
-  tree_->SetBranchAddress("ptJet1", ptJet1);
-  Float_t etaJet1[50];
-  tree_->SetBranchAddress("etaJet1", etaJet1);
-  Float_t phiJet1[50];
-  tree_->SetBranchAddress("phiJet1", phiJet1);
-  Float_t eJet1Gen[50];
-  tree_->SetBranchAddress("eJet1Gen", eJet1Gen);
-  Float_t ptJet1Gen[50];
-  tree_->SetBranchAddress("ptJet1Gen", ptJet1Gen);
-  Float_t etaJet1Gen[50];
-  tree_->SetBranchAddress("etaJet1Gen", etaJet1Gen);
-  Float_t phiJet1Gen[50];
-  tree_->SetBranchAddress("phiJet1Gen", phiJet1Gen);
-  Float_t eChargedHadronsJet1[50];
-  tree_->SetBranchAddress("eChargedHadronsJet1", eChargedHadronsJet1);
-  Float_t rmsCandJet1[50];
-  tree_->SetBranchAddress("rmsCandJet1", rmsCandJet1);
-  Float_t ptDJet1[50];
-  tree_->SetBranchAddress("ptDJet1", ptDJet1);
-  Int_t nChargedJet1[50];
-  tree_->SetBranchAddress("nChargedJet1", nChargedJet1);
-  Int_t nNeutralJet1[50];
-  tree_->SetBranchAddress("nNeutralJet1", nNeutralJet1);
-  Float_t eMuonsJet1[50];
-  tree_->SetBranchAddress("eMuonsJet1", eMuonsJet1);
-  Float_t eElectronsJet1[50];
-  tree_->SetBranchAddress("eElectronsJet1", eElectronsJet1);
-  Float_t trackCountingHighEffBJetTagJet1[50];
-  tree_->SetBranchAddress("trackCountingHighEffBJetTagJet1", trackCountingHighEffBJetTagJet1);
-  Float_t trackCountingHighPurBJetTagJet1[50];
-  tree_->SetBranchAddress("trackCountingHighPurBJetTagJet1", trackCountingHighPurBJetTagJet1);
-  Float_t simpleSecondaryVertexHighEffBJetTagJet1[50];
-  tree_->SetBranchAddress("simpleSecondaryVertexHighEffBJetTagJet1", simpleSecondaryVertexHighEffBJetTagJet1);
-  Float_t simpleSecondaryVertexHighPurBJetTagJet1[50];
-  tree_->SetBranchAddress("simpleSecondaryVertexHighPurBJetTagJet1", simpleSecondaryVertexHighPurBJetTagJet1);
-  Float_t jetBProbabilityBJetTagJet1[50];
-  tree_->SetBranchAddress("jetBProbabilityBJetTagJet1", jetBProbabilityBJetTagJet1);
-  Float_t jetProbabilityBJetTagJet1[50];
-  tree_->SetBranchAddress("jetProbabilityBJetTagJet1", jetProbabilityBJetTagJet1);
+  Float_t eJet[50];
+  tree_->SetBranchAddress("eJet", eJet);
+  Float_t ptJet[50];
+  tree_->SetBranchAddress("ptJet", ptJet);
+  Float_t etaJet[50];
+  tree_->SetBranchAddress("etaJet", etaJet);
+  Float_t phiJet[50];
+  tree_->SetBranchAddress("phiJet", phiJet);
+  Float_t eJetGen[50];
+  tree_->SetBranchAddress("eJetGen", eJetGen);
+  Float_t ptJetGen[50];
+  tree_->SetBranchAddress("ptJetGen", ptJetGen);
+  Float_t etaJetGen[50];
+  tree_->SetBranchAddress("etaJetGen", etaJetGen);
+  Float_t phiJetGen[50];
+  tree_->SetBranchAddress("phiJetGen", phiJetGen);
+  Float_t eChargedHadronsJet[50];
+  tree_->SetBranchAddress("eChargedHadronsJet", eChargedHadronsJet);
+  Float_t rmsCandJet[50];
+  tree_->SetBranchAddress("rmsCandJet", rmsCandJet);
+  Float_t ptDJet[50];
+  tree_->SetBranchAddress("ptDJet", ptDJet);
+  Int_t nChargedJet[50];
+  tree_->SetBranchAddress("nChargedJet", nChargedJet);
+  Int_t nNeutralJet[50];
+  tree_->SetBranchAddress("nNeutralJet", nNeutralJet);
+  Float_t eMuonsJet[50];
+  tree_->SetBranchAddress("eMuonsJet", eMuonsJet);
+  Float_t eElectronsJet[50];
+  tree_->SetBranchAddress("eElectronsJet", eElectronsJet);
+  Float_t trackCountingHighEffBJetTagJet[50];
+  tree_->SetBranchAddress("trackCountingHighEffBJetTagJet", trackCountingHighEffBJetTagJet);
+  Float_t trackCountingHighPurBJetTagJet[50];
+  tree_->SetBranchAddress("trackCountingHighPurBJetTagJet", trackCountingHighPurBJetTagJet);
+  Float_t simpleSecondaryVertexHighEffBJetTagJet[50];
+  tree_->SetBranchAddress("simpleSecondaryVertexHighEffBJetTagJet", simpleSecondaryVertexHighEffBJetTagJet);
+  Float_t simpleSecondaryVertexHighPurBJetTagJet[50];
+  tree_->SetBranchAddress("simpleSecondaryVertexHighPurBJetTagJet", simpleSecondaryVertexHighPurBJetTagJet);
+  Float_t jetBProbabilityBJetTagJet[50];
+  tree_->SetBranchAddress("jetBProbabilityBJetTagJet", jetBProbabilityBJetTagJet);
+  Float_t jetProbabilityBJetTagJet[50];
+  tree_->SetBranchAddress("jetProbabilityBJetTagJet", jetProbabilityBJetTagJet);
 
 
 
@@ -309,197 +309,6 @@ void Ntp1Finalizer_TTZTriplepton::finalize() {
   
 
 
-  float nEventsPassed_fb_kinfit=0.;
-  int nEventsPassed_kinfit=0;
-
-  float nEventsPassed_fb_gluetag_250=0.;
-  int nEventsPassed_gluetag_250=0;
-  float nEventsPassed_fb_0btag_250=0.;
-  int nEventsPassed_0btag_250=0;
-  float nEventsPassed_fb_1btag_250=0.;
-  int nEventsPassed_1btag_250=0;
-  float nEventsPassed_fb_2btag_250=0.;
-  int nEventsPassed_2btag_250=0;
-
-  float nEventsPassed_fb_gluetag_250_ELE=0.;
-  int nEventsPassed_gluetag_250_ELE=0;
-  float nEventsPassed_fb_0btag_250_ELE=0.;
-  int nEventsPassed_0btag_250_ELE=0;
-  float nEventsPassed_fb_1btag_250_ELE=0.;
-  int nEventsPassed_1btag_250_ELE=0;
-  float nEventsPassed_fb_2btag_250_ELE=0.;
-  int nEventsPassed_2btag_250_ELE=0;
-
-  float nEventsPassed_fb_gluetag_250_MU=0.;
-  int nEventsPassed_gluetag_250_MU=0;
-  float nEventsPassed_fb_0btag_250_MU=0.;
-  int nEventsPassed_0btag_250_MU=0;
-  float nEventsPassed_fb_1btag_250_MU=0.;
-  int nEventsPassed_1btag_250_MU=0;
-  float nEventsPassed_fb_2btag_250_MU=0.;
-  int nEventsPassed_2btag_250_MU=0;
-
-  float nEventsPassed_fb_gluetag_300=0.;
-  int nEventsPassed_gluetag_300=0;
-  float nEventsPassed_fb_0btag_300=0.;
-  int nEventsPassed_0btag_300=0;
-  float nEventsPassed_fb_1btag_300=0.;
-  int nEventsPassed_1btag_300=0;
-  float nEventsPassed_fb_2btag_300=0.;
-  int nEventsPassed_2btag_300=0;
-
-  float nEventsPassed_fb_gluetag_300_ELE=0.;
-  int nEventsPassed_gluetag_300_ELE=0;
-  float nEventsPassed_fb_0btag_300_ELE=0.;
-  int nEventsPassed_0btag_300_ELE=0;
-  float nEventsPassed_fb_1btag_300_ELE=0.;
-  int nEventsPassed_1btag_300_ELE=0;
-  float nEventsPassed_fb_2btag_300_ELE=0.;
-  int nEventsPassed_2btag_300_ELE=0;
-
-  float nEventsPassed_fb_gluetag_300_MU=0.;
-  int nEventsPassed_gluetag_300_MU=0;
-  float nEventsPassed_fb_0btag_300_MU=0.;
-  int nEventsPassed_0btag_300_MU=0;
-  float nEventsPassed_fb_1btag_300_MU=0.;
-  int nEventsPassed_1btag_300_MU=0;
-  float nEventsPassed_fb_2btag_300_MU=0.;
-  int nEventsPassed_2btag_300_MU=0;
-
-  float nEventsPassed_fb_gluetag_350=0.;
-  int nEventsPassed_gluetag_350=0;
-  float nEventsPassed_fb_0btag_350=0.;
-  int nEventsPassed_0btag_350=0;
-  float nEventsPassed_fb_1btag_350=0.;
-  int nEventsPassed_1btag_350=0;
-  float nEventsPassed_fb_2btag_350=0.;
-  int nEventsPassed_2btag_350=0;
-
-  float nEventsPassed_fb_gluetag_350_ELE=0.;
-  int nEventsPassed_gluetag_350_ELE=0;
-  float nEventsPassed_fb_0btag_350_ELE=0.;
-  int nEventsPassed_0btag_350_ELE=0;
-  float nEventsPassed_fb_1btag_350_ELE=0.;
-  int nEventsPassed_1btag_350_ELE=0;
-  float nEventsPassed_fb_2btag_350_ELE=0.;
-  int nEventsPassed_2btag_350_ELE=0;
-
-  float nEventsPassed_fb_gluetag_350_MU=0.;
-  int nEventsPassed_gluetag_350_MU=0;
-  float nEventsPassed_fb_0btag_350_MU=0.;
-  int nEventsPassed_0btag_350_MU=0;
-  float nEventsPassed_fb_1btag_350_MU=0.;
-  int nEventsPassed_1btag_350_MU=0;
-  float nEventsPassed_fb_2btag_350_MU=0.;
-  int nEventsPassed_2btag_350_MU=0;
-
-  float nEventsPassed_fb_gluetag_400=0.;
-  int nEventsPassed_gluetag_400=0;
-  float nEventsPassed_fb_0btag_400=0.;
-  int nEventsPassed_0btag_400=0;
-  float nEventsPassed_fb_1btag_400=0.;
-  int nEventsPassed_1btag_400=0;
-  float nEventsPassed_fb_2btag_400=0.;
-  int nEventsPassed_2btag_400=0;
-
-  float nEventsPassed_fb_gluetag_400_ELE=0.;
-  int nEventsPassed_gluetag_400_ELE=0;
-  float nEventsPassed_fb_0btag_400_ELE=0.;
-  int nEventsPassed_0btag_400_ELE=0;
-  float nEventsPassed_fb_1btag_400_ELE=0.;
-  int nEventsPassed_1btag_400_ELE=0;
-  float nEventsPassed_fb_2btag_400_ELE=0.;
-  int nEventsPassed_2btag_400_ELE=0;
-
-  float nEventsPassed_fb_gluetag_400_MU=0.;
-  int nEventsPassed_gluetag_400_MU=0;
-  float nEventsPassed_fb_0btag_400_MU=0.;
-  int nEventsPassed_0btag_400_MU=0;
-  float nEventsPassed_fb_1btag_400_MU=0.;
-  int nEventsPassed_1btag_400_MU=0;
-  float nEventsPassed_fb_2btag_400_MU=0.;
-  int nEventsPassed_2btag_400_MU=0;
-
-  float nEventsPassed_fb_gluetag_450=0.;
-  int nEventsPassed_gluetag_450=0;
-  float nEventsPassed_fb_0btag_450=0.;
-  int nEventsPassed_0btag_450=0;
-  float nEventsPassed_fb_1btag_450=0.;
-  int nEventsPassed_1btag_450=0;
-  float nEventsPassed_fb_2btag_450=0.;
-  int nEventsPassed_2btag_450=0;
-
-  float nEventsPassed_fb_gluetag_450_ELE=0.;
-  int nEventsPassed_gluetag_450_ELE=0;
-  float nEventsPassed_fb_0btag_450_ELE=0.;
-  int nEventsPassed_0btag_450_ELE=0;
-  float nEventsPassed_fb_1btag_450_ELE=0.;
-  int nEventsPassed_1btag_450_ELE=0;
-  float nEventsPassed_fb_2btag_450_ELE=0.;
-  int nEventsPassed_2btag_450_ELE=0;
-
-  float nEventsPassed_fb_gluetag_450_MU=0.;
-  int nEventsPassed_gluetag_450_MU=0;
-  float nEventsPassed_fb_0btag_450_MU=0.;
-  int nEventsPassed_0btag_450_MU=0;
-  float nEventsPassed_fb_1btag_450_MU=0.;
-  int nEventsPassed_1btag_450_MU=0;
-  float nEventsPassed_fb_2btag_450_MU=0.;
-  int nEventsPassed_2btag_450_MU=0;
-
-  float nEventsPassed_fb_gluetag_500=0.;
-  int nEventsPassed_gluetag_500=0;
-  float nEventsPassed_fb_0btag_500=0.;
-  int nEventsPassed_0btag_500=0;
-  float nEventsPassed_fb_1btag_500=0.;
-  int nEventsPassed_1btag_500=0;
-  float nEventsPassed_fb_2btag_500=0.;
-  int nEventsPassed_2btag_500=0;
-
-  float nEventsPassed_fb_gluetag_500_ELE=0.;
-  int nEventsPassed_gluetag_500_ELE=0;
-  float nEventsPassed_fb_0btag_500_ELE=0.;
-  int nEventsPassed_0btag_500_ELE=0;
-  float nEventsPassed_fb_1btag_500_ELE=0.;
-  int nEventsPassed_1btag_500_ELE=0;
-  float nEventsPassed_fb_2btag_500_ELE=0.;
-  int nEventsPassed_2btag_500_ELE=0;
-
-  float nEventsPassed_fb_gluetag_500_MU=0.;
-  int nEventsPassed_gluetag_500_MU=0;
-  float nEventsPassed_fb_0btag_500_MU=0.;
-  int nEventsPassed_0btag_500_MU=0;
-  float nEventsPassed_fb_1btag_500_MU=0.;
-  int nEventsPassed_1btag_500_MU=0;
-  float nEventsPassed_fb_2btag_500_MU=0.;
-  int nEventsPassed_2btag_500_MU=0;
-
-  float nEventsPassed_fb_gluetag_600=0.;
-  int nEventsPassed_gluetag_600=0;
-  float nEventsPassed_fb_0btag_600=0.;
-  int nEventsPassed_0btag_600=0;
-  float nEventsPassed_fb_1btag_600=0.;
-  int nEventsPassed_1btag_600=0;
-  float nEventsPassed_fb_2btag_600=0.;
-  int nEventsPassed_2btag_600=0;
-
-  float nEventsPassed_fb_gluetag_600_ELE=0.;
-  int nEventsPassed_gluetag_600_ELE=0;
-  float nEventsPassed_fb_0btag_600_ELE=0.;
-  int nEventsPassed_0btag_600_ELE=0;
-  float nEventsPassed_fb_1btag_600_ELE=0.;
-  int nEventsPassed_1btag_600_ELE=0;
-  float nEventsPassed_fb_2btag_600_ELE=0.;
-  int nEventsPassed_2btag_600_ELE=0;
-
-  float nEventsPassed_fb_gluetag_600_MU=0.;
-  int nEventsPassed_gluetag_600_MU=0;
-  float nEventsPassed_fb_0btag_600_MU=0.;
-  int nEventsPassed_0btag_600_MU=0;
-  float nEventsPassed_fb_1btag_600_MU=0.;
-  int nEventsPassed_1btag_600_MU=0;
-  float nEventsPassed_fb_2btag_600_MU=0.;
-  int nEventsPassed_2btag_600_MU=0;
 
 
 
@@ -507,22 +316,9 @@ void Ntp1Finalizer_TTZTriplepton::finalize() {
   std::map< int, std::map<int, std::vector<int> > > run_lumi_ev_map;
 
 
-  //QGLikelihoodCalculator *qglikeli = new QGLikelihoodCalculator("/cmsrm/pc18/pandolf/CMSSW_4_1_3/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt_15to3000_TuneZ2_Flat_7TeV_pythia6_Fall10.root");
-  //QGLikelihoodCalculator *qglikeli = new QGLikelihoodCalculator("/cmsrm/pc18/pandolf/CMSSW_4_1_3/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt_15to3000_TuneZ2_Flat_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1.root");
-  //QGLikelihoodCalculator *qglikeli = new QGLikelihoodCalculator("/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt_15to3000_TuneZ2_Flat_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1.root");
-  QGLikelihoodCalculator *qglikeli = new QGLikelihoodCalculator("/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
+  //QGLikelihoodCalculator *qglikeli = new QGLikelihoodCalculator("/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
   float Zmass = 91.1876;
-  DiJetKinFitter* fitter_jets = new DiJetKinFitter( "fitter_jets", "fitter_jets", Zmass );
-  HelicityLikelihoodDiscriminant *LD = new HelicityLikelihoodDiscriminant();
-  float helicityLD_selected = -1.;
-  float helicityLD_nokinfit_selected = -1.;
-  HelicityLikelihoodDiscriminant::HelicityAngles hangles_selected;
 
-  BTagSFUtil* btsfutil = new BTagSFUtil(13);
-  TFile* file_loose = TFile::Open("BTagPayloads_TCHEL.root");
-  TFile* file_medium = TFile::Open("BTagPayloads_TCHEM.root");
-  btsfutil->set_fileLoose(file_loose);
-  btsfutil->set_fileMedium(file_medium);
 
   std::string puType = "Spring11_Flat10";
   std::string puType_ave = "Spring11_Flat10";
@@ -595,38 +391,32 @@ void Ntp1Finalizer_TTZTriplepton::finalize() {
     fPUWeight->SetMCHistogram(h1_nPU_mc);
   }
 
+
+
   int maxBTag_found = -1;
-  float mZZ, mZZ_nokinfit, mZjj, mZll;
-  float ptLept1_t, ptLept2_t, etaLept1_t, etaLept2_t;
+  float mZll;
+  float ptLeptZ1_t, ptLeptZ2_t, etaLeptZ1_t, etaLeptZ2_t;
+  float ptLept3_t, etaLept3_t;
   float ptJet1_t, ptJet2_t, etaJet1_t, etaJet2_t;
   float HLTSF;
-  bool isSidebands=false;
-  bool isSignalRegion=false;
-  bool foundSignalRegionMjj=false;
-  bool atLeastOneInSignalRegionMjj=false;
 
   tree_passedEvents->Branch( "run", &run, "run/I" );
   tree_passedEvents->Branch( "LS", &LS, "LS/I" );
   tree_passedEvents->Branch( "event", &event, "event/I" );
   tree_passedEvents->Branch( "leptType", &leptType, "leptType/I" );
-  tree_passedEvents->Branch( "ptLept1", &ptLept1_t, "ptLept1_t/F" );
-  tree_passedEvents->Branch( "ptLept2", &ptLept2_t, "ptLept2_t/F" );
-  tree_passedEvents->Branch( "etaLept1", &etaLept1_t, "etaLept1_t/F" );
-  tree_passedEvents->Branch( "etaLept2", &etaLept2_t, "etaLept2_t/F" );
-  tree_passedEvents->Branch( "ptJet1", &ptJet1_t, "ptJet1_t/F" );
-  tree_passedEvents->Branch( "ptJet2", &ptJet2_t, "ptJet2_t/F" );
-  tree_passedEvents->Branch( "etaJet1", &etaJet1_t, "etaJet1_t/F" );
-  tree_passedEvents->Branch( "etaJet2", &etaJet2_t, "etaJet2_t/F" );
-  tree_passedEvents->Branch( "mZjj", &mZjj, "mZjj/F" );
-  tree_passedEvents->Branch( "mZll", &mZll, "mZll/F" );
-  tree_passedEvents->Branch( "CMS_hzz2l2q_mZZ", &mZZ, "mZZ/F" );
-  tree_passedEvents->Branch( "mZZ_nokinfit", &mZZ_nokinfit, "mZZ_nokinfit/F" );
+  tree_passedEvents->Branch( "ptLeptZ1", &ptLeptZ1_t, "ptLeptZ1_t/F" );
+  tree_passedEvents->Branch( "ptLeptZ2", &ptLeptZ2_t, "ptLeptZ2_t/F" );
+  tree_passedEvents->Branch( "ptLept3", &ptLept3_t, "ptLept3_t/F" );
+  tree_passedEvents->Branch( "etaLeptZ1", &etaLeptZ1_t, "etaLeptZ1_t/F" );
+  tree_passedEvents->Branch( "etaLeptZ2", &etaLeptZ2_t, "etaLeptZ2_t/F" );
+  tree_passedEvents->Branch( "etaLept3", &etaLept3_t, "etaLept3_t/F" );
+  //tree_passedEvents->Branch( "ptJet1", &ptJet1_t, "ptJet1_t/F" );
+  //tree_passedEvents->Branch( "ptJet2", &ptJet2_t, "ptJet2_t/F" );
+  //tree_passedEvents->Branch( "etaJet1", &etaJet1_t, "etaJet1_t/F" );
+  //tree_passedEvents->Branch( "etaJet2", &etaJet2_t, "etaJet2_t/F" );
   tree_passedEvents->Branch( "eventWeight", &eventWeight, "eventWeight/F" );
   tree_passedEvents->Branch( "HLTSF", &HLTSF, "HLTSF/F" );
   tree_passedEvents->Branch( "PUWeight", &eventWeightPU, "eventWeightPU/F" );
-  tree_passedEvents->Branch( "nBTags", &maxBTag_found, "maxBTag_found/I" );
-  tree_passedEvents->Branch( "isSidebands", &isSidebands, "isSidebands/O" );
-  tree_passedEvents->Branch( "isSignalRegion", &isSignalRegion, "isSignalRegion/O" );
 
 
 
@@ -634,13 +424,6 @@ void Ntp1Finalizer_TTZTriplepton::finalize() {
 ofstream ofs("run_event.txt");
 
 
-  
-  float nEvents_presel=0.;
-  float nEvents_presel_mZll=0.;
-  float nEvents_presel_mZll_mZjj=0.;
-  float nEvents_presel_mZll_mZjj_0btag=0.;
-  float nEvents_presel_mZll_mZjj_1btag=0.;
-  float nEvents_presel_mZll_mZjj_2btag=0.;
 
 
   std::cout << std::endl << std::endl;
@@ -667,82 +450,66 @@ ofstream ofs("run_event.txt");
     }
 
 
-  //// BUG FIX in Z->ll BR in Spring11 Alpgen Z+jets:
-  //if( dataset_=="ZJets_alpgen_TuneZ2_Spring11_v2" ) {
-  //  if( leptType==0 )      eventWeight = eventWeight_Zmm;
-  //  else if( leptType==1 ) eventWeight = eventWeight_Zee;
-  //}
-
-
 
 
     h1_nvertex->Fill(nvertex, eventWeight);
 
     if( isMC ) {
 
-      // scale factor for double mu triggers:
-      if( leptType==0 ) {
+//    // scale factor for double mu triggers:
+//    if( leptType==0 ) {
 
-        float effDouble1_Run2011A = getMuonHLTSF_DoubleTrigger( ptLept1, etaLept1, "Run2011A" );
-        float effDouble2_Run2011A = getMuonHLTSF_DoubleTrigger( ptLept2, etaLept2, "Run2011A" );
+//      float effDouble1_Run2011A = getMuonHLTSF_DoubleTrigger( ptLept1, etaLept1, "Run2011A" );
+//      float effDouble2_Run2011A = getMuonHLTSF_DoubleTrigger( ptLept2, etaLept2, "Run2011A" );
 
-        float effDouble1_Run2011B = getMuonHLTSF_DoubleTrigger( ptLept1, etaLept1, "Run2011B" );
-        float effDouble2_Run2011B = getMuonHLTSF_DoubleTrigger( ptLept2, etaLept2, "Run2011B" );
+//      float effDouble1_Run2011B = getMuonHLTSF_DoubleTrigger( ptLept1, etaLept1, "Run2011B" );
+//      float effDouble2_Run2011B = getMuonHLTSF_DoubleTrigger( ptLept2, etaLept2, "Run2011B" );
 
-        float effSingle1_Run2011A1 = getMuonHLTSF_SingleTrigger( ptLept1, etaLept1, "Run2011A1");
-        float effSingle2_Run2011A1 = getMuonHLTSF_SingleTrigger( ptLept2, etaLept2, "Run2011A1");
+//      float effSingle1_Run2011A1 = getMuonHLTSF_SingleTrigger( ptLept1, etaLept1, "Run2011A1");
+//      float effSingle2_Run2011A1 = getMuonHLTSF_SingleTrigger( ptLept2, etaLept2, "Run2011A1");
 
-        float effSingle1_Run2011A2 = getMuonHLTSF_SingleTrigger( ptLept1, etaLept1, "Run2011A2");
-        float effSingle2_Run2011A2 = getMuonHLTSF_SingleTrigger( ptLept2, etaLept2, "Run2011A2");
+//      float effSingle1_Run2011A2 = getMuonHLTSF_SingleTrigger( ptLept1, etaLept1, "Run2011A2");
+//      float effSingle2_Run2011A2 = getMuonHLTSF_SingleTrigger( ptLept2, etaLept2, "Run2011A2");
 
-        float effSingle1_Run2011A3 = getMuonHLTSF_SingleTrigger( ptLept1, etaLept1, "Run2011A3");
-        float effSingle2_Run2011A3 = getMuonHLTSF_SingleTrigger( ptLept2, etaLept2, "Run2011A3");
+//      float effSingle1_Run2011A3 = getMuonHLTSF_SingleTrigger( ptLept1, etaLept1, "Run2011A3");
+//      float effSingle2_Run2011A3 = getMuonHLTSF_SingleTrigger( ptLept2, etaLept2, "Run2011A3");
 
-        float effSingle1_Run2011B = getMuonHLTSF_SingleTrigger( ptLept1, etaLept1, "Run2011B");
-        float effSingle2_Run2011B = getMuonHLTSF_SingleTrigger( ptLept2, etaLept2, "Run2011B");
-
-
-        float HLTSF_Run2011A1 = getEventHLTSF( effSingle1_Run2011A1, effSingle2_Run2011A1, effDouble1_Run2011A, effDouble2_Run2011A );
-        float HLTSF_Run2011A2 = getEventHLTSF( effSingle1_Run2011A2, effSingle2_Run2011A2, effDouble1_Run2011A, effDouble2_Run2011A );
-        float HLTSF_Run2011A3 = getEventHLTSF( effSingle1_Run2011A3, effSingle2_Run2011A3, effDouble1_Run2011A, effDouble2_Run2011A );
-        float HLTSF_Run2011B  = getEventHLTSF( effSingle1_Run2011B, effSingle2_Run2011B, effDouble1_Run2011B, effDouble2_Run2011B );
+//      float effSingle1_Run2011B = getMuonHLTSF_SingleTrigger( ptLept1, etaLept1, "Run2011B");
+//      float effSingle2_Run2011B = getMuonHLTSF_SingleTrigger( ptLept2, etaLept2, "Run2011B");
 
 
-        // weighted average over full run (weighted with lumi):
-        // LP11:
-        //HLTSF = (217.*HLTSF_Run2011A1 + 920.*HLTSF_Run2011A2 + 478.*HLTSF_Run2011A3)/(217.+920.+478.);
-        if( PUType_=="Run2011A" || PUType_=="Run2011A_73pb" )
-          HLTSF = (217.*HLTSF_Run2011A1 + 920.*HLTSF_Run2011A2 + 1000.*HLTSF_Run2011A3)/(217.+920.+1000.);
-        else if( PUType_=="HR11" ) 
-          HLTSF = (217.*HLTSF_Run2011A1 + 920.*HLTSF_Run2011A2 + 1000.*HLTSF_Run2011A3 + 2100.*HLTSF_Run2011B)/(217.+920.+1000.+2100.);
-        else if( PUType_=="HR11_v2" || PUType_=="HR11_73pb" )
-          HLTSF = (217.*HLTSF_Run2011A1 + 920.*HLTSF_Run2011A2 + 1000.*HLTSF_Run2011A3 + 2500.*HLTSF_Run2011B)/(217.+920.+1000.+2500.);
+//      float HLTSF_Run2011A1 = getEventHLTSF( effSingle1_Run2011A1, effSingle2_Run2011A1, effDouble1_Run2011A, effDouble2_Run2011A );
+//      float HLTSF_Run2011A2 = getEventHLTSF( effSingle1_Run2011A2, effSingle2_Run2011A2, effDouble1_Run2011A, effDouble2_Run2011A );
+//      float HLTSF_Run2011A3 = getEventHLTSF( effSingle1_Run2011A3, effSingle2_Run2011A3, effDouble1_Run2011A, effDouble2_Run2011A );
+//      float HLTSF_Run2011B  = getEventHLTSF( effSingle1_Run2011B, effSingle2_Run2011B, effDouble1_Run2011B, effDouble2_Run2011B );
 
-        eventWeight *= HLTSF;
 
-      } else { //electrons
+//      // weighted average over full run (weighted with lumi):
+//      // LP11:
+//      //HLTSF = (217.*HLTSF_Run2011A1 + 920.*HLTSF_Run2011A2 + 478.*HLTSF_Run2011A3)/(217.+920.+478.);
+//      if( PUType_=="Run2011A" || PUType_=="Run2011A_73pb" )
+//        HLTSF = (217.*HLTSF_Run2011A1 + 920.*HLTSF_Run2011A2 + 1000.*HLTSF_Run2011A3)/(217.+920.+1000.);
+//      else if( PUType_=="HR11" ) 
+//        HLTSF = (217.*HLTSF_Run2011A1 + 920.*HLTSF_Run2011A2 + 1000.*HLTSF_Run2011A3 + 2100.*HLTSF_Run2011B)/(217.+920.+1000.+2100.);
+//      else if( PUType_=="HR11_v2" || PUType_=="HR11_73pb" )
+//        HLTSF = (217.*HLTSF_Run2011A1 + 920.*HLTSF_Run2011A2 + 1000.*HLTSF_Run2011A3 + 2500.*HLTSF_Run2011B)/(217.+920.+1000.+2500.);
 
-        HLTSF = 1.;
+//      eventWeight *= HLTSF;
 
-      }
+//    } else { //electrons
 
-      // PU reweighting:
-      h1_nvertex_PUW_ave->Fill(nvertex, eventWeight*eventWeightPU_ave);
-      //eventWeight *= eventWeightPU;
-     
-//for( unsigned ii=0; ii<36; ++ii )
-//  std::cout << ii << " " << fPUWeight->GetWeight(ii) << std::endl;
-//exit(1);
+//      HLTSF = 1.;
+
+//    }
+
+
       eventWeight *= fPUWeight->GetWeight(nPU);
-      //std::cout << event << " " << nPU << " " << nvertex << " " << fPUWeight->GetWeight(nPU) << std::endl;
 
     } // if is MC
 
 
 
     h1_nvertex_PUW->Fill(nvertex, eventWeight);
-    if( !isMC ) 
-      h1_nvertex_PUW_ave->Fill(nvertex, eventWeight);
 
 
     if( !isMC ) { 
@@ -798,76 +565,36 @@ ofstream ofs("run_event.txt");
 
       h1_run->Fill( run, eventWeight );
 
-
-      // HLT requirement:
-  
-      if( dataset_tstr.BeginsWith("SingleMu") ) {
-
-        bool passedHLT = passed_HLT_IsoMu24
-                      && !passed_HLT_DoubleMu7 && !passed_HLT_Mu13_Mu8
-                      && !passed_HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL && !passed_HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL;
-
-        if( !passedHLT ) continue;
-
-      }
-
-    //if( dataset_tstr.BeginsWith("DoubleMu") ) {
-
-    //  bool passedHLT = !passed_HLT_IsoMu24
-    //                && passed_HLT_DoubleMu7 && passed_HLT_Mu13_Mu8
-    //                && !passed_HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL && !passed_HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL;
-
-    //  if( !passedHLT ) continue;
-
-    //}
-
     
     } //if is not mc
 
 
-//std::cout << std::endl << "new event" << std::endl;
+
 
     h1_rhoPF_presel->Fill( rhoPF, eventWeight);
 
 
-    TLorentzVector lept1, lept2;
-    lept1.SetPtEtaPhiE( ptLept1, etaLept1, phiLept1, eLept1 );
-    lept2.SetPtEtaPhiE( ptLept2, etaLept2, phiLept2, eLept2 );
+    TLorentzVector leptZ1, leptZ2;
+    leptZ1.SetPtEtaPhiE( ptLeptZ1, etaLeptZ1, phiLeptZ1, eLeptZ1 );
+    leptZ2.SetPtEtaPhiE( ptLeptZ2, etaLeptZ2, phiLeptZ2, eLeptZ2 );
 
     TLorentzVector diLepton = lept1+lept2;
 
 
+    h1_ptLeptZ1->Fill( leptZ1.Pt(), eventWeight );
+    h1_ptLeptZ2->Fill( leptZ2.Pt(), eventWeight );
+    h1_etaLeptZ1->Fill( leptZ1.Eta(), eventWeight );
+    h1_etaLeptZ2->Fill( leptZ2.Eta(), eventWeight );
+
+    h1_deltaRllZ->Fill( leptZ2.DeltaR(&leptZ2), eventWeight );
+
+    h1_ptZll->Fill( diLepton.Pt(), eventWeight );
+    h1_etaZll->Fill( diLepton.Eta(), eventWeight );
+    h1_mZll->Fill( diLepton.M(), eventWeight );
+
 
     nEvents_presel += eventWeight;
 
-    std::vector< std::pair< AnalysisJet, AnalysisJet > > jetPairs_selected;
-
-    if( nPairs>0 ) {
-
-      h1_mZll_presel->Fill( diLepton.M(), eventWeight );
-      if( leptType==0 )
-        h1_mZmumu_presel->Fill( diLepton.M(), eventWeight );
-      else
-        h1_mZee_presel->Fill( diLepton.M(), eventWeight );
-      h1_ptZll_presel->Fill( diLepton.Pt(), eventWeight );
-
-      h1_deltaRll_presel->Fill(lept1.DeltaR(lept2), eventWeight );
-
-      h1_ptLept1_presel->Fill( ptLept1, eventWeight );
-      h1_ptLept2_presel->Fill( ptLept2, eventWeight );
-
-      h1_etaLept1_presel->Fill( etaLept1, eventWeight );
-      h1_etaLept2_presel->Fill( etaLept2, eventWeight );
-
-    } else {
-
-      h1_mZll_presel_0jets->Fill( diLepton.M(), eventWeight );
-      if( leptType==0 )
-        h1_mZmumu_presel_0jets->Fill( diLepton.M(), eventWeight );
-      else
-        h1_mZee_presel_0jets->Fill( diLepton.M(), eventWeight );
-
-    }
 
 
 
@@ -876,8 +603,8 @@ ofstream ofs("run_event.txt");
       std::cout << std::endl << std::endl << "----------------------------------" << std::endl;
       std::cout << "** LOG FOR RUN: " << run << "   EVENT: " << DEBUG_EVENTNUMBER << std::endl << std::endl;
       std::cout << "leptType: " << leptType << std::endl; 
-      std::cout << "lept1.Pt(): " << lept1.Pt() << " lept1.Eta(): " << lept1.Eta() << std::endl;
-      std::cout << "lept2.Pt(): " << lept2.Pt() << " lept2.Eta(): " << lept2.Eta() << std::endl;
+      std::cout << "leptZ1.Pt(): " << leptZ1.Pt() << " leptZ1.Eta(): " << leptZ1.Eta() << std::endl;
+      std::cout << "leptZ2.Pt(): " << leptZ2.Pt() << " leptZ2.Eta(): " << leptZ2.Eta() << std::endl;
       std::cout << "diLepton.M(): " << diLepton.M() << std::endl;
     }
 
@@ -886,27 +613,20 @@ ofstream ofs("run_event.txt");
     // KINEMATIC SELECTION: LEPTONS
     // ----------------------------
 
-    if( lept1.Pt() < ptLept1_thresh_ ) continue;
-    if( lept2.Pt() < ptLept2_thresh_ ) continue;
-    if( fabs(lept1.Eta()) > etaLept1_thresh_ ) continue;
-    if( fabs(lept2.Eta()) > etaLept2_thresh_ ) continue;
-    if( invert_mZll_ ) {
-      if( diLepton.M() > mZll_threshLo_ && diLepton.M() < mZll_threshHi_ ) continue;
-      if( diLepton.M() < 50. ) continue; //quick fix for now: madgraph DY does not go under 50 gev
-    } else {
-      if( diLepton.M() < mZll_threshLo_ || diLepton.M() > mZll_threshHi_ ) continue;
-    }
-
-    nEvents_presel_mZll += eventWeight;
+    if( leptZ1.Pt() < ptLeptZ1_thresh_ ) continue;
+    if( leptZ2.Pt() < ptLeptZ2_thresh_ ) continue;
+    if( fabs(leptZ1.Eta()) > etaLeptZ1_thresh_ ) continue;
+    if( fabs(leptZ2.Eta()) > etaLeptZ2_thresh_ ) continue;
+    if( diLepton.M() < mZll_threshLo_ || diLepton.M() > mZll_threshHi_ ) continue;
 
 
-    int nJets = getNJets(nPairs);
-    h1_nJets_presel->Fill( nJets , eventWeight );
-    h1_nPairs_presel->Fill( nPairs , eventWeight );
+
+    h1_nJets->Fill( nJets , eventWeight );
 
 
     float cached_jetpt = 0.;
-    AnalysisJet jet1_selected, jet2_selected, jetRecoil_selected;
+    AnalysisJet jet_bestTCHE, jet_2ndbestTCHE;
+    AnalysisJet jet_bestSSVHE, jet_2ndbestSSVHE;
     float bestMass = 0.;
     int  foundJets = 0;
     int  foundJets_signalRegion = 0;
@@ -915,109 +635,76 @@ ofstream ofs("run_event.txt");
     foundSignalRegionMjj = false;
     atLeastOneInSignalRegionMjj = false;
 
-    for( unsigned iJetPair=0; iJetPair<nPairs; ++iJetPair ) {
 
-      bool isSignalRegionMjj = false;
-
-      AnalysisJet jet1, jet2;
-      jet1.SetPtEtaPhiE( ptJet1[iJetPair], etaJet1[iJetPair], phiJet1[iJetPair], eJet1[iJetPair]);
-      jet2.SetPtEtaPhiE( ptJet2[iJetPair], etaJet2[iJetPair], phiJet2[iJetPair], eJet2[iJetPair]);
-
-      jet1.rmsCand = rmsCandJet1[iJetPair];
-      jet1.ptD = ptDJet1[iJetPair];
-      jet1.nCharged = nChargedJet1[iJetPair];
-      jet1.nNeutral = nNeutralJet1[iJetPair];
-      jet1.muonEnergyFraction = eMuonsJet1[iJetPair]/jet1.Energy();
-      jet1.electronEnergyFraction = eElectronsJet1[iJetPair]/jet1.Energy();
-
-      jet1.trackCountingHighEffBJetTag = trackCountingHighEffBJetTagJet1[iJetPair];
-      jet1.trackCountingHighPurBJetTag = trackCountingHighPurBJetTagJet1[iJetPair];
-      jet1.simpleSecondaryVertexHighEffBJetTag = simpleSecondaryVertexHighEffBJetTagJet1[iJetPair];
-      jet1.simpleSecondaryVertexHighPurBJetTag = simpleSecondaryVertexHighPurBJetTagJet1[iJetPair];
-      jet1.jetBProbabilityBJetTag              = jetBProbabilityBJetTagJet1[iJetPair];
-      jet1.jetProbabilityBJetTag               = jetProbabilityBJetTagJet1[iJetPair];
-
-      jet1.ptGen = ptJet1Gen[iJetPair];
-      jet1.etaGen = etaJet1Gen[iJetPair];
-      jet1.phiGen = phiJet1Gen[iJetPair];
-      jet1.eGen = eJet1Gen[iJetPair];
+    float bestTCHE=-9999.;
+    float bestSSVHE=-9999.;
 
 
-      jet2.rmsCand = rmsCandJet2[iJetPair];
-      jet2.ptD = ptDJet2[iJetPair];
-      jet2.nCharged = nChargedJet2[iJetPair];
-      jet2.nNeutral = nNeutralJet2[iJetPair];
-      jet2.muonEnergyFraction = eMuonsJet2[iJetPair]/jet2.Energy();
-      jet2.electronEnergyFraction = eElectronsJet2[iJetPair]/jet2.Energy();
 
-      jet2.trackCountingHighEffBJetTag = trackCountingHighEffBJetTagJet2[iJetPair];
-      jet2.trackCountingHighPurBJetTag = trackCountingHighPurBJetTagJet2[iJetPair];
-      jet2.simpleSecondaryVertexHighEffBJetTag = simpleSecondaryVertexHighEffBJetTagJet2[iJetPair];
-      jet2.simpleSecondaryVertexHighPurBJetTag = simpleSecondaryVertexHighPurBJetTagJet2[iJetPair];
-      jet2.jetBProbabilityBJetTag              = jetBProbabilityBJetTagJet2[iJetPair];
-      jet2.jetProbabilityBJetTag               = jetProbabilityBJetTagJet2[iJetPair];
+    for( unsigned iJet=0; iJet<nJet; ++iJet) {
 
-      jet2.ptGen =   ptJet2Gen[iJetPair];
-      jet2.etaGen = etaJet2Gen[iJetPair];
-      jet2.phiGen = phiJet2Gen[iJetPair];
-      jet2.eGen =     eJet2Gen[iJetPair];
 
-      AnalysisJet jetRecoil;
-      jetRecoil.SetPtEtaPhiE( ptJetRecoil[iJetPair], etaJetRecoil[iJetPair], phiJetRecoil[iJetPair], eJetRecoil[iJetPair]);
-      jetRecoil.ptD = ptDJetRecoil[iJetPair];
-      jetRecoil.nCharged = nChargedJetRecoil[iJetPair];
-      jetRecoil.nNeutral = nNeutralJetRecoil[iJetPair];
+      AnalysisJet thisJet;
+      thisJet.SetPtEtaPhiE( ptJet[iJet], etaJet[iJet], phiJet[iJet], eJet[iJet]);
+
+      thisJet.rmsCand = rmsCandJet[iJet];
+      thisJet.ptD = ptDJet[iJet];
+      thisJet.nCharged = nChargedJet[iJet];
+      thisJet.nNeutral = nNeutralJet[iJet];
+      thisJet.muonEnergyFraction = eMuonsJet[iJet]/thisJet.Energy();
+      thisJet.electronEnergyFraction = eElectronsJet[iJet]/thisJet.Energy();
+
+      thisJet.trackCountingHighEffBJetTag = trackCountingHighEffBJetTagJet[iJet];
+      thisJet.trackCountingHighPurBJetTag = trackCountingHighPurBJetTagJet[iJet];
+      thisJet.simpleSecondaryVertexHighEffBJetTag = simpleSecondaryVertexHighEffBJetTagJet[iJet];
+      thisJet.simpleSecondaryVertexHighPurBJetTag = simpleSecondaryVertexHighPurBJetTagJet[iJet];
+      thisJet.jetBProbabilityBJetTag              = jetBProbabilityBJetTagJet[iJet];
+      thisJet.jetProbabilityBJetTag               = jetProbabilityBJetTagJet[iJet];
+
+      thisJet.ptGen = ptJetGen[iJet];
+      thisJet.etaGen = etaJetGen[iJet];
+      thisJet.phiGen = phiJetGen[iJet];
+      thisJet.eGen = eJetGen[iJet];
+
+
 
 
       TLorentzVector diJet = jet1 + jet2;
 
-      if( event==DEBUG_EVENTNUMBER ) {
-        std::cout << std::endl << "jet pair N.: " << iJetPair << std::endl; 
-        std::cout << "jet1.Pt(): " << jet1.Pt() << " jet1.Eta(): " << jet1.Eta() << std::endl;
-        std::cout << "jet2.Pt(): " << jet2.Pt() << " jet2.Eta(): " << jet2.Eta() << std::endl;
-        std::cout << "diJet.M(): " << diJet.M() << std::endl;
+
+
+      if( thisJet.trackCountingHighEffBJetTag > bestTCHE ) {
+        bestTCHE = thisJet.trackCountingHighEffBJetTag;
+        jet_2ndbestTCHE = jet_bestTCHE;
+        jet_bestTCHE = thisJet;
       }
 
-
-      // fill histos before selection
-      h1_mZjj_all_presel->Fill( diJet.M(), eventWeight );
-      h1_ptZjj_all_presel->Fill( diJet.Pt(), eventWeight );
-      h1_deltaRjj_all_presel->Fill(jet1.DeltaR(jet2), eventWeight );
-
-      if( jet1.Pt()!=cached_jetpt ) {
-        h1_ptJet_all_presel->Fill( jet1.Pt(), eventWeight );
-        h1_etaJet_all_presel->Fill( jet1.Eta(), eventWeight );
-        cached_jetpt = jet1.Pt();
+      if( thisJet.simpleSecondaryVertexHighEffBJetTag > bestSSVHE ) {
+        bestSSVHE = thisJet.simpleSecondaryVertexHighEffBJetTag;
+        jet_2ndbestSSVHE = jet_bestSSVHE;
+        jet_bestSSVHE = thisJet;
       }
 
 
 
       //match to parton:
-      int partFlavor1=0;
-      float deltaRmin1=999.;
+      int partFlavor=0;
+      float deltaRmin=999.;
       for(unsigned iPart=0; iPart<nPart; ++iPart ) {
         TLorentzVector thisPart;
         thisPart.SetPtEtaPhiE( ptPart[iPart], etaPart[iPart], phiPart[iPart], ePart[iPart] );
-        float thisDeltaR = jet1.DeltaR(thisPart);
-        if( thisDeltaR<deltaRmin1 ) {
-          partFlavor1 = pdgIdPart[iPart];
-          deltaRmin1 = thisDeltaR;
+        float thisDeltaR = thisJet.DeltaR(thisPart);
+        if( thisDeltaR<deltaRmin ) {
+          partFlavor = pdgIdPart[iPart];
+          deltaRmin = thisDeltaR;
         }
       }
-      jet1.pdgIdPart = partFlavor1;
+      thisJet.pdgIdPart = partFlavor;
 
-      int partFlavor2=0;
-      float deltaRmin2=999.;
-      for(unsigned iPart=0; iPart<nPart; ++iPart ) {
-        TLorentzVector thisPart;
-        thisPart.SetPtEtaPhiE( ptPart[iPart], etaPart[iPart], phiPart[iPart], ePart[iPart] );
-        float thisDeltaR = jet2.DeltaR(thisPart);
-        if( thisDeltaR<deltaRmin2 ) {
-          partFlavor2 = pdgIdPart[iPart];
-          deltaRmin2 = thisDeltaR;
-        }
-      }
-      jet2.pdgIdPart = partFlavor2;
+
+
+    } // for jets
+
 
 
 
