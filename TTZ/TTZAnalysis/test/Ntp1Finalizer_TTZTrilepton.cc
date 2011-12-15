@@ -1,4 +1,4 @@
-#include "Ntp1Finalizer_TTZTriplepton.h"
+#include "Ntp1Finalizer_TTZTrilepton.h"
 
 #include <iostream>
 #include <fstream>
@@ -10,7 +10,6 @@
 #include "TRegexp.h"
 
 #include "QGLikelihood/QGLikelihoodCalculator.h"
-#include "CommonTools/fitTools.h"
 #include "HelicityLikelihoodDiscriminant/HelicityLikelihoodDiscriminant.h"
 #include "KinematicFit/DiJetKinFitter.h"
 
@@ -30,7 +29,7 @@ int DEBUG_EVENTNUMBER = 98901397;
 
 // constructor:
 
-Ntp1Finalizer_TTZTriplepton::Ntp1Finalizer_TTZTriplepton( const std::string& dataset, const std::string& selectionType, const std::string& bTaggerType, const std::string& PUType, const std::string& leptType ) : Ntp1Finalizer( "TTZTriplepton", dataset, leptType ) {
+Ntp1Finalizer_TTZTrilepton::Ntp1Finalizer_TTZTrilepton( const std::string& dataset, const std::string& selectionType, const std::string& bTaggerType, const std::string& PUType, const std::string& leptType ) : Ntp1Finalizer( "TTZTriplepton", dataset, leptType ) {
 
   if( leptType!="ALL" && leptType!="MU" && leptType!="ELE" ) {
     std::cout << "Lept type '" << leptType << "' currently not supported. Exiting." << std::endl;
@@ -53,14 +52,14 @@ Ntp1Finalizer_TTZTriplepton::Ntp1Finalizer_TTZTriplepton( const std::string& dat
 
 
 
-void Ntp1Finalizer_TTZTriplepton::finalize() {
+void Ntp1Finalizer_TTZTrilepton::finalize() {
 
   //if( outFile_==0 ) this->createOutputFile();
   
   Int_t run;
   tree_->SetBranchAddress("run", &run);
   tree_->GetEntry(0);
-  bool isMC = (run < 10);
+  bool isMC = (run < 160000);
   std::string fullFlags = selectionType_ + "_" + bTaggerType_;
   if( isMC ) fullFlags = fullFlags + "_PU" + PUType_;
   fullFlags = fullFlags + "_" + leptType_;
@@ -458,6 +457,7 @@ void Ntp1Finalizer_TTZTriplepton::finalize() {
   float ptLeptZ1_t, ptLeptZ2_t, etaLeptZ1_t, etaLeptZ2_t;
   float ptLept3_t, etaLept3_t;
   float ptJetB1_t, ptJetB2_t, etaJetB1_t, etaJetB2_t;
+  float bTagJetB1_t, bTagJetB2_t;
   float ptJet3_t, ptJet4_t, etaJet3_t, etaJet4_t;
   float HLTSF;
 
@@ -473,12 +473,14 @@ void Ntp1Finalizer_TTZTriplepton::finalize() {
   tree_passedEvents->Branch( "etaLept3", &etaLept3_t, "etaLept3_t/F" );
   tree_passedEvents->Branch( "ptJetB1", &ptJetB1_t, "ptJetB1_t/F" );
   tree_passedEvents->Branch( "ptJetB2", &ptJetB2_t, "ptJetB2_t/F" );
+  tree_passedEvents->Branch( "bTagJetB1", &bTagJetB1_t, "bTagJetB1_t/F" );
+  tree_passedEvents->Branch( "bTagJetB2", &bTagJetB2_t, "bTagJetB2_t/F" );
   tree_passedEvents->Branch( "ptJet3", &ptJet3_t, "ptJet3_t/F" );
   tree_passedEvents->Branch( "ptJet4", &ptJet4_t, "ptJet4_t/F" );
   tree_passedEvents->Branch( "etaJetB1", &etaJetB1_t, "etaJetB1_t/F" );
   tree_passedEvents->Branch( "etaJetB2", &etaJetB2_t, "etaJetB2_t/F" );
-  tree_passedEvents->Branch( "etaJet1", &etaJet1_t, "etaJet1_t/F" );
-  tree_passedEvents->Branch( "etaJet2", &etaJet2_t, "etaJet2_t/F" );
+  tree_passedEvents->Branch( "etaJet3", &etaJet3_t, "etaJet3_t/F" );
+  tree_passedEvents->Branch( "etaJet4", &etaJet4_t, "etaJet4_t/F" );
   tree_passedEvents->Branch( "eventWeight", &eventWeight, "eventWeight/F" );
   tree_passedEvents->Branch( "HLTSF", &HLTSF, "HLTSF/F" );
   tree_passedEvents->Branch( "PUWeight", &eventWeightPU, "eventWeightPU/F" );
@@ -629,18 +631,12 @@ ofstream ofs("run_event.txt");
       }
 
 
-      h1_run->Fill( run, eventWeight );
-
-    
     } //if is not mc
 
 
 
     // this is trilepton channel: require at least one other lepton:
     if( nLept<1 ) continue;
-
-
-    nEvents_presel += eventWeight;
 
 
     h1_rhoPF_presel->Fill( rhoPF, eventWeight);
@@ -655,10 +651,10 @@ ofstream ofs("run_event.txt");
     leptZ1.SetPtEtaPhiE( ptLeptZ1, etaLeptZ1, phiLeptZ1, eLeptZ1 );
     leptZ2.SetPtEtaPhiE( ptLeptZ2, etaLeptZ2, phiLeptZ2, eLeptZ2 );
 
-    TLorentzVector otherLept;
-    leptZ1.SetPtEtaPhiE( ptLept[0], etaLept[0], phiLept[0], eLept[0] );
+    TLorentzVector lept3;
+    lept3.SetPtEtaPhiE( ptLept[0], etaLept[0], phiLept[0], eLept[0] );
 
-    TLorentzVector diLepton = lept1+lept2;
+    TLorentzVector diLepton = leptZ1+leptZ2;
 
 
     h1_ptLeptZ1->Fill( leptZ1.Pt(), eventWeight );
@@ -666,7 +662,7 @@ ofstream ofs("run_event.txt");
     h1_etaLeptZ1->Fill( leptZ1.Eta(), eventWeight );
     h1_etaLeptZ2->Fill( leptZ2.Eta(), eventWeight );
 
-    h1_deltaRZll->Fill( leptZ2.DeltaR(&leptZ2), eventWeight );
+    h1_deltaRZll->Fill( leptZ2.DeltaR(leptZ2), eventWeight );
 
     h1_ptZll->Fill( diLepton.Pt(), eventWeight );
     h1_etaZll->Fill( diLepton.Eta(), eventWeight );
@@ -677,11 +673,11 @@ ofstream ofs("run_event.txt");
     TLorentzVector met;
     met.SetPtEtaPhiE( pfMet, 0., phiMet, pfMet );
 
-    TLorentzVector W = otherLept + met;
+    TLorentzVector W = lept3 + met;
 
     h1_mTW->Fill( W.Mt() , eventWeight );
 
-    TLorentzVector lZ = otherLept + diLepton;
+    TLorentzVector lZ = lept3 + diLepton;
     TLorentzVector lZ_plusMet = lZ + met;
 
     float mT_lZmet = ( sqrt( lZ.Pt()*lZ.Pt() + lZ.M()*lZ.M() ) + pfMet )*( sqrt( lZ.Pt()*lZ.Pt() + lZ.M()*lZ.M() ) + pfMet )  -  lZ_plusMet.Pt()*lZ_plusMet.Pt();
@@ -718,11 +714,11 @@ ofstream ofs("run_event.txt");
 
     if( nJets<4 ) continue;
 
-    AnalysisJet JetB1, JetB2, jet3, jet4;
+    AnalysisJet jetB1, jetB2, jet3, jet4;
 
     // default: order by pt
-    JetB1.SetPtEtaPhiE( ptJet[0], etaJet[0], phiJet[0], eJet[0]);
-    JetB2.SetPtEtaPhiE( ptJet[1], etaJet[1], phiJet[1], eJet[1]);
+    jetB1.SetPtEtaPhiE( ptJet[0], etaJet[0], phiJet[0], eJet[0]);
+    jetB2.SetPtEtaPhiE( ptJet[1], etaJet[1], phiJet[1], eJet[1]);
     jet3.SetPtEtaPhiE( ptJet[2], etaJet[2], phiJet[2], eJet[2]);
     jet4.SetPtEtaPhiE( ptJet[3], etaJet[3], phiJet[3], eJet[3]);
 
@@ -731,7 +727,7 @@ ofstream ofs("run_event.txt");
 
     float bestBtag=-9999.;
 
-    for( unsigned iJet=0; iJet<nJet; ++iJet) {
+    for( unsigned iJet=0; iJet<nJets; ++iJet) {
 
       AnalysisJet thisJet;
       thisJet.SetPtEtaPhiE( ptJet[iJet], etaJet[iJet], phiJet[iJet], eJet[iJet]);
@@ -775,44 +771,44 @@ ofstream ofs("run_event.txt");
         thisBtag = thisJet.trackCountingHighEffBJetTag;
       else if( bTaggerType_=="SSVHE" ) 
         thisBtag = thisJet.simpleSecondaryVertexHighEffBJetTag;
-;
 
-      if( thisBtag > bestTag ) {
-        bestTag = thisBtag;
+
+      if( thisBtag > bestBtag ) {
+        bestBtag = thisBtag;
         // slide them all:
         jet4 = jet3;
-        jet3 = JetB2;
-        JetB2 = JetB1;
-        JetB1 = thisJet;
+        jet3 = jetB2;
+        jetB2 = jetB1;
+        jetB1 = thisJet;
       }
 
     } // for jets
 
 
-    h1_ptJetB1->Fill( JetB1.Pt(), eventWeight );
-    h1_ptJetB2->Fill( JetB2.Pt(), eventWeight );
+    h1_ptJetB1->Fill( jetB1.Pt(), eventWeight );
+    h1_ptJetB2->Fill( jetB2.Pt(), eventWeight );
     h1_ptJet3->Fill( jet3.Pt(), eventWeight );
     h1_ptJet4->Fill( jet4.Pt(), eventWeight );
 
-    h1_etaJetB1->Fill( JetB1.Eta(), eventWeight );
-    h1_etaJetB2->Fill( JetB2.Eta(), eventWeight );
+    h1_etaJetB1->Fill( jetB1.Eta(), eventWeight );
+    h1_etaJetB2->Fill( jetB2.Eta(), eventWeight );
     h1_etaJet3->Fill( jet3.Eta(), eventWeight );
     h1_etaJet4->Fill( jet4.Eta(), eventWeight );
 
 
-    h1_partFlavorJetB1->Fill( JetB1.partFlavor, eventWeight );
-    h1_partFlavorJetB2->Fill( JetB2.partFlavor, eventWeight );
-    h1_partFlavorJet3->Fill( jet3.partFlavor, eventWeight );
-    h1_partFlavorJet4->Fill( jet4.partFlavor, eventWeight );
+    h1_partFlavorJetB1->Fill( jetB1.pdgIdPart, eventWeight );
+    h1_partFlavorJetB2->Fill( jetB2.pdgIdPart, eventWeight );
+    h1_partFlavorJet3->Fill( jet3.pdgIdPart, eventWeight );
+    h1_partFlavorJet4->Fill( jet4.pdgIdPart, eventWeight );
 
 
     float bTaggerJetB1, bTaggerJetB2;
     if( bTaggerType_=="TCHE" ) {
-      bTaggerJetB1 = JetB1.trackCountingHighEffBJetTag;
-      bTaggerJetB2 = JetB2.trackCountingHighEffBJetTag;
+      bTaggerJetB1 = jetB1.trackCountingHighEffBJetTag;
+      bTaggerJetB2 = jetB2.trackCountingHighEffBJetTag;
     } else if( bTaggerType_=="SSVHE" ) {
-      bTaggerJetB1 = JetB1.simpleSecondaryVertexHighEffBJetTag;
-      bTaggerJetB2 = JetB2.simpleSecondaryVertexHighEffBJetTag;
+      bTaggerJetB1 = jetB1.simpleSecondaryVertexHighEffBJetTag;
+      bTaggerJetB2 = jetB2.simpleSecondaryVertexHighEffBJetTag;
     }
 
 
@@ -821,7 +817,7 @@ ofstream ofs("run_event.txt");
 
 
 
-    h1_deltaRbb->Fill( JetB1.DeltaR(&JetB2), eventWeight );
+    h1_deltaRbb->Fill( jetB1.DeltaR(jetB2), eventWeight );
 
     TLorentzVector b1jj = jetB1 + jet3 + jet4;
     TLorentzVector b2jj = jetB2 + jet3 + jet4;
@@ -851,8 +847,8 @@ ofstream ofs("run_event.txt");
     TLorentzVector b1W = jetB1 + lept3 + met;
     TLorentzVector b2W = jetB2 + lept3 + met;
 
-    TLorentzVector b1ZW = jetB1 + diLepton + lept3 + met;
-    TLorentzVector b2ZW = jetB2 + diLepton + lept3 + met;
+    TLorentzVector b1WZ = jetB1 + diLepton + lept3 + met;
+    TLorentzVector b2WZ = jetB2 + diLepton + lept3 + met;
 
     h1_mTb1W->Fill( b1W.Mt(), eventWeight );
     h1_mTb2W->Fill( b2W.Mt(), eventWeight );
@@ -893,12 +889,12 @@ ofstream ofs("run_event.txt");
 
 
 
-    ptLeptZ1_t = ptLeptZ1;
-    ptLeptZ2_t = ptLeptZ2;
-    ptLept3_t = ptLept3;
-    etaLeptZ1_t = etaLeptZ1;
-    etaLeptZ2_t = etaLeptZ2;
-    etaLept3_t = etaLept3;
+    ptLeptZ1_t = leptZ1.Pt();
+    ptLeptZ2_t = leptZ2.Pt();
+    ptLept3_t = lept3.Pt();
+    etaLeptZ1_t = leptZ1.Eta();
+    etaLeptZ2_t = leptZ2.Eta();
+    etaLept3_t = lept3.Eta();
 
     ptJetB1_t = jetB1.Pt();
     ptJetB2_t = jetB2.Pt();
@@ -1024,7 +1020,7 @@ ofstream ofs("run_event.txt");
 
 
 
-void Ntp1Finalizer_TTZTriplepton::setSelectionType( const std::string& selectionType ) {
+void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionType ) {
 
   selectionType_ = selectionType;
 
