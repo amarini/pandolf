@@ -26,15 +26,15 @@ do2ndLevel_TTZ_DATA: Ntp1Analyzer.o Ntp1Analyzer_TTZ.o AnalysisElectron.o Analys
 
 
 
-finalize_TTZTrilepton: Ntp1Finalizer.o Ntp1Finalizer_TTZTrilepton.o finalize_TTZTrilepton.cpp fitTools.o QGLikelihoodCalculator.o AnalysisJet.o BTagSFUtil.o
-	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/ -I$(CMSSW_BASE)/src/UserCode/pandolf/QGLikelihood -o finalize_TTZTrilepton finalize_TTZTrilepton.cpp Ntp1Finalizer.o Ntp1Finalizer_TTZTrilepton.o fitTools.o QGLikelihoodCalculator.o AnalysisJet.o BTagSFUtil.o $(ROOTFLAG) -lMinuit
+finalize_TTZTrilepton: Ntp1Finalizer.o Ntp1Finalizer_TTZTrilepton.o finalize_TTZTrilepton.cpp  QGLikelihoodCalculator.o AnalysisJet.o BTagSFUtil.o PUWeight.o
+	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/ -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -I$(CMSSW_BASE)/src/UserCode/pandolf/QGLikelihood -o finalize_TTZTrilepton finalize_TTZTrilepton.cpp Ntp1Finalizer.o Ntp1Finalizer_TTZTrilepton.o QGLikelihoodCalculator.o AnalysisJet.o BTagSFUtil.o PUWeight.o $(ROOTFLAG) $(EXTRALIBS)
 
 
-drawTTZ: DrawBase.o fitTools.o drawTTZ.cpp
-	$(CC) -Wall $(INCLUDES) -o drawTTZ drawTTZ.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
+drawTTZTrilepton: DrawBase.o fitTools.o drawTTZTrilepton.cpp
+	$(CC) -Wall $(INCLUDES) -o drawTTZTrilepton drawTTZTrilepton.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
 
-drawTTZ_DATA: DrawBase.o fitTools.o drawTTZ_DATA.cpp
-	$(CC) -Wall $(INCLUDES) -o drawTTZ_DATA drawTTZ_DATA.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
+drawTTZTrilepton_DATA: DrawBase.o fitTools.o drawTTZTrilepton_DATA.cpp
+	$(CC) -Wall $(INCLUDES) -o drawTTZTrilepton_DATA drawTTZTrilepton_DATA.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
 
 
 
@@ -50,7 +50,7 @@ Ntp1Finalizer.o: $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/Ntp1Finalizer.C
 	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/ $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/Ntp1Finalizer.C $(ROOTFLAG)
 
 Ntp1Finalizer_TTZTrilepton.o: Ntp1Finalizer_TTZTrilepton.cc
-	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -I$(CMSSW_BASE)/src/UserCode/emanuele/CommonTools Ntp1Finalizer_TTZTrilepton.cc $(ROOTFLAG)
+	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/ -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -I$(CMSSW_BASE)/src/UserCode/emanuele/CommonTools Ntp1Finalizer_TTZTrilepton.cc $(ROOTFLAG)
 
 
 
