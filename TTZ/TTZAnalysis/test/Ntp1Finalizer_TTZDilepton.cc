@@ -122,7 +122,7 @@ void Ntp1Finalizer_TTZDilepton::finalize() {
 
 
 
-  TH1D* h1_nJets = new TH1D("nJets", "", 7, 1.5, 8.5);
+  TH1D* h1_nJets = new TH1D("nJets", "", 7, 5.5, 12.5);
   h1_nJets->Sumw2();
 
 
@@ -626,7 +626,7 @@ ofstream ofs("run_event.txt");
 
 
     // this is dilepton channel: no other lepton in the event 
-    if( nLept!=1 ) continue;
+    if( nLept!=0 ) continue;
 
 
     h1_rhoPF_presel->Fill( rhoPF, eventWeight);
@@ -684,9 +684,10 @@ ofstream ofs("run_event.txt");
 
 
 
-    h1_nJets->Fill( nJets , eventWeight );
 
     if( nJets<6 ) continue;
+
+    h1_nJets->Fill( nJets , eventWeight );
 
     std::vector<AnalysisJet> jets;
 
