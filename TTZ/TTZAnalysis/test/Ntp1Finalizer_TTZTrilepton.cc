@@ -30,13 +30,19 @@ int DEBUG_EVENTNUMBER = 98901397;
 
 // constructor:
 
-Ntp1Finalizer_TTZTriplepton::Ntp1Finalizer_TTZTriplepton( const std::string& dataset, const std::string& selectionType, const std::string& PUType, const std::string& leptType ) : Ntp1Finalizer( "TTZTriplepton", dataset, leptType ) {
+Ntp1Finalizer_TTZTriplepton::Ntp1Finalizer_TTZTriplepton( const std::string& dataset, const std::string& selectionType, const std::string& bTaggerType, const std::string& PUType, const std::string& leptType ) : Ntp1Finalizer( "TTZTriplepton", dataset, leptType ) {
 
   if( leptType!="ALL" && leptType!="MU" && leptType!="ELE" ) {
     std::cout << "Lept type '" << leptType << "' currently not supported. Exiting." << std::endl;
-    exit(9176);
+    exit(9177);
   }
 
+  if( bTaggerType!="SSVHE" && bTaggerType!="TCHE" ) {
+    std::cout << "b-Tagger type '" << bTaggerType << "' currently not supported. Exiting." << std::endl;
+    exit(9179);
+  }
+
+  bTaggerType_ = bTaggerType;
   leptType_ = leptType;
   PUType_ = PUType;
 
@@ -55,7 +61,7 @@ void Ntp1Finalizer_TTZTriplepton::finalize() {
   tree_->SetBranchAddress("run", &run);
   tree_->GetEntry(0);
   bool isMC = (run < 10);
-  std::string fullFlags = selectionType_;
+  std::string fullFlags = selectionType_ + "_" + bTaggerType_;
   if( isMC ) fullFlags = fullFlags + "_PU" + PUType_;
   fullFlags = fullFlags + "_" + leptType_;
   this->set_flags(fullFlags); //this is for the outfile name
@@ -117,19 +123,10 @@ void Ntp1Finalizer_TTZTriplepton::finalize() {
   h1_nJets_presel->Sumw2();
 
 
-  TH1D* h1_tcheJet_best = new TH1D("tcheJet_best", "", 100, 0., 20.);
-  h1_tcheJet_best->Sumw2();
-  TH1D* h1_tcheJet_2ndbest = new TH1D("tcheJet_2ndbest", "", 100, 0., 20.);
-  h1_tcheJet_2ndbest->Sumw2();
-  TH1D* h1_ssvheJet_best = new TH1D("ssvheJet_best", "", 700, -1., 6.);
-  h1_ssvheJet_best->Sumw2();
-  TH1D* h1_ssvheJet_2ndbest = new TH1D("ssvheJet_2ndbest", "", 700, -1., 6.);
-  h1_ssvheJet_2ndbest->Sumw2();
-
-  TH1D* h1_ptJet_all_presel = new TH1D("ptJet_all_presel", "", 200, 30., 430.);
-  h1_ptJet_all_presel->Sumw2();
-  TH1D* h1_etaJet_all_presel = new TH1D("etaJet_all_presel", "", 25, -5., 5.);
-  h1_etaJet_all_presel->Sumw2();
+  TH1D* h1_bTagJet1B = new TH1D("bTagJet1B", "", 420, 0., 20.);
+  h1_bTagJet1B->Sumw2();
+  TH1D* h1_bTagJet2B = new TH1D("bTagJet2B", "", 420, -1., 20.);
+  h1_bTagJet2B->Sumw2();
 
 
 
@@ -397,7 +394,8 @@ void Ntp1Finalizer_TTZTriplepton::finalize() {
   float mZll;
   float ptLeptZ1_t, ptLeptZ2_t, etaLeptZ1_t, etaLeptZ2_t;
   float ptLept3_t, etaLept3_t;
-  float ptJet1_t, ptJet2_t, etaJet1_t, etaJet2_t;
+  float ptJetB1_t, ptJetB2_t, etaJetB1_t, etaJetB2_t;
+  float ptJet3_t, ptJet4_t, etaJet3_t, etaJet4_t;
   float HLTSF;
 
   tree_passedEvents->Branch( "run", &run, "run/I" );
@@ -410,10 +408,14 @@ void Ntp1Finalizer_TTZTriplepton::finalize() {
   tree_passedEvents->Branch( "etaLeptZ1", &etaLeptZ1_t, "etaLeptZ1_t/F" );
   tree_passedEvents->Branch( "etaLeptZ2", &etaLeptZ2_t, "etaLeptZ2_t/F" );
   tree_passedEvents->Branch( "etaLept3", &etaLept3_t, "etaLept3_t/F" );
-  //tree_passedEvents->Branch( "ptJet1", &ptJet1_t, "ptJet1_t/F" );
-  //tree_passedEvents->Branch( "ptJet2", &ptJet2_t, "ptJet2_t/F" );
-  //tree_passedEvents->Branch( "etaJet1", &etaJet1_t, "etaJet1_t/F" );
-  //tree_passedEvents->Branch( "etaJet2", &etaJet2_t, "etaJet2_t/F" );
+  tree_passedEvents->Branch( "ptJetB1", &ptJetB1_t, "ptJetB1_t/F" );
+  tree_passedEvents->Branch( "ptJetB2", &ptJetB2_t, "ptJetB2_t/F" );
+  tree_passedEvents->Branch( "ptJet3", &ptJet3_t, "ptJet3_t/F" );
+  tree_passedEvents->Branch( "ptJet4", &ptJet4_t, "ptJet4_t/F" );
+  tree_passedEvents->Branch( "etaJetB1", &etaJetB1_t, "etaJetB1_t/F" );
+  tree_passedEvents->Branch( "etaJetB2", &etaJetB2_t, "etaJetB2_t/F" );
+  tree_passedEvents->Branch( "etaJet1", &etaJet1_t, "etaJet1_t/F" );
+  tree_passedEvents->Branch( "etaJet2", &etaJet2_t, "etaJet2_t/F" );
   tree_passedEvents->Branch( "eventWeight", &eventWeight, "eventWeight/F" );
   tree_passedEvents->Branch( "HLTSF", &HLTSF, "HLTSF/F" );
   tree_passedEvents->Branch( "PUWeight", &eventWeightPU, "eventWeightPU/F" );
@@ -570,13 +572,27 @@ ofstream ofs("run_event.txt");
 
 
 
+    // this is trilepton channel: require at least one other lepton:
+    if( nLept<1 ) continue;
+
+
+    nEvents_presel += eventWeight;
+
 
     h1_rhoPF_presel->Fill( rhoPF, eventWeight);
+
+
+    h1_pfMet->Fill( pfMet, eventWeight );
+    h1_metSignificance->Fill( metSignificance, eventWeight );
+
 
 
     TLorentzVector leptZ1, leptZ2;
     leptZ1.SetPtEtaPhiE( ptLeptZ1, etaLeptZ1, phiLeptZ1, eLeptZ1 );
     leptZ2.SetPtEtaPhiE( ptLeptZ2, etaLeptZ2, phiLeptZ2, eLeptZ2 );
+
+    TLorentzVector otherLept;
+    leptZ1.SetPtEtaPhiE( ptLept[0], etaLept[0], phiLept[0], eLept[0] );
 
     TLorentzVector diLepton = lept1+lept2;
 
@@ -593,8 +609,21 @@ ofstream ofs("run_event.txt");
     h1_mZll->Fill( diLepton.M(), eventWeight );
 
 
-    nEvents_presel += eventWeight;
 
+    TLorentzVector neutrino;
+    neutrino.SetPtEtaPhiE( pfMet, 0., phiMet, pfMet );
+
+    TLorentzVector W = otherLept + neutrino;
+
+    h1_mTW->Fill( W.Mt() , eventWeight );
+
+    TLorentzVector lZ = otherLept + diLepton;
+    TLorentzVector lZ_plusMet = lZ + neutrino;
+
+    float mT_lZmet = ( sqrt( lZ.Pt()*lZ.Pt() + lZ.M()*lZ.M() ) + pfMet )*( sqrt( lZ.Pt()*lZ.Pt() + lZ.M()*lZ.M() ) + pfMet )  -  lZ_plusMet.Pt()*lZ_plusMet.Pt();
+    mT_lZmet = sqrt(mT_lZmet);
+
+    h1_mT_lZmet->Fill( mT_lZmet, eventWeight );
 
 
 
@@ -623,26 +652,22 @@ ofstream ofs("run_event.txt");
 
     h1_nJets->Fill( nJets , eventWeight );
 
+    if( nJets<4 ) continue;
 
-    float cached_jetpt = 0.;
-    AnalysisJet jet_bestTCHE, jet_2ndbestTCHE;
-    AnalysisJet jet_bestSSVHE, jet_2ndbestSSVHE;
-    float bestMass = 0.;
-    int  foundJets = 0;
-    int  foundJets_signalRegion = 0;
-    bool foundJets_ZZmass = false;
-    maxBTag_found = -1;
-    foundSignalRegionMjj = false;
-    atLeastOneInSignalRegionMjj = false;
+    AnalysisJet jet1B, jet2B, jet3, jet4;
+
+    // default: order by pt
+    jet1B.SetPtEtaPhiE( ptJet[0], etaJet[0], phiJet[0], eJet[0]);
+    jet2B.SetPtEtaPhiE( ptJet[1], etaJet[1], phiJet[1], eJet[1]);
+    jet3.SetPtEtaPhiE( ptJet[2], etaJet[2], phiJet[2], eJet[2]);
+    jet4.SetPtEtaPhiE( ptJet[3], etaJet[3], phiJet[3], eJet[3]);
 
 
-    float bestTCHE=-9999.;
-    float bestSSVHE=-9999.;
 
 
+    float bestBtag=-9999.;
 
     for( unsigned iJet=0; iJet<nJet; ++iJet) {
-
 
       AnalysisJet thisJet;
       thisJet.SetPtEtaPhiE( ptJet[iJet], etaJet[iJet], phiJet[iJet], eJet[iJet]);
@@ -666,27 +691,6 @@ ofstream ofs("run_event.txt");
       thisJet.phiGen = phiJetGen[iJet];
       thisJet.eGen = eJetGen[iJet];
 
-
-
-
-      TLorentzVector diJet = jet1 + jet2;
-
-
-
-      if( thisJet.trackCountingHighEffBJetTag > bestTCHE ) {
-        bestTCHE = thisJet.trackCountingHighEffBJetTag;
-        jet_2ndbestTCHE = jet_bestTCHE;
-        jet_bestTCHE = thisJet;
-      }
-
-      if( thisJet.simpleSecondaryVertexHighEffBJetTag > bestSSVHE ) {
-        bestSSVHE = thisJet.simpleSecondaryVertexHighEffBJetTag;
-        jet_2ndbestSSVHE = jet_bestSSVHE;
-        jet_bestSSVHE = thisJet;
-      }
-
-
-
       //match to parton:
       int partFlavor=0;
       float deltaRmin=999.;
@@ -702,295 +706,83 @@ ofstream ofs("run_event.txt");
       thisJet.pdgIdPart = partFlavor;
 
 
+      float thisBtag;
+      if( bTaggerType_=="TCHE" )
+        thisBtag = thisJet.trackCountingHighEffBJetTag;
+      else if( bTaggerType_=="SSVHE" ) 
+        thisBtag = thisJet.simpleSecondaryVertexHighEffBJetTag;
+;
+
+      if( thisBtag > bestTag ) {
+        bestTag = thisBtag;
+        // slide them all:
+        jet4 = jet3;
+        jet3 = jet2B;
+        jet2B = jet1B;
+        jet1B = thisJet;
+      }
 
     } // for jets
 
 
 
-
-      // -------------------------
-      // KINEMATIC SELECTION: JETS
-      // -------------------------
-
-      if( jet1.Pt() < ptJet1_thresh_ ) continue;
-      if( event==DEBUG_EVENTNUMBER ) std::cout << "first jet pt OK" << std::endl;
-      if( jet2.Pt() < ptJet2_thresh_ ) continue;
-      if( event==DEBUG_EVENTNUMBER ) std::cout << "second jet pt OK" << std::endl;
-      if( fabs(jet1.Eta()) > etaJet1_thresh_ ) continue;
-      if( event==DEBUG_EVENTNUMBER ) std::cout << "first jet eta OK" << std::endl;
-      if( fabs(jet2.Eta()) > etaJet2_thresh_ ) continue;
-      if( event==DEBUG_EVENTNUMBER ) std::cout << "second jet eta OK" << std::endl;
-
-
-      // sideband logic:
-      if( foundSignalRegionMjj && ( diJet.M() < mZjj_threshLo_ || diJet.M() > mZjj_threshHi_ ) ) continue;
-
-
-      if( diJet.M() >= mZjj_threshLo_ && diJet.M() <= mZjj_threshHi_ ) {
-        if( !atLeastOneInSignalRegionMjj ) nEvents_presel_mZll_mZjj += eventWeight;
-        atLeastOneInSignalRegionMjj = true;
-        isSignalRegionMjj = true;
-      }
-
-
-
-
-      // ----------
-      // B-TAGGING:
-      // ----------
-
-
-      int nBTags = this->get_nBTags( jet1, jet2, btsfutil, use_looseBTags_ );
-      if( event==DEBUG_EVENTNUMBER ) std::cout << "nBTags: " << nBTags << std::endl;
-
-      if( (isSignalRegionMjj && foundSignalRegionMjj) ||
-          (!isSignalRegionMjj && !foundSignalRegionMjj) ) {
-        if( nBTags<maxBTag_found ) continue; //speed it up a little
-      }
-
-
-
-
-
-
-      // -------------------
-      // Q-G DISCRIMINATION:
-      // -------------------
-
-      jet1.QGLikelihood = qglikeli->computeQGLikelihoodPU( jet1.Pt(), rhoPF, jet1.nCharged, jet1.nNeutral, jet1.ptD, -1. );
-      jet2.QGLikelihood = qglikeli->computeQGLikelihoodPU( jet2.Pt(), rhoPF, jet2.nCharged, jet2.nNeutral, jet2.ptD, -1. );
-      jet1.QGLikelihoodNoPU = qglikeli->computeQGLikelihood( jet1.Pt(), jet1.nCharged, jet1.nNeutral, jet1.ptD, -1. );
-      jet2.QGLikelihoodNoPU = qglikeli->computeQGLikelihood( jet2.Pt(), jet2.nCharged, jet2.nNeutral, jet2.ptD, -1. );
-      float QGLikelihoodProd = jet1.QGLikelihood*jet2.QGLikelihood;
-      if( event==DEBUG_EVENTNUMBER ) std::cout << "rhoPF: " << rhoPF << std::endl;
-      if( event==DEBUG_EVENTNUMBER ) std::cout << "jet1: nCharged: " << jet1.nCharged << " nNeutral: " << jet1.nNeutral << " ptD: " << jet1.ptD << " QGlikelihood: " << jet1.QGLikelihood << std::endl;
-      if( event==DEBUG_EVENTNUMBER ) std::cout << "jet2: nCharged: " << jet2.nCharged << " nNeutral: " << jet2.nNeutral << " ptD: " << jet2.ptD << " QGlikelihood: " << jet2.QGLikelihood << std::endl;
-      if( event==DEBUG_EVENTNUMBER ) std::cout << "QGLikelihoodProd: " << QGLikelihoodProd << std::endl;
-      if( nBTags==0 ) {
-        //if( QGLikelihoodProd < QGLikelihoodProd_thresh_ ) continue;
-        if( QGLikelihoodProd < QGLikelihoodProd_thresh_ ) nBTags=-1; //glue-tag category
-      }
-
-
-
-
-
-      // --------------
-      // KINEMATIC FIT:
-      // --------------
-
-  
-      if( USE_MC_MASS ) {
-        TLorentzVector ZjjMC;
-        TLorentzVector ZllMC;
-        int iZllMC=-1;
-        // first look for ZllMC
-        float bestDeltaRToZll=9999.;
-        for( unsigned iPart=0; iPart<nPart; ++iPart ) {
-          if( pdgIdPart[iPart]!=23 ) continue;
-          TLorentzVector thisZMC;
-          thisZMC.SetPtEtaPhiE( ptPart[iPart], etaPart[iPart], phiPart[iPart], ePart[iPart] );
-          if( thisZMC.DeltaR(diLepton) < bestDeltaRToZll ) {
-            ZllMC=thisZMC;
-            iZllMC = iPart;
-            bestDeltaRToZll=thisZMC.DeltaR(diLepton);
-          }
-        }
-
-        if( iZllMC>=0 ) {
-
-          bool foundZjjMC=false;
-          for( unsigned iPart=0; iPart<nPart && !foundZjjMC; ++iPart ) {
-            if( pdgIdPart[iPart]==23 && iPart!=iZllMC ) {
-              ZjjMC.SetPtEtaPhiE( ptPart[iPart], etaPart[iPart], phiPart[iPart], ePart[iPart] );
-              foundZjjMC=true;
-            }
-          }
-
-          if( foundZjjMC ) {
-            h1_mZjjMC->Fill( ZjjMC.M(), eventWeight );
-            fitter_jets->set_mass(ZjjMC.M());
-          }
-
-        } // if found ZllMC
-
-      } //if use mc z mass
-
-      std::pair<TLorentzVector,TLorentzVector> jets_kinfit = fitter_jets->fit(jet1, jet2);
-      TLorentzVector jet1_kinfit(jets_kinfit.first);
-      TLorentzVector jet2_kinfit(jets_kinfit.second);
-
-      jet1.pt_preKinFit  = jet1.Pt();
-      jet1.eta_preKinFit = jet1.Eta();
-      jet1.phi_preKinFit = jet1.Phi();
-      jet1.e_preKinFit   = jet1.Energy();
-
-      jet2.pt_preKinFit  = jet2.Pt();
-      jet2.eta_preKinFit = jet2.Eta();
-      jet2.phi_preKinFit = jet2.Phi();
-      jet2.e_preKinFit   = jet2.Energy();
-
-      // update 4-vector to kinfit results:
-      jet1.SetPtEtaPhiE( jet1_kinfit.Pt(), jet1_kinfit.Eta(), jet1_kinfit.Phi(), jet1_kinfit.Energy() );
-      jet2.SetPtEtaPhiE( jet2_kinfit.Pt(), jet2_kinfit.Eta(), jet2_kinfit.Phi(), jet2_kinfit.Energy() );
-
-      TLorentzVector jet1_nokinfit, jet2_nokinfit;
-      jet1_nokinfit.SetPtEtaPhiE( jet1.pt_preKinFit, jet1.eta_preKinFit, jet1.phi_preKinFit, jet1.e_preKinFit );
-      jet2_nokinfit.SetPtEtaPhiE( jet2.pt_preKinFit, jet2.eta_preKinFit, jet2.phi_preKinFit, jet2.e_preKinFit );
-
-      TLorentzVector diJet_kinfit = jet1_kinfit + jet2_kinfit;
-      TLorentzVector ZZ_kinfit_tmp = diJet_kinfit + diLepton;
-
-      if( event==DEBUG_EVENTNUMBER ) std::cout << "ZZ_kinfit_tmp.M(): " << ZZ_kinfit_tmp.M() << std::endl;
-      if( ZZ_kinfit_tmp.M()<150. ) continue; //speed it up a little
-
-
-      // --------------------
-      // FULL EVENT VARIABLES
-      // --------------------
-   
-      if( event==DEBUG_EVENTNUMBER ) std::cout << "metSignificance: " << metSignificance << std::endl;
-      if( nBTags==2 )  {
-        if( metSignificance > metSignificance_thresh_ ) continue;
-      }
-
-
-
-      // ------------
-      // HELICITY LD:
-      // ------------
-
-      HelicityLikelihoodDiscriminant::HelicityAngles hangles;
-      if( chargeLept1<0 ) hangles = LD->computeHelicityAngles(lept1, lept2, jet1, jet2);
-      else                hangles = LD->computeHelicityAngles(lept2, lept1, jet1, jet2);
-    
-      LD->setMeasurables(hangles);
-      double sProb = LD->getSignalProbability();
-      double bProb = LD->getBkgdProbability();
-      double helicityLD = sProb/(sProb+bProb);
-    
-      HelicityLikelihoodDiscriminant::HelicityAngles hangles_nokinfit;
-      if( chargeLept1<0 ) hangles_nokinfit = LD->computeHelicityAngles(lept1, lept2, jet1_nokinfit, jet2_nokinfit);
-      else                hangles_nokinfit = LD->computeHelicityAngles(lept2, lept1, jet1_nokinfit, jet2_nokinfit);
-    
-      LD->setMeasurables(hangles_nokinfit);
-      double sProb_nokinfit=LD->getSignalProbability();
-      double bProb_nokinfit=LD->getBkgdProbability();
-      double helicityLD_nokinfit=sProb_nokinfit/(sProb_nokinfit+bProb_nokinfit);
-    
-      float helicityLD_thresh = (nBTags>=0) ? this->get_helicityLD_thresh(ZZ_kinfit_tmp.M(), nBTags) : this->get_helicityLD_thresh(ZZ_kinfit_tmp.M(), 0);
-
-      if( event==DEBUG_EVENTNUMBER ) std::cout << "helicityLD: " << helicityLD << " (threshold: " << helicityLD_thresh << ")" << std::endl;
-      if( helicityLD < helicityLD_thresh ) continue;
-
-
-
-      // this pair has passed selections
-      // if it is a signal region pair, dont consider any more sideband events:
-      if( isSignalRegionMjj && !foundSignalRegionMjj) {
-        if( event==DEBUG_EVENTNUMBER ) std::cout << "updating maxBTag_found: " << nBTags << std::endl;
-        maxBTag_found = nBTags; //reset maxbtag found
-        foundSignalRegionMjj = true;
-      }
-      if( foundSignalRegionMjj && !isSignalRegionMjj ) continue;
-
-
-
-      // logic: choose jet pair with highest number of btags which passes selection
-      // if more than one pair found, choose the one with the invariant mass closest to Z mass.
-      // keep also best-Zmass dijet pair which passes all cuts except mZjj for sideband study
-
-      float invMass = diJet.M();
-
-      if( foundJets==0 || (foundJets_signalRegion==0 && isSignalRegionMjj) ) {
-
-        if( event==DEBUG_EVENTNUMBER ) {
-          if(foundJets_signalRegion==0 && isSignalRegionMjj)   std::cout << "first **SIGNAL REGION** jet pair passing selections" << std::endl;
-          else std::cout << "first jet pair passing selections" << std::endl;
-        }
-        bestMass = invMass;
-        jet1_selected = jet1;
-        jet2_selected = jet2; 
-        jetRecoil_selected = jetRecoil; 
-        hangles_selected = hangles;
-        helicityLD_selected = helicityLD;
-        helicityLD_nokinfit_selected = helicityLD_nokinfit;
-        foundJets += 1;
-        if( isSignalRegionMjj ) foundJets_signalRegion += 1;
-        maxBTag_found = nBTags;
-
-      } else { 
-
-        foundJets += 1;
-
-        if( event==DEBUG_EVENTNUMBER ) std::cout << "jet pair passed selections, going to fight for first place:" << std::endl;
-        if( event==DEBUG_EVENTNUMBER ) std::cout << "nBTags: " << nBTags << " > " << maxBTag_found << " ?" << std::endl;
-        if( event==DEBUG_EVENTNUMBER ) std::cout << "invMass: " << invMass << " better than " << bestMass << " ?" << std::endl;
-
-        if( ( nBTags == maxBTag_found && (fabs(invMass-Zmass) < fabs(bestMass-Zmass)))
-         || (nBTags > maxBTag_found)  ) {
-          if( event==DEBUG_EVENTNUMBER ) std::cout << "---> YES! this pair is now in pole position." << std::endl;
-          bestMass = invMass;
-          jet1_selected = jet1;
-          jet2_selected = jet2;
-          jetRecoil_selected = jetRecoil; 
-          hangles_selected = hangles;
-          helicityLD_selected = helicityLD;
-          helicityLD_nokinfit_selected = helicityLD_nokinfit;
-          maxBTag_found = nBTags;
-        } else {
-          if( event==DEBUG_EVENTNUMBER ) std::cout << "NOPE. keeping old pair (" << bestMass << ")" << std::endl;
-        }
-
-      }
-
-      h1_nEventsCategories_presel->Fill( nBTags, eventWeight );
-
-    } //for on jet pairs
-
-
-    if( event==DEBUG_EVENTNUMBER ) std::cout << "----------------------------------" << std::endl;
-    if( event==DEBUG_EVENTNUMBER ) std::cout << "foundJets:" << foundJets << std::endl;
-    if( event==DEBUG_EVENTNUMBER ) std::cout << "maxBTag_found:" << maxBTag_found << std::endl;
-    if( event==DEBUG_EVENTNUMBER ) {
-      if( foundSignalRegionMjj )  std::cout << "foundSignalRegionMjj is TRUE" << std::endl;
-      else std::cout << "foundSignalRegionMjj is FALSE" << std::endl;
+    if( bTaggerType_=="TCHE" ) {
+      h1_bTagJet1B->Fill( jet1B.trackCountingHighEffBJetTag, eventWeight );
+      h1_bTagJet2B->Fill( jet2B.trackCountingHighEffBJetTag, eventWeight );
+    } else if( bTaggerType_=="SSVHE" ) {
+      h1_bTagJet1B->Fill( jet1B.simpleSecondaryVertexHighEffBJetTag, eventWeight );
+      h1_bTagJet2B->Fill( jet2B.simpleSecondaryVertexHighEffBJetTag, eventWeight );
     }
 
+    h1_ssvheJet_best->Fill( jet_bestSSVHE.simpleSecondaryVertexHighEffBJetTag, eventWeight );
+    h1_ssvheJet_2ndbest->Fill( jet_2ndbestSSVHE.simpleSecondaryVertexHighEffBJetTag, eventWeight );
+
+    h1_deltaRbb_tche->Fill( jet_bestTCHE.DeltaR(&jet_2ndbestTCHE), eventWeight );
+    h1_deltaRbb_ssvhe->Fill( jet_bestSSVHE.DeltaR(&jet_2ndbestSSVHE), eventWeight );
 
 
-    h1_nCandidates->Fill( foundJets, eventWeight );
+    
 
 
-    if( foundJets==0 ) continue;
 
 
-    // event has passed selection (except mZjj cut). define all objects:
+    // -------------------------
+    // KINEMATIC SELECTION: JETS
+    // -------------------------
 
-    TLorentzVector Zjj_kinfit = jet1_selected + jet2_selected;
+    if( jet1.Pt() < ptJet1_thresh_ ) continue;
+    if( event==DEBUG_EVENTNUMBER ) std::cout << "first jet pt OK" << std::endl;
+    if( jet2.Pt() < ptJet2_thresh_ ) continue;
+    if( event==DEBUG_EVENTNUMBER ) std::cout << "second jet pt OK" << std::endl;
+    if( fabs(jet1.Eta()) > etaJet1_thresh_ ) continue;
+    if( event==DEBUG_EVENTNUMBER ) std::cout << "first jet eta OK" << std::endl;
+    if( fabs(jet2.Eta()) > etaJet2_thresh_ ) continue;
+    if( event==DEBUG_EVENTNUMBER ) std::cout << "second jet eta OK" << std::endl;
 
-    TLorentzVector jet1_nokinfit, jet2_nokinfit;
-    jet1_nokinfit.SetPtEtaPhiE( jet1_selected.pt_preKinFit, jet1_selected.eta_preKinFit, jet1_selected.phi_preKinFit, jet1_selected.e_preKinFit );
-    jet2_nokinfit.SetPtEtaPhiE( jet2_selected.pt_preKinFit, jet2_selected.eta_preKinFit, jet2_selected.phi_preKinFit, jet2_selected.e_preKinFit );
 
-    TLorentzVector Zjj_nokinfit = jet1_nokinfit + jet2_nokinfit;
 
-    TLorentzVector ZZ_nokinfit = Zjj_nokinfit + diLepton;
-    TLorentzVector ZZ_kinfit = diLepton + Zjj_kinfit;
 
-    ptLept1_t = ptLept1;
-    ptLept2_t = ptLept2;
-    etaLept1_t = etaLept1;
-    etaLept2_t = etaLept2;
-    ptJet1_t = jet1_selected.Pt();
-    ptJet2_t = jet2_selected.Pt();
-    etaJet1_t = jet1_selected.Pt();
-    etaJet2_t = jet2_selected.Eta();
 
-    mZjj = Zjj_nokinfit.M();
-    mZll = diLepton.M();
-    mZZ = ZZ_kinfit.M();
-    mZZ_nokinfit = ZZ_nokinfit.M();
+
+    ptLeptZ1_t = ptLeptZ1;
+    ptLeptZ2_t = ptLeptZ2;
+    ptLept3_t = ptLept3;
+    etaLeptZ1_t = etaLeptZ1;
+    etaLeptZ2_t = etaLeptZ2;
+    etaLept3_t = etaLept3;
+
+    ptJetB1_t = jetB1.Pt();
+    ptJetB2_t = jetB2.Pt();
+    etaJetB1_t = jetB1.Pt();
+    etaJetB2_t = jetB2.Eta();
+
+    bTagJetB1_t = 
+
+    ptJet3_t = jet3.Pt();
+    ptJet4_t = jet4.Pt();
+    etaJet3_t = jet3.Pt();
+    etaJet4_t = jet4.Eta();
+
 
     isSignalRegion = (Zjj_nokinfit.M()>=75. && Zjj_nokinfit.M()<=105.);
     isSidebands = !isSignalRegion &&  Zjj_nokinfit.M()>60. && Zjj_nokinfit.M()<130.;
