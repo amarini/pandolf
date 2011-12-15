@@ -32,20 +32,22 @@ class Ntp1Finalizer_TTZTriplepton : public Ntp1Finalizer {
    std::string PUType_;
    std::string selectionType_;
 
-   float  ptLept1_thresh_;
-   float  ptLept2_thresh_;
-   float  etaLept1_thresh_;
-   float  etaLept2_thresh_;
-   float  ptJet1_thresh_;
-   float  ptJet2_thresh_;
-   float  etaJet1_thresh_;
-   float  etaJet2_thresh_;
+   float  ptLeptZ1_thresh_;
+   float  ptLeptZ2_thresh_;
+   float  ptLept3_thresh_;
+   float  etaLeptZ1_thresh_;
+   float  etaLeptZ2_thresh_;
+   float  etaLept3_thresh_;
+   float  ptJetB1_thresh_;
+   float  ptJetB2_thresh_;
+   float  ptJet3_thresh_;
+   float  ptJet4_thresh_;
+   float  etaJetB1_thresh_;
+   float  etaJetB2_thresh_;
+   float  etaJet3_thresh_;
+   float  etaJet4_thresh_;
    float  mZll_threshLo_;
    float  mZll_threshHi_;
-   float  mZjj_threshLo_;
-   float  mZjj_threshHi_;
-   float  metSignificance_thresh_;
-   bool use_looseBTags_;
 
 };
 
