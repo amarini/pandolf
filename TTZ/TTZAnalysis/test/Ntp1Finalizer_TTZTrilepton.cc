@@ -29,7 +29,7 @@ int DEBUG_EVENTNUMBER = 98901397;
 
 // constructor:
 
-Ntp1Finalizer_TTZTrilepton::Ntp1Finalizer_TTZTrilepton( const std::string& dataset, const std::string& selectionType, const std::string& bTaggerType, const std::string& PUType, const std::string& leptType ) : Ntp1Finalizer( "TTZTriplepton", dataset, leptType ) {
+Ntp1Finalizer_TTZTrilepton::Ntp1Finalizer_TTZTrilepton( const std::string& dataset, const std::string& selectionType, const std::string& bTaggerType, const std::string& PUType, const std::string& leptType ) : Ntp1Finalizer( "TTZTrilepton", dataset, leptType ) {
 
   if( leptType!="ALL" && leptType!="MU" && leptType!="ELE" ) {
     std::cout << "Lept type '" << leptType << "' currently not supported. Exiting." << std::endl;
@@ -898,7 +898,7 @@ ofstream ofs("run_event.txt");
 
     ptJetB1_t = jetB1.Pt();
     ptJetB2_t = jetB2.Pt();
-    etaJetB1_t = jetB1.Pt();
+    etaJetB1_t = jetB1.Eta();
     etaJetB2_t = jetB2.Eta();
 
     bTagJetB1_t = bTaggerJetB1;
@@ -906,7 +906,7 @@ ofstream ofs("run_event.txt");
 
     ptJet3_t = jet3.Pt();
     ptJet4_t = jet4.Pt();
-    etaJet3_t = jet3.Pt();
+    etaJet3_t = jet3.Eta();
     etaJet4_t = jet4.Eta();
 
 
