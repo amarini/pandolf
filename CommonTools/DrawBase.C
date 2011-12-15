@@ -1469,7 +1469,7 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
     bool noBinLabels=true;
     TH2D* h2_axes = new TH2D("axes", "", nBinsx, xMin, xMax, 10, yMin, yMax);
     if( yMax>1000. ) {
-      h2_axes->GetYaxis()->SetTitleOffset(1.5);
+      h2_axes->GetYaxis()->SetTitleOffset(1.55);
     }
     if( yMax>10000. ) {
       h2_axes->GetYaxis()->SetTitleOffset(1.55);
@@ -2751,7 +2751,7 @@ LegendBox DrawBase::get_legendBox( int legendQuadrant, const std::vector<std::st
     }
 
     if( widen ) {
-      if( legendQuadrant==1 || legendQuadrant==4 ) lb.xMin *=0.9;
+      if( legendQuadrant==1 || legendQuadrant==4 ) lb.xMin *=0.85;
       if( legendQuadrant==2 || legendQuadrant==3 ) lb.xMax *=1.1;
     }
 
@@ -2954,10 +2954,10 @@ TPaveText* DrawBase::get_labelCMS( int legendQuadrant ) const {
   
   if( lumiOnRightSide_ ) {
 
-    if( isCMSArticle_ )
-      cmslabel->AddText("CMS");
-    else
-      cmslabel->AddText("CMS Preliminary");
+    //if( isCMSArticle_ )
+    //  cmslabel->AddText("CMS");
+    //else
+    //  cmslabel->AddText("CMS Preliminary");
 
   } else { //old version
 
@@ -3018,9 +3018,9 @@ TPaveText* DrawBase::get_labelSqrt( int legendQuadrant ) const {
     x2 = 0.42;
     y2 = 0.2;
   } else if( legendQuadrant==0 ) {
-    x1 = 0.7;
+    x1 = (lumiOnRightSide_) ? 0.4 : 0.7;
     y1 = 0.953;
-    x2 = 0.96;
+    x2 = 0.975;
     y2 = 0.975;
   }
 
@@ -3037,8 +3037,18 @@ TPaveText* DrawBase::get_labelSqrt( int legendQuadrant ) const {
   } else {
     label_sqrt->SetTextAlign(31); // align right
     if( lumiOnRightSide_ ) {
+      label_sqrt->SetTextFont(62);
+      std::string cmsText;
+      if( dataFiles_.size()==0 ) {
+        cmsText = "CMS Simulation";
+      } else {
+        if( isCMSArticle_ )
+          cmsText = "CMS";
+        else
+          cmsText = "CMS Preliminary";
+      }
       std::string lumiText = this->get_lumiText();
-      label_sqrt->AddText(Form("%s at  #sqrt{s} = 7 TeV", lumiText.c_str()));
+      label_sqrt->AddText(Form("%s %s at  #sqrt{s} = 7 TeV", cmsText.c_str(), lumiText.c_str()));
     } else {
       label_sqrt->AddText("#sqrt{s} = 7 TeV");
     }
