@@ -101,6 +101,7 @@ class DrawBase {
   void set_etamax( Float_t etamax ) { etamax_ = etamax; };
   void set_raw_corr( const std::string& raw_corr ) { raw_corr_ = raw_corr; };
   void set_pdf_aussi( bool pdf_aussi ) { pdf_aussi_ = pdf_aussi; };
+  void set_root_aussi( bool root_aussi ) { root_aussi_ = root_aussi; };
   void set_logx( bool logx=true ) { logx_ = logx; };
   void set_scaleFactor( float scaleFactor ) { scaleFactor_ = scaleFactor;};
   void set_xAxisRange( float xAxisMin=9999., float xAxisMax=9999. ) { 
@@ -196,6 +197,7 @@ class DrawBase {
   Float_t etamax_;
   std::string raw_corr_;
   bool pdf_aussi_;
+  bool root_aussi_;
   bool logx_;
   bool getBinLabels_;
   std::string legendTitle_;
