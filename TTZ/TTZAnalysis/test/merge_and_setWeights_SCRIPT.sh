@@ -1,0 +1,5 @@
+./merge_and_setWeights DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1
+./merge_and_setWeights TTJets_TuneZ2_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1
+./merge_and_setWeights TTW_TuneZ2_7TeV-madgraphCMSSW42xPUv2_spadhi
+./merge_and_setWeights TTZ_TuneZ2_7TeV-madgraphCMSSW42xPUv3_spadhi
+./merge_and_setWeights WZJetsTo3LNu_TuneZ2_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1
