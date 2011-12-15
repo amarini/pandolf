@@ -130,7 +130,7 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   TH1D* h1_mT_lZmet = new TH1D("mT_lZmet", "", 300, 0., 300.);
   h1_mT_lZmet->Sumw2();
 
-  TH1D* h1_nJets = new TH1D("nJets", "", 7, 1.5, 8.5);
+  TH1D* h1_nJets = new TH1D("nJets", "", 7, 3.5, 10.5);
   h1_nJets->Sumw2();
 
 
