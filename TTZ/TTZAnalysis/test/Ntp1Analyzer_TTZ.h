@@ -160,7 +160,6 @@ class Ntp1Analyzer_TTZ : public Ntp1Analyzer {
    TH1D* h1_nCounter_Zee_;
    TH1D* h1_nCounter_Zmumu_;
 
-   TH1F* h1_nJets30;
 
    bool DEBUG_VERBOSE_;
 
