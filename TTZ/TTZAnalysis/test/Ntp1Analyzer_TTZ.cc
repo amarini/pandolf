@@ -1053,6 +1053,8 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
      for( unsigned iJet=0; iJet<leadJets.size() && nJets_<50; ++iJet ) {
 
+       if( leadJets[iJet].Pt()<jetPt_thresh ) continue;
+
        eJet_[nJets_] = leadJets[iJet].Energy();
        ptJet_[nJets_] = leadJets[iJet].Pt();
        etaJet_[nJets_] = leadJets[iJet].Eta();
@@ -1095,6 +1097,11 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        nJets_++;
 
      }
+
+
+     // at least 4 jets in the event
+     if( nJets_<4 ) continue;
+
 
 
      if( isMC_ ) {
