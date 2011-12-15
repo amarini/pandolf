@@ -29,7 +29,7 @@ int DEBUG_EVENTNUMBER = 98901397;
 
 // constructor:
 
-Ntp1Finalizer_TTZDilepton::Ntp1Finalizer_TTZDilepton( const std::string& dataset, const std::string& selectionType, const std::string& bTaggerType, const std::string& PUType, const std::string& leptType ) : Ntp1Finalizer( "TTZTrilepton", dataset, leptType ) {
+Ntp1Finalizer_TTZDilepton::Ntp1Finalizer_TTZDilepton( const std::string& dataset, const std::string& selectionType, const std::string& bTaggerType, const std::string& PUType, const std::string& leptType ) : Ntp1Finalizer( "TTZDilepton", dataset, leptType ) {
 
   if( leptType!="ALL" && leptType!="MU" && leptType!="ELE" ) {
     std::cout << "Lept type '" << leptType << "' currently not supported. Exiting." << std::endl;
