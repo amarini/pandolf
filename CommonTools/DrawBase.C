@@ -201,6 +201,7 @@ DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType
   noStack_ = false;
 
   isCMSArticle_ = false;
+  lumiOnRightSide_ = false;
 
   additionalLabel_ = 0;
 
@@ -318,6 +319,13 @@ void DrawBase::set_sameInstanceNormalization() {
 void DrawBase::set_isCMSArticle( bool set ) {
 
   isCMSArticle_ = set;
+
+}
+
+
+void DrawBase::set_lumiOnRightSide( bool set ) {
+
+  lumiOnRightSide_ = set;
 
 }
 
@@ -1460,6 +1468,9 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
 
     bool noBinLabels=true;
     TH2D* h2_axes = new TH2D("axes", "", nBinsx, xMin, xMax, 10, yMin, yMax);
+    if( yMax>1000. ) {
+      h2_axes->GetYaxis()->SetTitleOffset(1.5);
+    }
     if( yMax>10000. ) {
       h2_axes->GetYaxis()->SetTitleOffset(1.55);
       h2_axes->GetYaxis()->SetLabelSize(0.04);
@@ -2925,7 +2936,8 @@ TPaveText* DrawBase::get_labelCMS( int legendQuadrant ) const {
     x2 = 0.42;
     y2 = 0.24;
   } else if( legendQuadrant==0 ) {
-    x1 = 0.145;
+    x1 = 0.14;
+    //x1 = (lumiOnRightSide_) ? 0.14 : 0.145;
     y1 = 0.953;
     x2 = 0.6;
     y2 = 0.975;
@@ -2939,27 +2951,40 @@ TPaveText* DrawBase::get_labelCMS( int legendQuadrant ) const {
   cmslabel->SetTextSize(0.038);
   cmslabel->SetTextFont(62);
   std::string label_CMS_text = this->get_CMSText();
-  if( legendQuadrant!=0 ) {
-    cmslabel->AddText(label_CMS_text.c_str());
-  } else {
-    std::string leftText;
-    if( dataFiles_.size()==0 ) {
-      leftText = "CMS Simulation 2011";
+  
+  if( lumiOnRightSide_ ) {
+
+    if( isCMSArticle_ )
+      cmslabel->AddText("CMS");
+    else
+      cmslabel->AddText("CMS Preliminary");
+
+  } else { //old version
+
+    if( legendQuadrant!=0 ) {
+      cmslabel->AddText(label_CMS_text.c_str());
     } else {
-      if( isCMSArticle_ )
-        leftText = "CMS 2011";
-      else
-        leftText = "CMS Preliminary 2011";
-    }
-    if (lumi_ > 0.) {
-      cmslabel->SetTextAlign(11); // align left
-      std::string lumiText = this->get_lumiText();
-      cmslabel->AddText(Form("%s, %s", leftText.c_str(), lumiText.c_str()));
-    } else {
-      cmslabel->SetTextAlign(11); // align left
-      cmslabel->AddText(Form("%s", leftText.c_str()));
-    }
-  }
+      std::string leftText;
+      if( dataFiles_.size()==0 ) {
+        leftText = "CMS Simulation 2011";
+      } else {
+        if( isCMSArticle_ )
+          leftText = "CMS 2011";
+        else
+          leftText = "CMS Preliminary 2011";
+      }
+      if (lumi_ > 0.) {
+        cmslabel->SetTextAlign(11); // align left
+        std::string lumiText = this->get_lumiText();
+        cmslabel->AddText(Form("%s, %s", leftText.c_str(), lumiText.c_str()));
+      } else {
+        cmslabel->SetTextAlign(11); // align left
+        cmslabel->AddText(Form("%s", leftText.c_str()));
+      }
+
+    } 
+
+  } //if lumionrightside
 
   return cmslabel;
 
@@ -3005,11 +3030,18 @@ TPaveText* DrawBase::get_labelSqrt( int legendQuadrant ) const {
   label_sqrt->SetTextSize(0.038);
   label_sqrt->SetTextFont(42);
   std::string label_sqrt_text = this->get_sqrtText();
+
+
   if( legendQuadrant!=0 ) {
     label_sqrt->AddText(label_sqrt_text.c_str());
   } else {
     label_sqrt->SetTextAlign(31); // align right
-    label_sqrt->AddText("#sqrt{s} = 7 TeV");
+    if( lumiOnRightSide_ ) {
+      std::string lumiText = this->get_lumiText();
+      label_sqrt->AddText(Form("%s at  #sqrt{s} = 7 TeV", lumiText.c_str()));
+    } else {
+      label_sqrt->AddText("#sqrt{s} = 7 TeV");
+    }
   }
 
   return label_sqrt;
