@@ -179,7 +179,6 @@ void Ntp1Analyzer_TTZ::CreateOutputFile() {
   reducedTree_->Branch("phipfMet",&phipfMet_,"phipfMet_/F");
 
   
-  h1_nJets30 = new TH1F("nJets30", "", 31, -0.5, 30.5);
 
 } 
 
@@ -933,12 +932,11 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      // JETS
      // ------------------
 
-     float jetPt_thresh = 20.;
+     float jetPt_thresh = 10.;
 
      // first save leading jets in event:
      std::vector<AnalysisJet> leadJets;
      std::vector<int> leadJetsIndex; //index in the event collection (needed afterwards for PFCandidates)
-     int nJets30=0;
 
      for( unsigned int iJet=0; iJet<nAK5PFPUcorrJet; ++iJet ) {
 
@@ -969,7 +967,6 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        thisJet.jetProbabilityBJetTag = jetProbabilityBJetTagsAK5PFPUcorrJet[iJet];
 
 
-       if( thisJet.Pt()>jetPt_thresh ) nJets30++;
 
        //// save at least 3 lead jets (if event has them) and all jets with pt>thresh:
        //if( leadJets.size()>=3 && thisJet.Pt()<jetPt_thresh ) break;
@@ -1041,7 +1038,6 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      }
 
 
-     h1_nJets30->Fill(nJets30);
      if( leadJets.size()<2 ) continue;
      if( leadJets[1].Pt()<jetPt_thresh ) continue; //at least 2 jets over thresh
 
