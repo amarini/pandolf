@@ -453,7 +453,7 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
 
 
 
-  float mZll;
+  float mZll_t, ptZll_t;
   float ptLeptZ1_t, ptLeptZ2_t, etaLeptZ1_t, etaLeptZ2_t;
   float ptLept3_t, etaLept3_t;
   float ptJetB1_t, ptJetB2_t, etaJetB1_t, etaJetB2_t;
@@ -464,12 +464,15 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   tree_passedEvents->Branch( "run", &run, "run/I" );
   tree_passedEvents->Branch( "LS", &LS, "LS/I" );
   tree_passedEvents->Branch( "event", &event, "event/I" );
+  tree_passedEvents->Branch( "pfMet", &pfMet, "pfMet/I" );
   tree_passedEvents->Branch( "leptType", &leptType, "leptType/I" );
   tree_passedEvents->Branch( "ptLeptZ1", &ptLeptZ1_t, "ptLeptZ1_t/F" );
   tree_passedEvents->Branch( "ptLeptZ2", &ptLeptZ2_t, "ptLeptZ2_t/F" );
   tree_passedEvents->Branch( "ptLept3", &ptLept3_t, "ptLept3_t/F" );
   tree_passedEvents->Branch( "etaLeptZ1", &etaLeptZ1_t, "etaLeptZ1_t/F" );
   tree_passedEvents->Branch( "etaLeptZ2", &etaLeptZ2_t, "etaLeptZ2_t/F" );
+  tree_passedEvents->Branch( "ptZll", &ptZll_t, "ptZll_t/F" );
+  tree_passedEvents->Branch( "mZll", &mZll_t, "mZll_t/F" );
   tree_passedEvents->Branch( "etaLept3", &etaLept3_t, "etaLept3_t/F" );
   tree_passedEvents->Branch( "ptJetB1", &ptJetB1_t, "ptJetB1_t/F" );
   tree_passedEvents->Branch( "ptJetB2", &ptJetB2_t, "ptJetB2_t/F" );
@@ -571,7 +574,7 @@ ofstream ofs("run_event.txt");
 //    }
 
 
-      eventWeight *= fPUWeight->GetWeight(nPU);
+      //eventWeight *= fPUWeight->GetWeight(nPU);
 
     } // if is MC
 
@@ -895,6 +898,9 @@ ofstream ofs("run_event.txt");
     etaLeptZ1_t = leptZ1.Eta();
     etaLeptZ2_t = leptZ2.Eta();
     etaLept3_t = lept3.Eta();
+
+    ptZll_t = diLepton.Pt();
+    mZll_t = diLepton.M();
 
     ptJetB1_t = jetB1.Pt();
     ptJetB2_t = jetB2.Pt();
