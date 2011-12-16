@@ -115,7 +115,7 @@ DrawExtrap.o: DrawExtrap.C DrawBase.o
 	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools DrawExtrap.C DrawBase.o $(ROOTFLAG)
 
 merge_and_setWeights_PhotonJet: merge_and_setWeights_PhotonJet.cpp
-	$(CC) -Wall -o merge_and_setWeights_PhotonJet merge_and_setWeights_PhotonJet.cpp $(ROOTFLAG)
+	$(CC) -Wall -o merge_and_setWeights_PhotonJet merge_and_setWeights_PhotonJet.cpp $(ROOTFLAG) $(EXTRALIBS)
 
 merge_and_setWeights_Calo_vs_PF: merge_and_setWeights_Calo_vs_PF.cpp
 	$(CC) -Wall -o merge_and_setWeights_Calo_vs_PF merge_and_setWeights_Calo_vs_PF.cpp $(ROOTFLAG)
