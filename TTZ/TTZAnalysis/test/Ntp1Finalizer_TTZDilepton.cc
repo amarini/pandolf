@@ -561,7 +561,7 @@ ofstream ofs("run_event.txt");
 //    }
 
 
-      eventWeight *= fPUWeight->GetWeight(nPU);
+      //eventWeight *= fPUWeight->GetWeight(nPU);
 
     } // if is MC
 
@@ -882,6 +882,8 @@ ofstream ofs("run_event.txt");
     ptJet2_t = jets[1].Pt();
     ptJet3_t = jets[2].Pt();
     ptJet4_t = jets[3].Pt();
+    ptJet5_t = jets[4].Pt();
+    ptJet6_t = jets[5].Pt();
 
     bTagJet1_t = bTaggerJet1;
     bTagJet2_t = bTaggerJet2;
@@ -890,6 +892,8 @@ ofstream ofs("run_event.txt");
     etaJet2_t = jets[1].Eta();
     etaJet3_t = jets[2].Eta();
     etaJet4_t = jets[3].Eta();
+    etaJet5_t = jets[5].Eta();
+    etaJet6_t = jets[6].Eta();
 
 
 
