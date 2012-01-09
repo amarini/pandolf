@@ -433,16 +433,16 @@ void Ntp1Finalizer_TTZDilepton::finalize() {
     TH1F* h1_nPU_mc = (TH1F*)filePUMC->Get("hNPU");
     std::cout << "-> Switching MC PU file to: Pileup_MC_Summer11_S4.root" << std::endl;
     fPUWeight->SetMCHistogram(h1_nPU_mc);
-  } else if( dataset_tstr.Contains("Fall11") ) {
-    TFile* filePUMC = TFile::Open("s6MCPileUp.root");
-    TH1F* h1_nPU_mc = (TH1F*)filePUMC->Get("pileup");
-    std::cout << "-> Switching MC PU file to: s6MCPileUp.root" << std::endl;
-    fPUWeight->SetMCHistogram(h1_nPU_mc);
+//} else if( dataset_tstr.Contains("Fall11") ) {
+//  TFile* filePUMC = TFile::Open("s6MCPileUp.root");
+//  TH1F* h1_nPU_mc = (TH1F*)filePUMC->Get("pileup");
+//  std::cout << "-> Switching MC PU file to: s6MCPileUp.root" << std::endl;
+//  fPUWeight->SetMCHistogram(h1_nPU_mc);
   }
 
 
 
-  float mZll;
+  float mZll_t, ptZll_t;
   float ptLeptZ1_t, ptLeptZ2_t, etaLeptZ1_t, etaLeptZ2_t;
   float ptJet1_t, ptJet2_t, ptJet3_t, ptJet4_t, ptJet5_t, ptJet6_t;
   float etaJet1_t, etaJet2_t, etaJet3_t, etaJet4_t, etaJet5_t, etaJet6_t;
@@ -457,6 +457,8 @@ void Ntp1Finalizer_TTZDilepton::finalize() {
   tree_passedEvents->Branch( "ptLeptZ2", &ptLeptZ2_t, "ptLeptZ2_t/F" );
   tree_passedEvents->Branch( "etaLeptZ1", &etaLeptZ1_t, "etaLeptZ1_t/F" );
   tree_passedEvents->Branch( "etaLeptZ2", &etaLeptZ2_t, "etaLeptZ2_t/F" );
+  tree_passedEvents->Branch( "mZll", &mZll_t, "mZll_t/F" );
+  tree_passedEvents->Branch( "ptZll", &ptZll_t, "ptZll_t/F" );
   tree_passedEvents->Branch( "ptJet1", &ptJet1_t, "ptJet1_t/F" );
   tree_passedEvents->Branch( "ptJet2", &ptJet2_t, "ptJet2_t/F" );
   tree_passedEvents->Branch( "bTagJet1", &bTagJet1_t, "bTagJet1_t/F" );
@@ -691,18 +693,24 @@ ofstream ofs("run_event.txt");
 
     std::vector<AnalysisJet> jets;
 
-    // default: order by pt
-    for( unsigned int iJet=0; iJet<6; ++iJet ) {
-      AnalysisJet* newJet = new AnalysisJet();
-      newJet->SetPtEtaPhiE( ptJet[iJet], etaJet[iJet], phiJet[iJet], eJet[iJet]);
-      jets.push_back(*newJet);
-    }
+  //// default: order by pt
+  //for( unsigned int iJet=0; iJet<6; ++iJet ) {
+  //  AnalysisJet* newJet = new AnalysisJet();
+  //  newJet->SetPtEtaPhiE( ptJet[iJet], etaJet[iJet], phiJet[iJet], eJet[iJet]);
+  //  jets.push_back(*newJet);
+  //}
 
 
+//std::cout << "check jets: " << std::endl;
+//for( unsigned iSelectedJet=0; iSelectedJet<6; ++iSelectedJet )
+//std::cout << iSelectedJet << " " << jets[iSelectedJet].Pt() << std::endl;
 
 
 
     float bestBtag=-9999.;
+    float bestBtag2=-9999.;
+    int i_bestBtag=-1;
+    int i_bestBtag2=-1;
 
     for( unsigned iJet=0; iJet<nJets; ++iJet) {
 
@@ -751,15 +759,101 @@ ofstream ofs("run_event.txt");
 
 
       if( thisBtag > bestBtag ) {
+
+        bestBtag2 = bestBtag;
         bestBtag = thisBtag;
-        // slide them all:
-        for( unsigned iSelectedJet=0; iSelectedJet<5; ++iSelectedJet )
-          jets[5-iSelectedJet] = jets[4-iSelectedJet];
-        jets[0] = thisJet;
+        i_bestBtag2 = i_bestBtag;
+        i_bestBtag = iJet;
+
+        if( jets.size()==0 ) {
+          AnalysisJet* newJet = new AnalysisJet(thisJet);
+          jets.push_back(*newJet);
+        } else if( jets.size()==1 ) {
+          AnalysisJet oldJet = jets[0];
+          AnalysisJet* newJet = new AnalysisJet(thisJet);
+          jets.push_back(*newJet);
+          jets[0] = *newJet;
+          jets[1] = oldJet;
+        } else if( jets.size()==2 ) {
+          jets[1] = jets[0];
+          jets[0] = thisJet;
+        }
+
+      } else if( thisBtag > bestBtag2 ) { //means that at least one jet was found
+
+        bestBtag2 = thisBtag;
+        i_bestBtag2 = iJet;
+        
+        if( jets.size()==1 ) {
+          AnalysisJet* newJet = new AnalysisJet(thisJet);
+          jets.push_back(*newJet);
+        } else if( jets.size()==2 ) {
+          jets[1] = thisJet;
+        }
+  
       }
 
     } // for jets
 
+
+
+    // now add other jets ordered in pt:
+    for( unsigned iJet=0; iJet<nJets; ++iJet) {
+
+      if( iJet==i_bestBtag || iJet==i_bestBtag2 ) continue;
+
+      AnalysisJet thisJet;
+      thisJet.SetPtEtaPhiE( ptJet[iJet], etaJet[iJet], phiJet[iJet], eJet[iJet]);
+
+      thisJet.rmsCand = rmsCandJet[iJet];
+      thisJet.ptD = ptDJet[iJet];
+      thisJet.nCharged = nChargedJet[iJet];
+      thisJet.nNeutral = nNeutralJet[iJet];
+      thisJet.muonEnergyFraction = eMuonsJet[iJet]/thisJet.Energy();
+      thisJet.electronEnergyFraction = eElectronsJet[iJet]/thisJet.Energy();
+
+      thisJet.trackCountingHighEffBJetTag = trackCountingHighEffBJetTagJet[iJet];
+      thisJet.trackCountingHighPurBJetTag = trackCountingHighPurBJetTagJet[iJet];
+      thisJet.simpleSecondaryVertexHighEffBJetTag = simpleSecondaryVertexHighEffBJetTagJet[iJet];
+      thisJet.simpleSecondaryVertexHighPurBJetTag = simpleSecondaryVertexHighPurBJetTagJet[iJet];
+      thisJet.jetBProbabilityBJetTag              = jetBProbabilityBJetTagJet[iJet];
+      thisJet.jetProbabilityBJetTag               = jetProbabilityBJetTagJet[iJet];
+
+      thisJet.ptGen = ptJetGen[iJet];
+      thisJet.etaGen = etaJetGen[iJet];
+      thisJet.phiGen = phiJetGen[iJet];
+      thisJet.eGen = eJetGen[iJet];
+
+      //match to parton:
+      int partFlavor=0;
+      float deltaRmin=999.;
+      for(unsigned iPart=0; iPart<nPart; ++iPart ) {
+        TLorentzVector thisPart;
+        thisPart.SetPtEtaPhiE( ptPart[iPart], etaPart[iPart], phiPart[iPart], ePart[iPart] );
+        float thisDeltaR = thisJet.DeltaR(thisPart);
+        if( thisDeltaR<deltaRmin ) {
+          partFlavor = pdgIdPart[iPart];
+          deltaRmin = thisDeltaR;
+        }
+      }
+      thisJet.pdgIdPart = partFlavor;
+
+
+      AnalysisJet* newJet = new AnalysisJet(thisJet);
+      jets.push_back(*newJet);
+
+    } //for additional jets
+ 
+        
+  std::cout << "new order: " << std::endl;
+  for( unsigned iSelectedJet=0; iSelectedJet<6; ++iSelectedJet )
+  std::cout << iSelectedJet << " " << jets[iSelectedJet].Pt()  << std::endl;
+
+std::cout << std::endl << std::endl << std::endl;
+      //// slide them all:
+      //for( unsigned iSelectedJet=0; iSelectedJet<5; ++iSelectedJet )
+      //  jets[5-iSelectedJet] = jets[4-iSelectedJet];
+      //jets[0] = thisJet;
 
     h1_ptJet1->Fill( jets[0].Pt(), eventWeight );
     h1_ptJet2->Fill( jets[1].Pt(), eventWeight );
@@ -871,7 +965,8 @@ ofstream ofs("run_event.txt");
 
 
 
-
+    ptZll_t = diLepton.Pt(); 
+    mZll_t = diLepton.M(); 
 
     ptLeptZ1_t = leptZ1.Pt();
     ptLeptZ2_t = leptZ2.Pt();
