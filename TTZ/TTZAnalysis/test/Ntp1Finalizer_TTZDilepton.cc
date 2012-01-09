@@ -845,11 +845,10 @@ ofstream ofs("run_event.txt");
     } //for additional jets
  
         
-  std::cout << "new order: " << std::endl;
-  for( unsigned iSelectedJet=0; iSelectedJet<6; ++iSelectedJet )
-  std::cout << iSelectedJet << " " << jets[iSelectedJet].Pt()  << std::endl;
-
-std::cout << std::endl << std::endl << std::endl;
+ // std::cout << "new order: " << std::endl;
+ // for( unsigned iSelectedJet=0; iSelectedJet<6; ++iSelectedJet )
+ // std::cout << iSelectedJet << " " << jets[iSelectedJet].Pt()  << std::endl;
+ // std::cout << std::endl << std::endl << std::endl;
       //// slide them all:
       //for( unsigned iSelectedJet=0; iSelectedJet<5; ++iSelectedJet )
       //  jets[5-iSelectedJet] = jets[4-iSelectedJet];
