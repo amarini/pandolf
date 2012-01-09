@@ -387,7 +387,8 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
     puType = "Summer11_S4";
     puType_ave = "Summer11_S4_ave";
   } else if( dataset_tstr.Contains("Fall11") ) {
-    puType = "Fall11";
+    puType = "Summer11_S4";
+    //puType = "Fall11";
   }
   PUWeight* fPUWeight = new PUWeight(-1, "2011A", puType);
   PUWeight* fPUWeight_ave = new PUWeight(-1, "2011A", puType_ave);
@@ -444,11 +445,11 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
     TH1F* h1_nPU_mc = (TH1F*)filePUMC->Get("hNPU");
     std::cout << "-> Switching MC PU file to: Pileup_MC_Summer11_S4.root" << std::endl;
     fPUWeight->SetMCHistogram(h1_nPU_mc);
-  } else if( dataset_tstr.Contains("Fall11") ) {
-    TFile* filePUMC = TFile::Open("s6MCPileUp.root");
-    TH1F* h1_nPU_mc = (TH1F*)filePUMC->Get("pileup");
-    std::cout << "-> Switching MC PU file to: s6MCPileUp.root" << std::endl;
-    fPUWeight->SetMCHistogram(h1_nPU_mc);
+//} else if( dataset_tstr.Contains("Fall11") ) {
+//  TFile* filePUMC = TFile::Open("s6MCPileUp.root");
+//  TH1F* h1_nPU_mc = (TH1F*)filePUMC->Get("pileup");
+//  std::cout << "-> Switching MC PU file to: s6MCPileUp.root" << std::endl;
+//  fPUWeight->SetMCHistogram(h1_nPU_mc);
   }
 
 
@@ -712,12 +713,24 @@ ofstream ofs("run_event.txt");
     if( diLepton.M() < mZll_threshLo_ || diLepton.M() > mZll_threshHi_ ) continue;
 
 
+      
+      
+      
+      
+      
+      
+    // ------------
+    // AND NOW JETS
+    // ------------
+
 
     h1_nJets->Fill( nJets , eventWeight );
 
     if( nJets<4 ) continue;
 
     AnalysisJet jetB1, jetB2, jet3, jet4;
+    int i_jetB1=-1;
+    int i_jetB2=-1;
 
     // default: order by pt
     jetB1.SetPtEtaPhiE( ptJet[0], etaJet[0], phiJet[0], eJet[0]);
@@ -727,8 +740,10 @@ ofstream ofs("run_event.txt");
 
 
 
-
+    // first look for best Btags:
+    
     float bestBtag=-9999.;
+    float bestBtag2=-9999.;
 
     for( unsigned iJet=0; iJet<nJets; ++iJet) {
 
@@ -777,16 +792,83 @@ ofstream ofs("run_event.txt");
 
 
       if( thisBtag > bestBtag ) {
+        bestBtag2 = bestBtag;
         bestBtag = thisBtag;
-        // slide them all:
-        jet4 = jet3;
-        jet3 = jetB2;
         jetB2 = jetB1;
         jetB1 = thisJet;
+        i_jetB2 = i_jetB1;
+        i_jetB1 = iJet;
+      } else if( thisBtag > bestBtag2 ) {
+        bestBtag2 = thisBtag;
+        i_jetB2 = iJet;
+        jetB2 = thisJet;
       }
+
 
     } // for jets
 
+    
+    
+    // now add other jets ordered in pt:
+    int istep=0;
+    for( unsigned iJet=0; iJet<nJets; ++iJet) {
+
+      if( iJet==i_jetB1 || iJet==i_jetB2 ) continue;
+
+      AnalysisJet thisJet;
+      thisJet.SetPtEtaPhiE( ptJet[iJet], etaJet[iJet], phiJet[iJet], eJet[iJet]);
+
+      thisJet.rmsCand = rmsCandJet[iJet];
+      thisJet.ptD = ptDJet[iJet];
+      thisJet.nCharged = nChargedJet[iJet];
+      thisJet.nNeutral = nNeutralJet[iJet];
+      thisJet.muonEnergyFraction = eMuonsJet[iJet]/thisJet.Energy();
+      thisJet.electronEnergyFraction = eElectronsJet[iJet]/thisJet.Energy();
+
+      thisJet.trackCountingHighEffBJetTag = trackCountingHighEffBJetTagJet[iJet];
+      thisJet.trackCountingHighPurBJetTag = trackCountingHighPurBJetTagJet[iJet];
+      thisJet.simpleSecondaryVertexHighEffBJetTag = simpleSecondaryVertexHighEffBJetTagJet[iJet];
+      thisJet.simpleSecondaryVertexHighPurBJetTag = simpleSecondaryVertexHighPurBJetTagJet[iJet];
+      thisJet.jetBProbabilityBJetTag              = jetBProbabilityBJetTagJet[iJet];
+      thisJet.jetProbabilityBJetTag               = jetProbabilityBJetTagJet[iJet];
+
+      thisJet.ptGen = ptJetGen[iJet];
+      thisJet.etaGen = etaJetGen[iJet];
+      thisJet.phiGen = phiJetGen[iJet];
+      thisJet.eGen = eJetGen[iJet];
+
+      //match to parton:
+      int partFlavor=0;
+      float deltaRmin=999.;
+      for(unsigned iPart=0; iPart<nPart; ++iPart ) {
+        TLorentzVector thisPart;
+        thisPart.SetPtEtaPhiE( ptPart[iPart], etaPart[iPart], phiPart[iPart], ePart[iPart] );
+        float thisDeltaR = thisJet.DeltaR(thisPart);
+        if( thisDeltaR<deltaRmin ) {
+          partFlavor = pdgIdPart[iPart];
+          deltaRmin = thisDeltaR;
+        }
+      }
+      thisJet.pdgIdPart = partFlavor;
+
+
+      if( istep==0 ) {
+        jet3 = thisJet;
+        istep++;
+      } else if( istep==1 ) {
+        jet4 = thisJet;
+        istep++;
+      } else {
+        break;
+      }
+
+    } //for additional jets
+
+    //std::cout <<  jetB1.Pt() << std::endl;
+    //std::cout <<  jetB2.Pt() << std::endl;
+    //std::cout << jet3.Pt() << std::endl;
+    //std::cout << jet4.Pt() << std::endl;
+    //std::cout << std::endl << std::endl << std::endl;
 
     h1_ptJetB1->Fill( jetB1.Pt(), eventWeight );
     h1_ptJetB2->Fill( jetB2.Pt(), eventWeight );
