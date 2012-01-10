@@ -109,39 +109,39 @@ void TreeAnalyzer_VHgg::CreateOutputFile() {
   
 
   jetTree_->Branch("nJet",  &nJet_,  "nJet_/I");
-  jetTree_->Branch("eJet",  eJet_,  "eJet_[nJet]/F");
-  jetTree_->Branch( "ptJet",  ptJet_,  "ptJet_[nJet]/F");
-  jetTree_->Branch( "ptRawJet",  ptRawJet_,  "ptRawJet_[nJet]/F");
-  jetTree_->Branch("etaJet", etaJet_, "etaJet_[nJet]/F");
-  jetTree_->Branch("phiJet", phiJet_, "phiJet_[nJet]/F");
-  jetTree_->Branch( "ptDJet",  ptDJet_,  "ptDJet_[nJet]/F");
-  jetTree_->Branch( "rmsCandJet",  rmsCandJet_,  "rmsCandJet_[nJet]/F");
-  jetTree_->Branch("trackCountingHighEffBJetTagsJet",  trackCountingHighEffBJetTagsJet_,  "trackCountingHighEffBJetTagsJet_[nJet]/F");
-  jetTree_->Branch("simpleSecondaryVertexHighEffBJetTagsJet",  simpleSecondaryVertexHighEffBJetTagsJet_,  "simpleSecondaryVertexHighEffBJetTagsJet_[nJet]/F");
-  jetTree_->Branch(  "eJetGen",   eJetGen_,   "eJetGen_[nJet]/F");
-  jetTree_->Branch(  "ptJetGen",   ptJetGen_,   "ptJetGen_[nJet]/F");
-  jetTree_->Branch( "etaJetGen",  etaJetGen_,  "etaJetGen_[nJet]/F");
-  jetTree_->Branch( "phiJetGen",  phiJetGen_,  "phiJetGen_[nJet]/F");
-  jetTree_->Branch("pdgIdPartJet", pdgIdPartJet_, "pdgIdPartJet_[nJet]/I");
-  jetTree_->Branch(   "ptPartJet",    ptPartJet_,    "ptPartJet_[nJet]/F");
-  jetTree_->Branch(  "etaPartJet",   etaPartJet_,   "etaPartJet_[nJet]/F");
-  jetTree_->Branch(  "phiPartJet",   phiPartJet_,   "phiPartJet_[nJet]/F");
+  jetTree_->Branch("eJet",  eJet_,  "eJet_[nJet_]/F");
+  jetTree_->Branch( "ptJet",  ptJet_,  "ptJet_[nJet_]/F");
+  jetTree_->Branch( "ptRawJet",  ptRawJet_,  "ptRawJet_[nJet_]/F");
+  jetTree_->Branch("etaJet", etaJet_, "etaJet_[nJet_]/F");
+  jetTree_->Branch("phiJet", phiJet_, "phiJet_[nJet_]/F");
+  jetTree_->Branch( "ptDJet",  ptDJet_,  "ptDJet_[nJet_]/F");
+  jetTree_->Branch( "rmsCandJet",  rmsCandJet_,  "rmsCandJet_[nJet_]/F");
+  jetTree_->Branch("trackCountingHighEffBJetTagsJet",  trackCountingHighEffBJetTagsJet_,  "trackCountingHighEffBJetTagsJet_[nJet_]/F");
+  jetTree_->Branch("simpleSecondaryVertexHighEffBJetTagsJet",  simpleSecondaryVertexHighEffBJetTagsJet_,  "simpleSecondaryVertexHighEffBJetTagsJet_[nJet_]/F");
+  jetTree_->Branch(  "eJetGen",   eJetGen_,   "eJetGen_[nJet_]/F");
+  jetTree_->Branch(  "ptJetGen",   ptJetGen_,   "ptJetGen_[nJet_]/F");
+  jetTree_->Branch( "etaJetGen",  etaJetGen_,  "etaJetGen_[nJet_]/F");
+  jetTree_->Branch( "phiJetGen",  phiJetGen_,  "phiJetGen_[nJet_]/F");
+  jetTree_->Branch("pdgIdPartJet", pdgIdPartJet_, "pdgIdPartJet_[nJet_]/I");
+  jetTree_->Branch(   "ptPartJet",    ptPartJet_,    "ptPartJet_[nJet_]/F");
+  jetTree_->Branch(  "etaPartJet",   etaPartJet_,   "etaPartJet_[nJet_]/F");
+  jetTree_->Branch(  "phiPartJet",   phiPartJet_,   "phiPartJet_[nJet_]/F");
 
-  jetTree_->Branch("eTracksJet", &eTracksJet_, "eTracksJet_/F");
-  jetTree_->Branch("ePhotonsJet", &ePhotonsJet_, "ePhotonsJet_/F");
-  jetTree_->Branch("eNeutralHadronsJet", &eNeutralHadronsJet_, "eNeutralHadronsJet_/F");
-  jetTree_->Branch("eMuonsJet", &eMuonsJet_, "eMuonsJet_/F");
-  jetTree_->Branch("eElectronsJet", &eElectronsJet_, "eElectronsJet_/F");
-  jetTree_->Branch("eHFHadronsJet", &eHFHadronsJet_, "eHFHadronsJet_/F");
-  jetTree_->Branch("eHFEMJet", &eHFEMJet_, "eHFEMJet_/F");
+  jetTree_->Branch("eTracksJet", &eTracksJet_, "eTracksJet_[nJet_]/F");
+  jetTree_->Branch("ePhotonsJet", &ePhotonsJet_, "ePhotonsJet_[nJet_]/F");
+  jetTree_->Branch("eNeutralHadronsJet", &eNeutralHadronsJet_, "eNeutralHadronsJet_[nJet_]/F");
+  jetTree_->Branch("eMuonsJet", &eMuonsJet_, "eMuonsJet_[nJet_]/F");
+  jetTree_->Branch("eElectronsJet", &eElectronsJet_, "eElectronsJet_[nJet_]/F");
+  jetTree_->Branch("eHFHadronsJet", &eHFHadronsJet_, "eHFHadronsJet_[nJet_]/F");
+  jetTree_->Branch("eHFEMJet", &eHFEMJet_, "eHFEMJet_[nJet_]/F");
 
-  jetTree_->Branch("nTracksJet", &nTracksJet_, "nTracksJet_/I");
-  jetTree_->Branch("nPhotonsJet", &nPhotonsJet_, "nPhotonsJet_/I");
-  jetTree_->Branch("nNeutralHadronsJet", &nNeutralHadronsJet_, "nNeutralHadronsJet_/I");
-  jetTree_->Branch("nMuonsJet", &nMuonsJet_, "nMuonsJet_/I");
-  jetTree_->Branch("nElectronsJet", &nElectronsJet_, "nElectronsJet_/I");
-  jetTree_->Branch("nHFHadronsJet", &nHFHadronsJet_, "nHFHadronsJet_/I");
-  jetTree_->Branch("nHFEMJet", &nHFEMJet_, "nHFEMJet_/I");
+  jetTree_->Branch("nTracksJet", &nTracksJet_, "nTracksJet_[nJet_]/I");
+  jetTree_->Branch("nPhotonsJet", &nPhotonsJet_, "nPhotonsJet_[nJet_]/I");
+  jetTree_->Branch("nNeutralHadronsJet", &nNeutralHadronsJet_, "nNeutralHadronsJet_[nJet_]/I");
+  jetTree_->Branch("nMuonsJet", &nMuonsJet_, "nMuonsJet_[nJet_]/I");
+  jetTree_->Branch("nElectronsJet", &nElectronsJet_, "nElectronsJet_[nJet_]/I");
+  jetTree_->Branch("nHFHadronsJet", &nHFHadronsJet_, "nHFHadronsJet_[nJet_]/I");
+  jetTree_->Branch("nHFEMJet", &nHFEMJet_, "nHFEMJet_[nJet_]/I");
 
   jetTree_->Branch("epfMet",&epfMet_,"epfMet_/F");
   jetTree_->Branch("epfMetCorr",&epfMetCorr_,"epfMetCorr_/F");
@@ -226,7 +226,9 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      int iFoundPhotGen=0;
      for( unsigned int iMC=0; iMC<nMC; ++iMC ) {
 
-       if( !(statusMC[iMC]==3 && pdgIdMC[iMC]==22 && pdgIdMC[motherIDMC[iMC]]==25) ) continue;
+       if( statusMC[iMC]!=3 ) continue;
+       if( pdgIdMC[iMC]!=22 ) continue;
+       if( pdgIdMC[motherIDMC[iMC]]!=25 ) continue;
 
        if( iFoundPhotGen==0 ) {
          ptPhotGen1_ = ptMC[iMC];
@@ -246,6 +248,10 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
      } //for MC
 
+     if( iFoundPhotGen!=2 ) {
+       std::cout << "There is a problem. Didn't find the two Higgs photons." << std::endl;
+     }
+
      TLorentzVector photGen1, photGen2;
      photGen1.SetPtEtaPhiE( ptPhotGen1_, etaPhotGen1_, phiPhotGen1_, ePhotGen1_ );
      photGen2.SetPtEtaPhiE( ptPhotGen2_, etaPhotGen2_, phiPhotGen2_, ePhotGen2_ );
@@ -256,6 +262,8 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      float bestDeltaR2=999.;
      AnalysisPhoton phot1, phot2;
 
+     if( nPhot<2 ) continue;
+
      for( unsigned iPhot=0; iPhot<nPhot; ++iPhot ) {
 
        AnalysisPhoton thisPhot;
@@ -264,6 +272,8 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        thisPhot.pt = ptPhot[iPhot];
        thisPhot.eta = etaPhot[iPhot];
        thisPhot.phi = phiPhot[iPhot];
+
+       thisPhot.SetPtEtaPhiE( thisPhot.pt, thisPhot.eta, thisPhot.phi, thisPhot.e );
 
        thisPhot.hcalIso = hcalovecal04Phot[iPhot]; 
        thisPhot.ecalIso = ecaliso04Phot[iPhot]/thisPhot.e;
@@ -358,6 +368,8 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        thisJet.ptReco  =  ptJet[iRecoJet];
        thisJet.phiReco = phiJet[iRecoJet];
        thisJet.etaReco = etaJet[iRecoJet];
+
+       thisJet.SetPtEtaPhiE( thisJet.ptReco, thisJet.etaReco, thisJet.phiReco, thisJet.eReco );
 
        if( thisJet.ptReco<20. ) continue;
 
