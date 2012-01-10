@@ -328,6 +328,12 @@ float getWeight( const std::string& dataset, int nEvents ) {
     xSection = 1.545;
   } else if( dataset=="PhotonJet_Summer1036X_Pt500toInf" ) {
     xSection = 0.0923;
+  } else if( dataset_tstr.BeginsWith("WH_ZH_HToGG_M-120") ) {
+    xSection = (0.6561 + 0.3551)*2.25E-03;
+  } else if( dataset_tstr.BeginsWith("WH_ZH_HToGG_M-125") ) {
+    xSection = (0.5729 + 0.3158)*2.25E-03;
+  } else if( dataset_tstr.BeginsWith("DiPhotonJets") ) {
+    xSection = 134 * 1.15;
 
   } else {
     std::cout << std::endl;
