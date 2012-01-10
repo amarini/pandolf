@@ -3,11 +3,12 @@
 
 #include "TROOT.h"
 #include <string>
+#include "TLorentzVector.h"
 
-class AnalysisPhoton {
+class AnalysisPhoton : public TLorentzVector {
 
  public:
-  AnalysisPhoton();
+  AnalysisPhoton() : TLorentzVector() {};
   ~AnalysisPhoton(){};
 
   bool passedPhotonID( const std::string& tightness ) const;
