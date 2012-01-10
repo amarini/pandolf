@@ -2,11 +2,13 @@
 #define AnalysisJet_h
 
 #include "TROOT.h"
+#include "TLorentzVector.h"
 
 
-class AnalysisJet {
+class AnalysisJet : public TLorentzVector {
+
  public:
-  AnalysisJet();
+  AnalysisJet() : TLorentzVector() {};
   ~AnalysisJet(){};
 
   Float_t eReco;
@@ -23,6 +25,12 @@ class AnalysisJet {
   Float_t ptGen;
   Float_t etaGen;
   Float_t phiGen;
+
+  Float_t ePart;
+  Float_t ptPart;
+  Float_t etaPart;
+  Float_t phiPart;
+  Int_t pdgIdPart;
 
   Float_t thetaReco() const;
   Float_t pReco() const;
@@ -89,6 +97,7 @@ class AnalysisJet {
 
   //btag:
   Float_t trackCountingHighEffBJetTags;
+  Float_t simpleSecondaryVertexHighEffBJetTags;
 
 };
 
