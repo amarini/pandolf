@@ -27,7 +27,7 @@ do2ndLevel_PhotonJet_batch: AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAn
 	$(CC) -Wall -o do2ndLevel_PhotonJet_batch do2ndLevel_PhotonJet_batch.cpp AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJet.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
 
 do2ndLevel_VHgg_batch: AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_VHgg.o  do2ndLevel_VHgg_batch.cpp
-	$(CC) -Wall -o do2ndLevel_VHgg_batch do2ndLevel_VHgg_batch.cpp AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_VHgg.o $(ROOTFLAG) -lMinuit
+	$(CC) -Wall -o do2ndLevel_VHgg_batch do2ndLevel_VHgg_batch.cpp AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_VHgg.o $(ROOTFLAG) $(EXTRALIBS)
 
 do2ndLevel_PhotonJetInclusive_batch: AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJetInclusive.o fitTools.o do2ndLevel_PhotonJetInclusive_batch.cpp
 	$(CC) -Wall -o do2ndLevel_PhotonJetInclusive_batch do2ndLevel_PhotonJetInclusive_batch.cpp AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJetInclusive.o fitTools.o $(ROOTFLAG) -lMinuit
