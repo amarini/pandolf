@@ -74,17 +74,17 @@ TreeAnalyzer_DiJet.o: TreeAnalyzer_DiJet.C
 drawPhotonJet_2bkg: fitTools.o DrawBase.o drawPhotonJet_2bkg.C
 	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o drawPhotonJet_2bkg drawPhotonJet_2bkg.C fitTools.o DrawBase.o $(ROOTFLAG) $(EXTRALIBS)
 
+drawPF_vs_Calo: fitTools.o DrawBase.o drawPF_vs_Calo.cpp
+	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o drawPF_vs_Calo drawPF_vs_Calo.cpp fitTools.o DrawBase.o $(ROOTFLAG) $(EXTRALIBS)
+
 drawEfficiencies_vs_QGCut: DrawBase.o fitTools.o drawEfficiencies_vs_QGCut.C
 	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/ -o drawEfficiencies_vs_QGCut drawEfficiencies_vs_QGCut.C DrawBase.o fitTools.o $(ROOTFLAG) -lMinuit
 
 drawQGStudies: fitTools.o DrawBase.o drawQGStudies.C
-	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/ -o drawQGStudies drawQGStudies.C fitTools.o DrawBase.o $(ROOTFLAG) -lMinuit
+	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/ -o drawQGStudies drawQGStudies.C fitTools.o DrawBase.o $(ROOTFLAG) $(EXTRALIBS)
 
 drawPhotonJet_ONLYDATA: fitTools.o DrawBase.o drawPhotonJet_ONLYDATA.C
 	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o drawPhotonJet_ONLYDATA drawPhotonJet_ONLYDATA.C fitTools.o DrawBase.o $(ROOTFLAG) -lMinuit
-
-draw_Calo_vs_PF: fitTools.o DrawBase.o draw_Calo_vs_PF.C
-	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o draw_Calo_vs_PF draw_Calo_vs_PF.C fitTools.o DrawBase.o $(ROOTFLAG) -lMinuit
 
 drawPhotonJetExtrap: fitTools.o DrawBase.o DrawExtrap.o drawPhotonJetExtrap.C
 	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o drawPhotonJetExtrap drawPhotonJetExtrap.C fitTools.o DrawBase.o DrawExtrap.o $(ROOTFLAG) $(EXTRALIBS)
