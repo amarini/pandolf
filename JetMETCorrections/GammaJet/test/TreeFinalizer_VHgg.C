@@ -346,15 +346,21 @@ void finalize(const std::string& dataset) {
     if( fabs(etaPhotGen1) > 2.5 ) continue;
     if( fabs(etaPhotGen2) > 2.5 ) continue;
 
-    h1_ptPhot1->Fill( ptPhot1, eventWeight );
-    h1_etaPhot1->Fill( etaPhot1, eventWeight );
-    
-    h1_ptPhot2->Fill( ptPhot2, eventWeight );
-    h1_etaPhot2->Fill( etaPhot2, eventWeight );
-
     AnalysisPhoton phot1, phot2;
-    phot1.SetPtEtaPhiE( ptPhot1, etaPhot1, phiPhot1, ePhot1 );
-    phot2.SetPtEtaPhiE( ptPhot2, etaPhot2, phiPhot2, ePhot2 );
+    if( ptPhot1>ptPhot2 ) {
+      phot1.SetPtEtaPhiE( ptPhot1, etaPhot1, phiPhot1, ePhot1 );
+      phot2.SetPtEtaPhiE( ptPhot2, etaPhot2, phiPhot2, ePhot2 );
+    } else {
+      phot2.SetPtEtaPhiE( ptPhot1, etaPhot1, phiPhot1, ePhot1 );
+      phot1.SetPtEtaPhiE( ptPhot2, etaPhot2, phiPhot2, ePhot2 );
+    }
+
+
+    h1_ptPhot1->Fill( phot1.Pt(), eventWeight );
+    h1_etaPhot1->Fill( phot1.Eta(), eventWeight );
+    
+    h1_ptPhot2->Fill( phot2.Pt(), eventWeight );
+    h1_etaPhot2->Fill( phot2.Eta(), eventWeight );
 
     TLorentzVector diPhoton = phot1 + phot2;
     h1_mgg->Fill( diPhoton.M(), eventWeight );
