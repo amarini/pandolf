@@ -83,6 +83,9 @@ drawEfficiencies_vs_QGCut: DrawBase.o fitTools.o drawEfficiencies_vs_QGCut.C
 drawQGStudies: fitTools.o DrawBase.o drawQGStudies.C
 	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/ -o drawQGStudies drawQGStudies.C fitTools.o DrawBase.o $(ROOTFLAG) $(EXTRALIBS)
 
+drawVHgg: fitTools.o DrawBase.o drawVHgg.C
+	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/ -o drawVHgg drawVHgg.C fitTools.o DrawBase.o $(ROOTFLAG) $(EXTRALIBS)
+
 drawPhotonJet_ONLYDATA: fitTools.o DrawBase.o drawPhotonJet_ONLYDATA.C
 	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o drawPhotonJet_ONLYDATA drawPhotonJet_ONLYDATA.C fitTools.o DrawBase.o $(ROOTFLAG) -lMinuit
 
