@@ -19,6 +19,14 @@
 
 #include "/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/emanuele/CommonTools/src/PUWeight.C"
 #include "/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/pandolf/QGLikelihood/QGLikelihoodCalculator.C"
+#include "/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/pandolf/KinematicFit/TFitParticleEtThetaPhi.cc"
+#include "/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/pandolf/KinematicFit/TAbsFitConstraint.cc"
+#include "/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/pandolf/KinematicFit/TAbsFitParticle.cc"
+#include "/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/pandolf/KinematicFit/TFitConstraintEp.cc"
+#include "/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/pandolf/KinematicFit/TFitConstraintM.cc"
+#include "/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/pandolf/KinematicFit/TFitParticleEtEtaPhi.cc"
+#include "/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/pandolf/KinematicFit/TKinFitter.cc"
+#include "/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/pandolf/KinematicFit/DiJetKinFitter.cc"
 
 
 bool isAOD_ = true;
@@ -96,6 +104,12 @@ void finalize(const std::string& dataset) {
 
   TH1D* h1_mgg = new TH1D("mgg", "", 1000, 0., 1000.);
   h1_mgg->Sumw2();
+
+  TH1D* h1_kinfit_chiSquare = new TH1D("kinfit_chiSquare", "", 100, 0., 10.);
+  h1_kinfit_chiSquare->Sumw2();
+  TH1D* h1_kinfit_chiSquareProb = new TH1D("kinfit_chiSquareProb", "", 100, 0., 1.0001);
+  h1_kinfit_chiSquareProb->Sumw2();
+
 
   TH1D* h1_ptJet1 = new TH1D("ptJet1", "", 500, 0., 500.);
   h1_ptJet1->Sumw2();
@@ -289,10 +303,14 @@ void finalize(const std::string& dataset) {
   float etaJet1_t, etaJet2_t;
   float QGLikelihoodJet1_t, QGLikelihoodJet2_t;
   float mgg, mjj;
+  float chiSquareProb;
+
+
 
   TTree* tree_passedEvents = new TTree("tree_passedEvents", "");
   tree_passedEvents->Branch( "run", &run, "run/I" );
   tree_passedEvents->Branch( "event", &event, "event/I" );
+  tree_passedEvents->Branch( "eventWeight", &eventWeight, "eventWeight/F" );
   tree_passedEvents->Branch( "ptPhot1", &ptPhot1, "ptPhot1/F" );
   tree_passedEvents->Branch( "ptPhot2", &ptPhot2, "ptPhot2/F" );
   tree_passedEvents->Branch( "etaPhot1", &etaPhot1, "etaPhot1/F" );
@@ -305,12 +323,18 @@ void finalize(const std::string& dataset) {
   tree_passedEvents->Branch( "QGLikelihoodJet2", &QGLikelihoodJet2_t, "QGLikelihoodJet2_t/F" );
   tree_passedEvents->Branch( "mjj", &mjj, "mjj/F" );
   tree_passedEvents->Branch( "mgg", &mgg, "mgg/F" );
+  tree_passedEvents->Branch( "chiSquareProb", &chiSquareProb, "chiSquareProb/F" );
 
 
+  gROOT->cd();
 
   PUWeight* fPUWeight = new PUWeight();
 
   QGLikelihoodCalculator *qglikeli = new QGLikelihoodCalculator("/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
+
+  DiJetKinFitter* fitter_jets = new DiJetKinFitter( "fitter_jets", "fitter_jets", 85. );
+
+
 
 
   float selectedCorrectPair = 0.;
@@ -460,6 +484,13 @@ void finalize(const std::string& dataset) {
     if( correctPair ) selectedCorrectPair += 1.;
     allPairs += 1.;
 
+
+    std::pair<TLorentzVector,TLorentzVector> jets_kinfit = fitter_jets->fit(jet1, jet2);
+    chiSquareProb = TMath::Prob(fitter_jets->getS(), fitter_jets->getNDF());
+    h1_kinfit_chiSquare->Fill( fitter_jets->getS()/fitter_jets->getNDF(), eventWeight ); 
+    h1_kinfit_chiSquareProb->Fill( chiSquareProb, eventWeight ); 
+
+
     float QGLikelihoodJet1 = qglikeli->computeQGLikelihoodPU( jet1.Pt(), rhoPF, jet1.nCharged(), jet1.nNeutral(), jet1.ptD );
     float QGLikelihoodJet2 = qglikeli->computeQGLikelihoodPU( jet2.Pt(), rhoPF, jet2.nCharged(), jet2.nNeutral(), jet2.ptD );
 
@@ -487,6 +518,9 @@ void finalize(const std::string& dataset) {
 
     etaJet1_t = jet1.Eta();
     etaJet2_t = jet2.Eta();
+
+    QGLikelihoodJet1_t = QGLikelihoodJet1;
+    QGLikelihoodJet2_t = QGLikelihoodJet2;
 
     mgg = diPhoton.M();
     mjj = diJet.M();
@@ -517,6 +551,9 @@ void finalize(const std::string& dataset) {
 
   h1_mgg->Write();
 
+  h1_kinfit_chiSquare->Write();
+  h1_kinfit_chiSquareProb->Write();
+
   h1_ptJet1->Write();
   h1_etaJet1->Write();
   h1_pdgIdJet1->Write();
@@ -536,6 +573,27 @@ void finalize(const std::string& dataset) {
 
   delete tree;
   tree = 0;
+
+  delete h1_nvertex;
+  delete h1_nvertexPU;
+  delete h1_ptPhot1;
+  delete h1_etaPhot1;
+  delete h1_ptPhot2;
+  delete h1_etaPhot2;
+  delete h1_mgg;
+  delete h1_kinfit_chiSquare;
+  delete h1_kinfit_chiSquareProb;
+  delete h1_ptJet1;
+  delete h1_etaJet1;
+  delete h1_pdgIdJet1;
+  delete h1_QGLikelihoodJet1;
+  delete h1_ptJet2;
+  delete h1_etaJet2;
+  delete h1_pdgIdJet2;
+  delete h1_QGLikelihoodJet2;
+  delete h1_mjj;
+  delete h1_QGLikelihoodProd;
+
 
   totalLumi = 0.;
 
