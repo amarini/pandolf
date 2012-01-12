@@ -8,10 +8,10 @@
 
 int main(int argc, char* argv[]) {
 
-  if( argc != 2 && argc != 3 ) {
-    std::cout << "USAGE: ./drawVHgg [LUMI_SHAPE] [photonID=\"medium\"]" << std::endl;
-    exit(23);
-  }
+//if( argc != 2 && argc != 3 ) {
+//  std::cout << "USAGE: ./drawVHgg [LUMI_SHAPE] [photonID=\"medium\"]" << std::endl;
+//  exit(23);
+//}
 
   
 
@@ -22,11 +22,11 @@ int main(int argc, char* argv[]) {
 
   std::string mcSignalFileName = "VHgg_WH_ZH_HToGG_M-120_7TeV-pythia6-Fall11-PU_S6_START42_V14B-v1.root";
   TFile* mcSignalFile = TFile::Open(mcSignalFileName.c_str());
-  db->add_mcFile( mcSignalFile, "signal", "VH (120)", 46);
+  db->add_mcFile( mcSignalFile, "WH_ZH_HToGG_M-120_7TeV-pythia6-Fall11-PU_S6_START42_V14B-v1", "VH (120)", 46);
 
-  std::string mcBGFileName = "VHgg_DiPhotonBoxBorn";
+  std::string mcBGFileName = "VHgg_DiPhotonBoxBorn.root";
   TFile* mcBGFile = TFile::Open(mcBGFileName.c_str());
-  db->add_mcFile( mcBGFile, "BG", "SM DiPhoton", 38);
+  db->add_mcFile( mcBGFile, "DiPhotonBoxBorn", "SM DiPhoton", 38);
 
   db->set_shapeNormalization();
 
@@ -36,7 +36,6 @@ int main(int argc, char* argv[]) {
   bool log = true;
 
   db->drawHisto( "nvertex", "Number of Reconstructed Vertexes", "", "Events", log);
-  db->drawHisto( "nvertex_PU", "Number of Reconstructed Vertexes", "", "Events", log);
 
   db->drawHisto( "ptPhot1", "Lead Photon p_{T}", "GeV", "Events", log);
   db->drawHisto( "etaPhot1", "Lead Photon #eta", "", "Events", log);
