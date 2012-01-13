@@ -123,11 +123,12 @@ void TreeAnalyzer_VHgg::CreateOutputFile() {
   jetTree_->Branch( "etaJetGen",  etaJetGen_,  "etaJetGen_[nJet_]/F");
   jetTree_->Branch( "phiJetGen",  phiJetGen_,  "phiJetGen_[nJet_]/F");
   jetTree_->Branch("pdgIdPartJet", pdgIdPartJet_, "pdgIdPartJet_[nJet_]/I");
+  jetTree_->Branch("pdgIdMomJet", pdgIdMomJet_, "pdgIdMomJet_[nJet_]/I");
   jetTree_->Branch(   "ptPartJet",    ptPartJet_,    "ptPartJet_[nJet_]/F");
   jetTree_->Branch(  "etaPartJet",   etaPartJet_,   "etaPartJet_[nJet_]/F");
   jetTree_->Branch(  "phiPartJet",   phiPartJet_,   "phiPartJet_[nJet_]/F");
 
-  jetTree_->Branch("eTracksJet", &eTracksJet_, "eTracksJet_[nJet_]/F");
+  jetTree_->Branch("eChargedHadronsJet", &eChargedHadronsJet_, "eChargedHadronsJet_[nJet_]/F");
   jetTree_->Branch("ePhotonsJet", &ePhotonsJet_, "ePhotonsJet_[nJet_]/F");
   jetTree_->Branch("eNeutralHadronsJet", &eNeutralHadronsJet_, "eNeutralHadronsJet_[nJet_]/F");
   jetTree_->Branch("eMuonsJet", &eMuonsJet_, "eMuonsJet_[nJet_]/F");
@@ -135,7 +136,7 @@ void TreeAnalyzer_VHgg::CreateOutputFile() {
   jetTree_->Branch("eHFHadronsJet", &eHFHadronsJet_, "eHFHadronsJet_[nJet_]/F");
   jetTree_->Branch("eHFEMJet", &eHFEMJet_, "eHFEMJet_[nJet_]/F");
 
-  jetTree_->Branch("nTracksJet", &nTracksJet_, "nTracksJet_[nJet_]/I");
+  jetTree_->Branch("nChargedHadronsJet", &nChargedHadronsJet_, "nChargedHadronsJet_[nJet_]/I");
   jetTree_->Branch("nPhotonsJet", &nPhotonsJet_, "nPhotonsJet_[nJet_]/I");
   jetTree_->Branch("nNeutralHadronsJet", &nNeutralHadronsJet_, "nNeutralHadronsJet_[nJet_]/I");
   jetTree_->Branch("nMuonsJet", &nMuonsJet_, "nMuonsJet_[nJet_]/I");
@@ -228,7 +229,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
        if( statusMC[iMC]!=3 ) continue;
        if( pdgIdMC[iMC]!=22 ) continue;
-       if( pdgIdMC[motherIDMC[iMC]]!=25 ) continue;
+       //if( pdgIdMC[motherIDMC[iMC]]!=25 ) continue;
 
        if( iFoundPhotGen==0 ) {
          ptPhotGen1_ = ptMC[iMC];
@@ -325,10 +326,6 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      pid_sIEtaIEtaPhot1_ = phot1.pid_etawid;
      pid_hlwTrackPhot1_ = phot1.pid_hlwTrack;
      pid_hlwTrackNoDzPhot1_ = phot1.pid_hlwTrackNoDz;
-     ePhotGen1_ = phot1.eGen;
-     ptPhotGen1_ = phot1.ptGen;
-     etaPhotGen1_ = phot1.etaGen;
-     phiPhotGen1_ = phot1.phiGen;
 
      ePhot2_ = phot2.e;
      ptPhot2_ = phot2.pt;
@@ -347,10 +344,6 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      pid_sIEtaIEtaPhot2_ = phot2.pid_etawid;
      pid_hlwTrackPhot2_ = phot2.pid_hlwTrack;
      pid_hlwTrackNoDzPhot2_ = phot2.pid_hlwTrackNoDz;
-     ePhotGen2_ = phot2.eGen;
-     ptPhotGen2_ = phot2.ptGen;
-     etaPhotGen2_ = phot2.etaGen;
-     phiPhotGen2_ = phot2.phiGen;
 
 
 
@@ -425,6 +418,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
            thisJet.phiPart = phiMC[i_foundPart];
            thisJet.ePart = eMC[i_foundPart];
            thisJet.pdgIdPart = pdgIdMC[i_foundPart];
+           thisJet.pdgIdMom = pdgIdMC[motherIDMC[i_foundPart]];
          }
 
          AnalysisJet* newJet = new AnalysisJet(thisJet);
@@ -450,7 +444,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        phiJet_[iJet] = jets[iJet]->phiReco;
        etaJet_[iJet] = jets[iJet]->etaReco;
 
-       eTracksJet_[iJet] = jets[iJet]->eTracksReco;
+       eChargedHadronsJet_[iJet] = jets[iJet]->eTracksReco;
        ePhotonsJet_[iJet] = jets[iJet]->ePhotonsReco;
        eNeutralHadronsJet_[iJet] = jets[iJet]->eNeutralHadronsReco;
        eMuonsJet_[iJet] = jets[iJet]->eMuonsReco;
@@ -464,7 +458,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        trackCountingHighEffBJetTagsJet_[iJet]= jets[iJet]->trackCountingHighEffBJetTags;
        simpleSecondaryVertexHighEffBJetTagsJet_[iJet]= jets[iJet]->simpleSecondaryVertexHighEffBJetTags;
 
-       nTracksJet_[iJet] = jets[iJet]->nTracksReco;
+       nChargedHadronsJet_[iJet] = jets[iJet]->nTracksReco;
        nPhotonsJet_[iJet] = jets[iJet]->nPhotonsReco;
        nNeutralHadronsJet_[iJet] = jets[iJet]->nNeutralHadronsReco;
        nMuonsJet_[iJet] = jets[iJet]->nMuonsReco;
@@ -477,6 +471,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        phiPartJet_[iJet] = jets[iJet]->phiPart;
        etaPartJet_[iJet] = jets[iJet]->etaPart;
        pdgIdPartJet_[iJet] = jets[iJet]->pdgIdPart;
+       pdgIdMomJet_[iJet] = jets[iJet]->pdgIdMom;
 
      }
 
