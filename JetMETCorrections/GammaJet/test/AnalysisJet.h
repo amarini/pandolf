@@ -15,7 +15,6 @@ class AnalysisJet : public TLorentzVector {
   Float_t ptReco;
   Float_t etaReco;
   Float_t phiReco;
-//Float_t eCorrReco;
   Float_t ptCorrReco;
 
   Float_t ptD;
@@ -64,6 +63,7 @@ class AnalysisJet : public TLorentzVector {
   Float_t ptHFHadronsReco;
   Float_t ptHFEMReco;
 
+
   Int_t nTracksReco;
   Int_t nPhotonsReco;
   Int_t nNeutralHadronsReco;
@@ -71,6 +71,9 @@ class AnalysisJet : public TLorentzVector {
   Int_t nElectronsReco;
   Int_t nHFHadronsReco;
   Int_t nHFEMReco;
+
+  Int_t nCharged() const;
+  Int_t nNeutral() const;
 
   Float_t eTracksGen;
   Float_t ePhotonsGen;
