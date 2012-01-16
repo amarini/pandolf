@@ -282,7 +282,7 @@ float getWeight( const std::string& dataset, int nEvents ) {
     xSection = 3.481e-03;
   } else if( dataset_tstr.BeginsWith("G_Pt_1400to1800") || dataset_tstr.BeginsWith("G_Pt-1400to1800") ) {
     xSection = 1.270e-05;
-  } else if( dataset_tstr.BeginsWith("G_Pt_1800toInf") || dataset_tstr.BeginsWith("G_Pt-1800toInf") ) {
+  } else if( dataset_tstr.BeginsWith("G_Pt_1800") || dataset_tstr.BeginsWith("G_Pt-1800") ) {
     xSection = 2.936e-07;
   } else if( dataset_tstr.BeginsWith("QCD_Pt_15to30") || dataset_tstr.BeginsWith("QCD_Pt-15to30") ) {
     xSection = 8.159e+08;
@@ -328,13 +328,24 @@ float getWeight( const std::string& dataset, int nEvents ) {
     xSection = 1.545;
   } else if( dataset=="PhotonJet_Summer1036X_Pt500toInf" ) {
     xSection = 0.0923;
+  } else if( dataset_tstr.BeginsWith("QCD_Pt-20to30_BCtoE") ) {
+    xSection = 236000000.*0.00056;
+  } else if( dataset_tstr.BeginsWith("QCD_Pt-20to30_EMEnriched") ) {
+    xSection = 236000000.*0.0104;
+  } else if( dataset_tstr.BeginsWith("QCD_Pt-30to80_BCtoE") ) {
+    xSection = 59480000.*0.00230;
+  } else if( dataset_tstr.BeginsWith("QCD_Pt-30to80_EMEnriched") ) {
+    xSection = 59480000.*0.065;
+  } else if( dataset_tstr.BeginsWith("QCD_Pt-80to170_BCtoE") ) {
+    xSection = 900000.*0.0104;
+  } else if( dataset_tstr.BeginsWith("QCD_Pt-80to170_EMEnriched") ) {
+    xSection = 900000.*0.155;
   } else if( dataset_tstr.BeginsWith("WH_ZH_HToGG_M-120") ) {
     xSection = (0.6561 + 0.3551)*2.25E-03;
   } else if( dataset_tstr.BeginsWith("WH_ZH_HToGG_M-125") ) {
     xSection = (0.5729 + 0.3158)*2.25E-03;
   } else if( dataset_tstr.BeginsWith("DiPhotonJets") ) {
     xSection = 134 * 1.15;
-
   } else {
     std::cout << std::endl;
     std::cout << "-> WARNING!! Dataset: '" << dataset << "' not present in database. Cross section unknown." << std::endl;
