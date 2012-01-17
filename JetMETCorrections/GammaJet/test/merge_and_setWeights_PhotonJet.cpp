@@ -346,6 +346,34 @@ float getWeight( const std::string& dataset, int nEvents ) {
     xSection = (0.5729 + 0.3158)*2.25E-03;
   } else if( dataset_tstr.BeginsWith("DiPhotonJets") ) {
     xSection = 134 * 1.15;
+
+  } else if( dataset_tstr.BeginsWith("G1Jet_Pt-20to60") ) {
+    xSection = 2.270e+04;
+  } else if( dataset_tstr.BeginsWith("G1Jet_Pt-60to120") ) {
+    xSection = 7.993e+02;
+  } else if( dataset_tstr.BeginsWith("G1Jet_Pt-120to180") ) {
+    xSection = 4.011e+01 ;
+  } else if( dataset_tstr.BeginsWith("G1Jet_Pt-180to240") ) {
+    xSection = 5.612e+00 ;
+  } else if( dataset_tstr.BeginsWith("G1Jet_Pt-240to300") ) {
+    xSection = 1.224e+00 ;
+  } else if( dataset_tstr.BeginsWith("G1Jet_Pt-300to5000") ) {
+    xSection = 5.450e-01 ;
+
+
+  } else if( dataset_tstr.BeginsWith("G2Jet_Pt-20to60") ) {
+    xSection = 4.080e+03;
+  } else if( dataset_tstr.BeginsWith("G2Jet_Pt-60to120") ) {
+    xSection = 4.258e+02 ;
+  } else if( dataset_tstr.BeginsWith("G2Jet_Pt-120to180") ) {
+    xSection = 3.556e+01 ;
+  } else if( dataset_tstr.BeginsWith("G2Jet_Pt-180to240") ) {
+    xSection = 5.941e+00 ;
+  } else if( dataset_tstr.BeginsWith("G2Jet_Pt-240to300") ) {
+    xSection = 1.448e+00 ;
+  } else if( dataset_tstr.BeginsWith("G2Jet_Pt-300to5000") ) {
+    xSection = 7.233e-01 ;
+
   } else {
     std::cout << std::endl;
     std::cout << "-> WARNING!! Dataset: '" << dataset << "' not present in database. Cross section unknown." << std::endl;
