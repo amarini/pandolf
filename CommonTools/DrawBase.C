@@ -1379,16 +1379,18 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
       } else { //normalize each histo to its area
         // first: MC
         if( !noMC ) {
+          //Float_t mcIntegral_sum = mcHisto_sum->Integral();
           Float_t mcIntegral_sum = mcHisto_sum->Integral(0, mcHisto_sum->GetNbinsX()+1);
-          //Float_t mcIntegral_sum = mcHisto_sum->GetEntries();
           mcHisto_sum->Scale( 1./mcIntegral_sum );
           for( unsigned i=0; i<mcHistos.size(); ++i ) {
+            //Float_t mcIntegral = mcHistos[i]->Integral();
             Float_t mcIntegral = mcHistos[i]->Integral(0, mcHistos[i]->GetNbinsX()+1);
-            //Float_t mcIntegral = mcHistos[i]->GetEntries();
-            if( noStack_ )
-              mcHistos[i]->Scale( 1./mcIntegral );
-            else 
-              mcHistos[i]->Scale( 1./mcIntegral_sum );
+            if( mcIntegral!=0. ) {
+              if( noStack_ )
+                mcHistos[i]->Scale( 1./mcIntegral );
+              else 
+                mcHistos[i]->Scale( 1./mcIntegral_sum );
+            }
           }
         }
         // second: data
@@ -1628,8 +1630,10 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
     std::string canvasName_root = canvasName + ".root";
     if( pdf_aussi_ )
       c1->SaveAs(canvasName_pdf.c_str());
-    if( root_aussi_ )
+    if( root_aussi_ ) {
+      c1->SetFixedAspectRatio(true);
       c1->SaveAs(canvasName_root.c_str());
+    }
 
     if( log_aussi ) {
 
