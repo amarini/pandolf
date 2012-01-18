@@ -1042,9 +1042,9 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
           h1_QGLikelihoodJetReco_5080->Fill( QGlikelihood, correctWeight );
 
           if( !btagged ) {
-            nEvents_antibtag_passed_3050 += correctWeight;
+            nEvents_antibtag_passed_5080 += correctWeight;
             if( fabs(pdgIdPart) < 7 )
-              nEvents_antibtag_passed_quark_3050 += correctWeight;
+              nEvents_antibtag_passed_quark_5080 += correctWeight;
             h1_nChargedJetReco_antibtag_5080->Fill( nTracksReco, correctWeight );
             h1_nNeutralJetReco_antibtag_5080->Fill( nNeutralJetReco, correctWeight );
             h1_ptDJetReco_antibtag_5080->Fill( ptDJetReco, correctWeight );
@@ -1074,9 +1074,9 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
           h1_QGLikelihoodJetReco_80120->Fill( QGlikelihood, correctWeight );
 
           if( !btagged ) {
-            nEvents_antibtag_passed_3050 += correctWeight;
+            nEvents_antibtag_passed_80120 += correctWeight;
             if( fabs(pdgIdPart) < 7 )
-              nEvents_antibtag_passed_quark_3050 += correctWeight;
+              nEvents_antibtag_passed_quark_80120 += correctWeight;
             h1_nChargedJetReco_antibtag_80120->Fill( nTracksReco, correctWeight );
             h1_nNeutralJetReco_antibtag_80120->Fill( nNeutralJetReco, correctWeight );
             h1_ptDJetReco_antibtag_80120->Fill( ptDJetReco, correctWeight );
