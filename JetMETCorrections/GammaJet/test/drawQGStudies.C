@@ -14,19 +14,21 @@ void drawVariable_BGsubtr( const std::string& varName, int ptMin, int ptMax, Dra
 int main(int argc, char* argv[]) {
 
   if( argc != 2 && argc != 3 ) {
-    std::cout << "USAGE: ./drawQGStudies [LUMI_SHAPE] [photonID=\"medium\"]" << std::endl;
+    std::cout << "USAGE: ./drawQGStudies [data_dataset] [photonID=\"medium\"]" << std::endl;
     exit(23);
   }
 
   std::string data_dataset = "Photon_Run2011A-May10ReReco-v1";
+  //std::string data_dataset = "DATA_Run2011A_1fb";
   //std::string mc_photonjet = "G_Summer11";
   std::string mc_photonjet = "G_Spring11";
   //std::string mc_photonjet = "G_Pt-80to120_Tune23_7TeV_herwigpp_Summer11-PU_S3_START42_V11-v2";
   //std::string mc_QCD = mc_photonjet;
-  std::string mc_QCD = "QCD_EMEnriched_Spring11";
+  //std::string mc_QCD = "QCD_EMEnriched_Spring11";
+  std::string mc_QCD = "QCD_EMEnriched_Summer11";
   std::string recoType = "pf";
   std::string jetAlgo = "akt5";
-  std::string norm( argv[1] );
+  std::string norm = "LUMI";
   if( norm!="LUMI" && norm!="SHAPE" ) {
     std::cout << "'" << norm << "' normalization not implemented yet." << std::endl;
     std::cout << "Only 'LUMI' and 'SHAPE' currently supported." << std::endl;
@@ -89,7 +91,10 @@ int main(int argc, char* argv[]) {
   else
     db->set_shapeNormalization();
 
-  db->set_lumi(191.);
+  if( data_dataset=="DATA_Run2011A_1fb" )
+    db->set_lumi(1000.);
+  if( data_dataset=="Photon_Run2011A-May10ReReco-v1" )
+    db->set_lumi(191.);
 
   db->set_flags(photonID);
 
@@ -171,15 +176,15 @@ int main(int argc, char* argv[]) {
 
 void drawVariable_BGsubtr( const std::string& varName, int ptMin, int ptMax, DrawBase* db ) {
 
-  TFile* fileMC_photonjet = db->get_mcFile(0);
-  TFile* fileMC_qcd = db->get_mcFile(1);
+  TFile* fileMC_photonjet = db->get_mcFile(0).file;
+  TFile* fileMC_qcd = db->get_mcFile(1).file;
 
   if( fileMC_qcd==0 ) {
     std::cout << "Didn't find QCD file. Exiting." << std::endl;
     exit(199);
   }
 
-  TFile* file_data = db->get_dataFile(0);
+  TFile* file_data = db->get_dataFile(0).file;
 
   char histoName[200];
   sprintf( histoName, "%s_%d%d", varName.c_str(), ptMin, ptMax);
@@ -209,7 +214,7 @@ void drawVariable_BGsubtr( const std::string& varName, int ptMin, int ptMax, Dra
 
 
   char histoName_quarkFraction[200];
-  sprintf( histoName_quarkFraction, "quarkFraction_%d%d", ptMin, ptMax );
+  sprintf( histoName_quarkFraction, "quarkFraction_antibtag_%d%d", ptMin, ptMax );
 
   TH1D* h1_quarkFraction_qcd = (TH1D*)fileMC_qcd->Get(histoName_quarkFraction);
   TH1D* h1_quarkFraction_photonjet = (TH1D*)fileMC_photonjet->Get(histoName_quarkFraction);
@@ -440,13 +445,16 @@ file_prova->Close();
 
   int iBin_cut = h1_data_quark_only->FindBin(0.2);
 
-  float eff_mc   = h1_mc_quark_only->Integral(iBin_cut, nBins)/h1_mc_quark_only->Integral(1, nBins);
-  float eff_data = h1_data_quark_only->Integral(iBin_cut, nBins)/h1_data_quark_only->Integral(1, nBins);
+  float eff_mc   = h1_mc_quark_only->Integral(iBin_cut+1, nBins)/h1_mc_quark_only->Integral(1, nBins);
+  float eff_data = h1_data_quark_only->Integral(iBin_cut+1, nBins)/h1_data_quark_only->Integral(1, nBins);
+
+  float effErr_mc   = sqrt( eff_mc*(1.-eff_mc)/h1_mc_quark_only->GetEntries());
+  float effErr_data = sqrt( eff_data*(1.-eff_data)/h1_data_quark_only->GetEntries());
 
   std::cout << std::endl << "*** pt bin: " << ptMin << "-" << ptMax << std::endl;
   std::cout << "requiring QGLikelihood>0.2" << std::endl;
-  std::cout << "eff(mc): " << eff_mc << std::endl;
-  std::cout << "eff(data): " << eff_data << std::endl;
+  std::cout << "eff(mc): " << eff_mc << " +/- " << effErr_mc << std::endl;
+  std::cout << "eff(data): " << eff_data << " +/- " << effErr_data << std::endl;
   std::cout << std::endl;
 
 
