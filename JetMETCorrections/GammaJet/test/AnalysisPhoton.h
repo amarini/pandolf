@@ -8,7 +8,10 @@
 class AnalysisPhoton : public TLorentzVector {
 
  public:
-  AnalysisPhoton() : TLorentzVector() {};
+  AnalysisPhoton() : TLorentzVector(0.,0.,0.,0.) {
+    pt=0.;
+    e=0.;
+  };
   ~AnalysisPhoton(){};
 
   bool passedPhotonID( const std::string& tightness ) const;
