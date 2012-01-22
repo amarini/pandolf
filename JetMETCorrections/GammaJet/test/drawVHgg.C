@@ -4,7 +4,7 @@
 
 
 //void drawHistoWithShape( std::vector<TH1D*> refHistos, const std::string& plotName, DrawBase* db );
-void normalizedHistos( std::vector<TH1D*> referenceHistos, std::vector<TH1D*> lastHistos, float luminorm );
+std::vector<TH1D*> get_normalizedHistos( std::vector<TH1D*> referenceHistos, std::vector<TH1D*> lastHistos, float luminorm );
 
 
 
@@ -119,20 +119,20 @@ int main(int argc, char* argv[]) {
     TH1D* newHisto = new TH1D(*(lastHistos[iHisto]));
     referenceHistos.push_back(newHisto);
   }
-  normalizedHistos( referenceHistos, lastHistos, luminorm );
-  db->drawHisto_fromHistos( db->get_lastHistos_data(), referenceHistos, db->get_lastHistos_mc_superimp(), "mgg", "m_{#gamma#gamma}", "GeV", "Entries", false, 1, "fanelli_shape");
+  std::vector<TH1D*> normalizedHistos = get_normalizedHistos( referenceHistos, lastHistos, luminorm );
+  db->drawHisto_fromHistos( db->get_lastHistos_data(), normalizedHistos, db->get_lastHistos_mc_superimp(), "mgg", "m_{#gamma#gamma}", "GeV", "Entries", false, 1, "fanelli_shape");
   db->drawHisto_fromTree("tree_passedEvents", "mgg", "eventWeight*(mjj>55.&&mjj<115.&&ptJet1>35.&&ptPhot1>60.&&abs(etaJet1-etaJet2)<2.5&&((trackCountingHighEfficiencyJet1>3.3&&trackCountingHighEfficiencyJet2>1.7)||(trackCountingHighEfficiencyJet1>1.7&&trackCountingHighEfficiencyJet2>3.3)))", 20, 90., 190., "mgg_fanelli_btagTC_medloose", "m_{#gamma#gamma}", "GeV");
   lastHistos = db->get_lastHistos_mc();
-  normalizedHistos( referenceHistos, lastHistos, luminorm );
-  db->drawHisto_fromHistos( db->get_lastHistos_data(), referenceHistos, db->get_lastHistos_mc_superimp(), "mgg", "m_{#gamma#gamma}", "GeV", "Entries", false, 1, "fanelli_btagTC_medloose_shape");
+  normalizedHistos = get_normalizedHistos( referenceHistos, lastHistos, luminorm );
+  db->drawHisto_fromHistos( db->get_lastHistos_data(), normalizedHistos, db->get_lastHistos_mc_superimp(), "mgg", "m_{#gamma#gamma}", "GeV", "Entries", false, 1, "fanelli_btagTC_medloose_shape");
   db->drawHisto_fromTree("tree_passedEvents", "mgg", "eventWeight*(mjj>55.&&mjj<115.&&ptJet1>35.&&ptPhot1>60.&&abs(etaJet1-etaJet2)<2.5&&trackCountingHighEfficiencyJet1>3.3&&trackCountingHighEfficiencyJet2>3.3)", 20, 90., 190., "mgg_fanelli_btagTC_medmed", "m_{#gamma#gamma}", "GeV");
   lastHistos = db->get_lastHistos_mc();
-  normalizedHistos( referenceHistos, lastHistos, luminorm );
-  db->drawHisto_fromHistos( db->get_lastHistos_data(), referenceHistos, db->get_lastHistos_mc_superimp(), "mgg", "m_{#gamma#gamma}", "GeV", "Entries", false, 1, "fanelli_btagTC_medmed_shape");
-  db->drawHisto_fromTree("tree_passedEvents", "mgg", "eventWeight*(mjj>55.&&mjj<115.&&ptJet1>35.&&ptPhot1>60.&&abs(etaJet1-etaJet2)<2.5&&simpleSecondaryVertexHighEfficiencyJet1>0.&&simpleSecondaryVertexHighEfficiencyJet2>0.)", 20, 90., 190., "mgg_fanelli_btag", "m_{#gamma#gamma}", "GeV");
+  normalizedHistos = get_normalizedHistos( referenceHistos, lastHistos, luminorm );
+  db->drawHisto_fromHistos( db->get_lastHistos_data(), normalizedHistos, db->get_lastHistos_mc_superimp(), "mgg", "m_{#gamma#gamma}", "GeV", "Entries", false, 1, "fanelli_btagTC_medmed_shape");
+  db->drawHisto_fromTree("tree_passedEvents", "mgg", "eventWeight*(mjj>55.&&mjj<115.&&ptJet1>35.&&ptPhot1>60.&&abs(etaJet1-etaJet2)<2.5&&simpleSecondaryVertexHighEfficiencyJet1>1.74&&simpleSecondaryVertexHighEfficiencyJet2>1.74)", 20, 90., 190., "mgg_fanelli_btag", "m_{#gamma#gamma}", "GeV");
   lastHistos = db->get_lastHistos_mc();
-  normalizedHistos( referenceHistos, lastHistos, luminorm );
-  db->drawHisto_fromHistos( db->get_lastHistos_data(), referenceHistos, db->get_lastHistos_mc_superimp(), "mgg", "m_{#gamma#gamma}", "GeV", "Entries", false, 1, "fanelli_btag_shape");
+  normalizedHistos = get_normalizedHistos( referenceHistos, lastHistos, luminorm );
+  db->drawHisto_fromHistos( db->get_lastHistos_data(), normalizedHistos, db->get_lastHistos_mc_superimp(), "mgg", "m_{#gamma#gamma}", "GeV", "Entries", false, 1, "fanelli_btag_shape");
 
 
   db->set_shapeNormalization();
@@ -157,16 +157,23 @@ int main(int argc, char* argv[]) {
 
 
 
-void normalizedHistos( std::vector<TH1D*> referenceHistos, std::vector<TH1D*> lastHistos, float luminorm ) {
+std::vector<TH1D*> get_normalizedHistos( std::vector<TH1D*> referenceHistos, std::vector<TH1D*> lastHistos, float luminorm ) {
+
+  std::vector<TH1D*> returnHistos;
 
   for( unsigned iHisto=0; iHisto<referenceHistos.size(); ++iHisto ) {
   
-    if( referenceHistos[iHisto]->Integral()!=0. )
-      referenceHistos[iHisto]->Scale( 1./referenceHistos[iHisto]->Integral() );
-    referenceHistos[iHisto]->Scale( lastHistos[iHisto]->Integral()/luminorm );
+    TH1D* newHisto = new TH1D(*(referenceHistos[iHisto]));
+
+    if( newHisto->Integral()!=0. )
+      newHisto->Scale( 1./newHisto->Integral() );
+    newHisto->Scale( lastHistos[iHisto]->Integral()/luminorm );
+
+    returnHistos.push_back(newHisto);
 
   }
 
+  return returnHistos;
 
 }
 
