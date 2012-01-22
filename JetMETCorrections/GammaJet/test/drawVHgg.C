@@ -5,6 +5,7 @@
 
 //void drawHistoWithShape( std::vector<TH1D*> refHistos, const std::string& plotName, DrawBase* db );
 std::vector<TH1D*> get_normalizedHistos( std::vector<TH1D*> referenceHistos, std::vector<TH1D*> lastHistos, float luminorm );
+void printYields( std::vector<TH1D*> histos );
 
 
 
@@ -122,17 +123,22 @@ int main(int argc, char* argv[]) {
   std::vector<TH1D*> normalizedHistos = get_normalizedHistos( referenceHistos, lastHistos, luminorm );
   db->drawHisto_fromHistos( db->get_lastHistos_data(), normalizedHistos, db->get_lastHistos_mc_superimp(), "mgg", "m_{#gamma#gamma}", "GeV", "Entries", false, 1, "fanelli_shape");
   db->drawHisto_fromTree("tree_passedEvents", "mgg", "eventWeight*(mjj>55.&&mjj<115.&&ptJet1>35.&&ptPhot1>60.&&abs(etaJet1-etaJet2)<2.5&&((trackCountingHighEfficiencyJet1>3.3&&trackCountingHighEfficiencyJet2>1.7)||(trackCountingHighEfficiencyJet1>1.7&&trackCountingHighEfficiencyJet2>3.3)))", 20, 90., 190., "mgg_fanelli_btagTC_medloose", "m_{#gamma#gamma}", "GeV");
+  printYields( normalizedHistos );
   lastHistos = db->get_lastHistos_mc();
   normalizedHistos = get_normalizedHistos( referenceHistos, lastHistos, luminorm );
   db->drawHisto_fromHistos( db->get_lastHistos_data(), normalizedHistos, db->get_lastHistos_mc_superimp(), "mgg", "m_{#gamma#gamma}", "GeV", "Entries", false, 1, "fanelli_btagTC_medloose_shape");
   db->drawHisto_fromTree("tree_passedEvents", "mgg", "eventWeight*(mjj>55.&&mjj<115.&&ptJet1>35.&&ptPhot1>60.&&abs(etaJet1-etaJet2)<2.5&&trackCountingHighEfficiencyJet1>3.3&&trackCountingHighEfficiencyJet2>3.3)", 20, 90., 190., "mgg_fanelli_btagTC_medmed", "m_{#gamma#gamma}", "GeV");
+  printYields( normalizedHistos );
   lastHistos = db->get_lastHistos_mc();
   normalizedHistos = get_normalizedHistos( referenceHistos, lastHistos, luminorm );
   db->drawHisto_fromHistos( db->get_lastHistos_data(), normalizedHistos, db->get_lastHistos_mc_superimp(), "mgg", "m_{#gamma#gamma}", "GeV", "Entries", false, 1, "fanelli_btagTC_medmed_shape");
   db->drawHisto_fromTree("tree_passedEvents", "mgg", "eventWeight*(mjj>55.&&mjj<115.&&ptJet1>35.&&ptPhot1>60.&&abs(etaJet1-etaJet2)<2.5&&simpleSecondaryVertexHighEfficiencyJet1>1.74&&simpleSecondaryVertexHighEfficiencyJet2>1.74)", 20, 90., 190., "mgg_fanelli_btag", "m_{#gamma#gamma}", "GeV");
+  printYields( normalizedHistos );
   lastHistos = db->get_lastHistos_mc();
   normalizedHistos = get_normalizedHistos( referenceHistos, lastHistos, luminorm );
   db->drawHisto_fromHistos( db->get_lastHistos_data(), normalizedHistos, db->get_lastHistos_mc_superimp(), "mgg", "m_{#gamma#gamma}", "GeV", "Entries", false, 1, "fanelli_btag_shape");
+  lastHistos = db->get_lastHistos_mc();
+
 
 
   db->set_shapeNormalization();
@@ -178,3 +184,17 @@ std::vector<TH1D*> get_normalizedHistos( std::vector<TH1D*> referenceHistos, std
 }
 
 
+void printYields( std::vector<TH1D*> histos ) {
+
+  float xMin = 115.;
+  float xMax = 125.;
+
+  int binXmin = histos[0]->FindBin(xMin);
+  int binXmax = histos[0]->FindBin(xMax) -1;
+
+  std::cout << std::endl << "Yields (@ 10 fb-1): " << std::endl;
+  for( unsigned int ii=0; ii<histos.size(); ++ii )
+    std::cout << histos[ii]->Integral(binXmin, binXmax) << std::endl;
+
+
+}
