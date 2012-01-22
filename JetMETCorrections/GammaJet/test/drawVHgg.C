@@ -121,23 +121,34 @@ int main(int argc, char* argv[]) {
     referenceHistos.push_back(newHisto);
   }
   std::vector<TH1D*> normalizedHistos = get_normalizedHistos( referenceHistos, lastHistos, luminorm );
+  printYields( normalizedHistos );
   db->drawHisto_fromHistos( db->get_lastHistos_data(), normalizedHistos, db->get_lastHistos_mc_superimp(), "mgg", "m_{#gamma#gamma}", "GeV", "Entries", false, 1, "fanelli_shape");
   db->drawHisto_fromTree("tree_passedEvents", "mgg", "eventWeight*(mjj>55.&&mjj<115.&&ptJet1>35.&&ptPhot1>60.&&abs(etaJet1-etaJet2)<2.5&&((trackCountingHighEfficiencyJet1>3.3&&trackCountingHighEfficiencyJet2>1.7)||(trackCountingHighEfficiencyJet1>1.7&&trackCountingHighEfficiencyJet2>3.3)))", 20, 90., 190., "mgg_fanelli_btagTC_medloose", "m_{#gamma#gamma}", "GeV");
   printYields( normalizedHistos );
   lastHistos = db->get_lastHistos_mc();
   normalizedHistos = get_normalizedHistos( referenceHistos, lastHistos, luminorm );
   db->drawHisto_fromHistos( db->get_lastHistos_data(), normalizedHistos, db->get_lastHistos_mc_superimp(), "mgg", "m_{#gamma#gamma}", "GeV", "Entries", false, 1, "fanelli_btagTC_medloose_shape");
+  printYields( normalizedHistos );
+
   db->drawHisto_fromTree("tree_passedEvents", "mgg", "eventWeight*(mjj>55.&&mjj<115.&&ptJet1>35.&&ptPhot1>60.&&abs(etaJet1-etaJet2)<2.5&&trackCountingHighEfficiencyJet1>3.3&&trackCountingHighEfficiencyJet2>3.3)", 20, 90., 190., "mgg_fanelli_btagTC_medmed", "m_{#gamma#gamma}", "GeV");
   printYields( normalizedHistos );
   lastHistos = db->get_lastHistos_mc();
   normalizedHistos = get_normalizedHistos( referenceHistos, lastHistos, luminorm );
   db->drawHisto_fromHistos( db->get_lastHistos_data(), normalizedHistos, db->get_lastHistos_mc_superimp(), "mgg", "m_{#gamma#gamma}", "GeV", "Entries", false, 1, "fanelli_btagTC_medmed_shape");
+  printYields( normalizedHistos );
+
   db->drawHisto_fromTree("tree_passedEvents", "mgg", "eventWeight*(mjj>55.&&mjj<115.&&ptJet1>35.&&ptPhot1>60.&&abs(etaJet1-etaJet2)<2.5&&simpleSecondaryVertexHighEfficiencyJet1>1.74&&simpleSecondaryVertexHighEfficiencyJet2>1.74)", 20, 90., 190., "mgg_fanelli_btag", "m_{#gamma#gamma}", "GeV");
   printYields( normalizedHistos );
   lastHistos = db->get_lastHistos_mc();
   normalizedHistos = get_normalizedHistos( referenceHistos, lastHistos, luminorm );
   db->drawHisto_fromHistos( db->get_lastHistos_data(), normalizedHistos, db->get_lastHistos_mc_superimp(), "mgg", "m_{#gamma#gamma}", "GeV", "Entries", false, 1, "fanelli_btag_shape");
+  printYields( normalizedHistos );
+
+  db->drawHisto_fromTree("tree_passedEvents", "mgg", "eventWeight*(mjj>55.&&mjj<115.&&ptJet1>35.&&ptPhot1>60.&&abs(etaJet1-etaJet2)<2.5&&trackCountingHighEfficiencyJet1>1.7&&trackCountingHighEfficiencyJet2>1.7)", 20, 90., 190., "mgg_fanelli_btagTC_looseloose", "m_{#gamma#gamma}", "GeV");
   lastHistos = db->get_lastHistos_mc();
+  normalizedHistos = get_normalizedHistos( referenceHistos, lastHistos, luminorm );
+  db->drawHisto_fromHistos( db->get_lastHistos_data(), normalizedHistos, db->get_lastHistos_mc_superimp(), "mgg", "m_{#gamma#gamma}", "GeV", "Entries", false, 1, "fanelli_btagTC_looseloose_shape");
+  printYields( normalizedHistos );
 
 
 
