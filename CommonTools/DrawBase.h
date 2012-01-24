@@ -156,6 +156,7 @@ class DrawBase {
 
   float get_xAxisMin() const { return xAxisMin_; };
   float get_xAxisMax() const { return xAxisMax_; };
+  float get_yAxisMaxScale() const { return yAxisMaxScale_; };
 
  private:
 
