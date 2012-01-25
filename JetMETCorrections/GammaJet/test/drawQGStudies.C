@@ -8,7 +8,8 @@ bool ONEVTX = false;
 
 
 
-void drawVariable_BGsubtr( const std::string& varName, int ptMin, int ptMax, DrawBase* db );
+std::pair<TH1D,TH1D> drawVariable_BGsubtr( const std::string& varName, int ptMin, int ptMax, DrawBase* db );
+//void drawSignalPtMix( std::pair<TH1D*,TH1D*> h1pair_3050, std::pair<TH1D*,TH1D*> h1pair_5080, std::pair<TH1D*,TH1D*> h1pair_80120, int mass, float frac_3050, float frac_5080, float frac_80120, DrawBase* db );
 
 
 int main(int argc, char* argv[]) {
@@ -19,13 +20,18 @@ int main(int argc, char* argv[]) {
   }
 
   std::string data_dataset = "Photon_Run2011A-May10ReReco-v1";
+  if( argc>1 ) {
+    std::string dataset_tmp(argv[1]);
+    data_dataset = dataset_tmp;
+  }
+
   //std::string data_dataset = "DATA_Run2011A_1fb";
-  //std::string mc_photonjet = "G_Summer11";
-  std::string mc_photonjet = "G_Spring11";
+  std::string mc_photonjet = "G_Summer11";
+  //std::string mc_photonjet = "G_Spring11";
   //std::string mc_photonjet = "G_Pt-80to120_Tune23_7TeV_herwigpp_Summer11-PU_S3_START42_V11-v2";
   //std::string mc_QCD = mc_photonjet;
-  //std::string mc_QCD = "QCD_EMEnriched_Spring11";
-  std::string mc_QCD = "QCD_EMEnriched_Summer11";
+  std::string mc_QCD = "QCD_EMEnriched_Spring11";
+  //std::string mc_QCD = "QCD_EMEnriched_Summer11";
   std::string recoType = "pf";
   std::string jetAlgo = "akt5";
   std::string norm = "LUMI";
@@ -159,9 +165,11 @@ int main(int argc, char* argv[]) {
 //db->drawHisto( "QGLikelihoodJetReco_antibtag_80120", "Jet Q-G Likelihood", "", "Events", log);
 //db->set_rebin(1);
 
-  drawVariable_BGsubtr( "QGLikelihoodJetReco_antibtag", 30, 50, db );
-  drawVariable_BGsubtr( "QGLikelihoodJetReco_antibtag", 50, 80, db );
-  drawVariable_BGsubtr( "QGLikelihoodJetReco_antibtag", 80, 120, db );
+  std::pair<TH1D,TH1D> h1pair_3050 = drawVariable_BGsubtr( "QGLikelihoodJetReco_antibtag", 30, 50, db );
+  std::pair<TH1D,TH1D> h1pair_5080 = drawVariable_BGsubtr( "QGLikelihoodJetReco_antibtag", 50, 80, db );
+  std::pair<TH1D,TH1D> h1pair_80120 = drawVariable_BGsubtr( "QGLikelihoodJetReco_antibtag", 80, 120, db );
+
+//  drawSignalPtMix( h1pair_3050, h1pair_5080, h1pair_80120, 300, 0.03, 0.41, 0.56, db );
 
 
   delete db;
@@ -174,7 +182,7 @@ int main(int argc, char* argv[]) {
 
 
 
-void drawVariable_BGsubtr( const std::string& varName, int ptMin, int ptMax, DrawBase* db ) {
+std::pair<TH1D, TH1D> drawVariable_BGsubtr( const std::string& varName, int ptMin, int ptMax, DrawBase* db ) {
 
   TFile* fileMC_photonjet = db->get_mcFile(0).file;
   TFile* fileMC_qcd = db->get_mcFile(1).file;
@@ -214,10 +222,14 @@ void drawVariable_BGsubtr( const std::string& varName, int ptMin, int ptMax, Dra
 
 
   char histoName_quarkFraction[200];
-  sprintf( histoName_quarkFraction, "quarkFraction_antibtag_%d%d", ptMin, ptMax );
+  sprintf( histoName_quarkFraction, "quarkFraction_%d%d", ptMin, ptMax );
+  //sprintf( histoName_quarkFraction, "quarkFraction_antibtag_%d%d", ptMin, ptMax );
 
   TH1D* h1_quarkFraction_qcd = (TH1D*)fileMC_qcd->Get(histoName_quarkFraction);
   TH1D* h1_quarkFraction_photonjet = (TH1D*)fileMC_photonjet->Get(histoName_quarkFraction);
+
+  std::cout <<  h1_quarkFraction_qcd << std::endl;
+  std::cout <<  h1_quarkFraction_photonjet << std::endl;
 
   float quarkFraction_qcd = h1_quarkFraction_qcd->GetBinContent(1);
   float quarkFraction_photonjet = h1_quarkFraction_photonjet->GetBinContent(1);
@@ -457,5 +469,19 @@ file_prova->Close();
   std::cout << "eff(data): " << eff_data << " +/- " << effErr_data << std::endl;
   std::cout << std::endl;
 
+  std::pair< TH1D, TH1D > returnPair;
+  returnPair.first = *h1_mc_quark_only;
+  returnPair.second = *h1_data_quark_only;
+
+  return returnPair;
 
 }
+
+
+
+//void drawSignalPtMix( std::pair<TH1D*,TH1D*> h1pair_3050, std::pair<TH1D*,TH1D*> h1pair_5080, std::pair<TH1D*,TH1D*> h1pair_80120, int mass, float frac_3050, float frac_5080, float frac_80120, DrawBase* db ) {
+//
+//
+//
+//
+//}
