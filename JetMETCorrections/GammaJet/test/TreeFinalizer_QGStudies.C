@@ -16,8 +16,8 @@
 #include <vector>
 #include <cmath>
 
-#include "/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/pandolf/QGLikelihood/QGLikelihoodCalculator.C"
-#include "/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/emanuele/CommonTools/src/PUWeight.C"
+#include "/shome/pandolf/CMSSW_4_2_8/src/UserCode/pandolf/QGLikelihood/QGLikelihoodCalculator.C"
+#include "/shome/pandolf/CMSSW_4_2_8/src/UserCode/pandolf/CommonTools/PUWeight.C"
 
 float delta_phi(float phi1, float phi2);
 
@@ -53,7 +53,13 @@ void addInput(const std::string& dataset, bool genjets=false);
 
 
 
-void finalize(const std::string& dataset, std::string recoType, std::string jetAlgo="akt5", std::string photonID="medium", float secondJetThreshold=0.1, bool useGenJets=false, std::string partType="") {
+void finalize(const std::string& dataset, std::string recoType="pf", std::string jetAlgo="akt5", std::string photonID="medium", float secondJetThreshold=0.1, bool useGenJets=false, std::string partType="") {
+
+
+  TString dataset_tstr(dataset);
+
+  //TTree* tree_passedEvents = new TTree("tree_passedEvents", "Unbinned data for statistical treatment");
+
 
   bool noJetSelection = ( secondJetThreshold < 0. );
 
@@ -115,9 +121,11 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
   } else if( dataset=="G_Summer11" ) {
 
-    addInput( "G_Pt_30to50_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1-ntpv2" );
-    addInput( "G_Pt-50to80_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v2");
-    addInput( "G_Pt-80to120_Tune23_7TeV_herwigpp_Summer11-PU_S3_START42_V11-v2");
+    addInput("G_Pt-15to30_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v2");
+    addInput("G_Pt-120to170_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v2");
+    addInput("G_Pt-80to120_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v1");
+    addInput("G_Pt-50to80_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v2");
+    addInput("G_Pt-30to50_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v2");
 
   } else if( dataset=="QCD_TuneZ2_7TeV_pythia6_Fall10_ProbDist_2010Data" ) {
 
@@ -605,9 +613,39 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
   tree->SetBranchAddress("passed_Photon70", &passed_Photon70);
 
 
+
+  //tree_passedEvents->Branch( "run", &run, "run/I" );
+  //tree_passedEvents->Branch( "LS", &LS, "LS/I" );
+  //tree_passedEvents->Branch( "event", &event, "event/I" );
+  //tree_passedEvents->Branch( "ptPhot", &ptPhotReco, "ptPhotReco/F");
+  //tree_passedEvents->Branch( "etaPhot", &etaPhotReco, "etaPhotReco/F");
+  //tree_passedEvents->Branch( "ptJet", &ptCorrJetReco, "ptCorrJetReco/F");
+  //tree_passedEvents->Branch( "etaJet", &etaJetReco, "etaJetReco/F");
+  //tree_passedEvents->Branch( "pt2ndJet", &ptCorr2ndJetReco, "ptCorr2ndJetReco/F");
+  //tree_passedEvents->Branch( "eta2ndJet", &eta2ndJetReco, "eta2ndJetReco/F");
+  //tree_passedEvents->Branch( "QGLikelihoodJet", &QGLikelihoodJet, "QGLikelihoodJet/F");
+  //tree_passedEvents->Branch( "partFlavorJet", &partFlavorJet, "partFlavorJet/I");
+
+
+
   //QGLikelihoodCalculator* qglikeli = new QGLikelihoodCalculator("/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt_15to3000_TuneZ2_Flat_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1.root");
-  QGLikelihoodCalculator* qglikeli = new QGLikelihoodCalculator("/cmsrm/pc18/pandolf/CMSSW_4_2_8/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
-  PUWeight* fPUWeight = new PUWeight();
+  QGLikelihoodCalculator* qglikeli = new QGLikelihoodCalculator("/shome/pandolf/CMSSW_4_2_8/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
+
+  std::string puType = "Spring11_Flat10";
+  if( dataset_tstr.Contains("Summer11") ) puType = "Summer11_S4";
+  PUWeight* fPUWeight = new PUWeight(-1, "2011A", puType);
+  std::string puFileName;
+  //if( PUType_=="Run2011A_73pb" )
+    puFileName = "all2011A.pileup_v2.root";
+  std::cout << std::endl << "-> Using data pileup file: " << puFileName << std::endl;
+  TFile* filePU = TFile::Open(puFileName.c_str());
+  TH1F* h1_nPU_data = (TH1F*)filePU->Get("pileup");
+  fPUWeight->SetDataHistogram(h1_nPU_data);
+
+  //TFile* filePU = TFile::Open(puFileName.c_str());
+  //TH1F* h1_nPU_data = (TH1F*)filePU->Get("pileup");
+  //fPUWeight->SetDataHistogram(h1_nPU_data);
+
 
   TRandom3* rand = new TRandom3(13);
 
@@ -653,7 +691,7 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
     if( isMC ) {
 
-      if( dataset!="QCD_EMEnriched_Spring11" && dataset!="G2Jets_alpgen_Spring11" ) {
+      if( dataset!="G2Jets_alpgen_Spring11" ) {
         // PU reweighting:
         correctWeight *= fPUWeight->GetWeight(nPU);
       }
@@ -778,8 +816,8 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
     bool secondJetOK;
 
-    //secondJetOK = ( ptCorr2ndJetReco < secondJetThreshold*ptPhotReco || pt2ndJetReco < 5. );
-    secondJetOK = ( pt2ndJetReco < secondJetThreshold*ptPhotReco || pt2ndJetReco < 5. );
+    secondJetOK = ( ptCorr2ndJetReco < secondJetThreshold*ptPhotReco || ptCorr2ndJetReco < 10. );
+    //secondJetOK = ( pt2ndJetReco < secondJetThreshold*ptPhotReco || pt2ndJetReco < 5. );
 
 
     // do them by hand just to be sure:
@@ -916,7 +954,7 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
 
    int nNeutralJetReco = nPhotonsReco + nNeutralHadronsReco;
-   float QGlikelihood = qglikeli->computeQGLikelihoodPU( ptJetReco, rhoPF, nTracksReco, nNeutralJetReco, ptDJetReco, -1. );
+   float QGlikelihood = qglikeli->computeQGLikelihoodPU( ptCorrJetReco, rhoPF, nTracksReco, nNeutralJetReco, ptDJetReco, -1. );
   
 
     // fill parton matched histos before photon ID:
@@ -925,9 +963,9 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
       TLorentzVector parton;
       parton.SetPtEtaPhiE( ptPart, etaPart, phiPart, ptPart );
       TLorentzVector jet;
-      jet.SetPtEtaPhiE( ptJetReco, etaJetReco, phiJetReco, eJetReco );
+      jet.SetPtEtaPhiE( ptCorrJetReco, etaJetReco, phiJetReco, eJetReco );
 
-      if( ptJetReco>30. && ptJetReco<50. ) {
+      if( ptCorrJetReco>30. && ptCorrJetReco<50. ) {
 
         if( abs( pdgIdPart ) < 7 ) {
           h1_QGLikelihoodJetReco_antibtag_quark_noPhotID_3050->Fill( QGlikelihood, correctWeight );
@@ -937,7 +975,7 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
               h1_QGLikelihoodJetReco_antibtag_gluon_noPhotID_3050->Fill( QGlikelihood, correctWeight );
         }
    
-      } else if( ptJetReco>50. && ptJetReco<80. ) {
+      } else if( ptCorrJetReco>50. && ptCorrJetReco<80. ) {
 
         if( abs( pdgIdPart ) < 7 ) {
           h1_QGLikelihoodJetReco_antibtag_quark_noPhotID_5080->Fill( QGlikelihood, correctWeight );
@@ -947,7 +985,7 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
               h1_QGLikelihoodJetReco_antibtag_gluon_noPhotID_5080->Fill( QGlikelihood, correctWeight );
         }
 
-      } else if( ptJetReco>80. && ptJetReco<120. ) {
+      } else if( ptCorrJetReco>80. && ptCorrJetReco<120. ) {
 
         if( abs( pdgIdPart ) < 7 ) {
           h1_QGLikelihoodJetReco_antibtag_quark_noPhotID_80120->Fill( QGlikelihood, correctWeight );
@@ -988,20 +1026,20 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
 
         h1_phiPhot->Fill( phiPhotReco, correctWeight );
         h1_etaPhot->Fill( etaPhotReco, correctWeight );
-        h1_ptJetReco->Fill( ptJetReco, correctWeight );
-        h1_pt2ndJetReco->Fill( pt2ndJetReco, correctWeight );
+        h1_ptJetReco->Fill( ptCorrJetReco, correctWeight );
+        h1_pt2ndJetReco->Fill( ptCorr2ndJetReco, correctWeight );
 
         //if( ptPhotReco>33. && ptPhotReco<48. ) {
-        if( ptJetReco>30. && ptJetReco<50. ) {
+        if( ptCorrJetReco>30. && ptCorrJetReco<50. ) {
 
           h1_ptPhot_3050->Fill( ptPhotReco, correctWeight );
 
           nEvents_passed_3050 += correctWeight;
-          h1_nEvents_passed->Fill( ptJetReco, correctWeight );
+          h1_nEvents_passed->Fill( ptCorrJetReco, correctWeight );
 
           if( fabs(pdgIdPart) < 7 ) {
             nEvents_passed_quark_3050 += correctWeight;
-            h1_nEvents_passed_quark->Fill( ptJetReco, correctWeight );
+            h1_nEvents_passed_quark->Fill( ptCorrJetReco, correctWeight );
           }
 
           h1_nChargedJetReco_3050->Fill( nTracksReco, correctWeight );
@@ -1024,16 +1062,16 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
           }
 
         //} else if( ptPhotReco>55. && ptPhotReco<78. ) {
-        } else if( ptJetReco>50. && ptJetReco<80. ) {
+        } else if( ptCorrJetReco>50. && ptCorrJetReco<80. ) {
 
           h1_ptPhot_5080->Fill( ptPhotReco, correctWeight );
 
           nEvents_passed_5080 += correctWeight;
-          h1_nEvents_passed->Fill( ptJetReco, correctWeight );
+          h1_nEvents_passed->Fill( ptCorrJetReco, correctWeight );
 
           if( fabs(pdgIdPart) < 7 ) {
             nEvents_passed_quark_5080 += correctWeight;
-            h1_nEvents_passed_quark->Fill( ptJetReco, correctWeight );
+            h1_nEvents_passed_quark->Fill( ptCorrJetReco, correctWeight );
           }
 
           h1_nChargedJetReco_5080->Fill( nTracksReco, correctWeight );
@@ -1056,16 +1094,16 @@ void finalize(const std::string& dataset, std::string recoType, std::string jetA
           }
 
         //} else if( ptPhotReco>85. && ptPhotReco<115. ) {
-        } else if( ptJetReco>80. && ptJetReco<120. ) {
+        } else if( ptCorrJetReco>80. && ptCorrJetReco<120. ) {
 
           h1_ptPhot_80120->Fill( ptPhotReco, correctWeight );
 
           nEvents_passed_80120 += correctWeight;
-          h1_nEvents_passed->Fill( ptJetReco, correctWeight );
+          h1_nEvents_passed->Fill( ptCorrJetReco, correctWeight );
 
           if( fabs(pdgIdPart) < 7 ) {
             nEvents_passed_quark_80120 += correctWeight;
-            h1_nEvents_passed_quark->Fill( ptJetReco, correctWeight );
+            h1_nEvents_passed_quark->Fill( ptCorrJetReco, correctWeight );
           }
 
           h1_nChargedJetReco_80120->Fill( nTracksReco, correctWeight );
