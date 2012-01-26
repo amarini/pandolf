@@ -1,4 +1,5 @@
 
+#include <TROOT.h>
 #include <TH2F.h>
 #include <TH1D.h>
 #include <TProfile.h>
@@ -58,7 +59,9 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
 
   TString dataset_tstr(dataset);
 
-  //TTree* tree_passedEvents = new TTree("tree_passedEvents", "Unbinned data for statistical treatment");
+  gROOT->cd();
+
+  TTree* tree_passedEvents = new TTree("tree_passedEvents", "Unbinned data for statistical treatment");
 
 
   bool noJetSelection = ( secondJetThreshold < 0. );
@@ -443,6 +446,13 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
   TH1D* h1_ptPhot_80120 = new TH1D("ptPhot_80120", "", 100, 80., 120.);
   h1_ptPhot_80120->Sumw2();
 
+  TH1D* h1_ptJet_3050 = new TH1D("ptJet_3050", "", 100, 30., 50.);
+  h1_ptJet_3050->Sumw2();
+  TH1D* h1_ptJet_5080 = new TH1D("ptJet_5080", "", 100, 50., 80.);
+  h1_ptJet_5080->Sumw2();
+  TH1D* h1_ptJet_80120 = new TH1D("ptJet_80120", "", 100, 80., 120.);
+  h1_ptJet_80120->Sumw2();
+
 
 
 
@@ -613,18 +623,19 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
   tree->SetBranchAddress("passed_Photon70", &passed_Photon70);
 
 
+  Float_t QGlikelihood;
 
-  //tree_passedEvents->Branch( "run", &run, "run/I" );
-  //tree_passedEvents->Branch( "LS", &LS, "LS/I" );
-  //tree_passedEvents->Branch( "event", &event, "event/I" );
-  //tree_passedEvents->Branch( "ptPhot", &ptPhotReco, "ptPhotReco/F");
-  //tree_passedEvents->Branch( "etaPhot", &etaPhotReco, "etaPhotReco/F");
-  //tree_passedEvents->Branch( "ptJet", &ptCorrJetReco, "ptCorrJetReco/F");
-  //tree_passedEvents->Branch( "etaJet", &etaJetReco, "etaJetReco/F");
-  //tree_passedEvents->Branch( "pt2ndJet", &ptCorr2ndJetReco, "ptCorr2ndJetReco/F");
-  //tree_passedEvents->Branch( "eta2ndJet", &eta2ndJetReco, "eta2ndJetReco/F");
-  //tree_passedEvents->Branch( "QGLikelihoodJet", &QGLikelihoodJet, "QGLikelihoodJet/F");
-  //tree_passedEvents->Branch( "partFlavorJet", &partFlavorJet, "partFlavorJet/I");
+  tree_passedEvents->Branch( "run", &run, "run/I" );
+  tree_passedEvents->Branch( "LS", &LS, "LS/I" );
+  tree_passedEvents->Branch( "event", &event, "event/I" );
+  tree_passedEvents->Branch( "ptPhot", &ptPhotReco, "ptPhotReco/F");
+  tree_passedEvents->Branch( "etaPhot", &etaPhotReco, "etaPhotReco/F");
+  tree_passedEvents->Branch( "ptJet", &ptCorrJetReco, "ptCorrJetReco/F");
+  tree_passedEvents->Branch( "etaJet", &etaJetReco, "etaJetReco/F");
+  tree_passedEvents->Branch( "pt2ndJet", &ptCorr2ndJetReco, "ptCorr2ndJetReco/F");
+  tree_passedEvents->Branch( "eta2ndJet", &eta2ndJetReco, "eta2ndJetReco/F");
+  tree_passedEvents->Branch( "QGLikelihoodJet", &QGlikelihood, "QGlikelihood/F");
+  tree_passedEvents->Branch( "pdgIdPart", &pdgIdPart, "pdgIdPart/I");
 
 
 
@@ -765,13 +776,18 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
 
 
     if( !isMC ) {
-      if( ptPhotReco < 33. ) {
-        if( !passed_Photon20 ) continue;
-      } else if( ptPhotReco < 55. ) {
-        if( !passed_Photon30 ) continue;
-      } else if( ptPhotReco < 85. ) {
-        if( !passed_Photon50 ) continue;
-      }
+
+      if( ptPhotReco>30. && ptPhotReco<50. && !passed_Photon30 ) continue;
+      if( ptPhotReco>50. && ptPhotReco<70. && !passed_Photon50 ) continue;
+//      if( ptPhotReco>70. && ptPhotReco<120. && !passed_Photon30 ) continue;
+
+//    if( ptPhotReco < 33. ) {
+//      if( !passed_Photon20 ) continue;
+//    } else if( ptPhotReco < 55. ) {
+//      if( !passed_Photon30 ) continue;
+//    } else if( ptPhotReco < 85. ) {
+//      if( !passed_Photon50 ) continue;
+//    }
     } //trigger requirement
 
 
@@ -954,7 +970,8 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
 
 
    int nNeutralJetReco = nPhotonsReco + nNeutralHadronsReco;
-   float QGlikelihood = qglikeli->computeQGLikelihoodPU( ptCorrJetReco, rhoPF, nTracksReco, nNeutralJetReco, ptDJetReco, -1. );
+   //float QGlikelihood = qglikeli->computeQGLikelihoodPU( ptCorrJetReco, rhoPF, nTracksReco, nNeutralJetReco, ptDJetReco, -1. );
+   QGlikelihood = qglikeli->computeQGLikelihoodPU( ptCorrJetReco, rhoPF, nTracksReco, nNeutralJetReco, ptDJetReco, -1. );
   
 
     // fill parton matched histos before photon ID:
@@ -1024,6 +1041,8 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
       
       if( passedID_FULL ) {
 
+        tree_passedEvents->Fill();
+
         h1_phiPhot->Fill( phiPhotReco, correctWeight );
         h1_etaPhot->Fill( etaPhotReco, correctWeight );
         h1_ptJetReco->Fill( ptCorrJetReco, correctWeight );
@@ -1033,6 +1052,7 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
         if( ptCorrJetReco>30. && ptCorrJetReco<50. ) {
 
           h1_ptPhot_3050->Fill( ptPhotReco, correctWeight );
+          h1_ptJet_3050->Fill( ptJetReco, correctWeight );
 
           nEvents_passed_3050 += correctWeight;
           h1_nEvents_passed->Fill( ptCorrJetReco, correctWeight );
@@ -1065,6 +1085,7 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
         } else if( ptCorrJetReco>50. && ptCorrJetReco<80. ) {
 
           h1_ptPhot_5080->Fill( ptPhotReco, correctWeight );
+          h1_ptJet_5080->Fill( ptJetReco, correctWeight );
 
           nEvents_passed_5080 += correctWeight;
           h1_nEvents_passed->Fill( ptCorrJetReco, correctWeight );
@@ -1097,6 +1118,7 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
         } else if( ptCorrJetReco>80. && ptCorrJetReco<120. ) {
 
           h1_ptPhot_80120->Fill( ptPhotReco, correctWeight );
+          h1_ptJet_80120->Fill( ptJetReco, correctWeight );
 
           nEvents_passed_80120 += correctWeight;
           h1_nEvents_passed->Fill( ptCorrJetReco, correctWeight );
@@ -1181,6 +1203,7 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
   TFile* outFile = new TFile(outfileName.c_str(), "RECREATE");
   outFile->cd();
 
+  tree_passedEvents->Write();
 
   h1_totalLumi->Write();
   h1_nvertex->Write();
@@ -1194,6 +1217,10 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
   h1_ptPhot_3050->Write();
   h1_ptPhot_5080->Write();
   h1_ptPhot_80120->Write();
+
+  h1_ptJet_3050->Write();
+  h1_ptJet_5080->Write();
+  h1_ptJet_80120->Write();
 
   gr_quarkFraction_vs_pt->Write();
   h1_nEvents_passed_quark->Write();
