@@ -61,6 +61,21 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
 
   gROOT->cd();
 
+  std::string outfileName;
+
+  if( DEBUG_ ) outfileName = "provaPhotonJet_"+dataset;
+  else {
+   if(dataset!="") outfileName = "QGStudies_"+dataset;
+   else outfileName = "QGStudies";
+  }
+
+  outfileName = outfileName + suffix;
+  if( photonID!="medium" ) outfileName = outfileName + "_" + photonID;
+  outfileName += ".root";
+
+  TFile* outFile = new TFile(outfileName.c_str(), "RECREATE");
+  outFile->cd();
+
   TTree* tree_passedEvents = new TTree("tree_passedEvents", "Unbinned data for statistical treatment");
 
 
@@ -1171,26 +1186,7 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
   gr_quarkFraction_vs_pt->SetName("quarkFraction_vs_pt");
   gr_quarkFraction_vs_pt->BayesDivide( h1_nEvents_passed_quark, h1_nEvents_passed );
 
-  std::string outfileName;
 
-  if( DEBUG_ ) outfileName = "provaPhotonJet_"+dataset;
-  else {
-   if(dataset!="") outfileName = "QGStudies_"+dataset;
-   else outfileName = "QGStudies";
-  }
-
-  outfileName = outfileName + suffix;
-  if( photonID!="medium" ) outfileName = outfileName + "_" + photonID;
-//if( !noJetSelection ) {
-//  std::string R = ( NO2ndJETABS ) ? "R" : "";
-//  char outfileName_char[300];
-//  sprintf( outfileName_char, "%s_2ndJet%d%s", outfileName.c_str(), (int)(100.*secondJetThreshold), R.c_str());
-//  std::string outfileName_str( outfileName_char );
-//  outfileName = outfileName_str;
-//}
-  outfileName += ".root";
-
-  TFile* outFile = new TFile(outfileName.c_str(), "RECREATE");
   outFile->cd();
 
   tree_passedEvents->Write();
