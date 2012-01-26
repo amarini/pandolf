@@ -56,6 +56,7 @@ void addInput(const std::string& dataset, bool genjets=false);
 
 void finalize(const std::string& dataset, std::string recoType="pf", std::string jetAlgo="akt5", std::string photonID="medium", float secondJetThreshold=0.1, std::string partType="") {
 
+  suffix = "_"+ALGOTYPE_;
 
   TString dataset_tstr(dataset);
 
@@ -93,7 +94,6 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
   std::string infileName, treeName;
 
 
-  suffix = "_"+ALGOTYPE_;
 
 
 
