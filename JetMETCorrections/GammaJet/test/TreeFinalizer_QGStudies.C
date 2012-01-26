@@ -54,7 +54,7 @@ void addInput(const std::string& dataset, bool genjets=false);
 
 
 
-void finalize(const std::string& dataset, std::string recoType="pf", std::string jetAlgo="akt5", std::string photonID="medium", float secondJetThreshold=0.1, bool useGenJets=false, std::string partType="") {
+void finalize(const std::string& dataset, std::string recoType="pf", std::string jetAlgo="akt5", std::string photonID="medium", float secondJetThreshold=0.1, std::string partType="") {
 
 
   TString dataset_tstr(dataset);
@@ -79,7 +79,6 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
 
 
   suffix = "_"+ALGOTYPE_;
-  if( useGenJets ) suffix = suffix + "_GENJETS";
 
 
 
@@ -467,16 +466,6 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
   Float_t eventWeight;
   tree->SetBranchAddress("eventWeight", &eventWeight);
   Float_t eventWeight_genjets;
-  if( useGenJets ) {
-    if( photonID=="medium" )
-      tree->SetBranchAddress("eventWeight_medium", &eventWeight_genjets);
-    else if( photonID=="loose" )
-      tree->SetBranchAddress("eventWeight_loose", &eventWeight_genjets);
-    else {
-      std::cout << "Photon ID: '" << photonID << "' currently not implemented for GENJET technology. Exiting." << std::endl;
-      exit(12);
-    }
-  }
 
   Float_t eMet;
   Float_t phiMet;
@@ -624,10 +613,15 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
 
 
   Float_t QGlikelihood;
+  Bool_t passedID_FULL;
+  Bool_t btagged;
 
   tree_passedEvents->Branch( "run", &run, "run/I" );
   tree_passedEvents->Branch( "LS", &LS, "LS/I" );
   tree_passedEvents->Branch( "event", &event, "event/I" );
+  tree_passedEvents->Branch( "eventWeight", &eventWeight, "eventWeight/F");
+  tree_passedEvents->Branch( "passedPhotonID", &passedID_FULL, "passedID_FULL/O");
+  tree_passedEvents->Branch( "btagged", &btagged, "btagged/O");
   tree_passedEvents->Branch( "ptPhot", &ptPhotReco, "ptPhotReco/F");
   tree_passedEvents->Branch( "etaPhot", &etaPhotReco, "etaPhotReco/F");
   tree_passedEvents->Branch( "ptJet", &ptCorrJetReco, "ptCorrJetReco/F");
@@ -694,9 +688,8 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
 
 
     if( eventWeight <= 0. ) eventWeight = 1.;
-    Float_t correctWeight = (useGenJets) ? eventWeight_genjets : eventWeight;
 
-    h1_nvertex->Fill( nvertex, correctWeight);
+    h1_nvertex->Fill( nvertex, eventWeight);
 
     bool isMC = run<5;
 
@@ -704,7 +697,7 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
 
       if( dataset!="G2Jets_alpgen_Spring11" ) {
         // PU reweighting:
-        correctWeight *= fPUWeight->GetWeight(nPU);
+        eventWeight *= fPUWeight->GetWeight(nPU);
       }
 
     } else { //it's data: remove duplicate events (if any):
@@ -760,12 +753,11 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
 
 
 
-    h1_nvertex_PUW->Fill( nvertex, correctWeight);
+    h1_nvertex_PUW->Fill( nvertex, eventWeight);
 
 
     if( ptPhotReco<20. ) continue;
     if( fabs(etaPhotReco)>1.3 ) continue;
-    //if( clusterMinPhotReco<0.15 && !MCassoc_ && !useGenJets ) continue; //protection vs EB spikes
     if( clusterMinPhotReco<0.15 ) continue; //protection vs EB spikes
     if( fabs(etaJetReco)>2. ) continue; //jet in tracker region
 
@@ -822,7 +814,7 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
 
     // cut away b-jets:
     //if( trackCountingHighEffBJetTagsJetReco>1.7 ) continue;
-    bool btagged = trackCountingHighEffBJetTagsJetReco>1.7;
+    btagged = trackCountingHighEffBJetTagsJetReco>1.7;
     if( isMC ) { //take into account scale factors
       float coin = rand->Uniform(1.);
       if( coin > 0.9 ) 
@@ -930,18 +922,18 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
   
 
   ////before selection fill N-1 isolation plots (no event topology for isolation variables):
-  //if(                    isIsolated_ecal  && isIsolated_ptTracks && isIsolated_nTracks && clusterMajOK && clusterMinOK  ) h1_hcalIsoPhotReco_Nm1->Fill( hcalIsoPhotReco, correctWeight);
-  //if(                    isIsolated_ecal  && isIsolated_ptTracks && isIsolated_nTracks && clusterMajOK && clusterMinOK  ) h1_hcalIsoEnergyPhotReco_Nm1->Fill( hcalIsoPhotReco*ePhotReco, correctWeight);
-  //if( isIsolated_hcal                     && isIsolated_ptTracks && isIsolated_nTracks && clusterMajOK && clusterMinOK  ) h1_ecalIsoPhotReco_Nm1->Fill( ecalIsoPhotReco, correctWeight);
-  //if( isIsolated_hcal                     && isIsolated_ptTracks && isIsolated_nTracks && clusterMajOK && clusterMinOK  ) h1_ecalIsoEnergyPhotReco_Nm1->Fill( ecalIsoPhotReco*ePhotReco, correctWeight);
-  //if( isIsolated_hcal && isIsolated_ecal                         && isIsolated_nTracks && clusterMajOK && clusterMinOK  ) h1_ptTrkIsoPhotReco_Nm1->Fill( ptTrkIsoPhotReco, correctWeight);
-  //if( isIsolated_hcal && isIsolated_ecal  && isIsolated_ptTracks                       && clusterMajOK && clusterMinOK  ) h1_nTrkIsoPhotReco_Nm1->Fill( nTrkIsoPhotReco, correctWeight);
+  //if(                    isIsolated_ecal  && isIsolated_ptTracks && isIsolated_nTracks && clusterMajOK && clusterMinOK  ) h1_hcalIsoPhotReco_Nm1->Fill( hcalIsoPhotReco, eventWeight);
+  //if(                    isIsolated_ecal  && isIsolated_ptTracks && isIsolated_nTracks && clusterMajOK && clusterMinOK  ) h1_hcalIsoEnergyPhotReco_Nm1->Fill( hcalIsoPhotReco*ePhotReco, eventWeight);
+  //if( isIsolated_hcal                     && isIsolated_ptTracks && isIsolated_nTracks && clusterMajOK && clusterMinOK  ) h1_ecalIsoPhotReco_Nm1->Fill( ecalIsoPhotReco, eventWeight);
+  //if( isIsolated_hcal                     && isIsolated_ptTracks && isIsolated_nTracks && clusterMajOK && clusterMinOK  ) h1_ecalIsoEnergyPhotReco_Nm1->Fill( ecalIsoPhotReco*ePhotReco, eventWeight);
+  //if( isIsolated_hcal && isIsolated_ecal                         && isIsolated_nTracks && clusterMajOK && clusterMinOK  ) h1_ptTrkIsoPhotReco_Nm1->Fill( ptTrkIsoPhotReco, eventWeight);
+  //if( isIsolated_hcal && isIsolated_ecal  && isIsolated_ptTracks                       && clusterMajOK && clusterMinOK  ) h1_nTrkIsoPhotReco_Nm1->Fill( nTrkIsoPhotReco, eventWeight);
   ////no cluster cuts on cluster N-1's:
-  //if( isIsolated_hcal && isIsolated_ecal  && isIsolated_ptTracks && isIsolated_nTracks                                  ) h1_clusterMajPhotReco_Nm1->Fill( clusterMajPhotReco, correctWeight);
-  //if( isIsolated_hcal && isIsolated_ecal  && isIsolated_ptTracks && isIsolated_nTracks                                  ) h1_clusterMinPhotReco_Nm1->Fill( clusterMinPhotReco, correctWeight);
+  //if( isIsolated_hcal && isIsolated_ecal  && isIsolated_ptTracks && isIsolated_nTracks                                  ) h1_clusterMajPhotReco_Nm1->Fill( clusterMajPhotReco, eventWeight);
+  //if( isIsolated_hcal && isIsolated_ecal  && isIsolated_ptTracks && isIsolated_nTracks                                  ) h1_clusterMinPhotReco_Nm1->Fill( clusterMinPhotReco, eventWeight);
   //// yes topology for topology variables:
-  //if( isIsolated_hcal && isIsolated_ecal  && isIsolated_ptTracks && isIsolated_nTracks && clusterMajOK && clusterMinOK              && secondJetOK && jetInBarrel) h1_deltaPhi_Nm1->Fill( deltaPhi_jet, correctWeight);
-  //if( isIsolated_hcal && isIsolated_ecal  && isIsolated_ptTracks && isIsolated_nTracks && clusterMajOK && clusterMinOK && back2back                && jetInBarrel) h1_ptSecondJetRel_Nm1->Fill( pt2ndJetReco/ptPhotReco, correctWeight);
+  //if( isIsolated_hcal && isIsolated_ecal  && isIsolated_ptTracks && isIsolated_nTracks && clusterMajOK && clusterMinOK              && secondJetOK && jetInBarrel) h1_deltaPhi_Nm1->Fill( deltaPhi_jet, eventWeight);
+  //if( isIsolated_hcal && isIsolated_ecal  && isIsolated_ptTracks && isIsolated_nTracks && clusterMajOK && clusterMinOK && back2back                && jetInBarrel) h1_ptSecondJetRel_Nm1->Fill( pt2ndJetReco/ptPhotReco, eventWeight);
 
 
 //    bool isIsolated_loose = (isIsolated_hcal_loose && isIsolated_ecal_loose && isIsolated_ptTracks_loose && isIsolated_nTracks_loose);
@@ -960,13 +952,13 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
     //////////////////////////////////////////////
 
 
-    //bool photonOK = (isIsolated && clusterShapeOK && pixelSeedOK) || MCassoc_ || useGenJets;
     bool photonOK = (isIsolated && clusterShapeOK && pixelSeedOK);
     bool passedID_no2ndJet = photonOK && back2back;
-    bool passedID_FULL     = passedID_no2ndJet && secondJetOK;
+    passedID_FULL     = passedID_no2ndJet && secondJetOK;
     bool passedID_noSmaj     = isIsolated && clusterMinOK && pixelSeedOK && (secondJetOK || noJetSelection);
 
 
+   tree_passedEvents->Fill();
 
 
    int nNeutralJetReco = nPhotonsReco + nNeutralHadronsReco;
@@ -985,31 +977,31 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
       if( ptCorrJetReco>30. && ptCorrJetReco<50. ) {
 
         if( abs( pdgIdPart ) < 7 ) {
-          h1_QGLikelihoodJetReco_antibtag_quark_noPhotID_3050->Fill( QGlikelihood, correctWeight );
+          h1_QGLikelihoodJetReco_antibtag_quark_noPhotID_3050->Fill( QGlikelihood, eventWeight );
         } else if( pdgIdPart == 21 ) {
           if( parton.Energy() > 2. )
             if( parton.DeltaR(jet) < 0.3 )
-              h1_QGLikelihoodJetReco_antibtag_gluon_noPhotID_3050->Fill( QGlikelihood, correctWeight );
+              h1_QGLikelihoodJetReco_antibtag_gluon_noPhotID_3050->Fill( QGlikelihood, eventWeight );
         }
    
       } else if( ptCorrJetReco>50. && ptCorrJetReco<80. ) {
 
         if( abs( pdgIdPart ) < 7 ) {
-          h1_QGLikelihoodJetReco_antibtag_quark_noPhotID_5080->Fill( QGlikelihood, correctWeight );
+          h1_QGLikelihoodJetReco_antibtag_quark_noPhotID_5080->Fill( QGlikelihood, eventWeight );
         } else if( pdgIdPart == 21 ) {
           if( parton.Energy() > 2. )
             if( parton.DeltaR(jet) < 0.3 )
-              h1_QGLikelihoodJetReco_antibtag_gluon_noPhotID_5080->Fill( QGlikelihood, correctWeight );
+              h1_QGLikelihoodJetReco_antibtag_gluon_noPhotID_5080->Fill( QGlikelihood, eventWeight );
         }
 
       } else if( ptCorrJetReco>80. && ptCorrJetReco<120. ) {
 
         if( abs( pdgIdPart ) < 7 ) {
-          h1_QGLikelihoodJetReco_antibtag_quark_noPhotID_80120->Fill( QGlikelihood, correctWeight );
+          h1_QGLikelihoodJetReco_antibtag_quark_noPhotID_80120->Fill( QGlikelihood, eventWeight );
         } else if( pdgIdPart == 21 ) {
           if( parton.Energy() > 2. )
             if( parton.DeltaR(jet) < 0.3 )
-              h1_QGLikelihoodJetReco_antibtag_gluon_noPhotID_80120->Fill( QGlikelihood, correctWeight );
+              h1_QGLikelihoodJetReco_antibtag_gluon_noPhotID_80120->Fill( QGlikelihood, eventWeight );
         }
 
       }
@@ -1020,20 +1012,20 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
 
     if( passedID_no2ndJet ) {
 
-    //h1_nvertex_passedID->Fill( nvertex, correctWeight );
+    //h1_nvertex_passedID->Fill( nvertex, eventWeight );
 
-    //h1_deltaPhi_passedID->Fill( deltaPhi_jet, correctWeight);
-    //h1_deltaPhi_2ndJet_passedID->Fill( deltaPhi_2ndJet, correctWeight);
-    //h1_ptSecondJetRel_passedID->Fill( pt2ndJetReco/ptPhotReco, correctWeight);
+    //h1_deltaPhi_passedID->Fill( deltaPhi_jet, eventWeight);
+    //h1_deltaPhi_2ndJet_passedID->Fill( deltaPhi_2ndJet, eventWeight);
+    //h1_ptSecondJetRel_passedID->Fill( pt2ndJetReco/ptPhotReco, eventWeight);
     //if( ptPhotReco>50. ) {
-    //  h1_deltaPhi_2ndJet_passedID_pt50->Fill( deltaPhi_2ndJet, correctWeight);
-    //  h1_ptSecondJetRel_passedID_pt50->Fill( pt2ndJetReco/ptPhotReco, correctWeight);
-    //  h1_nvertex_passedID_pt50->Fill( nvertex, correctWeight );
+    //  h1_deltaPhi_2ndJet_passedID_pt50->Fill( deltaPhi_2ndJet, eventWeight);
+    //  h1_ptSecondJetRel_passedID_pt50->Fill( pt2ndJetReco/ptPhotReco, eventWeight);
+    //  h1_nvertex_passedID_pt50->Fill( nvertex, eventWeight );
     //}
-    //h1_phiPhot_passedID->Fill( phiPhotReco, correctWeight );
-    //h1_etaPhot_passedID->Fill( etaPhotReco, correctWeight );
-    //h1_ptPhot_passedID->Fill( ptPhotReco, correctWeight );
-    //h1_ptPhot_passedID_fineBin->Fill( ptPhotReco, correctWeight );
+    //h1_phiPhot_passedID->Fill( phiPhotReco, eventWeight );
+    //h1_etaPhot_passedID->Fill( etaPhotReco, eventWeight );
+    //h1_ptPhot_passedID->Fill( ptPhotReco, eventWeight );
+    //h1_ptPhot_passedID_fineBin->Fill( ptPhotReco, eventWeight );
 
     //h1_met_no2ndJet->Fill(eMet);
     //if( ptPhotReco>80. ) h1_met_pt80->Fill(eMet);
@@ -1041,110 +1033,108 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
       
       if( passedID_FULL ) {
 
-        tree_passedEvents->Fill();
-
-        h1_phiPhot->Fill( phiPhotReco, correctWeight );
-        h1_etaPhot->Fill( etaPhotReco, correctWeight );
-        h1_ptJetReco->Fill( ptCorrJetReco, correctWeight );
-        h1_pt2ndJetReco->Fill( ptCorr2ndJetReco, correctWeight );
+        h1_phiPhot->Fill( phiPhotReco, eventWeight );
+        h1_etaPhot->Fill( etaPhotReco, eventWeight );
+        h1_ptJetReco->Fill( ptCorrJetReco, eventWeight );
+        h1_pt2ndJetReco->Fill( ptCorr2ndJetReco, eventWeight );
 
         //if( ptPhotReco>33. && ptPhotReco<48. ) {
         if( ptCorrJetReco>30. && ptCorrJetReco<50. ) {
 
-          h1_ptPhot_3050->Fill( ptPhotReco, correctWeight );
-          h1_ptJet_3050->Fill( ptJetReco, correctWeight );
+          h1_ptPhot_3050->Fill( ptPhotReco, eventWeight );
+          h1_ptJet_3050->Fill( ptJetReco, eventWeight );
 
-          nEvents_passed_3050 += correctWeight;
-          h1_nEvents_passed->Fill( ptCorrJetReco, correctWeight );
+          nEvents_passed_3050 += eventWeight;
+          h1_nEvents_passed->Fill( ptCorrJetReco, eventWeight );
 
           if( fabs(pdgIdPart) < 7 ) {
-            nEvents_passed_quark_3050 += correctWeight;
-            h1_nEvents_passed_quark->Fill( ptCorrJetReco, correctWeight );
+            nEvents_passed_quark_3050 += eventWeight;
+            h1_nEvents_passed_quark->Fill( ptCorrJetReco, eventWeight );
           }
 
-          h1_nChargedJetReco_3050->Fill( nTracksReco, correctWeight );
-          h1_nNeutralJetReco_3050->Fill( nNeutralJetReco, correctWeight );
-          h1_ptDJetReco_3050->Fill( ptDJetReco, correctWeight );
-          h1_QGLikelihoodJetReco_3050->Fill( QGlikelihood, correctWeight );
+          h1_nChargedJetReco_3050->Fill( nTracksReco, eventWeight );
+          h1_nNeutralJetReco_3050->Fill( nNeutralJetReco, eventWeight );
+          h1_ptDJetReco_3050->Fill( ptDJetReco, eventWeight );
+          h1_QGLikelihoodJetReco_3050->Fill( QGlikelihood, eventWeight );
 
           if( !btagged ) {
-            nEvents_antibtag_passed_3050 += correctWeight;
+            nEvents_antibtag_passed_3050 += eventWeight;
             if( fabs(pdgIdPart) < 7 )
-              nEvents_antibtag_passed_quark_3050 += correctWeight;
-            h1_nChargedJetReco_antibtag_3050->Fill( nTracksReco, correctWeight );
-            h1_nNeutralJetReco_antibtag_3050->Fill( nNeutralJetReco, correctWeight );
-            h1_ptDJetReco_antibtag_3050->Fill( ptDJetReco, correctWeight );
-            h1_QGLikelihoodJetReco_antibtag_3050->Fill( QGlikelihood, correctWeight );
+              nEvents_antibtag_passed_quark_3050 += eventWeight;
+            h1_nChargedJetReco_antibtag_3050->Fill( nTracksReco, eventWeight );
+            h1_nNeutralJetReco_antibtag_3050->Fill( nNeutralJetReco, eventWeight );
+            h1_ptDJetReco_antibtag_3050->Fill( ptDJetReco, eventWeight );
+            h1_QGLikelihoodJetReco_antibtag_3050->Fill( QGlikelihood, eventWeight );
             if( pdgIdPart==21 )
-              h1_QGLikelihoodJetReco_antibtag_gluon_3050->Fill( QGlikelihood, correctWeight );
+              h1_QGLikelihoodJetReco_antibtag_gluon_3050->Fill( QGlikelihood, eventWeight );
             else if( abs(pdgIdPart)<7 ) 
-              h1_QGLikelihoodJetReco_antibtag_quark_3050->Fill( QGlikelihood, correctWeight );
+              h1_QGLikelihoodJetReco_antibtag_quark_3050->Fill( QGlikelihood, eventWeight );
           }
 
         //} else if( ptPhotReco>55. && ptPhotReco<78. ) {
         } else if( ptCorrJetReco>50. && ptCorrJetReco<80. ) {
 
-          h1_ptPhot_5080->Fill( ptPhotReco, correctWeight );
-          h1_ptJet_5080->Fill( ptJetReco, correctWeight );
+          h1_ptPhot_5080->Fill( ptPhotReco, eventWeight );
+          h1_ptJet_5080->Fill( ptJetReco, eventWeight );
 
-          nEvents_passed_5080 += correctWeight;
-          h1_nEvents_passed->Fill( ptCorrJetReco, correctWeight );
+          nEvents_passed_5080 += eventWeight;
+          h1_nEvents_passed->Fill( ptCorrJetReco, eventWeight );
 
           if( fabs(pdgIdPart) < 7 ) {
-            nEvents_passed_quark_5080 += correctWeight;
-            h1_nEvents_passed_quark->Fill( ptCorrJetReco, correctWeight );
+            nEvents_passed_quark_5080 += eventWeight;
+            h1_nEvents_passed_quark->Fill( ptCorrJetReco, eventWeight );
           }
 
-          h1_nChargedJetReco_5080->Fill( nTracksReco, correctWeight );
-          h1_nNeutralJetReco_5080->Fill( nNeutralJetReco, correctWeight );
-          h1_ptDJetReco_5080->Fill( ptDJetReco, correctWeight );
-          h1_QGLikelihoodJetReco_5080->Fill( QGlikelihood, correctWeight );
+          h1_nChargedJetReco_5080->Fill( nTracksReco, eventWeight );
+          h1_nNeutralJetReco_5080->Fill( nNeutralJetReco, eventWeight );
+          h1_ptDJetReco_5080->Fill( ptDJetReco, eventWeight );
+          h1_QGLikelihoodJetReco_5080->Fill( QGlikelihood, eventWeight );
 
           if( !btagged ) {
-            nEvents_antibtag_passed_5080 += correctWeight;
+            nEvents_antibtag_passed_5080 += eventWeight;
             if( fabs(pdgIdPart) < 7 )
-              nEvents_antibtag_passed_quark_5080 += correctWeight;
-            h1_nChargedJetReco_antibtag_5080->Fill( nTracksReco, correctWeight );
-            h1_nNeutralJetReco_antibtag_5080->Fill( nNeutralJetReco, correctWeight );
-            h1_ptDJetReco_antibtag_5080->Fill( ptDJetReco, correctWeight );
-            h1_QGLikelihoodJetReco_antibtag_5080->Fill( QGlikelihood, correctWeight );
+              nEvents_antibtag_passed_quark_5080 += eventWeight;
+            h1_nChargedJetReco_antibtag_5080->Fill( nTracksReco, eventWeight );
+            h1_nNeutralJetReco_antibtag_5080->Fill( nNeutralJetReco, eventWeight );
+            h1_ptDJetReco_antibtag_5080->Fill( ptDJetReco, eventWeight );
+            h1_QGLikelihoodJetReco_antibtag_5080->Fill( QGlikelihood, eventWeight );
             if( pdgIdPart==21 )
-              h1_QGLikelihoodJetReco_antibtag_gluon_5080->Fill( QGlikelihood, correctWeight );
+              h1_QGLikelihoodJetReco_antibtag_gluon_5080->Fill( QGlikelihood, eventWeight );
             else if( abs(pdgIdPart)<7 ) 
-              h1_QGLikelihoodJetReco_antibtag_quark_5080->Fill( QGlikelihood, correctWeight );
+              h1_QGLikelihoodJetReco_antibtag_quark_5080->Fill( QGlikelihood, eventWeight );
           }
 
         //} else if( ptPhotReco>85. && ptPhotReco<115. ) {
         } else if( ptCorrJetReco>80. && ptCorrJetReco<120. ) {
 
-          h1_ptPhot_80120->Fill( ptPhotReco, correctWeight );
-          h1_ptJet_80120->Fill( ptJetReco, correctWeight );
+          h1_ptPhot_80120->Fill( ptPhotReco, eventWeight );
+          h1_ptJet_80120->Fill( ptJetReco, eventWeight );
 
-          nEvents_passed_80120 += correctWeight;
-          h1_nEvents_passed->Fill( ptCorrJetReco, correctWeight );
+          nEvents_passed_80120 += eventWeight;
+          h1_nEvents_passed->Fill( ptCorrJetReco, eventWeight );
 
           if( fabs(pdgIdPart) < 7 ) {
-            nEvents_passed_quark_80120 += correctWeight;
-            h1_nEvents_passed_quark->Fill( ptCorrJetReco, correctWeight );
+            nEvents_passed_quark_80120 += eventWeight;
+            h1_nEvents_passed_quark->Fill( ptCorrJetReco, eventWeight );
           }
 
-          h1_nChargedJetReco_80120->Fill( nTracksReco, correctWeight );
-          h1_nNeutralJetReco_80120->Fill( nNeutralJetReco, correctWeight );
-          h1_ptDJetReco_80120->Fill( ptDJetReco, correctWeight );
-          h1_QGLikelihoodJetReco_80120->Fill( QGlikelihood, correctWeight );
+          h1_nChargedJetReco_80120->Fill( nTracksReco, eventWeight );
+          h1_nNeutralJetReco_80120->Fill( nNeutralJetReco, eventWeight );
+          h1_ptDJetReco_80120->Fill( ptDJetReco, eventWeight );
+          h1_QGLikelihoodJetReco_80120->Fill( QGlikelihood, eventWeight );
 
           if( !btagged ) {
-            nEvents_antibtag_passed_80120 += correctWeight;
+            nEvents_antibtag_passed_80120 += eventWeight;
             if( fabs(pdgIdPart) < 7 )
-              nEvents_antibtag_passed_quark_80120 += correctWeight;
-            h1_nChargedJetReco_antibtag_80120->Fill( nTracksReco, correctWeight );
-            h1_nNeutralJetReco_antibtag_80120->Fill( nNeutralJetReco, correctWeight );
-            h1_ptDJetReco_antibtag_80120->Fill( ptDJetReco, correctWeight );
-            h1_QGLikelihoodJetReco_antibtag_80120->Fill( QGlikelihood, correctWeight );
+              nEvents_antibtag_passed_quark_80120 += eventWeight;
+            h1_nChargedJetReco_antibtag_80120->Fill( nTracksReco, eventWeight );
+            h1_nNeutralJetReco_antibtag_80120->Fill( nNeutralJetReco, eventWeight );
+            h1_ptDJetReco_antibtag_80120->Fill( ptDJetReco, eventWeight );
+            h1_QGLikelihoodJetReco_antibtag_80120->Fill( QGlikelihood, eventWeight );
             if( pdgIdPart==21 )
-              h1_QGLikelihoodJetReco_antibtag_gluon_80120->Fill( QGlikelihood, correctWeight );
+              h1_QGLikelihoodJetReco_antibtag_gluon_80120->Fill( QGlikelihood, eventWeight );
             else if( abs(pdgIdPart)<7 ) 
-              h1_QGLikelihoodJetReco_antibtag_quark_80120->Fill( QGlikelihood, correctWeight );
+              h1_QGLikelihoodJetReco_antibtag_quark_80120->Fill( QGlikelihood, eventWeight );
           }
 
         }
