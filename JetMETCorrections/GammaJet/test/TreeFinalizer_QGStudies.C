@@ -629,6 +629,7 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
 
   Float_t QGlikelihood;
   Bool_t passedID_FULL;
+  Bool_t secondJetOK;
   Bool_t btagged;
 
   tree_passedEvents->Branch( "run", &run, "run/I" );
@@ -636,6 +637,7 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
   tree_passedEvents->Branch( "event", &event, "event/I" );
   tree_passedEvents->Branch( "eventWeight", &eventWeight, "eventWeight/F");
   tree_passedEvents->Branch( "passedPhotonID", &passedID_FULL, "passedID_FULL/O");
+  tree_passedEvents->Branch( "secondJetOK", &secondJetOK, "secondJetOK/O");
   tree_passedEvents->Branch( "btagged", &btagged, "btagged/O");
   tree_passedEvents->Branch( "ptPhot", &ptPhotReco, "ptPhotReco/F");
   tree_passedEvents->Branch( "etaPhot", &etaPhotReco, "etaPhotReco/F");
@@ -837,7 +839,6 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
     }
 
 
-    bool secondJetOK;
 
     secondJetOK = ( ptCorr2ndJetReco < secondJetThreshold*ptPhotReco || ptCorr2ndJetReco < 10. );
     //secondJetOK = ( pt2ndJetReco < secondJetThreshold*ptPhotReco || pt2ndJetReco < 5. );
