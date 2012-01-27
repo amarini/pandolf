@@ -975,13 +975,16 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
     bool passedID_noSmaj     = isIsolated && clusterMinOK && pixelSeedOK && (secondJetOK || noJetSelection);
 
 
-   tree_passedEvents->Fill();
 
 
    int nNeutralJetReco = nPhotonsReco + nNeutralHadronsReco;
    //float QGlikelihood = qglikeli->computeQGLikelihoodPU( ptCorrJetReco, rhoPF, nTracksReco, nNeutralJetReco, ptDJetReco, -1. );
    QGlikelihood = qglikeli->computeQGLikelihoodPU( ptCorrJetReco, rhoPF, nTracksReco, nNeutralJetReco, ptDJetReco, -1. );
   
+
+
+   tree_passedEvents->Fill();
+
 
     // fill parton matched histos before photon ID:
     if( !btagged ) {
