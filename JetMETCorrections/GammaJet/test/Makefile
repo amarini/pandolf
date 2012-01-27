@@ -29,6 +29,9 @@ do2ndLevel_PhotonJet_batch: AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAn
 do2ndLevel_VHgg_batch: AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_VHgg.o  do2ndLevel_VHgg_batch.cpp
 	$(CC) -Wall -o do2ndLevel_VHgg_batch do2ndLevel_VHgg_batch.cpp AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_VHgg.o $(ROOTFLAG) $(EXTRALIBS)
 
+do2ndLevel_MultiJet_batch: AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_MultiJet.o  do2ndLevel_MultiJet_batch.cpp
+	$(CC) -Wall -o do2ndLevel_MultiJet_batch do2ndLevel_MultiJet_batch.cpp AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_MultiJet.o $(ROOTFLAG) $(EXTRALIBS)
+
 do2ndLevel_PhotonJetInclusive_batch: AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJetInclusive.o fitTools.o do2ndLevel_PhotonJetInclusive_batch.cpp
 	$(CC) -Wall -o do2ndLevel_PhotonJetInclusive_batch do2ndLevel_PhotonJetInclusive_batch.cpp AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJetInclusive.o fitTools.o $(ROOTFLAG) -lMinuit
 
@@ -57,6 +60,9 @@ TreeAnalyzer_PhotonJet.o: TreeAnalyzer_PhotonJet.C fitTools.o
 
 TreeAnalyzer_VHgg.o: TreeAnalyzer_VHgg.C
 	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools TreeAnalyzer_VHgg.C $(ROOTFLAG)
+
+TreeAnalyzer_MultiJet.o: TreeAnalyzer_MultiJet.C
+	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools TreeAnalyzer_MultiJet.C $(ROOTFLAG)
 
 TreeAnalyzer_PhotonJetInclusive.o: TreeAnalyzer_PhotonJetInclusive.C fitTools.o
 	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools fitTools.o TreeAnalyzer_PhotonJetInclusive.C $(ROOTFLAG)
