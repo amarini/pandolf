@@ -1559,6 +1559,12 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
     label_bonus->AddText(labelText.c_str());
 
 
+    TPaveText* label_shapeNorm = new TPaveText(0.2, 0.83, 0.35, 0.88, "brNDC");
+    label_shapeNorm->SetTextSize(0.03);
+    label_shapeNorm->SetFillColor(kWhite);
+    label_shapeNorm->AddText("SHAPE NORM");
+
+
     TCanvas* c1 = new TCanvas("c1", "c1", 800, 800);
     c1->cd();
     if( logx_ ) {
@@ -1605,6 +1611,8 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
     gPad->RedrawAxis();
     label_cms->Draw("same");
     label_sqrt->Draw("same");
+    if( scaleFactor_<0 )
+      label_shapeNorm->Draw("same");
     if( label_cuts!=0 )
       label_cuts->Draw("same");
     if( labelText!="" )
@@ -1718,6 +1726,8 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
       gPad->RedrawAxis();
       label_cms->Draw("same");
       label_sqrt->Draw("same");
+      if( scaleFactor_<0 )
+        label_shapeNorm->Draw("same");
       if( label_cuts!=0 )
         label_cuts->Draw("same");
       if( labelText!="" )
