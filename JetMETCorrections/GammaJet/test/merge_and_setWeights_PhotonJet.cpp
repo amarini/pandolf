@@ -374,6 +374,13 @@ float getWeight( const std::string& dataset, int nEvents ) {
   } else if( dataset_tstr.BeginsWith("G2Jet_Pt-300to5000") ) {
     xSection = 7.233e-01 ;
 
+  } else if( dataset_tstr.BeginsWith("QCD") && dataset_tstr.Contains("HT-250To500_7TeV") ) {
+    xSection = 198500.;
+  } else if( dataset_tstr.BeginsWith("QCD") && dataset_tstr.Contains("HT-500To1000_7TeV") ) {
+    xSection = 5856.;
+  } else if( dataset_tstr.BeginsWith("QCD") && dataset_tstr.Contains("HT-1000_7TeV") ) {
+    xSection = 122.6;
+
   } else {
     std::cout << std::endl;
     std::cout << "-> WARNING!! Dataset: '" << dataset << "' not present in database. Cross section unknown." << std::endl;
