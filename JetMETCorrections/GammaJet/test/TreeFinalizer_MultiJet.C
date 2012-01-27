@@ -1,0 +1,505 @@
+
+#include <TH2F.h>
+#include <TH1D.h>
+#include <TProfile.h>
+#include <TGraphErrors.h>
+#include <TFile.h>
+#include <TChain.h>
+#include <TTree.h>
+#include <TCanvas.h>
+#include <TF1.h>
+#include <TMath.h>
+#include <TROOT.h>
+#include <iostream>
+#include <vector>
+#include <cmath>
+
+#include "AnalysisJet.C"
+#include "AnalysisPhoton.C"
+
+#include "/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/CommonTools/PUWeight.C"
+#include "/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/QGLikelihood/QGLikelihoodCalculator.C"
+
+
+bool isAOD_ = true;
+bool DEBUG_ = false;
+bool MCassoc_ = false;
+std::string RECOTYPE_;
+std::string ALGOTYPE_;
+std::string PARTTYPE_;
+
+TChain* tree;
+Double_t totalLumi=0.;
+
+
+void addInput(const std::string& dataset);
+void finalize(const std::string& dataset);
+
+
+
+
+
+void finalize(const std::string& dataset) {
+
+
+  tree = new TChain("jetTree");
+
+
+  if( dataset=="QCD_HT_Summer11" ) {
+    addInput( "QCD_TuneZ2_HT-250To500_7TeV-madgraph_Summer11-PU_S4_START42_V11-v3" );
+    addInput( "QCD_TuneZ2_HT-500To1000_7TeV-madgraph_Summer11-PU_S4_START42_V11-v1" );
+    addInput( "QCD_TuneZ2_HT-1000_7TeV-madgraph_Summer11-PU_S4_START42_V11-v1" );
+  } else {
+    addInput( dataset );
+  }
+
+
+
+
+
+
+  TH1F* h1_nvertex = new TH1F("nvertex", "", 26, -0.5, 25.5);
+  h1_nvertex->Sumw2();
+  TH1F* h1_nvertexPU = new TH1F("nvertexPU", "", 26, -0.5, 25.5);
+  h1_nvertexPU->Sumw2();
+
+
+  TH1D* h1_ptJet0 = new TH1D("ptJet0", "", 500, 0., 500.);
+  h1_ptJet0->Sumw2();
+  TH1D* h1_etaJet0 = new TH1D("etaJet0", "", 500, -5., 5.);
+  h1_etaJet0->Sumw2();
+  TH1D* h1_pdgIdJet0 = new TH1D("pdgIdJet0", "", 38, -15.5, 22.5);
+  h1_pdgIdJet0->Sumw2();
+  TH1D* h1_QGLikelihoodJet0 = new TH1D("QGLikelihoodJet0", "", 100, 0., 1.0001);
+  h1_QGLikelihoodJet0->Sumw2();
+
+  TH1D* h1_ptJet1 = new TH1D("ptJet1", "", 500, 0., 500.);
+  h1_ptJet1->Sumw2();
+  TH1D* h1_etaJet1 = new TH1D("etaJet1", "", 500, -5., 5.);
+  h1_etaJet1->Sumw2();
+  TH1D* h1_pdgIdJet1 = new TH1D("pdgIdJet1", "", 38, -15.5, 22.5);
+  h1_pdgIdJet1->Sumw2();
+  TH1D* h1_QGLikelihoodJet1 = new TH1D("QGLikelihoodJet1", "", 100, 0., 1.0001);
+  h1_QGLikelihoodJet1->Sumw2();
+
+  TH1D* h1_ptJet2 = new TH1D("ptJet2", "", 500, 0., 500.);
+  h1_ptJet2->Sumw2();
+  TH1D* h1_etaJet2 = new TH1D("etaJet2", "", 500, -5., 5.);
+  h1_etaJet2->Sumw2();
+  TH1D* h1_pdgIdJet2 = new TH1D("pdgIdJet2", "", 38, -15.5, 22.5);
+  h1_pdgIdJet2->Sumw2();
+  TH1D* h1_QGLikelihoodJet2 = new TH1D("QGLikelihoodJet2", "", 100, 0., 1.0001);
+  h1_QGLikelihoodJet2->Sumw2();
+
+  TH1D* h1_ptJet3 = new TH1D("ptJet3", "", 500, 0., 500.);
+  h1_ptJet3->Sumw2();
+  TH1D* h1_etaJet3 = new TH1D("etaJet3", "", 500, -5., 5.);
+  h1_etaJet3->Sumw2();
+  TH1D* h1_pdgIdJet3 = new TH1D("pdgIdJet3", "", 38, -15.5, 22.5);
+  h1_pdgIdJet3->Sumw2();
+  TH1D* h1_QGLikelihoodJet3 = new TH1D("QGLikelihoodJet3", "", 100, 0., 1.0001);
+  h1_QGLikelihoodJet3->Sumw2();
+
+
+
+
+  Int_t run;
+  tree->SetBranchAddress("run", &run);
+  Int_t nvertex;
+  tree->SetBranchAddress("nvertex", &nvertex);
+  Float_t rhoPF;
+  tree->SetBranchAddress("rhoPF", &rhoPF);
+  Int_t event;
+  tree->SetBranchAddress("event", &event);
+  Float_t eventWeight;
+  tree->SetBranchAddress("eventWeight", &eventWeight);
+
+  Float_t eMet;
+  tree->SetBranchAddress("epfMet", &eMet);
+  Float_t phiMet;
+  tree->SetBranchAddress("phipfMet", &phiMet);
+
+
+  Int_t nPU;
+  tree->SetBranchAddress("nPU", &nPU);
+  Float_t ptHat;
+  tree->SetBranchAddress("ptHat", &ptHat);
+
+
+  Int_t nJet;
+  tree->SetBranchAddress("nJet", &nJet);
+  Float_t eJet[20];
+  tree->SetBranchAddress("eJet", eJet);
+  Float_t ptJet[20];
+  tree->SetBranchAddress("ptJet", ptJet);
+  Float_t ptRawJet[20];
+  tree->SetBranchAddress("ptRawJet", ptRawJet);
+  Float_t etaJet[20];
+  tree->SetBranchAddress("etaJet", etaJet);
+  Float_t phiJet[20];
+  tree->SetBranchAddress("phiJet", phiJet);
+  Float_t eChargedHadronsJet[20];
+  tree->SetBranchAddress("eChargedHadronsJet", eChargedHadronsJet);
+  Float_t ePhotonsJet[20];
+  tree->SetBranchAddress("ePhotonsJet", ePhotonsJet);
+  Int_t eNeutralHadronsJet[20];
+  tree->SetBranchAddress("eNeutralHadronsJet", eNeutralHadronsJet);
+  Int_t nChargedHadronsJet[20];
+  tree->SetBranchAddress("nChargedHadronsJet", nChargedHadronsJet);
+  Int_t nPhotonsJet[20];
+  tree->SetBranchAddress("nPhotonsJet", nPhotonsJet);
+  Int_t nNeutralHadronsJet[20];
+  tree->SetBranchAddress("nNeutralHadronsJet", nNeutralHadronsJet);
+  Float_t ptDJet[20];
+  tree->SetBranchAddress("ptDJet", ptDJet);
+
+  Float_t ptPartJet[20];
+  tree->SetBranchAddress("ptPartJet", ptPartJet);
+  Float_t etaPartJet[20];
+  tree->SetBranchAddress("etaPartJet", etaPartJet);
+  Float_t phiPartJet[20];
+  tree->SetBranchAddress("phiPartJet", phiPartJet);
+  Int_t pdgIdPartJet[20];
+  tree->SetBranchAddress("pdgIdPartJet", pdgIdPartJet);
+  Int_t pdgIdMomJet[20];
+  tree->SetBranchAddress("pdgIdMomJet", pdgIdMomJet);
+
+
+  Bool_t passed_HT250;
+  tree->SetBranchAddress("passed_HT250", &passed_HT250);
+  Bool_t passed_HT300;
+  tree->SetBranchAddress("passed_HT300", &passed_HT300);
+  Bool_t passed_HT350;
+  tree->SetBranchAddress("passed_HT350", &passed_HT350);
+  Bool_t passed_HT400;
+  tree->SetBranchAddress("passed_HT400", &passed_HT400);
+  Bool_t passed_HT450;
+  tree->SetBranchAddress("passed_HT450", &passed_HT450);
+  Bool_t passed_HT500;
+  tree->SetBranchAddress("passed_HT500", &passed_HT500);
+  Bool_t passed_HT550;
+  tree->SetBranchAddress("passed_HT550", &passed_HT550);
+  Bool_t passed_HT600;
+  tree->SetBranchAddress("passed_HT600", &passed_HT600);
+  Bool_t passed_HT650;
+  tree->SetBranchAddress("passed_HT650", &passed_HT650);
+  Bool_t passed_HT700;
+  tree->SetBranchAddress("passed_HT700", &passed_HT700);
+
+
+
+
+  PUWeight* fPUWeight = new PUWeight();
+
+  QGLikelihoodCalculator *qglikeli = new QGLikelihoodCalculator("/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
+
+
+
+
+  std::string outfileName;
+  if( DEBUG_ ) outfileName = "provaMultiJet_"+dataset;
+  else {
+   if(dataset!="") outfileName = "MultiJet_"+dataset;
+   else outfileName = "MultiJet";
+  }
+  if( MCassoc_ ) outfileName = outfileName + "_MCassoc";
+  outfileName += ".root";
+
+  TFile* outFile = new TFile(outfileName.c_str(), "RECREATE");
+  outFile->cd();
+
+
+
+
+  float ptJet0, ptJet1, ptJet2, ptJet3;
+  float etaJet0, etaJet1, etaJet2, etaJet3;
+  int pdgIdPartJet0, pdgIdPartJet1, pdgIdPartJet2, pdgIdPartJet3;
+  float QGLikelihoodJet0, QGLikelihoodJet1, QGLikelihoodJet2, QGLikelihoodJet3;
+
+
+  TTree* tree_passedEvents = new TTree("tree_passedEvents", "");
+  tree_passedEvents->Branch( "run", &run, "run/I" );
+  tree_passedEvents->Branch( "event", &event, "event/I" );
+  tree_passedEvents->Branch( "eventWeight", &eventWeight, "eventWeight/F" );
+
+  tree_passedEvents->Branch( "ptJet0", &ptJet0, "ptJet0/F" );
+  tree_passedEvents->Branch( "ptJet1", &ptJet1, "ptJet1/F" );
+  tree_passedEvents->Branch( "ptJet2", &ptJet2, "ptJet2/F" );
+  tree_passedEvents->Branch( "ptJet3", &ptJet3, "ptJet3/F" );
+
+  tree_passedEvents->Branch( "etaJet0", &etaJet0, "etaJet0/F" );
+  tree_passedEvents->Branch( "etaJet1", &etaJet1, "etaJet1/F" );
+  tree_passedEvents->Branch( "etaJet2", &etaJet2, "etaJet2/F" );
+  tree_passedEvents->Branch( "etaJet3", &etaJet3, "etaJet3/F" );
+
+  tree_passedEvents->Branch( "pdgIdPartJet0", &pdgIdPartJet0, "pdgIdPartJet0/I" );
+  tree_passedEvents->Branch( "pdgIdPartJet1", &pdgIdPartJet1, "pdgIdPartJet1/I" );
+  tree_passedEvents->Branch( "pdgIdPartJet2", &pdgIdPartJet2, "pdgIdPartJet2/I" );
+  tree_passedEvents->Branch( "pdgIdPartJet3", &pdgIdPartJet3, "pdgIdPartJet3/I" );
+
+  tree_passedEvents->Branch( "QGLikelihoodJet0", &QGLikelihoodJet0, "QGLikelihoodJet0/F" );
+  tree_passedEvents->Branch( "QGLikelihoodJet1", &QGLikelihoodJet1, "QGLikelihoodJet1/F" );
+  tree_passedEvents->Branch( "QGLikelihoodJet2", &QGLikelihoodJet2, "QGLikelihoodJet2/F" );
+  tree_passedEvents->Branch( "QGLikelihoodJet3", &QGLikelihoodJet3, "QGLikelihoodJet3/F" );
+
+
+
+  gROOT->cd();
+
+
+
+
+
+  float selectedCorrectPair = 0.;
+  float allPairs = 0.;
+
+  int nEntries = tree->GetEntries();
+//nEntries = 100000;
+
+  for(int iEntry=0; iEntry<nEntries; ++iEntry) {
+
+    if( (iEntry % 100000)==0 ) std::cout << "Entry: " << iEntry << " /" << nEntries << std::endl;
+
+    tree->GetEntry(iEntry);
+
+
+    //initialize tree branches:
+    ptJet0 = 0.;
+    etaJet0 = 10.;
+    pdgIdPartJet0 = -100;
+    QGLikelihoodJet0 = -1.;
+
+    ptJet1 = 0.;
+    etaJet1 = 10.;
+    pdgIdPartJet1 = -100;
+    QGLikelihoodJet1 = -1.;
+
+    ptJet2 = 0.;
+    etaJet2 = 10.;
+    pdgIdPartJet2 = -100;
+    QGLikelihoodJet2 = -1.;
+
+    ptJet3 = 0.;
+    etaJet3 = 10.;
+    pdgIdPartJet3 = -100;
+    QGLikelihoodJet3 = -1.;
+
+
+
+
+    if( eventWeight <= 0. ) eventWeight = 1.;
+
+    h1_nvertex->Fill( nvertex, eventWeight);
+
+    bool isMC = run<5;
+    if( isMC ) {
+
+      // PU reweighting:
+     eventWeight *= fPUWeight->GetWeight(nPU);
+    }
+
+    h1_nvertexPU->Fill( nvertex, eventWeight);
+
+
+    std::vector<AnalysisJet*> jets;
+
+    for( unsigned iJet=0; iJet<nJet; ++iJet ) {
+
+      AnalysisJet* thisJet = new AnalysisJet();
+    
+      thisJet->SetPtEtaPhiE( ptJet[iJet], etaJet[iJet], phiJet[iJet], ptJet[iJet]/ptRawJet[iJet]*eJet[iJet] );
+
+      if( thisJet->Pt()<20. ) continue;
+      if( fabs(thisJet->Eta())>2.4 ) continue;
+
+      thisJet->ptD = ptDJet[iJet];
+      thisJet->nTracksReco = nChargedHadronsJet[iJet];
+      thisJet->nNeutralHadronsReco = nNeutralHadronsJet[iJet];
+      thisJet->nPhotonsReco = nPhotonsJet[iJet];
+      thisJet->pdgIdPart = pdgIdPartJet[iJet];
+      thisJet->pdgIdMom = pdgIdMomJet[iJet];
+
+      thisJet->QGLikelihood = qglikeli->computeQGLikelihood( thisJet->Pt(), rhoPF, thisJet->nCharged(), thisJet->nNeutral(), thisJet->ptD );
+
+      jets.push_back(thisJet);
+
+    } //for i jets
+
+
+    if( jets.size()>0 ) {
+
+      ptJet0 = jets[0]->Pt();
+      etaJet0 = jets[0]->Eta();
+      pdgIdPartJet0 = jets[0]->pdgIdPart;
+      QGLikelihoodJet0 = jets[0]->QGLikelihood;
+
+      h1_ptJet0->Fill( jets[0]->Pt(), eventWeight );
+      h1_etaJet0->Fill( jets[0]->Eta(), eventWeight );
+      h1_pdgIdJet0->Fill( jets[0]->pdgIdPart, eventWeight );
+      h1_QGLikelihoodJet0->Fill( jets[0]->QGLikelihood, eventWeight );
+
+    }
+
+    if( jets.size()>1 ) {
+
+      ptJet1 = jets[1]->Pt();
+      etaJet1 = jets[1]->Eta();
+      pdgIdPartJet1 = jets[1]->pdgIdPart;
+      QGLikelihoodJet1 = jets[1]->QGLikelihood;
+
+      h1_ptJet1->Fill( jets[1]->Pt(), eventWeight );
+      h1_etaJet1->Fill( jets[1]->Eta(), eventWeight );
+      h1_pdgIdJet1->Fill( jets[1]->pdgIdPart, eventWeight );
+      h1_QGLikelihoodJet1->Fill( jets[1]->QGLikelihood, eventWeight );
+
+    }
+
+    if( jets.size()>2 ) {
+
+      ptJet2 = jets[2]->Pt();
+      etaJet2 = jets[2]->Eta();
+      pdgIdPartJet2 = jets[2]->pdgIdPart;
+      QGLikelihoodJet2 = jets[2]->QGLikelihood;
+
+      h1_ptJet2->Fill( jets[2]->Pt(), eventWeight );
+      h1_etaJet2->Fill( jets[2]->Eta(), eventWeight );
+      h1_pdgIdJet2->Fill( jets[2]->pdgIdPart, eventWeight );
+      h1_QGLikelihoodJet2->Fill( jets[2]->QGLikelihood, eventWeight );
+
+    }
+
+    if( jets.size()>3 ) {
+
+      ptJet3 = jets[3]->Pt();
+      etaJet3 = jets[3]->Eta();
+      pdgIdPartJet3 = jets[3]->pdgIdPart;
+      QGLikelihoodJet3 = jets[3]->QGLikelihood;
+
+      h1_ptJet3->Fill( jets[3]->Pt(), eventWeight );
+      h1_etaJet3->Fill( jets[3]->Eta(), eventWeight );
+      h1_pdgIdJet3->Fill( jets[3]->pdgIdPart, eventWeight );
+      h1_QGLikelihoodJet3->Fill( jets[3]->QGLikelihood, eventWeight );
+
+    }
+
+
+    // fill tree:
+    tree_passedEvents->Fill();
+
+  } //for entries
+
+
+  std::cout << std::endl << std::endl;
+  std::cout << "Finished loop." << std::endl;
+  
+
+  outFile->cd();
+
+  tree_passedEvents->Write();
+
+  h1_nvertex->Write();
+  h1_nvertexPU->Write();
+
+
+  h1_ptJet0->Write();
+  h1_etaJet0->Write();
+  h1_pdgIdJet0->Write();
+  h1_QGLikelihoodJet0->Write();
+
+  h1_ptJet1->Write();
+  h1_etaJet1->Write();
+  h1_pdgIdJet1->Write();
+  h1_QGLikelihoodJet1->Write();
+
+  h1_ptJet2->Write();
+  h1_etaJet2->Write();
+  h1_pdgIdJet2->Write();
+  h1_QGLikelihoodJet2->Write();
+
+  h1_ptJet3->Write();
+  h1_etaJet3->Write();
+  h1_pdgIdJet3->Write();
+  h1_QGLikelihoodJet3->Write();
+
+
+  outFile->Close();
+
+
+  delete tree;
+  tree = 0;
+
+  delete h1_nvertex;
+  delete h1_nvertexPU;
+
+  delete h1_ptJet0;
+  delete h1_etaJet0;
+  delete h1_pdgIdJet0;
+  delete h1_QGLikelihoodJet0;
+
+  delete h1_ptJet1;
+  delete h1_etaJet1;
+  delete h1_pdgIdJet1;
+  delete h1_QGLikelihoodJet1;
+
+  delete h1_ptJet2;
+  delete h1_etaJet2;
+  delete h1_pdgIdJet2;
+  delete h1_QGLikelihoodJet2;
+
+  delete h1_ptJet3;
+  delete h1_etaJet3;
+  delete h1_pdgIdJet3;
+  delete h1_QGLikelihoodJet3;
+
+
+  totalLumi = 0.;
+
+}
+
+
+void addInput( const std::string& dataset ) {
+
+
+  //FILE* iff = fopen(infileName.c_str(),"r");
+  //if(iff == 0) {
+    //std::cout << "cannot open input file '" << infileName << "' ... adding single file." << std::endl;
+    std::string infileName = "MultiJet_2ndLevelTreeW_" + dataset + "_pfakt5";
+    infileName += ".root";
+    TFile* infile = TFile::Open(infileName.c_str(), "read");
+    if( infile==0 ) {
+      std::cout << "Didn't find file '" << infileName << "'. Did you forget to finalize (i.e. the \"W\")?" << std::endl;
+      std::cout << "Exiting." << std::endl;
+      exit(77);
+    }
+    std::string treeName = infileName +"/jetTree";
+    tree->Add(treeName.c_str());
+    std::cout << "-> Added " << treeName << ". Tree has " << tree->GetEntries() << " entries." << std::endl;
+    infile->Close();
+
+  /*} else {
+
+    char singleLine[500];
+
+    while( fscanf(iff, "%s", singleLine) !=EOF ) {
+
+      std::string rootfilename(singleLine);
+      std::string treename = rootfilename + "/jetTree";
+      std::cout << "-> Added " << treename;
+      tree->Add(treename.c_str());
+      TFile* infile = TFile::Open(rootfilename.c_str(), "READ");
+      h1_lumi = (TH1F*)infile->Get("lumi");
+      if( h1_lumi!=0 ) {
+        totalLumi += h1_lumi->GetBinContent(1);
+        std::cout << "\tTotal lumi: " << totalLumi << " ub-1" << std::endl;
+      } else {
+        std::cout << " WARNING! File '" << infileName << "' has no lumi information. Skipping." << std::endl;
+      }
+      infile->Close();
+
+    }
+    fclose(iff);
+
+  } */
+
+} //addinput
+
