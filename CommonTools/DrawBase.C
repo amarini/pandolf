@@ -3069,8 +3069,8 @@ TPaveText* DrawBase::get_labelSqrt( int legendQuadrant ) const {
           cmsText = "CMS Preliminary";
       }
       std::string lumiText = this->get_lumiText();
-      label_sqrt->AddText(Form("%s %s at  #sqrt{s} = 7 TeV", cmsText.c_str(), lumiText.c_str()));
-    } else {
+      label_sqrt->AddText(Form("%s, L = %s  at  #sqrt{s} = 7 TeV", cmsText.c_str(), lumiText.c_str()));
+    } else { //if lumiOnRightSide
       label_sqrt->AddText("#sqrt{s} = 7 TeV");
     }
   }
@@ -3215,11 +3215,12 @@ TGraphErrors* DrawBase::get_graphRatio( TGraphErrors* gr_data, TGraphErrors* gr_
 }
 
 
-void DrawBase::add_label( const std::string& text, float xmin, float ymin, float xmax, float ymax ) {
+void DrawBase::add_label( const std::string& text, float xmin, float ymin, float xmax, float ymax, float textSize ) {
 
   additionalLabel_ = new TPaveText( xmin, ymin, xmax, ymax, "brNDC" );
-  additionalLabel_->SetTextSize(0.035);
+  additionalLabel_->SetTextSize(textSize);
   additionalLabel_->SetFillColor(0);
+  additionalLabel_->SetTextFont(42);
   additionalLabel_->AddText(text.c_str());
 
 }
