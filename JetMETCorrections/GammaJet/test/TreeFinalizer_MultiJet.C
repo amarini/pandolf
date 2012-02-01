@@ -68,6 +68,8 @@ void finalize(const std::string& dataset) {
 
   TH1D* h1_ht_akt5 = new TH1D("ht_akt5", "", 300, 200., 3200.);
   h1_ht_akt5->Sumw2();
+  TH1D* h1_ht_akt5_all = new TH1D("ht_akt5_all", "", 300, 200., 3200.);
+  h1_ht_akt5_all->Sumw2();
   TH1D* h1_htmet_akt5 = new TH1D("htmet_akt5", "", 300, 200., 3200.);
   h1_htmet_akt5->Sumw2();
   TH1D* h1_sumpt_pfakt5 = new TH1D("sumpt_pfakt5", "", 300, 200., 3200.);
@@ -151,6 +153,8 @@ void finalize(const std::string& dataset) {
   tree->SetBranchAddress("eMet", &eMet);
   Float_t ht_akt5;
   tree->SetBranchAddress("ht_akt5", &ht_akt5);
+  Float_t ht_akt5_all;
+  tree->SetBranchAddress("ht_akt5_all", &ht_akt5_all);
   Float_t epfMet;
   tree->SetBranchAddress("epfMet", &epfMet);
   Float_t phiMet;
@@ -189,6 +193,8 @@ void finalize(const std::string& dataset) {
   tree->SetBranchAddress("nNeutralHadronsJet", nNeutralHadronsJet);
   Float_t ptDJet[20];
   tree->SetBranchAddress("ptDJet", ptDJet);
+  Float_t QGLikelihoodJet[20];
+  tree->SetBranchAddress("QGLikelihoodJet", QGLikelihoodJet);
 
   Float_t ptPartJet[20];
   tree->SetBranchAddress("ptPartJet", ptPartJet);
@@ -231,14 +237,15 @@ void finalize(const std::string& dataset) {
   PUWeight* fPUWeight = new PUWeight(-1, "2011A", puType);
   std::string puFileName;
   //if( PUType_=="Run2011A_73pb" )
-    puFileName = "all2011A.pileup_v2.root";
+  //puFileName = "all2011A.pileup_v2.root";
+    puFileName = "PUTarget.Run2011B.175832-180252.root";
   std::cout << std::endl << "-> Using data pileup file: " << puFileName << std::endl;
   TFile* filePU = TFile::Open(puFileName.c_str());
   TH1F* h1_nPU_data = (TH1F*)filePU->Get("pileup");
   fPUWeight->SetDataHistogram(h1_nPU_data);
 
 
-  QGLikelihoodCalculator *qglikeli = new QGLikelihoodCalculator("/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
+  //QGLikelihoodCalculator *qglikeli = new QGLikelihoodCalculator("/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
 
 
 
@@ -364,7 +371,11 @@ void finalize(const std::string& dataset) {
 
     if( ht_akt5 > 3500. ) continue;
 
+
     if( !isMC && !passed_HT600 ) continue;
+
+    // avoid the trigger turn-on:
+    if( ht_akt5_all < 650. ) continue;
 
     if( nJet<4 ) continue;
     if( ptJet[3]<20. ) continue; //speed it up a little
@@ -382,6 +393,7 @@ void finalize(const std::string& dataset) {
     h1_nvertexPU->Fill( nvertex, eventWeight);
 
     h1_ht_akt5->Fill( ht_akt5, eventWeight );
+    h1_ht_akt5_all->Fill( ht_akt5_all, eventWeight );
     h1_htmet_akt5->Fill( ht_akt5 + eMet, eventWeight );
 
 
@@ -392,11 +404,14 @@ void finalize(const std::string& dataset) {
 
       if( ptJet[iJet]<20. ) continue;
       if( fabs(etaJet[iJet])>2. ) continue;
+      int nCandidates = nChargedHadronsJet[iJet] + nNeutralHadronsJet[iJet] + nPhotonsJet[iJet];
+      if( nChargedHadronsJet[iJet]==0 || nCandidates<2 ) continue;
 
       AnalysisJet* thisJet = new AnalysisJet();
     
       thisJet->SetPtEtaPhiE( ptJet[iJet], etaJet[iJet], phiJet[iJet], ptJet[iJet]/ptRawJet[iJet]*eJet[iJet] );
 
+      thisJet->QGLikelihood = QGLikelihoodJet[iJet];
       thisJet->ptD = ptDJet[iJet];
       thisJet->nTracksReco = nChargedHadronsJet[iJet];
       thisJet->nNeutralHadronsReco = nNeutralHadronsJet[iJet];
@@ -422,7 +437,7 @@ void finalize(const std::string& dataset) {
       ptJet0 = jets[0]->Pt();
       etaJet0 = jets[0]->Eta();
       pdgIdPartJet0 = jets[0]->pdgIdPart;
-      QGLikelihoodJet0 = qglikeli->computeQGLikelihoodPU( jets[0]->Pt(), rhoPF, jets[0]->nCharged(), jets[0]->nNeutral(), jets[0]->ptD, -1. );
+      QGLikelihoodJet0 = jets[0]->QGLikelihood;
       ptDJet0 = jets[0]->ptD;
       nChargedJet0 = jets[0]->nCharged();
       nNeutralJet0 = jets[0]->nNeutral();
@@ -442,7 +457,7 @@ void finalize(const std::string& dataset) {
       ptJet1 = jets[1]->Pt();
       etaJet1 = jets[1]->Eta();
       pdgIdPartJet1 = jets[1]->pdgIdPart;
-      QGLikelihoodJet1 = qglikeli->computeQGLikelihoodPU( jets[1]->Pt(), rhoPF, jets[1]->nCharged(), jets[1]->nNeutral(), jets[1]->ptD, -1. );
+      QGLikelihoodJet1 = jets[1]->QGLikelihood;
       ptDJet1 = jets[1]->ptD;
       nChargedJet1 = jets[1]->nCharged();
       nNeutralJet1 = jets[1]->nNeutral();
@@ -462,7 +477,7 @@ void finalize(const std::string& dataset) {
       ptJet2 = jets[2]->Pt();
       etaJet2 = jets[2]->Eta();
       pdgIdPartJet2 = jets[2]->pdgIdPart;
-      QGLikelihoodJet2 = qglikeli->computeQGLikelihoodPU( jets[2]->Pt(), rhoPF, jets[2]->nCharged(), jets[2]->nNeutral(), jets[2]->ptD, -1. );
+      QGLikelihoodJet2 = jets[2]->QGLikelihood;
       ptDJet2 = jets[2]->ptD;
       nChargedJet2 = jets[2]->nCharged();
       nNeutralJet2 = jets[2]->nNeutral();
@@ -482,7 +497,7 @@ void finalize(const std::string& dataset) {
       ptJet3 = jets[3]->Pt();
       etaJet3 = jets[3]->Eta();
       pdgIdPartJet3 = jets[3]->pdgIdPart;
-      QGLikelihoodJet3 = qglikeli->computeQGLikelihoodPU( jets[3]->Pt(), rhoPF, jets[3]->nCharged(), jets[3]->nNeutral(), jets[3]->ptD, -1. );
+      QGLikelihoodJet3 = jets[3]->QGLikelihood;
       ptDJet3 = jets[3]->ptD;
       nChargedJet3 = jets[3]->nCharged();
       nNeutralJet3 = jets[3]->nNeutral();
@@ -516,6 +531,7 @@ void finalize(const std::string& dataset) {
   h1_nvertexPU->Write();
 
   h1_ht_akt5->Write();
+  h1_ht_akt5_all->Write();
   h1_htmet_akt5->Write();
   h1_sumpt_pfakt5->Write();
 
