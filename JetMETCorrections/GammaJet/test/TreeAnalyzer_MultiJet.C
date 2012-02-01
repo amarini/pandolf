@@ -7,6 +7,7 @@
 #include "TRandom3.h"
 #include "TLorentzVector.h"
 
+#include "QGLikelihood/QGLikelihoodCalculator.h"
 
 
 
@@ -50,6 +51,7 @@ void TreeAnalyzer_MultiJet::CreateOutputFile() {
   jetTree_->Branch("phiJet", phiJet_, "phiJet_[nJet_]/F");
   jetTree_->Branch( "ptDJet",  ptDJet_,  "ptDJet_[nJet_]/F");
   jetTree_->Branch( "rmsCandJet",  rmsCandJet_,  "rmsCandJet_[nJet_]/F");
+  jetTree_->Branch( "QGLikelihoodJet",  QGLikelihoodJet_,  "QGLikelihoodJet_[nJet_]/F");
   jetTree_->Branch("trackCountingHighEffBJetTagsJet",  trackCountingHighEffBJetTagsJet_,  "trackCountingHighEffBJetTagsJet_[nJet_]/F");
   jetTree_->Branch("simpleSecondaryVertexHighEffBJetTagsJet",  simpleSecondaryVertexHighEffBJetTagsJet_,  "simpleSecondaryVertexHighEffBJetTagsJet_[nJet_]/F");
   jetTree_->Branch(  "eJetGen",   eJetGen_,   "eJetGen_[nJet_]/F");
@@ -85,6 +87,9 @@ void TreeAnalyzer_MultiJet::CreateOutputFile() {
   jetTree_->Branch("phiMet",&phiMet_,"phiMet_/F");
   jetTree_->Branch("etcMet",&etcMet_,"etcMet_/F");
   jetTree_->Branch("phitcMet",&phitcMet_,"phitcMet_/F");
+
+  jetTree_->Branch("ht_akt5",&ht_akt5_,"ht_akt5_/F");
+  jetTree_->Branch("ht_akt5_all",&ht_akt5_all_,"ht_akt5_all_/F");
 
   jetTree_->Branch("passed_HT250", &passed_HT250_, "passed_HT250_/O");
   jetTree_->Branch("passed_HT300", &passed_HT300_, "passed_HT300_/O");
@@ -129,6 +134,19 @@ void TreeAnalyzer_MultiJet::Loop()
 
    TRandom3 rand;
 
+
+   Int_t nJet_akt5;
+   fChain->SetBranchAddress( "nJet_akt5", &nJet_akt5 );
+   Float_t ptCorrJet_akt5[100];
+   fChain->SetBranchAddress( "ptJet_akt5 ", ptCorrJet_akt5 );
+   Float_t etaJet_akt5[100];
+   fChain->SetBranchAddress( "etaJet_akt5", etaJet_akt5 );
+
+
+
+   QGLikelihoodCalculator *qglikeli = new QGLikelihoodCalculator("/afs/cern.ch/user/p/pandolf/scratch1/CMSSW_4_2_3_patch5/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
+
+
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
      Long64_t ientry = LoadTree(jentry);
      if (ientry < 0) break;
@@ -168,6 +186,22 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      etcMet_ = etcMet;
      phitcMet_ = phitcMet;
 
+     
+     ht_akt5_ = 0.;
+     ht_akt5_all_ = 0.;
+
+     for(unsigned int iCaloJet=0; iCaloJet<nJet_akt5 && iCaloJet<100; ++iCaloJet) {
+
+       ht_akt5_all_ += ptCorrJet_akt5[iCaloJet];
+       if( ptCorrJet_akt5[iCaloJet] > 40. && fabs(etaJet_akt5[iCaloJet])<3. ) ht_akt5_ += ptCorrJet_akt5[iCaloJet];
+
+     }  // for calojets
+
+
+     // will rely on HT600 trigger on data, so preselect:
+     if( ht_akt5_all_ < 500. ) continue;
+
+     
 
 
      std::vector<AnalysisJet*> jets;
@@ -184,7 +218,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        thisJet.phiReco = phiJet[iRecoJet];
        thisJet.etaReco = etaJet[iRecoJet];
 
-       thisJet.SetPtEtaPhiE( thisJet.ptReco, thisJet.etaReco, thisJet.phiReco, thisJet.eReco );
+       thisJet.SetPtEtaPhiE( thisJet.ptCorrReco, thisJet.etaReco, thisJet.phiReco, thisJet.eReco*thisJet.ptCorrReco/thisJet.ptReco );
 
        if( thisJet.ptReco<20. ) continue;
 
@@ -252,9 +286,11 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      if( jets.size()<4 ) continue; //at least 4 jets
 
 
-     for( unsigned iJet=0; iJet<jets.size(); iJet++ ) {
+//   // will be relying mostly on HLT_HT600 trigger, so the following requirement is ~100% efficient:
+//   if( jets[0]->Pt() + jets[1]->Pt() + jets[2]->Pt() + jets[3]->Pt() < 375. ) continue; // preselection
 
-       ptJet_[iJet] = jets[iJet]->ptReco;
+
+     for( unsigned iJet=0; iJet<jets.size(); iJet++ ) {
 
        eJet_[iJet]  =  jets[iJet]->eReco;
        ptJet_[iJet]  =  jets[iJet]->ptCorrReco;
@@ -290,6 +326,12 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        etaPartJet_[iJet] = jets[iJet]->etaPart;
        pdgIdPartJet_[iJet] = jets[iJet]->pdgIdPart;
        pdgIdMomJet_[iJet] = jets[iJet]->pdgIdMom;
+
+       if( fabs(jets[iJet]->Eta())<2.4 ) 
+         QGLikelihoodJet_[iJet] = qglikeli->computeQGLikelihoodPU( jets[iJet]->Pt(), rhoPF, jets[iJet]->nCharged(), jets[iJet]->nNeutral(), jets[iJet]->ptD );
+       else
+         QGLikelihoodJet_[iJet] = 0.;
+
 
      }
 
