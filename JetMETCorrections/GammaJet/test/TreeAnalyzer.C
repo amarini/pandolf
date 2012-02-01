@@ -455,6 +455,8 @@ void TreeAnalyzer::Init(TTree *tree)
        fChain->SetBranchAddress(branchName.c_str(), rmsCandJet, &b_rmsCandJet);
        branchName = "trackCountingHighEffBJetTags";
        fChain->SetBranchAddress(branchName.c_str(), trackCountingHighEffBJetTags, &b_trackCountingHighEffBJetTags);
+       branchName = "simpleSecondaryVertexHighEffBJetTags";
+       fChain->SetBranchAddress(branchName.c_str(), simpleSecondaryVertexHighEffBJetTags, &b_simpleSecondaryVertexHighEffBJetTags);
      }
    }
    branchName = "nJetGen_"+jetAlgo_;
@@ -517,8 +519,10 @@ void TreeAnalyzer::Init(TTree *tree)
    fChain->SetBranchAddress("etcMet  ", &etcMet  , &b_etcMet);
    fChain->SetBranchAddress("phitcMet", &phitcMet, &b_phitcMet);
    fChain->SetBranchAddress("signiftcMet", &signiftcMet, &b_signiftcMet);
-   fChain->SetBranchAddress("spfMet  ", &spfMet  , &b_spfMet);
-   fChain->SetBranchAddress("epfMet  ", &epfMet  , &b_epfMet);
+   fChain->SetBranchAddress("spfMet", &spfMet  , &b_spfMet);
+   fChain->SetBranchAddress("epfMet", &epfMet  , &b_epfMet);
+   //fChain->SetBranchAddress("spfMet  ", &spfMet  , &b_spfMet);
+   //fChain->SetBranchAddress("epfMet  ", &epfMet  , &b_epfMet);
    fChain->SetBranchAddress("phipfMet", &phipfMet, &b_phipfMet);
    fChain->SetBranchAddress("signifpfMet", &signifpfMet, &b_signifpfMet);
    fChain->SetBranchAddress("sMetGen  ", &sMetGen  , &b_sMetGen);
