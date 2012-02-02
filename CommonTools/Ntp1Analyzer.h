@@ -520,29 +520,51 @@ public :
    Float_t         uncorrEnergyAK5PFPUcorrJet[300];   //[nAK5PFPUcorrJet]
    Float_t         ptDAK5PFPUcorrJet[300];   //[nAK5PFPUcorrJet]
    Float_t         rmsCandAK5PFPUcorrJet[300];   //[nAK5PFPUcorrJet]
- //Int_t           nAK5JPTJet;
- //Int_t           chargeAK5JPTJet[300];   //[nAK5JPTJet]
- //Float_t         energyAK5JPTJet[300];   //[nAK5JPTJet]
- //Float_t         thetaAK5JPTJet[300];   //[nAK5JPTJet]
- //Float_t         etaAK5JPTJet[300];   //[nAK5JPTJet]
- //Float_t         phiAK5JPTJet[300];   //[nAK5JPTJet]
- //Float_t         pxAK5JPTJet[300];   //[nAK5JPTJet]
- //Float_t         pyAK5JPTJet[300];   //[nAK5JPTJet]
- //Float_t         pzAK5JPTJet[300];   //[nAK5JPTJet]
- //Float_t         vertexXAK5JPTJet[300];   //[nAK5JPTJet]
- //Float_t         vertexYAK5JPTJet[300];   //[nAK5JPTJet]
- //Float_t         vertexZAK5JPTJet[300];   //[nAK5JPTJet]
- //Float_t         emFracAK5JPTJet[300];   //[nAK5JPTJet]
- //Float_t         hadFracAK5JPTJet[300];   //[nAK5JPTJet]
- //Float_t         combinedSecondaryVertexBJetTagsAK5JPTJet[300];   //[nAK5JPTJet]
- //Float_t         combinedSecondaryVertexMVABJetTagsAK5JPTJet[300];   //[nAK5JPTJet]
- //Float_t         jetBProbabilityBJetTagsAK5JPTJet[300];   //[nAK5JPTJet]
- //Float_t         jetProbabilityBJetTagsAK5JPTJet[300];   //[nAK5JPTJet]
- //Float_t         simpleSecondaryVertexBJetTagsAK5JPTJet[300];   //[nAK5JPTJet]
- //Float_t         softMuonBJetTagsAK5JPTJet[300];   //[nAK5JPTJet]
- //Float_t         trackCountingHighPurBJetTagsAK5JPTJet[300];   //[nAK5JPTJet]
- //Float_t         trackCountingHighEffBJetTagsAK5JPTJet[300];   //[nAK5JPTJet]
- //Float_t         uncorrEnergyAK5JPTJet[300];   //[nAK5JPTJet]
+   Int_t           nAK5PFNoPUJet;
+   Int_t           chargeAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         energyAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         thetaAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         etaAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         phiAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         pxAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         pyAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         pzAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         vertexXAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         vertexYAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         vertexZAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         chargedHadronEnergyAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         neutralHadronEnergyAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         photonEnergyAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         electronEnergyAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         muonEnergyAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         HFHadronEnergyAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         HFEMEnergyAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Int_t           chargedHadronMultiplicityAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Int_t           neutralHadronMultiplicityAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Int_t           photonMultiplicityAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Int_t           electronMultiplicityAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Int_t           muonMultiplicityAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Int_t           HFHadronMultiplicityAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Int_t           HFEMMultiplicityAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         chargedEmEnergyAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         neutralEmEnergyAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         combinedSecondaryVertexBJetTagsAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         combinedSecondaryVertexMVABJetTagsAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         jetBProbabilityBJetTagsAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         jetProbabilityBJetTagsAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         simpleSecondaryVertexHighEffBJetTagsAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         simpleSecondaryVertexHighPurBJetTagsAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         softMuonBJetTagsAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         softMuonByIP3dBJetTagsAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         softMuonByPtBJetTagsAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         softElectronBJetTagsAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         softElectronByIP3dBJetTagsAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         softElectronByPtBJetTagsAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         trackCountingHighPurBJetTagsAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         trackCountingHighEffBJetTagsAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         uncorrEnergyAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         ptDAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
+   Float_t         rmsCandAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
    Int_t           nAK5GenJet;
    Int_t           chargeAK5GenJet[300];   //[nAK5GenJet]
    Float_t         energyAK5GenJet[300];   //[nAK5GenJet]
@@ -1140,29 +1162,51 @@ public :
    TBranch        *b_uncorrEnergyAK5PFPUcorrJet;   //!
    TBranch        *b_ptDAK5PFPUcorrJet;   //!
    TBranch        *b_rmsCandAK5PFPUcorrJet;   //!
- //TBranch        *b_nAK5JPTJet;   //!
- //TBranch        *b_chargeAK5JPTJet;   //!
- //TBranch        *b_energyAK5JPTJet;   //!
- //TBranch        *b_thetaAK5JPTJet;   //!
- //TBranch        *b_etaAK5JPTJet;   //!
- //TBranch        *b_phiAK5JPTJet;   //!
- //TBranch        *b_pxAK5JPTJet;   //!
- //TBranch        *b_pyAK5JPTJet;   //!
- //TBranch        *b_pzAK5JPTJet;   //!
- //TBranch        *b_vertexXAK5JPTJet;   //!
- //TBranch        *b_vertexYAK5JPTJet;   //!
- //TBranch        *b_vertexZAK5JPTJet;   //!
- //TBranch        *b_emFracAK5JPTJet;   //!
- //TBranch        *b_hadFracAK5JPTJet;   //!
- //TBranch        *b_combinedSecondaryVertexBJetTagsAK5JPTJet;   //!
- //TBranch        *b_combinedSecondaryVertexMVABJetTagsAK5JPTJet;   //!
- //TBranch        *b_jetBProbabilityBJetTagsAK5JPTJet;   //!
- //TBranch        *b_jetProbabilityBJetTagsAK5JPTJet;   //!
- //TBranch        *b_simpleSecondaryVertexBJetTagsAK5JPTJet;   //!
- //TBranch        *b_softMuonBJetTagsAK5JPTJet;   //!
- //TBranch        *b_trackCountingHighPurBJetTagsAK5JPTJet;   //!
- //TBranch        *b_trackCountingHighEffBJetTagsAK5JPTJet;   //!
- //TBranch        *b_uncorrEnergyAK5JPTJet;   //!
+   TBranch        *b_nAK5PFNoPUJet;   //!
+   TBranch        *b_chargeAK5PFNoPUJet;   //!
+   TBranch        *b_energyAK5PFNoPUJet;   //!
+   TBranch        *b_thetaAK5PFNoPUJet;   //!
+   TBranch        *b_etaAK5PFNoPUJet;   //!
+   TBranch        *b_phiAK5PFNoPUJet;   //!
+   TBranch        *b_pxAK5PFNoPUJet;   //!
+   TBranch        *b_pyAK5PFNoPUJet;   //!
+   TBranch        *b_pzAK5PFNoPUJet;   //!
+   TBranch        *b_vertexXAK5PFNoPUJet;   //!
+   TBranch        *b_vertexYAK5PFNoPUJet;   //!
+   TBranch        *b_vertexZAK5PFNoPUJet;   //!
+   TBranch        *b_chargedHadronEnergyAK5PFNoPUJet;   //!
+   TBranch        *b_neutralHadronEnergyAK5PFNoPUJet;   //!
+   TBranch        *b_photonEnergyAK5PFNoPUJet;   //!
+   TBranch        *b_electronEnergyAK5PFNoPUJet;   //!
+   TBranch        *b_muonEnergyAK5PFNoPUJet;   //!
+   TBranch        *b_HFHadronEnergyAK5PFNoPUJet;   //!
+   TBranch        *b_HFEMEnergyAK5PFNoPUJet;   //!
+   TBranch        *b_chargedHadronMultiplicityAK5PFNoPUJet;   //!
+   TBranch        *b_neutralHadronMultiplicityAK5PFNoPUJet;   //!
+   TBranch        *b_photonMultiplicityAK5PFNoPUJet;   //!
+   TBranch        *b_electronMultiplicityAK5PFNoPUJet;   //!
+   TBranch        *b_muonMultiplicityAK5PFNoPUJet;   //!
+   TBranch        *b_HFHadronMultiplicityAK5PFNoPUJet;   //!
+   TBranch        *b_HFEMMultiplicityAK5PFNoPUJet;   //!
+   TBranch        *b_chargedEmEnergyAK5PFNoPUJet;   //!
+   TBranch        *b_neutralEmEnergyAK5PFNoPUJet;   //!
+   TBranch        *b_combinedSecondaryVertexBJetTagsAK5PFNoPUJet;   //!
+   TBranch        *b_combinedSecondaryVertexMVABJetTagsAK5PFNoPUJet;   //!
+   TBranch        *b_jetBProbabilityBJetTagsAK5PFNoPUJet;   //!
+   TBranch        *b_jetProbabilityBJetTagsAK5PFNoPUJet;   //!
+   TBranch        *b_simpleSecondaryVertexHighEffBJetTagsAK5PFNoPUJet;   //!
+   TBranch        *b_simpleSecondaryVertexHighPurBJetTagsAK5PFNoPUJet;   //!
+   TBranch        *b_softMuonBJetTagsAK5PFNoPUJet;   //!
+   TBranch        *b_softMuonByIP3dBJetTagsAK5PFNoPUJet;   //!
+   TBranch        *b_softMuonByPtBJetTagsAK5PFNoPUJet;   //!
+   TBranch        *b_softElectronBJetTagsAK5PFNoPUJet;   //!
+   TBranch        *b_softElectronByIP3dBJetTagsAK5PFNoPUJet;   //!
+   TBranch        *b_softElectronByPtBJetTagsAK5PFNoPUJet;   //!
+   TBranch        *b_trackCountingHighPurBJetTagsAK5PFNoPUJet;   //!
+   TBranch        *b_trackCountingHighEffBJetTagsAK5PFNoPUJet;   //!
+   TBranch        *b_uncorrEnergyAK5PFNoPUJet;   //!
+   TBranch        *b_ptDAK5PFNoPUJet;   //!
+   TBranch        *b_rmsCandAK5PFNoPUJet;   //!
    TBranch        *b_nAK5GenJet;   //!
    TBranch        *b_chargeAK5GenJet;   //!
    TBranch        *b_energyAK5GenJet;   //!
