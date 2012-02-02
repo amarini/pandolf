@@ -78,13 +78,6 @@ void Ntp1Analyzer::LoadInput() {
 
    sprintf(treePath, "%s/default_*.root/ntp1", treeDir.c_str());
 
-   if( dataset_=="HZZ_qqll_gluonfusion_M300_CANDS") {
-     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/HZZ_qqll_gluonfusion_M300/default_CANDS_1000ev.root");
-   } else if( dataset_=="HZZ_qqll_gluonfusion_M400_CANDS") {
-     sprintf(treePath, "/cmsrm/pc21_2/pandolf/MC/HZZ_qqll_gluonfusion_M400/default_CANDS_1000ev.root");
-   } 
-
-
    int addInt = chain->Add(treePath);
 
    if( addInt==0 ) {
@@ -442,7 +435,7 @@ void Ntp1Analyzer::Init(TTree *tree)
 
    fChain->SetBranchAddress("runNumber", &runNumber, &b_runNumber);
    fChain->GetEntry(0);
-   isMC_ = (runNumber < 10);
+   isMC_ = (runNumber < 160000);
 
    h1_nCounter_->SetBinContent( 1, fChain->GetEntries() );
 
@@ -929,6 +922,51 @@ void Ntp1Analyzer::Init(TTree *tree)
    fChain->SetBranchAddress("uncorrEnergyAK5PFPUcorrJet", uncorrEnergyAK5PFPUcorrJet, &b_uncorrEnergyAK5PFPUcorrJet);
    fChain->SetBranchAddress("ptDAK5PFPUcorrJet", ptDAK5PFPUcorrJet, &b_ptDAK5PFPUcorrJet);
    fChain->SetBranchAddress("rmsCandAK5PFPUcorrJet", rmsCandAK5PFPUcorrJet, &b_rmsCandAK5PFPUcorrJet);
+   fChain->SetBranchAddress("nAK5PFNoPUJet", &nAK5PFNoPUJet, &b_nAK5PFNoPUJet);
+   fChain->SetBranchAddress("chargeAK5PFNoPUJet", chargeAK5PFNoPUJet, &b_chargeAK5PFNoPUJet);
+   fChain->SetBranchAddress("energyAK5PFNoPUJet", energyAK5PFNoPUJet, &b_energyAK5PFNoPUJet);
+   fChain->SetBranchAddress("thetaAK5PFNoPUJet", thetaAK5PFNoPUJet, &b_thetaAK5PFNoPUJet);
+   fChain->SetBranchAddress("etaAK5PFNoPUJet", etaAK5PFNoPUJet, &b_etaAK5PFNoPUJet);
+   fChain->SetBranchAddress("phiAK5PFNoPUJet", phiAK5PFNoPUJet, &b_phiAK5PFNoPUJet);
+   fChain->SetBranchAddress("pxAK5PFNoPUJet", pxAK5PFNoPUJet, &b_pxAK5PFNoPUJet);
+   fChain->SetBranchAddress("pyAK5PFNoPUJet", pyAK5PFNoPUJet, &b_pyAK5PFNoPUJet);
+   fChain->SetBranchAddress("pzAK5PFNoPUJet", pzAK5PFNoPUJet, &b_pzAK5PFNoPUJet);
+   fChain->SetBranchAddress("vertexXAK5PFNoPUJet", vertexXAK5PFNoPUJet, &b_vertexXAK5PFNoPUJet);
+   fChain->SetBranchAddress("vertexYAK5PFNoPUJet", vertexYAK5PFNoPUJet, &b_vertexYAK5PFNoPUJet);
+   fChain->SetBranchAddress("vertexZAK5PFNoPUJet", vertexZAK5PFNoPUJet, &b_vertexZAK5PFNoPUJet);
+   fChain->SetBranchAddress("chargedHadronEnergyAK5PFNoPUJet", chargedHadronEnergyAK5PFNoPUJet, &b_chargedHadronEnergyAK5PFNoPUJet);
+   fChain->SetBranchAddress("neutralHadronEnergyAK5PFNoPUJet", neutralHadronEnergyAK5PFNoPUJet, &b_neutralHadronEnergyAK5PFNoPUJet);
+   fChain->SetBranchAddress("photonEnergyAK5PFNoPUJet", photonEnergyAK5PFNoPUJet, &b_photonEnergyAK5PFNoPUJet);
+   fChain->SetBranchAddress("electronEnergyAK5PFNoPUJet", electronEnergyAK5PFNoPUJet, &b_electronEnergyAK5PFNoPUJet);
+   fChain->SetBranchAddress("muonEnergyAK5PFNoPUJet", muonEnergyAK5PFNoPUJet, &b_muonEnergyAK5PFNoPUJet);
+   fChain->SetBranchAddress("HFHadronEnergyAK5PFNoPUJet", HFHadronEnergyAK5PFNoPUJet, &b_HFHadronEnergyAK5PFNoPUJet);
+   fChain->SetBranchAddress("HFEMEnergyAK5PFNoPUJet", HFEMEnergyAK5PFNoPUJet, &b_HFEMEnergyAK5PFNoPUJet);
+   fChain->SetBranchAddress("chargedHadronMultiplicityAK5PFNoPUJet", chargedHadronMultiplicityAK5PFNoPUJet, &b_chargedHadronMultiplicityAK5PFNoPUJet);
+   fChain->SetBranchAddress("neutralHadronMultiplicityAK5PFNoPUJet", neutralHadronMultiplicityAK5PFNoPUJet, &b_neutralHadronMultiplicityAK5PFNoPUJet);
+   fChain->SetBranchAddress("photonMultiplicityAK5PFNoPUJet", photonMultiplicityAK5PFNoPUJet, &b_photonMultiplicityAK5PFNoPUJet);
+   fChain->SetBranchAddress("electronMultiplicityAK5PFNoPUJet", electronMultiplicityAK5PFNoPUJet, &b_electronMultiplicityAK5PFNoPUJet);
+   fChain->SetBranchAddress("muonMultiplicityAK5PFNoPUJet", muonMultiplicityAK5PFNoPUJet, &b_muonMultiplicityAK5PFNoPUJet);
+   fChain->SetBranchAddress("HFHadronMultiplicityAK5PFNoPUJet", HFHadronMultiplicityAK5PFNoPUJet, &b_HFHadronMultiplicityAK5PFNoPUJet);
+   fChain->SetBranchAddress("HFEMMultiplicityAK5PFNoPUJet", HFEMMultiplicityAK5PFNoPUJet, &b_HFEMMultiplicityAK5PFNoPUJet);
+   fChain->SetBranchAddress("chargedEmEnergyAK5PFNoPUJet", chargedEmEnergyAK5PFNoPUJet, &b_chargedEmEnergyAK5PFNoPUJet);
+   fChain->SetBranchAddress("neutralEmEnergyAK5PFNoPUJet", neutralEmEnergyAK5PFNoPUJet, &b_neutralEmEnergyAK5PFNoPUJet);
+   fChain->SetBranchAddress("combinedSecondaryVertexBJetTagsAK5PFNoPUJet", combinedSecondaryVertexBJetTagsAK5PFNoPUJet, &b_combinedSecondaryVertexBJetTagsAK5PFNoPUJet);
+   fChain->SetBranchAddress("combinedSecondaryVertexMVABJetTagsAK5PFNoPUJet", combinedSecondaryVertexMVABJetTagsAK5PFNoPUJet, &b_combinedSecondaryVertexMVABJetTagsAK5PFNoPUJet);
+   fChain->SetBranchAddress("jetBProbabilityBJetTagsAK5PFNoPUJet", jetBProbabilityBJetTagsAK5PFNoPUJet, &b_jetBProbabilityBJetTagsAK5PFNoPUJet);
+   fChain->SetBranchAddress("jetProbabilityBJetTagsAK5PFNoPUJet", jetProbabilityBJetTagsAK5PFNoPUJet, &b_jetProbabilityBJetTagsAK5PFNoPUJet);
+   fChain->SetBranchAddress("simpleSecondaryVertexHighEffBJetTagsAK5PFNoPUJet", simpleSecondaryVertexHighEffBJetTagsAK5PFNoPUJet, &b_simpleSecondaryVertexHighEffBJetTagsAK5PFNoPUJet);
+   fChain->SetBranchAddress("simpleSecondaryVertexHighPurBJetTagsAK5PFNoPUJet", simpleSecondaryVertexHighPurBJetTagsAK5PFNoPUJet, &b_simpleSecondaryVertexHighPurBJetTagsAK5PFNoPUJet);
+   fChain->SetBranchAddress("softMuonBJetTagsAK5PFNoPUJet", softMuonBJetTagsAK5PFNoPUJet, &b_softMuonBJetTagsAK5PFNoPUJet);
+   fChain->SetBranchAddress("softMuonByIP3dBJetTagsAK5PFNoPUJet", softMuonByIP3dBJetTagsAK5PFNoPUJet, &b_softMuonByIP3dBJetTagsAK5PFNoPUJet);
+   fChain->SetBranchAddress("softMuonByPtBJetTagsAK5PFNoPUJet", softMuonByPtBJetTagsAK5PFNoPUJet, &b_softMuonByPtBJetTagsAK5PFNoPUJet);
+   fChain->SetBranchAddress("softElectronBJetTagsAK5PFNoPUJet", softElectronBJetTagsAK5PFNoPUJet, &b_softElectronBJetTagsAK5PFNoPUJet);
+   fChain->SetBranchAddress("softElectronByIP3dBJetTagsAK5PFNoPUJet", softElectronByIP3dBJetTagsAK5PFNoPUJet, &b_softElectronByIP3dBJetTagsAK5PFNoPUJet);
+   fChain->SetBranchAddress("softElectronByPtBJetTagsAK5PFNoPUJet", softElectronByPtBJetTagsAK5PFNoPUJet, &b_softElectronByPtBJetTagsAK5PFNoPUJet);
+   fChain->SetBranchAddress("trackCountingHighPurBJetTagsAK5PFNoPUJet", trackCountingHighPurBJetTagsAK5PFNoPUJet, &b_trackCountingHighPurBJetTagsAK5PFNoPUJet);
+   fChain->SetBranchAddress("trackCountingHighEffBJetTagsAK5PFNoPUJet", trackCountingHighEffBJetTagsAK5PFNoPUJet, &b_trackCountingHighEffBJetTagsAK5PFNoPUJet);
+   fChain->SetBranchAddress("uncorrEnergyAK5PFNoPUJet", uncorrEnergyAK5PFNoPUJet, &b_uncorrEnergyAK5PFNoPUJet);
+   fChain->SetBranchAddress("ptDAK5PFNoPUJet", ptDAK5PFNoPUJet, &b_ptDAK5PFNoPUJet);
+   fChain->SetBranchAddress("rmsCandAK5PFNoPUJet", rmsCandAK5PFNoPUJet, &b_rmsCandAK5PFNoPUJet);
    if( isMC_ ) {
      fChain->SetBranchAddress("nAK5GenJet", &nAK5GenJet, &b_nAK5GenJet);
      fChain->SetBranchAddress("chargeAK5GenJet", chargeAK5GenJet, &b_chargeAK5GenJet);
