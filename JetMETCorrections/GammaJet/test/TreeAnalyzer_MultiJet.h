@@ -111,7 +111,6 @@ class TreeAnalyzer_MultiJet : public TreeAnalyzer {
    Float_t phitcMet_;
 
    Float_t ht_akt5_;
-   Float_t ht_akt5_all_;
 
    Bool_t passed_HT250_;
    Bool_t passed_HT300_;
