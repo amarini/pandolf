@@ -89,7 +89,6 @@ void TreeAnalyzer_MultiJet::CreateOutputFile() {
   jetTree_->Branch("phitcMet",&phitcMet_,"phitcMet_/F");
 
   jetTree_->Branch("ht_akt5",&ht_akt5_,"ht_akt5_/F");
-  jetTree_->Branch("ht_akt5_all",&ht_akt5_all_,"ht_akt5_all_/F");
 
   jetTree_->Branch("passed_HT250", &passed_HT250_, "passed_HT250_/O");
   jetTree_->Branch("passed_HT300", &passed_HT300_, "passed_HT300_/O");
@@ -138,7 +137,7 @@ void TreeAnalyzer_MultiJet::Loop()
    Int_t nJet_akt5;
    fChain->SetBranchAddress( "nJet_akt5", &nJet_akt5 );
    Float_t ptCorrJet_akt5[100];
-   fChain->SetBranchAddress( "ptJet_akt5 ", ptCorrJet_akt5 );
+   fChain->SetBranchAddress( "ptCorrJet_akt5 ", ptCorrJet_akt5 );
    Float_t etaJet_akt5[100];
    fChain->SetBranchAddress( "etaJet_akt5", etaJet_akt5 );
 
@@ -188,18 +187,16 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
      
      ht_akt5_ = 0.;
-     ht_akt5_all_ = 0.;
 
      for(unsigned int iCaloJet=0; iCaloJet<nJet_akt5 && iCaloJet<100; ++iCaloJet) {
 
-       ht_akt5_all_ += ptCorrJet_akt5[iCaloJet];
        if( ptCorrJet_akt5[iCaloJet] > 40. && fabs(etaJet_akt5[iCaloJet])<3. ) ht_akt5_ += ptCorrJet_akt5[iCaloJet];
 
      }  // for calojets
 
 
      // will rely on HT600 trigger on data, so preselect:
-     if( ht_akt5_all_ < 500. ) continue;
+     if( ht_akt5_ < 500. ) continue;
 
      
 
