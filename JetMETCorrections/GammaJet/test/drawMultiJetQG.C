@@ -129,11 +129,10 @@ int main(int argc, char* argv[]) {
   db->drawHisto( "nNeutralJet2", "Third  Jet Neutral Multiplicity", "", "Events", log);
   db->drawHisto( "nNeutralJet3", "Fourth Jet Neutral Multiplicity", "", "Events", log);
 
-  db->drawHisto( "QGLikelihoodJet0", "First  Jet Q-G Likelihood", "", "Events");
   drawHistoWithQuarkGluonComponents( db, "tree_passedEvents", "QGLikelihoodJet0", "First  Jet Q-G Likelihood", "", "Events");
-  db->drawHisto( "QGLikelihoodJet1", "Second Jet Q-G Likelihood", "", "Events");
-  db->drawHisto( "QGLikelihoodJet2", "Third  Jet Q-G Likelihood", "", "Events");
-  db->drawHisto( "QGLikelihoodJet3", "Fourth Jet Q-G Likelihood", "", "Events");
+  drawHistoWithQuarkGluonComponents( db, "tree_passedEvents", "QGLikelihoodJet1", "Second  Jet Q-G Likelihood", "", "Events");
+  drawHistoWithQuarkGluonComponents( db, "tree_passedEvents", "QGLikelihoodJet2", "Third  Jet Q-G Likelihood", "", "Events");
+  drawHistoWithQuarkGluonComponents( db, "tree_passedEvents", "QGLikelihoodJet3", "Fourth  Jet Q-G Likelihood", "", "Events");
 
 
 
@@ -233,8 +232,16 @@ void drawHistoWithQuarkGluonComponents( DrawBase* db, const std::string& treeNam
 
   gPad->RedrawAxis();
 
-  c1->SaveAs("prova.eps");
+  std::string canvasName = db->get_outputdir() + "/" + varName + "_components.eps";
+
+  c1->SaveAs(canvasName.c_str());
   
+  delete c1;
+  delete h2_axes;
+
+  delete h1_all;
+  delete h1_quark;
+  delete h1_gluon;
   
 }
 
