@@ -66,10 +66,13 @@ void finalize(const std::string& dataset) {
   TH1F* h1_nvertexPU = new TH1F("nvertexPU", "", 26, -0.5, 25.5);
   h1_nvertexPU->Sumw2();
 
+  TH1F* h1_rhoPF = new TH1F("rhoPF", "", 100, 0., 25. );
+  h1_rhoPF->Sumw2();
+  TH1F* h1_rhoPFPU = new TH1F("rhoPFPU", "", 100, 0., 25.);
+  h1_rhoPFPU->Sumw2();
+
   TH1D* h1_ht_akt5 = new TH1D("ht_akt5", "", 300, 200., 3200.);
   h1_ht_akt5->Sumw2();
-  TH1D* h1_ht_akt5_all = new TH1D("ht_akt5_all", "", 300, 200., 3200.);
-  h1_ht_akt5_all->Sumw2();
   TH1D* h1_htmet_akt5 = new TH1D("htmet_akt5", "", 300, 200., 3200.);
   h1_htmet_akt5->Sumw2();
   TH1D* h1_sumpt_pfakt5 = new TH1D("sumpt_pfakt5", "", 300, 200., 3200.);
@@ -153,8 +156,6 @@ void finalize(const std::string& dataset) {
   tree->SetBranchAddress("eMet", &eMet);
   Float_t ht_akt5;
   tree->SetBranchAddress("ht_akt5", &ht_akt5);
-  Float_t ht_akt5_all;
-  tree->SetBranchAddress("ht_akt5_all", &ht_akt5_all);
   Float_t epfMet;
   tree->SetBranchAddress("epfMet", &epfMet);
   Float_t phiMet;
@@ -238,7 +239,8 @@ void finalize(const std::string& dataset) {
   std::string puFileName;
   //if( PUType_=="Run2011A_73pb" )
   //puFileName = "all2011A.pileup_v2.root";
-    puFileName = "PUTarget.Run2011B.175832-180252.root";
+  //puFileName = "PUTarget.Run2011B.175832-180252.root";
+    puFileName = "PileUpTarget_runs_173236_178380.root";
   std::cout << std::endl << "-> Using data pileup file: " << puFileName << std::endl;
   TFile* filePU = TFile::Open(puFileName.c_str());
   TH1F* h1_nPU_data = (TH1F*)filePU->Get("pileup");
@@ -278,6 +280,7 @@ void finalize(const std::string& dataset) {
   tree_passedEvents->Branch( "run", &run, "run/I" );
   tree_passedEvents->Branch( "event", &event, "event/I" );
   tree_passedEvents->Branch( "eventWeight", &eventWeight, "eventWeight/F" );
+  tree_passedEvents->Branch( "ht_akt5", &ht_akt5, "ht_akt5/F" );
 
   tree_passedEvents->Branch( "ptJet0", &ptJet0, "ptJet0/F" );
   tree_passedEvents->Branch( "ptJet1", &ptJet1, "ptJet1/F" );
@@ -372,10 +375,14 @@ void finalize(const std::string& dataset) {
     if( ht_akt5 > 3500. ) continue;
 
 
-    if( !isMC && !passed_HT600 ) continue;
+    if( !isMC ) {
+      if( !passed_HT600 ) continue; //trigger on data
+      if( run<173236 || run>178380 ) continue; //run range in which HT600 was unprescaled: corresponds to 1894.3 pb-1
+    }
 
-    // avoid the trigger turn-on:
-    if( ht_akt5_all < 650. ) continue;
+    // avoid trigger turn-on:
+    if( ht_akt5 < 650. ) continue;
+
 
     if( nJet<4 ) continue;
     if( ptJet[3]<20. ) continue; //speed it up a little
@@ -384,6 +391,7 @@ void finalize(const std::string& dataset) {
     if( eventWeight <= 0. ) eventWeight = 1.;
 
     h1_nvertex->Fill( nvertex, eventWeight);
+    h1_rhoPF->Fill( rhoPF, eventWeight);
 
     if( isMC ) {
       // PU reweighting:
@@ -391,9 +399,9 @@ void finalize(const std::string& dataset) {
     }
 
     h1_nvertexPU->Fill( nvertex, eventWeight);
+    h1_rhoPFPU->Fill( rhoPF, eventWeight);
 
     h1_ht_akt5->Fill( ht_akt5, eventWeight );
-    h1_ht_akt5_all->Fill( ht_akt5_all, eventWeight );
     h1_htmet_akt5->Fill( ht_akt5 + eMet, eventWeight );
 
 
@@ -529,9 +537,10 @@ void finalize(const std::string& dataset) {
 
   h1_nvertex->Write();
   h1_nvertexPU->Write();
+  h1_rhoPF->Write();
+  h1_rhoPFPU->Write();
 
   h1_ht_akt5->Write();
-  h1_ht_akt5_all->Write();
   h1_htmet_akt5->Write();
   h1_sumpt_pfakt5->Write();
 
@@ -576,6 +585,8 @@ void finalize(const std::string& dataset) {
 
   delete h1_nvertex;
   delete h1_nvertexPU;
+  delete h1_rhoPF;
+  delete h1_rhoPFPU;
 
   delete h1_ptJet0;
   delete h1_etaJet0;
