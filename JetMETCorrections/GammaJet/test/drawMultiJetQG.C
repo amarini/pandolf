@@ -90,12 +90,16 @@ int main(int argc, char* argv[]) {
   db->set_outputdir();
 
 
+  db->set_lumiOnRightSide();
+
+
   bool log = true;
 
   db->drawHisto( "nvertex", "Number of Reconstructed Vertexes", "", "Events", log);
   db->drawHisto( "nvertexPU", "Number of Reconstructed Vertexes", "", "Events", log);
 
-  //db->drawHisto( "rhoPF", "Particle Flow Energy Density", "GeV", "Events", log);
+  db->drawHisto( "rhoPF", "Particle Flow Energy Density", "GeV", "Events", log);
+  db->drawHisto( "rhoPFPU", "Particle Flow Energy Density", "GeV", "Events", log);
 
   db->set_xAxisRange( 650., 1300. );
   db->drawHisto( "ht_akt5", "CaloJet H_{T}", "GeV", "Events", log);
@@ -143,35 +147,95 @@ int main(int argc, char* argv[]) {
 
 
 void drawHistoWithQuarkGluonComponents( DrawBase* db, const std::string& treeName, const std::string& varName, const std::string& axisName, const std::string& units, const std::string& instanceName, bool log ) {
-std::cout << "-1" << std::endl;
 
   db->drawHisto( varName, axisName, units, instanceName, log );
-std::cout << "0" << std::endl;
 
+
+  TH1D* h1_data = db->get_lastHistos_data()[0];
   std::vector<TH1D*> lastHistos = db->get_lastHistos_mc();
 
-std::cout << "1" << std::endl;
   int nBins = lastHistos[0]->GetNbinsX();
   float xMin = lastHistos[0]->GetXaxis()->GetXmin();
   float xMax = lastHistos[0]->GetXaxis()->GetXmax();
 
-std::cout << "2" << std::endl;
   TH1D* h1_all = new TH1D( "all", "", nBins, xMin, xMax );
   TH1D* h1_quark = new TH1D( "quark", "", nBins, xMin, xMax );
   TH1D* h1_gluon = new TH1D( "gluon", "", nBins, xMin, xMax );
 
-std::cout << "3" << std::endl;
   TTree* tree = (TTree*)(db->get_mcFile(0).file->Get(treeName.c_str()));
 
   tree->Project( "all",   varName.c_str(), "eventWeight" );
   tree->Project( "quark", varName.c_str(), "eventWeight*(abs(pdgIdPartJet0)<5)" );
   tree->Project( "gluon", varName.c_str(), "eventWeight*(pdgIdPartJet0==21)" );
-std::cout << "4" << std::endl;
-  
-std::cout << h1_all->GetEntries() << std::endl;
-std::cout << h1_quark->GetEntries() << std::endl;
-std::cout << h1_gluon->GetEntries() << std::endl;
 
+  float data_int = h1_data->Integral();
+  float mc_int = h1_all->Integral();
+  float scaleFactor = data_int/mc_int;
+
+  float quark_fraction = h1_quark->Integral()/mc_int;
+  float gluon_fraction = h1_gluon->Integral()/mc_int;
+  float b_fraction = 1.-quark_fraction-gluon_fraction;
+
+  char quarkText[300];
+  sprintf( quarkText, "udsc (%.1f %%)", 100.*quark_fraction );
+  char gluonText[300];
+  sprintf( gluonText, "Gluons (%.1f %%)", 100.*gluon_fraction );
+  char bText[300];
+  sprintf( bText, "b (%.1f %%)", 100.*b_fraction );
+
+  TLegend* legend = new TLegend( 0.5, 0.6, 0.88, 0.9 );
+  legend->SetFillColor( kWhite );
+  legend->SetTextSize(0.035);
+  legend->AddEntry( h1_data, "Data", "p" );
+  legend->AddEntry( h1_gluon, gluonText, "F" );
+  legend->AddEntry( h1_quark, quarkText, "F" );
+  legend->AddEntry( h1_all, bText, "F" );
+
+  h1_all->Rebin( 2 );
+  h1_gluon->Rebin( 2 );
+  h1_quark->Rebin( 2 );
+  h1_data->Rebin( 2 );
+  
+  h1_all->Scale( scaleFactor );
+  h1_gluon->Scale( scaleFactor );
+  h1_quark->Scale( scaleFactor );
+  
+  h1_all->SetFillColor( kGray );
+  h1_gluon->SetFillColor( 46 );
+  h1_quark->SetFillColor( 38 );
+
+  THStack* stack = new THStack();
+  stack->Add(h1_gluon );
+  stack->Add(h1_quark);
+
+  float dataMax = h1_data->GetMaximum();
+  float mcMax = stack->GetMaximum();
+  float yMax = (dataMax>mcMax) ? dataMax : mcMax;
+  yMax *= 1.3;
+
+
+  TPaveText* cmsLabel = db->get_labelCMS();
+  TPaveText* sqrtLabel = db->get_labelSqrt();
+
+  TH2D* h2_axes = new TH2D("axes", "", 10, xMin, xMax, 10, 0., yMax );
+  h2_axes->SetXTitle( axisName.c_str() );
+  
+
+  TCanvas* c1 = new TCanvas("c1", "", 600, 600);
+  c1->cd();
+
+  h2_axes->Draw();
+  h1_all->Draw("same");
+  stack->Draw("histo same");
+  h1_data->Draw("same");
+  legend->Draw("same");
+  sqrtLabel->Draw("Same");
+
+  gPad->RedrawAxis();
+
+  c1->SaveAs("prova.eps");
+  
+  
 }
 
 
