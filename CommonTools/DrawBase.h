@@ -120,7 +120,7 @@ class DrawBase {
   void set_markerSize( float markerSize ) { markerSize_ = markerSize; };
   void set_getBinLabels( bool getBinL=true ) { getBinLabels_ = getBinL; };
   void set_legendTitle( const std::string& title ) { legendTitle_ = title; };
-  void add_label( const std::string& text, float xmin, float ymin, float xmax, float ymax );
+  void add_label( const std::string& text, float xmin, float ymin, float xmax, float ymax, float textSize=0.035 );
   void delete_label();
 
   LegendBox get_legendBox( int legendQuadrant=1, const std::vector<std::string>* legendNames=0 ) const;
