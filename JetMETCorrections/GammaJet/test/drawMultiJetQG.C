@@ -8,6 +8,7 @@ bool ONEVTX = false;
 
 
 
+void drawHistoWithQuarkGluonComponents( DrawBase* db, const std::string& treeName, const std::string& varName, const std::string& axisName, const std::string& units="", const std::string& instanceName="Entries", bool log=false );
 std::pair<TH1D,TH1D> drawVariable_BGsubtr( const std::string& varName, int ptMin, int ptMax, DrawBase* db );
 //void drawSignalPtMix( std::pair<TH1D*,TH1D*> h1pair_3050, std::pair<TH1D*,TH1D*> h1pair_5080, std::pair<TH1D*,TH1D*> h1pair_80120, int mass, float frac_3050, float frac_5080, float frac_80120, DrawBase* db );
 
@@ -15,7 +16,7 @@ std::pair<TH1D,TH1D> drawVariable_BGsubtr( const std::string& varName, int ptMin
 int main(int argc, char* argv[]) {
 
   if( argc != 2 && argc != 3 ) {
-    std::cout << "USAGE: ./drawMultiJetQG [data_dataset] [photonID=\"medium\"]" << std::endl;
+    std::cout << "USAGE: ./drawMultiJetQG [data_dataset] [normalization=\"SHAPE\"]" << std::endl;
     exit(23);
   }
 
@@ -26,12 +27,17 @@ int main(int argc, char* argv[]) {
   }
 
   //std::string data_dataset = "DATA_Run2011A_1fb";
-  std::string mc_QCD = "QCD_TuneZ2_HT-500To1000_7TeV-madgraph_Summer11-PU_S4_START42_V11-v1";
+  //std::string mc_QCD = "QCD_TuneZ2_HT-500To1000_7TeV-madgraph_Summer11-PU_S4_START42_V11-v1";
+  std::string mc_QCD = "QCD_HT_Summer11";
 
 
   std::string recoType = "pf";
   std::string jetAlgo = "akt5";
   std::string norm = "SHAPE";
+  if( argc==3 ) {
+    std::string norm_tmp(argv[2]);
+    norm = norm_tmp;
+  }
   if( norm!="LUMI" && norm!="SHAPE" ) {
     std::cout << "'" << norm << "' normalization not implemented yet." << std::endl;
     std::cout << "Only 'LUMI' and 'SHAPE' currently supported." << std::endl;
@@ -39,11 +45,6 @@ int main(int argc, char* argv[]) {
     exit(9811);
   }
 
-  std::string photonID="medium";
-  if( argc==3 ) {
-    std::string photonID_tmp(argv[2]);
-    photonID = photonID_tmp;
-  }
 
   std::string algoType;
   if( recoType=="calo" )
@@ -58,10 +59,7 @@ int main(int argc, char* argv[]) {
   DrawBase* db = new DrawBase("MultiJetQG", recoType, jetAlgo);
 
   char dataFileName[150];
-  if( photonID=="medium" )
-    sprintf( dataFileName, "MultiJet_%s.root", data_dataset.c_str());
-  else
-    sprintf( dataFileName, "MultiJet_%s_%s.root", data_dataset.c_str(), photonID.c_str());
+  sprintf( dataFileName, "MultiJet_%s.root", data_dataset.c_str());
   TFile* dataFile = TFile::Open(dataFileName);
 
   db->add_dataFile( dataFile, data_dataset );
@@ -69,30 +67,25 @@ int main(int argc, char* argv[]) {
 
 
   char mcQCDFile_char[150];
-  if( photonID=="medium" )
-    sprintf( mcQCDFile_char, "MultiJet_%s.root", mc_QCD.c_str());
-  else
-    sprintf( mcQCDFile_char, "MultiJet_%s_%s.root", mc_QCD.c_str(), photonID.c_str());
+  sprintf( mcQCDFile_char, "MultiJet_%s.root", mc_QCD.c_str());
 
   TFile* mcQCDFile = TFile::Open(mcQCDFile_char);
   db->add_mcFile( mcQCDFile, mc_QCD, "QCD MC", 38);
 
 
 
-  if( norm=="LUMI" )
-    db->set_lumiNormalization(191.);
-  else
+  if( norm=="LUMI" ) {
+    db->set_lumiNormalization(1894.3);
+    std::cout << "-> Lumi normalization." << std::endl;
+  } else {
+    std::cout << "-> Shape normalization." << std::endl;
     db->set_shapeNormalization();
-
-  if( data_dataset=="DATA_Run2011A_1fb" )
-    db->set_lumi(1000.);
-  if( data_dataset=="Photon_Run2011A-May10ReReco-v1" )
-    db->set_lumi(191.);
-  if( data_dataset=="HT_Run2011B-PromptReco-v1_HLT" )
-    db->set_lumi(2500.);
+    db->set_lumi(1894.3);
+  }
 
 
-  db->set_flags(photonID);
+
+
 
   db->set_outputdir();
 
@@ -102,15 +95,21 @@ int main(int argc, char* argv[]) {
   db->drawHisto( "nvertex", "Number of Reconstructed Vertexes", "", "Events", log);
   db->drawHisto( "nvertexPU", "Number of Reconstructed Vertexes", "", "Events", log);
 
+  //db->drawHisto( "rhoPF", "Particle Flow Energy Density", "GeV", "Events", log);
+
+  db->set_xAxisRange( 650., 1300. );
   db->drawHisto( "ht_akt5", "CaloJet H_{T}", "GeV", "Events", log);
+  db->set_xAxisRange();
   db->drawHisto( "htmet_akt5", "CaloJet H_{T} + CaloME_{T}", "GeV", "Events", log);
   db->drawHisto( "sumpt_pfakt5", "Sump_{T}^{4}", "GeV", "Events", log);
 
+  db->set_rebin(5);
   db->drawHisto( "ptJet0", "First Jet p_{T}", "GeV", "Events", log);
   db->drawHisto( "ptJet1", "Second Jet p_{T}", "GeV", "Events", log);
   db->drawHisto( "ptJet2", "Third Jet p_{T}", "GeV", "Events", log);
   db->drawHisto( "ptJet3", "Fourth Jet p_{T}", "GeV", "Events", log);
 
+  db->set_rebin();
   db->drawHisto( "ptDJet0", "First Jet p_{T}D",  "", "Events", log);
   db->drawHisto( "ptDJet1", "Second Jet p_{T}D", "", "Events", log);
   db->drawHisto( "ptDJet2", "Third Jet p_{T}D",  "", "Events", log);
@@ -127,6 +126,7 @@ int main(int argc, char* argv[]) {
   db->drawHisto( "nNeutralJet3", "Fourth Jet Neutral Multiplicity", "", "Events", log);
 
   db->drawHisto( "QGLikelihoodJet0", "First  Jet Q-G Likelihood", "", "Events");
+  drawHistoWithQuarkGluonComponents( db, "tree_passedEvents", "QGLikelihoodJet0", "First  Jet Q-G Likelihood", "", "Events");
   db->drawHisto( "QGLikelihoodJet1", "Second Jet Q-G Likelihood", "", "Events");
   db->drawHisto( "QGLikelihoodJet2", "Third  Jet Q-G Likelihood", "", "Events");
   db->drawHisto( "QGLikelihoodJet3", "Fourth Jet Q-G Likelihood", "", "Events");
@@ -139,6 +139,41 @@ int main(int argc, char* argv[]) {
   return 0;
 
 }  
+
+
+
+void drawHistoWithQuarkGluonComponents( DrawBase* db, const std::string& treeName, const std::string& varName, const std::string& axisName, const std::string& units, const std::string& instanceName, bool log ) {
+std::cout << "-1" << std::endl;
+
+  db->drawHisto( varName, axisName, units, instanceName, log );
+std::cout << "0" << std::endl;
+
+  std::vector<TH1D*> lastHistos = db->get_lastHistos_mc();
+
+std::cout << "1" << std::endl;
+  int nBins = lastHistos[0]->GetNbinsX();
+  float xMin = lastHistos[0]->GetXaxis()->GetXmin();
+  float xMax = lastHistos[0]->GetXaxis()->GetXmax();
+
+std::cout << "2" << std::endl;
+  TH1D* h1_all = new TH1D( "all", "", nBins, xMin, xMax );
+  TH1D* h1_quark = new TH1D( "quark", "", nBins, xMin, xMax );
+  TH1D* h1_gluon = new TH1D( "gluon", "", nBins, xMin, xMax );
+
+std::cout << "3" << std::endl;
+  TTree* tree = (TTree*)(db->get_mcFile(0).file->Get(treeName.c_str()));
+
+  tree->Project( "all",   varName.c_str(), "eventWeight" );
+  tree->Project( "quark", varName.c_str(), "eventWeight*(abs(pdgIdPartJet0)<5)" );
+  tree->Project( "gluon", varName.c_str(), "eventWeight*(pdgIdPartJet0==21)" );
+std::cout << "4" << std::endl;
+  
+std::cout << h1_all->GetEntries() << std::endl;
+std::cout << h1_quark->GetEntries() << std::endl;
+std::cout << h1_gluon->GetEntries() << std::endl;
+
+}
+
 
 
 
