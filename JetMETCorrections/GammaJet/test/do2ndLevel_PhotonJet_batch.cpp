@@ -61,7 +61,8 @@ void doSingleLoop(std::string fileName, std::string name, std::string recoType, 
   t->LoadInputFromFile(fileName);
   if( useJSON ) {
 //    t->ReadJSONFile("Cert_136033-149442_7TeV_Nov4ReReco_Collisions10_CMSSWConfig.txt");
-    t->ReadJSONFile("Cert_160404-166861_7TeV_PromptReco_Collisions11_CMSSWConfig.txt");
+  //  t->ReadJSONFile("Cert_160404-171116_7TeV_PromptReco_Collisions11_CMSSWConfig.txt");
+    t->ReadJSONFile("Cert_160404-180252_7TeV_PromptReco_Collisions11_CMSSWConfig.txt");
   //t->ReadCSVFile("csv_runs143337_144114.txt");
   //t->ReadJSONFile("Cert_132440-143336_7TeV_StreamExpress_Collisions10_CMSSWConfig_v2.txt");
   //t->ReadCSVFile("csvfile_upto143336.txt");
