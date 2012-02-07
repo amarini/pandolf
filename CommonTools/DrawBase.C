@@ -1559,7 +1559,7 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
     label_bonus->AddText(labelText.c_str());
 
 
-    TPaveText* label_shapeNorm = new TPaveText(0.2, 0.83, 0.35, 0.88, "brNDC");
+    TPaveText* label_shapeNorm = new TPaveText(0.23, 0.87, 0.36, 0.9, "brNDC");
     label_shapeNorm->SetTextSize(0.03);
     label_shapeNorm->SetFillColor(kWhite);
     label_shapeNorm->AddText("SHAPE NORM");
