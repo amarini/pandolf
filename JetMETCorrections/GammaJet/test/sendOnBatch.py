@@ -35,9 +35,9 @@ application = "do2ndLevel_PhotonJet_batch"
 ################################################
 #diskoutputdir = "/cmsrm/pc21_2/pandolf/DATA/EG/Run2010A-PromptReco-v4"
 if PDname=="EG" or PDname=="Photon":
-  diskoutputdir = "/cmsrm/pc23_2/pandolf/DATA/" + dataset_path
+  diskoutputdir = "/cmsrm/pc24_2/pandolf/DATA/" + dataset_path
 else:
-  diskoutputdir = "/cmsrm/pc23_2/pandolf/MC/Summer11/" + dataset_path
+  diskoutputdir = "/cmsrm/pc24_2/pandolf/MC/Summer11/" + dataset_path
 diskoutputmain = diskoutputdir
 # prepare job to write on the cmst3 cluster disks
 ################################################
@@ -48,7 +48,7 @@ os.system("mkdir -p "+dir+"/input/")
 os.system("mkdir -p "+dir+"/src/")
 
 if diskoutputdir != "none": 
-    os.system("ssh -o BatchMode=yes -o StrictHostKeyChecking=no pccmsrm22 mkdir -p "+diskoutputmain)
+    os.system("ssh -o BatchMode=yes -o StrictHostKeyChecking=no pccmsrm25 mkdir -p "+diskoutputmain)
 
 #look for the current directory
 #######################################
@@ -111,7 +111,7 @@ while (len(inputfiles) > 0):
     outputfile.write(pwd+'/'+application+" "+dataset_name+" "+recoType+" "+jetAlgo+" "+inputfilename+" _"+str(ijob)+"\n") 
     # select this for GENJETS ntuples:
     #outputfile.write(pwd+'/'+application+" "+dataset_name+" "+recoType+" "+jetAlgo+" "+inputfilename+" _"+str(ijob)+" true\n")
-    outputfile.write('ls *.root | xargs -i scp -o BatchMode=yes -o StrictHostKeyChecking=no {} pccmsrm22:'+diskoutputmain+'/{}\n') 
+    outputfile.write('ls *.root | xargs -i scp -o BatchMode=yes -o StrictHostKeyChecking=no {} pccmsrm25:'+diskoutputmain+'/{}\n') 
     outputfile.close
     os.system("echo bsub -q "+queue+" -o "+dir+"/log/"+dataset_name+"_"+str(ijob)+".log source "+pwd+"/"+outputname)
     os.system("bsub -q "+queue+" -o "+dir+"/log/"+dataset_name+"_"+str(ijob)+".log source "+pwd+"/"+outputname+" -copyInput="+dataset_name+"_"+str(ijob))
