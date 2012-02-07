@@ -9,6 +9,8 @@
 #include "TVector2.h"
 #include "fitTools.h"
 
+#include "QGLikelihood/QGLikelihoodCalculator.h"
+
 
 //#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 //#include "CondFormats/JetMETObjects/interface/SimpleJetCorrector.h"
@@ -148,6 +150,7 @@ void TreeAnalyzer_PhotonJet::CreateOutputFile() {
   jetTree_->Branch("phiJetReco", &phiJetReco_, "phiJetReco_/F");
   jetTree_->Branch( "ptDJetReco",  &ptDJetReco_,  "ptDJetReco_/F");
   jetTree_->Branch( "rmsCandJetReco",  &rmsCandJetReco_,  "rmsCandJetReco_/F");
+  jetTree_->Branch( "QGLikelihoodJetReco",  &QGLikelihoodJetReco_,  "QGLikelihoodJetReco_/F");
   jetTree_->Branch("trackCountingHighEffBJetTagsJetReco",  &trackCountingHighEffBJetTagsJetReco_,  "trackCountingHighEffBJetTagsJetReco_/F");
   jetTree_->Branch(  "eJetGen",   &eJetGen_,   "eJetGen_/F");
   jetTree_->Branch(  "ptJetGen",   &ptJetGen_,   "ptJetGen_/F");
@@ -243,6 +246,10 @@ void TreeAnalyzer_PhotonJet::Loop()
 
    TRandom3 rand;
 
+
+   QGLikelihoodCalculator *qglikeli = new QGLikelihoodCalculator("/afs/cern.ch/user/p/pandolf/scratch1/CMSSW_4_2_3_patch5/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
+
+
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
      Long64_t ientry = LoadTree(jentry);
      if (ientry < 0) break;
@@ -291,6 +298,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      //foundPhot will be either a reco photon (signal) or a genjet (if usegenjets):
      AnalysisPhoton foundPhot;
 
+//std::cout << "found phot pt before: " << foundPhot.Pt() << std::endl;
 
      //foundRecoPhot is the highest-pt photon candidate of the event which passes minimal photon ID:
      AnalysisPhoton foundRecoPhot;
@@ -716,6 +724,7 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
      phiJetReco_  =  firstJet.phiReco;
      etaJetReco_  =  firstJet.etaReco;
      ptDJetReco_  =  firstJet.ptD;
+     QGLikelihoodJetReco_  =  qglikeli->computeQGLikelihoodPU( firstJet.Pt(), rhoPF, firstJet.nCharged(), firstJet.nNeutral(), firstJet.ptD );
  rmsCandJetReco_  =  firstJet.rmsCand;
  trackCountingHighEffBJetTagsJetReco_  =  firstJet.trackCountingHighEffBJetTags;
         eJetGen_  =  firstJet.eGen;
@@ -867,6 +876,7 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
      //bool eventOK = ( matchedToMC_ || isIsolated_veryloose_);
 
      //if( eventOK && (ptPhotReco_>15.) )
+//std::cout << "event: " << event << " ptPhotReco: " << ptPhotReco_ << std::endl;
      if( ptPhotReco_>15. )
        jetTree_->Fill(); 
 

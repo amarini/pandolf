@@ -23,8 +23,8 @@ do2ndLevel_PhotonJet: AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer
 #do2ndLevel_PhotonJet_batch: AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJet.o Utilities.o JetCorrectorParameters.o SimpleJetCorrector.o FactorizedJetCorrector.o fitTools.o do2ndLevel_PhotonJet_batch.cpp
 #	$(CC) -Wall -o do2ndLevel_PhotonJet_batch do2ndLevel_PhotonJet_batch.cpp AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJet.o Utilities.o JetCorrectorParameters.o SimpleJetCorrector.o FactorizedJetCorrector.o fitTools.o $(ROOTFLAG) -lMinuit
 
-do2ndLevel_PhotonJet_batch: AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJet.o  fitTools.o do2ndLevel_PhotonJet_batch.cpp
-	$(CC) -Wall -o do2ndLevel_PhotonJet_batch do2ndLevel_PhotonJet_batch.cpp AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJet.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
+do2ndLevel_PhotonJet_batch: AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJet.o  fitTools.o QGLikelihoodCalculator.o do2ndLevel_PhotonJet_batch.cpp
+	$(CC) -Wall $(INCLUDES) -o do2ndLevel_PhotonJet_batch do2ndLevel_PhotonJet_batch.cpp AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJet.o fitTools.o QGLikelihoodCalculator.o $(ROOTFLAG) $(EXTRALIBS)
 
 do2ndLevel_VHgg_batch: AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_VHgg.o  do2ndLevel_VHgg_batch.cpp
 	$(CC) -Wall -o do2ndLevel_VHgg_batch do2ndLevel_VHgg_batch.cpp AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_VHgg.o $(ROOTFLAG) $(EXTRALIBS)
@@ -46,6 +46,10 @@ do2ndLevel_ZGamma:  TreeAnalyzer.o TreeAnalyzer_ZGamma.o
 prova: AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJet.o
 	$(CC) -Wall -o prova prova_TreeAnalyzer_Photon.cpp AnalysisJet.o AnalysisPhoton.o TreeAnalyzer.o TreeAnalyzer_PhotonJet.o $(ROOTFLAG)
 
+
+QGLikelihoodCalculator.o: $(CMSSW_BASE)/src/UserCode/pandolf/QGLikelihood/QGLikelihoodCalculator.C
+	$(CC) $(CFLAGS) $(INCLUDES) $(CMSSW_BASE)/src/UserCode/pandolf/QGLikelihood/QGLikelihoodCalculator.C $(ROOTFLAG)
+
 AnalysisJet.o: AnalysisJet.C
 	$(CC) $(CFLAGS) AnalysisJet.C $(ROOTFLAG)
 
@@ -55,8 +59,8 @@ AnalysisPhoton.o: AnalysisPhoton.C
 TreeAnalyzer.o: TreeAnalyzer.C
 	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools TreeAnalyzer.C $(ROOTFLAG)
 
-TreeAnalyzer_PhotonJet.o: TreeAnalyzer_PhotonJet.C fitTools.o
-	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools fitTools.o TreeAnalyzer_PhotonJet.C $(ROOTFLAG)
+TreeAnalyzer_PhotonJet.o: TreeAnalyzer_PhotonJet.C fitTools.o QGLikelihoodCalculator.o
+	$(CC) $(CFLAGS) $(INCLUDES) fitTools.o QGLikelihoodCalculator.o TreeAnalyzer_PhotonJet.C $(ROOTFLAG)
 
 TreeAnalyzer_VHgg.o: TreeAnalyzer_VHgg.C
 	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools TreeAnalyzer_VHgg.C $(ROOTFLAG)
