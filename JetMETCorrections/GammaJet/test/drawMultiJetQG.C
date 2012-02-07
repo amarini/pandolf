@@ -177,6 +177,8 @@ void drawHistoWithQuarkGluonComponents( DrawBase* db, const std::string& treeNam
   TH1D* h1_quark = new TH1D( "quark", "", nBins, xMin, xMax );
   TH1D* h1_gluon = new TH1D( "gluon", "", nBins, xMin, xMax );
 
+  char allCondition[300];
+  sprintf( allCondition, "eventWeight*(pdgIdPartJet%d>-10)", jetNumber );
   char quarkCondition[300];
   sprintf( quarkCondition, "eventWeight*(abs(pdgIdPartJet%d)<5)", jetNumber );
   char gluonCondition[300];
@@ -184,7 +186,7 @@ void drawHistoWithQuarkGluonComponents( DrawBase* db, const std::string& treeNam
 
   TTree* tree = (TTree*)(db->get_mcFile(0).file->Get(treeName.c_str()));
 
-  tree->Project( "all",   varName.c_str(), "eventWeight" );
+  tree->Project( "all",   varName.c_str(), allCondition );
   tree->Project( "quark", varName.c_str(), quarkCondition );
   tree->Project( "gluon", varName.c_str(), gluonCondition );
 
