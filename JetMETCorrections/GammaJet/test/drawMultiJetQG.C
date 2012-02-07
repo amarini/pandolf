@@ -15,12 +15,12 @@ std::pair<TH1D,TH1D> drawVariable_BGsubtr( const std::string& varName, int ptMin
 
 int main(int argc, char* argv[]) {
 
-  if( argc != 2 && argc != 3 ) {
-    std::cout << "USAGE: ./drawMultiJetQG [data_dataset] [normalization=\"SHAPE\"]" << std::endl;
+  if( argc!=1 && argc != 2 && argc != 3 ) {
+    std::cout << "USAGE: ./drawMultiJetQG [data_dataset=\"HT_Run2011B-PromptReco-v1_HLT\"] [normalization=\"SHAPE\"]" << std::endl;
     exit(23);
   }
 
-  std::string data_dataset = "Photon_Run2011A-May10ReReco-v1";
+  std::string data_dataset = "HT_Run2011B-PromptReco-v1_HLT";
   if( argc>1 ) {
     std::string dataset_tmp(argv[1]);
     data_dataset = dataset_tmp;
@@ -130,9 +130,9 @@ int main(int argc, char* argv[]) {
   db->drawHisto( "nNeutralJet3", "Fourth Jet Neutral Multiplicity", "", "Events", log);
 
   drawHistoWithQuarkGluonComponents( db, "tree_passedEvents", "QGLikelihoodJet0", "First  Jet Q-G Likelihood", "", "Events");
-  drawHistoWithQuarkGluonComponents( db, "tree_passedEvents", "QGLikelihoodJet1", "Second  Jet Q-G Likelihood", "", "Events");
-  drawHistoWithQuarkGluonComponents( db, "tree_passedEvents", "QGLikelihoodJet2", "Third  Jet Q-G Likelihood", "", "Events");
-  drawHistoWithQuarkGluonComponents( db, "tree_passedEvents", "QGLikelihoodJet3", "Fourth  Jet Q-G Likelihood", "", "Events");
+  drawHistoWithQuarkGluonComponents( db, "tree_passedEvents", "QGLikelihoodJet1", "Second Jet Q-G Likelihood", "", "Events");
+  drawHistoWithQuarkGluonComponents( db, "tree_passedEvents", "QGLikelihoodJet2", "Third Jet Q-G Likelihood", "", "Events");
+  drawHistoWithQuarkGluonComponents( db, "tree_passedEvents", "QGLikelihoodJet3", "Fourth Jet Q-G Likelihood", "", "Events");
 
 
 
@@ -149,6 +149,22 @@ void drawHistoWithQuarkGluonComponents( DrawBase* db, const std::string& treeNam
 
   db->drawHisto( varName, axisName, units, instanceName, log );
 
+  TString varName_tstr(varName);
+
+  int jetNumber=-1;
+  if( varName_tstr.Contains("Jet0") )
+    jetNumber=0;
+  else if( varName_tstr.Contains("Jet1") )
+    jetNumber=1;
+  else if( varName_tstr.Contains("Jet2") )
+    jetNumber=2;
+  else if( varName_tstr.Contains("Jet3") )
+    jetNumber=3;
+
+  if( jetNumber<0 ) {
+    std::cout << "There must be a problem, this is not possible." << std::endl;
+    exit(333);
+  }
 
   TH1D* h1_data = db->get_lastHistos_data()[0];
   std::vector<TH1D*> lastHistos = db->get_lastHistos_mc();
@@ -161,11 +177,16 @@ void drawHistoWithQuarkGluonComponents( DrawBase* db, const std::string& treeNam
   TH1D* h1_quark = new TH1D( "quark", "", nBins, xMin, xMax );
   TH1D* h1_gluon = new TH1D( "gluon", "", nBins, xMin, xMax );
 
+  char quarkCondition[300];
+  sprintf( quarkCondition, "eventWeight*(abs(pdgIdPartJet%d)<5)", jetNumber );
+  char gluonCondition[300];
+  sprintf( gluonCondition, "eventWeight*(pdgIdPartJet%d==21)", jetNumber );
+
   TTree* tree = (TTree*)(db->get_mcFile(0).file->Get(treeName.c_str()));
 
   tree->Project( "all",   varName.c_str(), "eventWeight" );
-  tree->Project( "quark", varName.c_str(), "eventWeight*(abs(pdgIdPartJet0)<5)" );
-  tree->Project( "gluon", varName.c_str(), "eventWeight*(pdgIdPartJet0==21)" );
+  tree->Project( "quark", varName.c_str(), quarkCondition );
+  tree->Project( "gluon", varName.c_str(), gluonCondition );
 
   float data_int = h1_data->Integral();
   float mc_int = h1_all->Integral();
