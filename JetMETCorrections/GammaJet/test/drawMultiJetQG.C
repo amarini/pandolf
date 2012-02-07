@@ -8,7 +8,7 @@ bool ONEVTX = false;
 
 
 
-void drawHistoWithQuarkGluonComponents( DrawBase* db, const std::string& treeName, const std::string& varName, const std::string& axisName, const std::string& units="", const std::string& instanceName="Entries", bool log=false );
+void drawHistoWithQuarkGluonComponents( DrawBase* db, const std::string& treeName, const std::string& varName, const std::string& axisName, const std::string& units="", const std::string& instanceName="Events", bool log=false, float ptMin=0., float ptMax=10000. );
 std::pair<TH1D,TH1D> drawVariable_BGsubtr( const std::string& varName, int ptMin, int ptMax, DrawBase* db );
 //void drawSignalPtMix( std::pair<TH1D*,TH1D*> h1pair_3050, std::pair<TH1D*,TH1D*> h1pair_5080, std::pair<TH1D*,TH1D*> h1pair_80120, int mass, float frac_3050, float frac_5080, float frac_80120, DrawBase* db );
 
@@ -134,6 +134,7 @@ int main(int argc, char* argv[]) {
   drawHistoWithQuarkGluonComponents( db, "tree_passedEvents", "QGLikelihoodJet2", "Third Jet Q-G Likelihood", "", "Events");
   drawHistoWithQuarkGluonComponents( db, "tree_passedEvents", "QGLikelihoodJet3", "Fourth Jet Q-G Likelihood", "", "Events");
 
+  drawHistoWithQuarkGluonComponents( db, "tree_passedEvents", "QGLikelihoodJet0", "First  Jet Q-G Likelihood", "", "Events", false, 100., 200.);
 
 
   delete db;
@@ -145,7 +146,7 @@ int main(int argc, char* argv[]) {
 
 
 
-void drawHistoWithQuarkGluonComponents( DrawBase* db, const std::string& treeName, const std::string& varName, const std::string& axisName, const std::string& units, const std::string& instanceName, bool log ) {
+void drawHistoWithQuarkGluonComponents( DrawBase* db, const std::string& treeName, const std::string& varName, const std::string& axisName, const std::string& units, const std::string& instanceName, bool log, float ptMin, float ptMax ) {
 
   db->drawHisto( varName, axisName, units, instanceName, log );
 
@@ -177,12 +178,13 @@ void drawHistoWithQuarkGluonComponents( DrawBase* db, const std::string& treeNam
   TH1D* h1_quark = new TH1D( "quark", "", nBins, xMin, xMax );
   TH1D* h1_gluon = new TH1D( "gluon", "", nBins, xMin, xMax );
 
-  char allCondition[300];
-  sprintf( allCondition, "eventWeight*(pdgIdPartJet%d>-10)", jetNumber );
-  char quarkCondition[300];
-  sprintf( quarkCondition, "eventWeight*(abs(pdgIdPartJet%d)<5)", jetNumber );
-  char gluonCondition[300];
-  sprintf( gluonCondition, "eventWeight*(pdgIdPartJet%d==21)", jetNumber );
+
+  char allCondition[400];
+  sprintf( allCondition, "eventWeight*(pdgIdPartJet%d>-10 && ptJet%d>%f && ptJet%d<%f)", jetNumber, jetNumber, ptMin, jetNumber, ptMax );
+  char quarkCondition[400];
+  sprintf( quarkCondition, "eventWeight*(abs(pdgIdPartJet%d)<5 && ptJet%d>%f && ptJet%d<%f)", jetNumber, jetNumber, ptMin, jetNumber, ptMax );
+  char gluonCondition[400];
+  sprintf( gluonCondition, "eventWeight*(pdgIdPartJet%d==21 && ptJet%d>%f && ptJet%d<%f)", jetNumber, jetNumber, ptMin, jetNumber, ptMax );
 
   TTree* tree = (TTree*)(db->get_mcFile(0).file->Get(treeName.c_str()));
 
@@ -205,7 +207,15 @@ void drawHistoWithQuarkGluonComponents( DrawBase* db, const std::string& treeNam
   char bText[300];
   sprintf( bText, "b (%.1f %%)", 100.*b_fraction );
 
-  TLegend* legend = new TLegend( 0.5, 0.6, 0.88, 0.9 );
+  
+  TLegend* legend;
+  if( ptMin !=0. && ptMax != 10000. ) {
+    char legendTitle[150];
+    sprintf( legendTitle, "%.0f < p_{T} < %.0f GeV", ptMin, ptMax );
+    legend = new TLegend( 0.5, 0.55, 0.88, 0.9, legendTitle );
+  } else {
+    legend = new TLegend( 0.5, 0.6, 0.88, 0.9 );
+  }
   legend->SetFillColor( kWhite );
   legend->SetTextSize(0.035);
   legend->AddEntry( h1_data, "Data", "p" );
@@ -255,9 +265,16 @@ void drawHistoWithQuarkGluonComponents( DrawBase* db, const std::string& treeNam
 
   gPad->RedrawAxis();
 
-  std::string canvasName = db->get_outputdir() + "/" + varName + "_components.eps";
+  //std::string canvasName = db->get_outputdir() + "/" + varName + "_components.eps";
 
-  c1->SaveAs(canvasName.c_str());
+  char canvasName[200];
+  if( ptMin !=0. && ptMax != 10000. )
+    sprintf( canvasName, "%s/%s_pt%.0f_%.0f_components.eps", db->get_outputdir().c_str(), varName.c_str(), ptMin, ptMax );
+  else
+    sprintf( canvasName, "%s/%s_components.eps", db->get_outputdir().c_str(), varName.c_str() );
+
+  c1->SaveAs(canvasName);
+
   
   delete c1;
   delete h2_axes;
