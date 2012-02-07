@@ -724,7 +724,10 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
      phiJetReco_  =  firstJet.phiReco;
      etaJetReco_  =  firstJet.etaReco;
      ptDJetReco_  =  firstJet.ptD;
-     QGLikelihoodJetReco_  =  qglikeli->computeQGLikelihoodPU( firstJet.Pt(), rhoPF, firstJet.nCharged(), firstJet.nNeutral(), firstJet.ptD );
+     if( fabs(etaJetReco_)<2.4 )
+       QGLikelihoodJetReco_  =  qglikeli->computeQGLikelihoodPU( firstJet.Pt(), rhoPF, firstJet.nCharged(), firstJet.nNeutral(), firstJet.ptD );
+     else
+       QGLikelihoodJetReco_  =  -1.;
  rmsCandJetReco_  =  firstJet.rmsCand;
  trackCountingHighEffBJetTagsJetReco_  =  firstJet.trackCountingHighEffBJetTags;
         eJetGen_  =  firstJet.eGen;
