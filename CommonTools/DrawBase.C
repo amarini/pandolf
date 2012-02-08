@@ -1609,7 +1609,8 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
     //  dataHistos[i]->Draw("E same");
     }
     gPad->RedrawAxis();
-    label_cms->Draw("same");
+    if( !lumiOnRightSide_ )
+      label_cms->Draw("same");
     label_sqrt->Draw("same");
     if( scaleFactor_<0 )
       label_shapeNorm->Draw("same");
