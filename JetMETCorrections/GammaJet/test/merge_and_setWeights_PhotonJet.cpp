@@ -341,11 +341,13 @@ float getWeight( const std::string& dataset, int nEvents ) {
   } else if( dataset_tstr.BeginsWith("QCD_Pt-80to170_EMEnriched") ) {
     xSection = 900000.*0.155;
   } else if( dataset_tstr.BeginsWith("WH_ZH_HToGG_M-120") ) {
-    xSection = (0.6561 + 0.3551)*2.25E-03;
+    xSection = (0.6561 + 0.3551)* 0.0231; //fermiophobic BR!!
   } else if( dataset_tstr.BeginsWith("WH_ZH_HToGG_M-125") ) {
-    xSection = (0.5729 + 0.3158)*2.25E-03;
+    xSection = (0.5729 + 0.3158)* 0.0231; //fermiophobic BR!!
   } else if( dataset_tstr.BeginsWith("DiPhotonJets") ) {
     xSection = 134 * 1.15;
+  } else if( dataset_tstr.BeginsWith("DiPhotonBox_Pt-25To250") ) {
+    xSection = 12.37 * 1.3;
 
   } else if( dataset_tstr.BeginsWith("G1Jet_Pt-20to60") ) {
     xSection = 2.270e+04;
