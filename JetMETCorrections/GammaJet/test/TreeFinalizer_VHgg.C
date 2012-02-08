@@ -47,8 +47,10 @@ void finalize(const std::string& dataset);
 void finalize_all() {
 
   finalize( "WH_ZH_HToGG_M-120_7TeV-pythia6-Fall11-PU_S6_START42_V14B-v1" );
-  finalize( "WH_ZH_HToGG_M-125_7TeV-pythia6-Fall11-PU_S6_START42_V14B-v1" );
-  finalize( "DiPhotonBoxBorn" );
+  //finalize( "WH_ZH_HToGG_M-125_7TeV-pythia6-Fall11-PU_S6_START42_V14B-v1" );
+  //finalize( "DiPhotonBoxBorn" );
+  finalize( "DiPhotonJets_7TeV-madgraph-Fall11-PU_S6_START42_V14B-v1" );
+  finalize( "DiPhotonBox_Pt-25To250_7TeV-pythia6-Fall11-PU_S6_START42_V14B-v1" );
 
 }
 
@@ -105,10 +107,12 @@ void finalize(const std::string& dataset) {
   TH1D* h1_mgg = new TH1D("mgg", "", 1000, 0., 1000.);
   h1_mgg->Sumw2();
 
-  TH1D* h1_kinfit_chiSquare = new TH1D("kinfit_chiSquare", "", 100, 0., 10.);
+  TH1D* h1_kinfit_chiSquare = new TH1D("kinfit_chiSquare", "", 200, 0., 10.);
   h1_kinfit_chiSquare->Sumw2();
-  TH1D* h1_kinfit_chiSquareProb = new TH1D("kinfit_chiSquareProb", "", 100, 0., 1.0001);
+  TH1D* h1_kinfit_chiSquareProb = new TH1D("kinfit_chiSquareProb", "", 1000, 0., 1.0001);
   h1_kinfit_chiSquareProb->Sumw2();
+  TH1D* h1_kinfit_chiSquareProbMax = new TH1D("kinfit_chiSquareProbMax", "", 1000, 0., 1.0001);
+  h1_kinfit_chiSquareProbMax->Sumw2();
 
 
   TH1D* h1_ptJet1 = new TH1D("ptJet1", "", 500, 0., 500.);
@@ -263,6 +267,10 @@ void finalize(const std::string& dataset) {
   tree->SetBranchAddress("nNeutralHadronsJet", nNeutralHadronsJet);
   Float_t ptDJet[20];
   tree->SetBranchAddress("ptDJet", ptDJet);
+  Float_t simpleSecondaryVertexHighEffBJetTagsJet[20];
+  tree->SetBranchAddress("simpleSecondaryVertexHighEffBJetTagsJet", simpleSecondaryVertexHighEffBJetTagsJet);
+  Float_t trackCountingHighEffBJetTagsJet[20];
+  tree->SetBranchAddress("trackCountingHighEffBJetTagsJet", trackCountingHighEffBJetTagsJet);
 
   Float_t ptPartJet[20];
   tree->SetBranchAddress("ptPartJet", ptPartJet);
@@ -302,8 +310,10 @@ void finalize(const std::string& dataset) {
   float ptJet1_t, ptJet2_t;
   float etaJet1_t, etaJet2_t;
   float QGLikelihoodJet1_t, QGLikelihoodJet2_t;
+  float simpleSecondaryVertexHighEfficiencyJet1_t, simpleSecondaryVertexHighEfficiencyJet2_t;
+  float trackCountingHighEfficiencyJet1_t, trackCountingHighEfficiencyJet2_t;
   float mgg, mjj;
-  float chiSquareProb;
+  float chiSquareProb, chiSquareProbMax;
 
 
 
@@ -321,9 +331,14 @@ void finalize(const std::string& dataset) {
   tree_passedEvents->Branch( "etaJet2", &etaJet2_t, "etaJet2_t/F" );
   tree_passedEvents->Branch( "QGLikelihoodJet1", &QGLikelihoodJet1_t, "QGLikelihoodJet1_t/F" );
   tree_passedEvents->Branch( "QGLikelihoodJet2", &QGLikelihoodJet2_t, "QGLikelihoodJet2_t/F" );
+  tree_passedEvents->Branch( "simpleSecondaryVertexHighEfficiencyJet1", &simpleSecondaryVertexHighEfficiencyJet1_t, "simpleSecondaryVertexHighEfficiencyJet1_t/F" );
+  tree_passedEvents->Branch( "simpleSecondaryVertexHighEfficiencyJet2", &simpleSecondaryVertexHighEfficiencyJet2_t, "simpleSecondaryVertexHighEfficiencyJet2_t/F" );
+  tree_passedEvents->Branch( "trackCountingHighEfficiencyJet1", &trackCountingHighEfficiencyJet1_t, "trackCountingHighEfficiencyJet1_t/F" );
+  tree_passedEvents->Branch( "trackCountingHighEfficiencyJet2", &trackCountingHighEfficiencyJet2_t, "trackCountingHighEfficiencyJet2_t/F" );
   tree_passedEvents->Branch( "mjj", &mjj, "mjj/F" );
   tree_passedEvents->Branch( "mgg", &mgg, "mgg/F" );
   tree_passedEvents->Branch( "chiSquareProb", &chiSquareProb, "chiSquareProb/F" );
+  tree_passedEvents->Branch( "chiSquareProbMax", &chiSquareProbMax, "chiSquareProbMax/F" );
 
 
   gROOT->cd();
@@ -332,7 +347,10 @@ void finalize(const std::string& dataset) {
 
   QGLikelihoodCalculator *qglikeli = new QGLikelihoodCalculator("/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
 
-  DiJetKinFitter* fitter_jets = new DiJetKinFitter( "fitter_jets", "fitter_jets", 85. );
+  DiJetKinFitter* fitter_jetsWZ = new DiJetKinFitter( "fitter_jetsWZ", "fitter_jets", 85. );
+
+  DiJetKinFitter* fitter_jetsW = new DiJetKinFitter( "fitter_jetsW", "fitter_jets", 80. );
+  DiJetKinFitter* fitter_jetsZ = new DiJetKinFitter( "fitter_jetsZ", "fitter_jets", 91. );
 
 
 
@@ -354,12 +372,12 @@ void finalize(const std::string& dataset) {
 
     h1_nvertex->Fill( nvertex, eventWeight);
 
-    bool isMC = run<5;
-    if( isMC ) {
+  //bool isMC = run<5;
+  //if( isMC ) {
 
-      // PU reweighting:
-     eventWeight *= fPUWeight->GetWeight(nPU);
-    }
+  //  // PU reweighting:
+  // eventWeight *= fPUWeight->GetWeight(nPU);
+  //}
 
     h1_nvertexPU->Fill( nvertex, eventWeight);
 
@@ -446,6 +464,8 @@ void finalize(const std::string& dataset) {
         firstJet.nTracksReco = nChargedHadronsJet[iJet];
         firstJet.nNeutralHadronsReco = nNeutralHadronsJet[iJet];
         firstJet.nPhotonsReco = nPhotonsJet[iJet];
+        firstJet.simpleSecondaryVertexHighEffBJetTags = simpleSecondaryVertexHighEffBJetTagsJet[iJet];
+        firstJet.trackCountingHighEffBJetTags = trackCountingHighEffBJetTagsJet[iJet];
         firstJet.pdgIdPart = pdgIdPartJet[iJet];
         firstJet.pdgIdMom = pdgIdMomJet[iJet];
 
@@ -453,24 +473,36 @@ void finalize(const std::string& dataset) {
         secondJet.nTracksReco = nChargedHadronsJet[jJet];
         secondJet.nNeutralHadronsReco = nNeutralHadronsJet[jJet];
         secondJet.nPhotonsReco = nPhotonsJet[jJet];
+        secondJet.simpleSecondaryVertexHighEffBJetTags = simpleSecondaryVertexHighEffBJetTagsJet[jJet];
+        secondJet.trackCountingHighEffBJetTags = trackCountingHighEffBJetTagsJet[jJet];
         secondJet.pdgIdPart = pdgIdPartJet[jJet];
         secondJet.pdgIdMom = pdgIdMomJet[jJet];
 
         TLorentzVector thisDiJet = firstJet + secondJet;
         float thisMjj = thisDiJet.M();
 
-//        if( (fabs(firstJet.pdgIdMom)==23 && fabs(secondJet.pdgIdMom)==23) || (fabs(firstJet.pdgIdMom)==24 && fabs(secondJet.pdgIdMom)==24) ) {
+        
+        // choose highest-pt jet pair:
+        bestMjj = thisMjj;
+        jet1 = firstJet;
+        jet2 = secondJet;
 
-        if( bestMjj<0. || fabs(thisMjj-85.) < fabs(bestMjj-85.) ) {
+        if( (fabs(firstJet.pdgIdMom)==23 && fabs(secondJet.pdgIdMom)==23) || (fabs(firstJet.pdgIdMom)==24 && fabs(secondJet.pdgIdMom)==24) ) correctPair=true;
+        else correctPair=false;
 
-          bestMjj = thisMjj;
-          jet1 = firstJet;
-          jet2 = secondJet;
+        break;
 
-          if( (fabs(firstJet.pdgIdMom)==23 && fabs(secondJet.pdgIdMom)==23) || (fabs(firstJet.pdgIdMom)==24 && fabs(secondJet.pdgIdMom)==24) ) correctPair=true;
-          else correctPair=false;
 
-        } //if best mass
+//      if( bestMjj<0. || fabs(thisMjj-85.) < fabs(bestMjj-85.) ) {
+
+//        bestMjj = thisMjj;
+//        jet1 = firstJet;
+//        jet2 = secondJet;
+
+//        if( (fabs(firstJet.pdgIdMom)==23 && fabs(secondJet.pdgIdMom)==23) || (fabs(firstJet.pdgIdMom)==24 && fabs(secondJet.pdgIdMom)==24) ) correctPair=true;
+//        else correctPair=false;
+
+//      } //if best mass
 
       } //for j jets
 
@@ -485,10 +517,22 @@ void finalize(const std::string& dataset) {
     allPairs += 1.;
 
 
-    std::pair<TLorentzVector,TLorentzVector> jets_kinfit = fitter_jets->fit(jet1, jet2);
-    chiSquareProb = TMath::Prob(fitter_jets->getS(), fitter_jets->getNDF());
-    h1_kinfit_chiSquare->Fill( fitter_jets->getS()/fitter_jets->getNDF(), eventWeight ); 
+//  // kinematic selection on jets:
+//  if( jet1.Pt() < jet1Pt_thresh ) continue;
+//  if( jet2.Pt() < jet2Pt_thresh ) continue;
+
+    std::pair<TLorentzVector,TLorentzVector> jets_kinfit = fitter_jetsWZ->fit(jet1, jet2);
+    chiSquareProb = TMath::Prob(fitter_jetsWZ->getS(), fitter_jetsWZ->getNDF());
+    h1_kinfit_chiSquare->Fill( fitter_jetsWZ->getS()/fitter_jetsWZ->getNDF(), eventWeight ); 
     h1_kinfit_chiSquareProb->Fill( chiSquareProb, eventWeight ); 
+
+    jets_kinfit = fitter_jetsW->fit(jet1, jet2);
+    float chiSquareProbW = TMath::Prob(fitter_jetsW->getS(), fitter_jetsW->getNDF());
+    jets_kinfit = fitter_jetsZ->fit(jet1, jet2);
+    float chiSquareProbZ = TMath::Prob(fitter_jetsZ->getS(), fitter_jetsZ->getNDF());
+
+    chiSquareProbMax = (chiSquareProbW>chiSquareProbZ) ? chiSquareProbW : chiSquareProbZ;
+    h1_kinfit_chiSquareProbMax->Fill( chiSquareProbMax, eventWeight ); 
 
 
     float QGLikelihoodJet1 = qglikeli->computeQGLikelihoodPU( jet1.Pt(), rhoPF, jet1.nCharged(), jet1.nNeutral(), jet1.ptD );
@@ -522,6 +566,12 @@ void finalize(const std::string& dataset) {
     QGLikelihoodJet1_t = QGLikelihoodJet1;
     QGLikelihoodJet2_t = QGLikelihoodJet2;
 
+    simpleSecondaryVertexHighEfficiencyJet1_t = jet1.simpleSecondaryVertexHighEffBJetTags;
+    simpleSecondaryVertexHighEfficiencyJet2_t = jet2.simpleSecondaryVertexHighEffBJetTags;
+
+    trackCountingHighEfficiencyJet1_t = jet1.trackCountingHighEffBJetTags;
+    trackCountingHighEfficiencyJet2_t = jet2.trackCountingHighEffBJetTags;
+
     mgg = diPhoton.M();
     mjj = diJet.M();
 
@@ -553,6 +603,7 @@ void finalize(const std::string& dataset) {
 
   h1_kinfit_chiSquare->Write();
   h1_kinfit_chiSquareProb->Write();
+  h1_kinfit_chiSquareProbMax->Write();
 
   h1_ptJet1->Write();
   h1_etaJet1->Write();
@@ -583,6 +634,7 @@ void finalize(const std::string& dataset) {
   delete h1_mgg;
   delete h1_kinfit_chiSquare;
   delete h1_kinfit_chiSquareProb;
+  delete h1_kinfit_chiSquareProbMax;
   delete h1_ptJet1;
   delete h1_etaJet1;
   delete h1_pdgIdJet1;
