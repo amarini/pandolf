@@ -117,6 +117,10 @@ void TreeAnalyzer_PhotonJet::CreateOutputFile() {
   jetTree_->Branch("passed_Photon60", &passed_Photon60_, "passed_Photon60_/O");
   jetTree_->Branch("passed_Photon70", &passed_Photon70_, "passed_Photon70_/O");
   jetTree_->Branch("passed_Photon75", &passed_Photon75_, "passed_Photon75_/O");
+  jetTree_->Branch("passed_Photon90", &passed_Photon90_, "passed_Photon90_/O");
+  jetTree_->Branch("passed_Photon125", &passed_Photon125_, "passed_Photon125_/O");
+  jetTree_->Branch("passed_Photon135", &passed_Photon135_, "passed_Photon135_/O");
+  jetTree_->Branch("passed_Photon400", &passed_Photon400_, "passed_Photon400_/O");
 
   jetTree_->Branch("ePhotReco",  &ePhotReco_,  "ePhotReco_/F");
   jetTree_->Branch("ptPhotReco",  &ptPhotReco_,  "ptPhotReco_/F");
@@ -863,17 +867,21 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
      etaPart2nd_= etaPart2nd_found;
 
 
-     passed_Photon10_ = passedTrigger_regexp("HLT_Photon10_");
-     passed_Photon15_ = passedTrigger_regexp("HLT_Photon15_");
-     passed_Photon20_ = passedTrigger_regexp("HLT_Photon20_");
-     passed_Photon25_ = passedTrigger_regexp("HLT_Photon25_");
-     passed_Photon30_ = passedTrigger_regexp("HLT_Photon30_");
-     passed_Photon35_ = passedTrigger_regexp("HLT_Photon35_");
-     passed_Photon40_ = passedTrigger_regexp("HLT_Photon40_");
-     passed_Photon50_ = passedTrigger_regexp("HLT_Photon50_");
-     passed_Photon60_ = passedTrigger_regexp("HLT_Photon60_");
-     passed_Photon70_ = passedTrigger_regexp("HLT_Photon70_");
-     passed_Photon75_ = passedTrigger_regexp("HLT_Photon75_");
+     passed_Photon10_ = passedTrigger_regexp("HLT_Photon10_v");
+     passed_Photon15_ = passedTrigger_regexp("HLT_Photon15_v");
+     passed_Photon20_ = passedTrigger_regexp("HLT_Photon20_v");
+     passed_Photon25_ = passedTrigger_regexp("HLT_Photon25_v");
+     passed_Photon30_ = passedTrigger_regexp("HLT_Photon30_v");
+     passed_Photon35_ = passedTrigger_regexp("HLT_Photon35_v");
+     passed_Photon40_ = passedTrigger_regexp("HLT_Photon40_v");
+     passed_Photon50_ = passedTrigger_regexp("HLT_Photon50_v");
+     passed_Photon60_ = passedTrigger_regexp("HLT_Photon60_v");
+     passed_Photon70_ = passedTrigger_regexp("HLT_Photon70_v");
+     passed_Photon75_ = passedTrigger_regexp("HLT_Photon75_v");
+     passed_Photon90_ = passedTrigger_regexp("HLT_Photon90_v");
+     passed_Photon125_ = passedTrigger_regexp("HLT_Photon125_v");
+     passed_Photon135_ = passedTrigger_regexp("HLT_Photon135_v");
+     passed_Photon400_ = passedTrigger_regexp("HLT_Photon400_v");
 
 
      //bool eventOK = ( matchedToMC_ || isIsolated_veryloose_);
