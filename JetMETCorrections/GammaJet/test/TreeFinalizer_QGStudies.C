@@ -622,6 +622,8 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
   tree->SetBranchAddress("passed_Photon20", &passed_Photon20);
   Bool_t passed_Photon30;
   tree->SetBranchAddress("passed_Photon30", &passed_Photon30);
+  Bool_t passed_Photon40;
+  tree->SetBranchAddress("passed_Photon40", &passed_Photon40);
   Bool_t passed_Photon50;
   tree->SetBranchAddress("passed_Photon50", &passed_Photon50);
   Bool_t passed_Photon70;
@@ -648,6 +650,8 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
   tree_passedEvents->Branch( "eta2ndJet", &eta2ndJetReco, "eta2ndJetReco/F");
   tree_passedEvents->Branch( "QGLikelihoodJet", &QGlikelihood, "QGlikelihood/F");
   tree_passedEvents->Branch( "pdgIdPart", &pdgIdPart, "pdgIdPart/I");
+  tree_passedEvents->Branch( "passed_Photon40", &passed_Photon40, "passed_Photon40/O");
+  tree_passedEvents->Branch( "passed_Photon70", &passed_Photon70, "passed_Photon70/O");
 
 
 
@@ -785,10 +789,10 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
 
 
 
-    if( !isMC ) {
+//  if( !isMC ) {
 
-      if( ptPhotReco>30. && ptPhotReco<50. && !passed_Photon30 ) continue;
-      if( ptPhotReco>50. && ptPhotReco<70. && !passed_Photon50 ) continue;
+//    if( ptPhotReco>30. && ptPhotReco<50. && !passed_Photon30 ) continue;
+//    if( ptPhotReco>50. && ptPhotReco<70. && !passed_Photon50 ) continue;
 //      if( ptPhotReco>70. && ptPhotReco<120. && !passed_Photon30 ) continue;
 
 //    if( ptPhotReco < 33. ) {
@@ -798,7 +802,7 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
 //    } else if( ptPhotReco < 85. ) {
 //      if( !passed_Photon50 ) continue;
 //    }
-    } //trigger requirement
+//  } //trigger requirement
 
 
     //if( ptPhotReco<85. || ptPhotReco>115. ) continue;
