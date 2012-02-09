@@ -29,6 +29,7 @@ int main(int argc, char* argv[]) {
   //std::string data_dataset = "DATA_Run2011A_1fb";
   //std::string mc_QCD = "QCD_TuneZ2_HT-500To1000_7TeV-madgraph_Summer11-PU_S4_START42_V11-v1";
   std::string mc_QCD = "QCD_HT_Summer11";
+  std::string mc_PhotonJet = "G_Summer11";
 
 
   std::string recoType = "pf";
@@ -73,6 +74,13 @@ int main(int argc, char* argv[]) {
   db->add_mcFile( mcQCDFile, mc_QCD, "QCD MC", 38);
 
 
+  //char mcPhotonJetFile_char[150];
+  //sprintf( mcPhotonJetFile_char, "MultiJet_%s.root", mc_PhotonJet.c_str());
+
+  //TFile* mcPhotonJetFile = TFile::Open(mcPhotonJetFile_char);
+  //db->add_mcFile( mcPhotonJetFile, mc_PhotonJet, "#gamma+Jet MC", 46);
+
+
 
   if( norm=="LUMI" ) {
     db->set_lumiNormalization(1894.3);
@@ -95,6 +103,7 @@ int main(int argc, char* argv[]) {
 
   bool log = true;
 
+  db->set_yAxisMaxScaleLog( 1000. );
   db->drawHisto( "nvertex", "Number of Reconstructed Vertexes", "", "Events", log);
   db->drawHisto( "nvertexPU", "Number of Reconstructed Vertexes", "", "Events", log);
 
@@ -119,22 +128,31 @@ int main(int argc, char* argv[]) {
   db->drawHisto( "ptDJet2", "Third Jet p_{T}D",  "", "Events", log);
   db->drawHisto( "ptDJet3", "Fourth Jet p_{T}D", "", "Events", log);
 
-  db->drawHisto( "nChargedJet0", "First  Jet Charged Multiplicity", "", "Events", log);
+  db->set_xAxisMax(60.);
+  db->drawHisto( "nChargedJet0", "First Jet Charged Multiplicity", "", "Events", log);
   db->drawHisto( "nChargedJet1", "Second Jet Charged Multiplicity", "", "Events", log);
-  db->drawHisto( "nChargedJet2", "Third  Jet Charged Multiplicity", "", "Events", log);
+  db->drawHisto( "nChargedJet2", "Third Jet Charged Multiplicity", "", "Events", log);
   db->drawHisto( "nChargedJet3", "Fourth Jet Charged Multiplicity", "", "Events", log);
 
-  db->drawHisto( "nNeutralJet0", "First  Jet Neutral Multiplicity", "", "Events", log);
+  db->drawHisto( "nNeutralJet0", "First Jet Neutral Multiplicity", "", "Events", log);
   db->drawHisto( "nNeutralJet1", "Second Jet Neutral Multiplicity", "", "Events", log);
-  db->drawHisto( "nNeutralJet2", "Third  Jet Neutral Multiplicity", "", "Events", log);
+  db->drawHisto( "nNeutralJet2", "Third Jet Neutral Multiplicity", "", "Events", log);
   db->drawHisto( "nNeutralJet3", "Fourth Jet Neutral Multiplicity", "", "Events", log);
+  db->set_xAxisMax();
 
-  drawHistoWithQuarkGluonComponents( db, "tree_passedEvents", "QGLikelihoodJet0", "First  Jet Q-G Likelihood", "", "Events");
+  db->set_rebin(2);
+  drawHistoWithQuarkGluonComponents( db, "tree_passedEvents", "QGLikelihoodJet0", "First Jet Q-G Likelihood", "", "Events");
   drawHistoWithQuarkGluonComponents( db, "tree_passedEvents", "QGLikelihoodJet1", "Second Jet Q-G Likelihood", "", "Events");
   drawHistoWithQuarkGluonComponents( db, "tree_passedEvents", "QGLikelihoodJet2", "Third Jet Q-G Likelihood", "", "Events");
   drawHistoWithQuarkGluonComponents( db, "tree_passedEvents", "QGLikelihoodJet3", "Fourth Jet Q-G Likelihood", "", "Events");
 
-  drawHistoWithQuarkGluonComponents( db, "tree_passedEvents", "QGLikelihoodJet0", "First  Jet Q-G Likelihood", "", "Events", false, 100., 200.);
+  drawHistoWithQuarkGluonComponents( db, "tree_passedEvents", "QGLikelihoodJet0", "First Jet Q-G Likelihood", "", "Events", false, 100., 200.);
+  drawHistoWithQuarkGluonComponents( db, "tree_passedEvents", "QGLikelihoodJet0", "First Jet Q-G Likelihood", "", "Events", false, 200., 300.);
+  drawHistoWithQuarkGluonComponents( db, "tree_passedEvents", "QGLikelihoodJet0", "First Jet Q-G Likelihood", "", "Events", false, 300., 400.);
+
+  drawHistoWithQuarkGluonComponents( db, "tree_passedEvents", "QGLikelihoodJet1", "Second Jet Q-G Likelihood", "", "Events", false, 100., 200.);
+  drawHistoWithQuarkGluonComponents( db, "tree_passedEvents", "QGLikelihoodJet1", "Second Jet Q-G Likelihood", "", "Events", false, 200., 300.);
+  drawHistoWithQuarkGluonComponents( db, "tree_passedEvents", "QGLikelihoodJet1", "Second Jet Q-G Likelihood", "", "Events", false, 300., 400.);
 
 
   delete db;
@@ -167,30 +185,49 @@ void drawHistoWithQuarkGluonComponents( DrawBase* db, const std::string& treeNam
     exit(333);
   }
 
-  TH1D* h1_data = db->get_lastHistos_data()[0];
+  //TH1D* h1_data = db->get_lastHistos_data()[0];
   std::vector<TH1D*> lastHistos = db->get_lastHistos_mc();
 
   int nBins = lastHistos[0]->GetNbinsX();
   float xMin = lastHistos[0]->GetXaxis()->GetXmin();
   float xMax = lastHistos[0]->GetXaxis()->GetXmax();
 
+  TH1D* h1_data = new TH1D( "data", "", nBins, xMin, xMax );
   TH1D* h1_all = new TH1D( "all", "", nBins, xMin, xMax );
   TH1D* h1_quark = new TH1D( "quark", "", nBins, xMin, xMax );
   TH1D* h1_gluon = new TH1D( "gluon", "", nBins, xMin, xMax );
+  TH1D* h1_b = new TH1D( "b", "", nBins, xMin, xMax );
 
+
+  //char allCondition[400];
+  //sprintf( allCondition, "eventWeight*(pdgIdPartJet%d>-10 && ptJet%d>%f && ptJet%d<%f && ptDJet%d<0.9)", jetNumber, jetNumber, ptMin, jetNumber, ptMax, jetNumber );
+  //char quarkCondition[400];
+  //sprintf( quarkCondition, "eventWeight*(abs(pdgIdPartJet%d)<5 && ptJet%d>%f && ptJet%d<%f && ptDJet%d<0.9)", jetNumber, jetNumber, ptMin, jetNumber, ptMax, jetNumber );
+  //char gluonCondition[400];
+  //sprintf( gluonCondition, "eventWeight*(pdgIdPartJet%d==21 && ptJet%d>%f && ptJet%d<%f && ptDJet%d<0.9)", jetNumber, jetNumber, ptMin, jetNumber, ptMax, jetNumber );
+
+  char commonCondition[200];
+  //sprintf( commonCondition, "ptJet%d>%f && ptJet%d<%f", jetNumber, ptMin, jetNumber, ptMax ); 
+  sprintf( commonCondition, "ptJet%d>%f && ptJet%d<%f && ptDJet%d<0.9", jetNumber, ptMin, jetNumber, ptMax, jetNumber ); 
 
   char allCondition[400];
-  sprintf( allCondition, "eventWeight*(pdgIdPartJet%d>-10 && ptJet%d>%f && ptJet%d<%f)", jetNumber, jetNumber, ptMin, jetNumber, ptMax );
+  sprintf( allCondition, "eventWeight*(%s)", commonCondition );
   char quarkCondition[400];
-  sprintf( quarkCondition, "eventWeight*(abs(pdgIdPartJet%d)<5 && ptJet%d>%f && ptJet%d<%f)", jetNumber, jetNumber, ptMin, jetNumber, ptMax );
+  sprintf( quarkCondition, "eventWeight*(abs(pdgIdPartJet%d)<5 && %s)", jetNumber, commonCondition );
   char gluonCondition[400];
-  sprintf( gluonCondition, "eventWeight*(pdgIdPartJet%d==21 && ptJet%d>%f && ptJet%d<%f)", jetNumber, jetNumber, ptMin, jetNumber, ptMax );
+  sprintf( gluonCondition, "eventWeight*(pdgIdPartJet%d==21 && %s)", jetNumber, commonCondition );
+  char bCondition[400];
+  sprintf( bCondition, "eventWeight*(abs(pdgIdPartJet%d)==5 && %s)", jetNumber, commonCondition );
 
-  TTree* tree = (TTree*)(db->get_mcFile(0).file->Get(treeName.c_str()));
+  TTree* treeDATA = (TTree*)(db->get_dataFile(0).file->Get(treeName.c_str()));
+  treeDATA->Project( "data", varName.c_str(), commonCondition );
 
-  tree->Project( "all",   varName.c_str(), allCondition );
-  tree->Project( "quark", varName.c_str(), quarkCondition );
-  tree->Project( "gluon", varName.c_str(), gluonCondition );
+
+  TTree* treeMC = (TTree*)(db->get_mcFile(0).file->Get(treeName.c_str()));
+  treeMC->Project( "all",   varName.c_str(), allCondition );
+  treeMC->Project( "quark", varName.c_str(), quarkCondition );
+  treeMC->Project( "gluon", varName.c_str(), gluonCondition );
+  treeMC->Project( "b", varName.c_str(), bCondition );
 
   float data_int = h1_data->Integral();
   float mc_int = h1_all->Integral();
@@ -198,14 +235,17 @@ void drawHistoWithQuarkGluonComponents( DrawBase* db, const std::string& treeNam
 
   float quark_fraction = h1_quark->Integral()/mc_int;
   float gluon_fraction = h1_gluon->Integral()/mc_int;
-  float b_fraction = 1.-quark_fraction-gluon_fraction;
+  float b_fraction = h1_b->Integral()/mc_int;
+  float other_fraction = 1.-quark_fraction-gluon_fraction-b_fraction;
 
   char quarkText[300];
-  sprintf( quarkText, "udsc (%.1f %%)", 100.*quark_fraction );
+  sprintf( quarkText, "udsc (%.1f%%)", 100.*quark_fraction );
   char gluonText[300];
-  sprintf( gluonText, "Gluons (%.1f %%)", 100.*gluon_fraction );
+  sprintf( gluonText, "Gluons (%.1f%%)", 100.*gluon_fraction );
   char bText[300];
-  sprintf( bText, "b (%.1f %%)", 100.*b_fraction );
+  sprintf( bText, "b (%.1f%%)", 100.*b_fraction );
+  char otherText[300];
+  sprintf( otherText, "Undefined (%.1f%%)", 100.*other_fraction );
 
   
   TLegend* legend;
@@ -221,27 +261,34 @@ void drawHistoWithQuarkGluonComponents( DrawBase* db, const std::string& treeNam
   legend->AddEntry( h1_data, "Data", "p" );
   legend->AddEntry( h1_gluon, gluonText, "F" );
   legend->AddEntry( h1_quark, quarkText, "F" );
-  legend->AddEntry( h1_all, bText, "F" );
+  legend->AddEntry( h1_b, bText, "F" );
+  legend->AddEntry( h1_all, otherText, "F" );
 
-  h1_all->Rebin( 2 );
-  h1_gluon->Rebin( 2 );
-  h1_quark->Rebin( 2 );
-  h1_data->Rebin( 2 );
+//h1_all->Rebin( 2 );
+//h1_gluon->Rebin( 2 );
+//h1_quark->Rebin( 2 );
+//h1_b->Rebin( 2 );
+//h1_data->Rebin( 2 );
   
   h1_all->Scale( scaleFactor );
   h1_gluon->Scale( scaleFactor );
   h1_quark->Scale( scaleFactor );
+  h1_b->Scale( scaleFactor );
   
+  h1_data->SetMarkerStyle( 20 );
+  h1_data->SetMarkerSize( 1. );
   h1_all->SetFillColor( kGray );
   h1_gluon->SetFillColor( 46 );
   h1_quark->SetFillColor( 38 );
+  h1_b->SetFillColor( kYellow );
 
   THStack* stack = new THStack();
   stack->Add(h1_gluon );
   stack->Add(h1_quark);
+  stack->Add(h1_b);
 
   float dataMax = h1_data->GetMaximum();
-  float mcMax = stack->GetMaximum();
+  float mcMax = h1_all->GetMaximum();
   float yMax = (dataMax>mcMax) ? dataMax : mcMax;
   yMax *= 1.3;
 
@@ -257,10 +304,10 @@ void drawHistoWithQuarkGluonComponents( DrawBase* db, const std::string& treeNam
   c1->cd();
 
   h2_axes->Draw();
+  legend->Draw("same");
   h1_all->Draw("same");
   stack->Draw("histo same");
-  h1_data->Draw("same");
-  legend->Draw("same");
+  h1_data->Draw("p same");
   sqrtLabel->Draw("Same");
 
   gPad->RedrawAxis();
@@ -279,9 +326,11 @@ void drawHistoWithQuarkGluonComponents( DrawBase* db, const std::string& treeNam
   delete c1;
   delete h2_axes;
 
+  delete h1_data;
   delete h1_all;
   delete h1_quark;
   delete h1_gluon;
+  delete h1_b;
   
 }
 
