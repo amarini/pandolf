@@ -2415,6 +2415,7 @@ void DrawBase::compareDifferentHistos_singleFile( InputFile infile, const std::v
   c1->cd();
 
   h2_axes->Draw();
+  legend->Draw("same");
   if( stacked ) {
     stack->Draw("histo same");
   } else {
@@ -2444,7 +2445,6 @@ void DrawBase::compareDifferentHistos_singleFile( InputFile infile, const std::v
     } //for later histos
 
   } // if stacked
-  legend->Draw("same");
   label_CMS->Draw("same");
   label_sqrt->Draw("same");
   gPad->RedrawAxis();
