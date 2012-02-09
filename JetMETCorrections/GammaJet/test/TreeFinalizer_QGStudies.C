@@ -630,6 +630,7 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
   tree->SetBranchAddress("passed_Photon70", &passed_Photon70);
 
 
+  Int_t nNeutralJetReco;
   Float_t QGlikelihood;
   Bool_t passedID_FULL;
   Bool_t secondJetOK;
@@ -644,14 +645,15 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
   tree_passedEvents->Branch( "btagged", &btagged, "btagged/O");
   tree_passedEvents->Branch( "ptPhot", &ptPhotReco, "ptPhotReco/F");
   tree_passedEvents->Branch( "etaPhot", &etaPhotReco, "etaPhotReco/F");
-  tree_passedEvents->Branch( "ptJet", &ptCorrJetReco, "ptCorrJetReco/F");
-  tree_passedEvents->Branch( "etaJet", &etaJetReco, "etaJetReco/F");
-  tree_passedEvents->Branch( "pt2ndJet", &ptCorr2ndJetReco, "ptCorr2ndJetReco/F");
-  tree_passedEvents->Branch( "eta2ndJet", &eta2ndJetReco, "eta2ndJetReco/F");
-  tree_passedEvents->Branch( "QGLikelihoodJet", &QGlikelihood, "QGlikelihood/F");
-  tree_passedEvents->Branch( "pdgIdPart", &pdgIdPart, "pdgIdPart/I");
-  tree_passedEvents->Branch( "passed_Photon40", &passed_Photon40, "passed_Photon40/O");
-  tree_passedEvents->Branch( "passed_Photon70", &passed_Photon70, "passed_Photon70/O");
+  tree_passedEvents->Branch( "ptJet0", &ptCorrJetReco, "ptCorrJetReco/F");
+  tree_passedEvents->Branch( "etaJet0", &etaJetReco, "etaJetReco/F");
+  tree_passedEvents->Branch( "ptJet1", &ptCorr2ndJetReco, "ptCorr2ndJetReco/F");
+  tree_passedEvents->Branch( "etaJet1", &eta2ndJetReco, "eta2ndJetReco/F");
+  tree_passedEvents->Branch( "nChargedJet0", &nTracksReco, "nTracksReco/I");
+  tree_passedEvents->Branch( "nNeutralJet0", &nNeutralJetReco, "nNeutralJetReco/I");
+  tree_passedEvents->Branch( "ptDJet0", &ptDJetReco, "ptDJetReco/F");
+  tree_passedEvents->Branch( "QGLikelihoodJet0", &QGlikelihood, "QGlikelihood/F");
+  tree_passedEvents->Branch( "pdgIdPartJet0", &pdgIdPart, "pdgIdPart/I");
 
 
 
