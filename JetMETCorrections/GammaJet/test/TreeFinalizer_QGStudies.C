@@ -983,7 +983,7 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
 
 
 
-   int nNeutralJetReco = nPhotonsReco + nNeutralHadronsReco;
+   nNeutralJetReco = nPhotonsReco + nNeutralHadronsReco;
    //float QGlikelihood = qglikeli->computeQGLikelihoodPU( ptCorrJetReco, rhoPF, nTracksReco, nNeutralJetReco, ptDJetReco, -1. );
    QGlikelihood = qglikeli->computeQGLikelihoodPU( ptCorrJetReco, rhoPF, nTracksReco, nNeutralJetReco, ptDJetReco, -1. );
   
