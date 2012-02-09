@@ -874,8 +874,12 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
       //} else {
       //  isIsolated_ecal = ( ecalIsoPhotReco<0.05  || ecalIsoPhotReco*ePhotReco<3. );
       //}
-      isIsolated_ptTracks = ( ptTrkIsoPhotReco<0.1 );
-      isIsolated_nTracks = (nTrkIsoPhotReco < 3 );
+
+////  isIsolated_ptTracks = ( ptTrkIsoPhotReco<0.1 );
+////  isIsolated_nTracks = (nTrkIsoPhotReco < 3 );
+
+      isIsolated_ptTracks = ( ptTrkIsoPhotReco<0.05 );
+      isIsolated_nTracks = true;
       clusterMajOK = ( clusterMajPhotReco>0.15 && clusterMajPhotReco<0.35 );
       clusterMinOK = ( clusterMinPhotReco>0.15 && clusterMinPhotReco<0.3 );
       pixelSeedOK = !hasPixelSeedPhotReco;
