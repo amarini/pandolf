@@ -52,6 +52,14 @@ void finalize(const std::string& dataset) {
     addInput( "QCD_TuneZ2_HT-250To500_7TeV-madgraph_Summer11-PU_S4_START42_V11-v3" );
     addInput( "QCD_TuneZ2_HT-500To1000_7TeV-madgraph_Summer11-PU_S4_START42_V11-v1" );
     addInput( "QCD_TuneZ2_HT-1000_7TeV-madgraph_Summer11-PU_S4_START42_V11-v1" );
+  } else if( dataset=="G_Summer11" ) {
+    addInput( "G_Pt-170to300_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v1");
+    addInput( "G_Pt-300to470_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v1");
+    addInput( "G_Pt-800to1400_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v1");
+    addInput( "G_Pt-470to800_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v1");
+    addInput( "G_Pt-120to170_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v1");
+    addInput( "G_Pt-80to120_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v1");
+    addInput( "G_Pt-1400to1800_TuneZ2_7TeV_pythia_Summer11-PU_S4_START42_V11-v1");
   } else {
     addInput( dataset );
   }
@@ -77,6 +85,16 @@ void finalize(const std::string& dataset) {
   h1_htmet_akt5->Sumw2();
   TH1D* h1_sumpt_pfakt5 = new TH1D("sumpt_pfakt5", "", 300, 200., 3200.);
   h1_sumpt_pfakt5->Sumw2();
+
+  TH1D* h1_deltaR_part_jet0 = new TH1D("deltaR_part_jet0", "", 100, 0., 5.);
+  h1_deltaR_part_jet0->Sumw2();
+  TH1D* h1_deltaR_part_jet1 = new TH1D("deltaR_part_jet1", "", 100, 0., 5.);
+  h1_deltaR_part_jet1->Sumw2();
+  TH1D* h1_deltaR_part_jet2 = new TH1D("deltaR_part_jet2", "", 100, 0., 5.);
+  h1_deltaR_part_jet2->Sumw2();
+  TH1D* h1_deltaR_part_jet3 = new TH1D("deltaR_part_jet3", "", 100, 0., 5.);
+  h1_deltaR_part_jet3->Sumw2();
+
 
   TH1D* h1_ptJet0 = new TH1D("ptJet0", "", 500, 0., 500.);
   h1_ptJet0->Sumw2();
@@ -143,6 +161,8 @@ void finalize(const std::string& dataset) {
 
   Int_t run;
   tree->SetBranchAddress("run", &run);
+  Int_t LS;
+  tree->SetBranchAddress("LS", &LS);
   Int_t nvertex;
   tree->SetBranchAddress("nvertex", &nvertex);
   Float_t rhoPF;
@@ -197,6 +217,8 @@ void finalize(const std::string& dataset) {
   Float_t QGLikelihoodJet[20];
   tree->SetBranchAddress("QGLikelihoodJet", QGLikelihoodJet);
 
+  Float_t ePartJet[20];
+  tree->SetBranchAddress("ePartJet", ePartJet);
   Float_t ptPartJet[20];
   tree->SetBranchAddress("ptPartJet", ptPartJet);
   Float_t etaPartJet[20];
@@ -280,6 +302,7 @@ void finalize(const std::string& dataset) {
   tree_passedEvents->Branch( "run", &run, "run/I" );
   tree_passedEvents->Branch( "event", &event, "event/I" );
   tree_passedEvents->Branch( "eventWeight", &eventWeight, "eventWeight/F" );
+  tree_passedEvents->Branch( "rhoPF", &rhoPF, "rhoPF/F" );
   tree_passedEvents->Branch( "ht_akt5", &ht_akt5, "ht_akt5/F" );
 
   tree_passedEvents->Branch( "ptJet0", &ptJet0, "ptJet0/F" );
@@ -325,6 +348,7 @@ void finalize(const std::string& dataset) {
 
 
 
+  std::map< int, std::map<int, std::vector<int> > > run_lumi_ev_map;
 
   int nEntries = tree->GetEntries();
 //nEntries = 100000;
@@ -336,6 +360,58 @@ void finalize(const std::string& dataset) {
     tree->GetEntry(iEntry);
 
     bool isMC = run<5;
+
+
+    if( !isMC ) {
+
+      std::map<int, std::map<int, std::vector<int> > >::iterator it;
+
+      it = run_lumi_ev_map.find(run);
+
+
+      if( it==run_lumi_ev_map.end() ) {
+
+        std::vector<int> events;
+        events.push_back(event);
+        std::map<int, std::vector<int> > lumi_ev_map;
+        lumi_ev_map.insert( std::pair<int,std::vector<int> >(LS, events));
+        run_lumi_ev_map.insert( std::pair<int, std::map<int, std::vector<int> > > (run, lumi_ev_map) );
+
+      } else { //run exists, look for LS
+
+
+        std::map<int, std::vector<int> >::iterator it_LS;
+        it_LS = it->second.find( LS );
+
+        if( it_LS==(it->second.end())  ) {
+
+          std::vector<int> events;
+          events.push_back(event);
+          it->second.insert( std::pair<int, std::vector<int> > (LS, events) );
+
+        } else { //LS exists, look for event
+
+          std::vector<int>::iterator ev;
+          for( ev=it_LS->second.begin(); ev!=it_LS->second.end(); ++ev )
+            if( *ev==event ) break;
+
+
+          if( ev==it_LS->second.end() ) {
+
+            it_LS->second.push_back(event);
+
+          } else {
+
+            std::cout << "DISCARDING DUPLICATE EVENT!! Run: " << run << " LS: " << LS << " event: " << event << std::endl;
+
+            continue;
+
+          }
+        }
+      }
+
+    } //if is mc
+
 
     //initialize tree branches:
     ptJet0 = 0.;
@@ -424,8 +500,42 @@ void finalize(const std::string& dataset) {
       thisJet->nTracksReco = nChargedHadronsJet[iJet];
       thisJet->nNeutralHadronsReco = nNeutralHadronsJet[iJet];
       thisJet->nPhotonsReco = nPhotonsJet[iJet];
-      thisJet->pdgIdPart = pdgIdPartJet[iJet];
-      thisJet->pdgIdMom = pdgIdMomJet[iJet];
+
+      if( isMC ) {
+
+        thisJet->pdgIdPart = pdgIdPartJet[iJet];
+        thisJet->ptPart = ptPartJet[iJet];
+        thisJet->etaPart = etaPartJet[iJet];
+        thisJet->phiPart = phiPartJet[iJet];
+        thisJet->ePart = ePartJet[iJet];
+        thisJet->pdgIdMom = pdgIdMomJet[iJet];
+
+        TLorentzVector* parton = new TLorentzVector();
+        parton->SetPtEtaPhiE( thisJet->ptPart, thisJet->etaPart, thisJet->phiPart, thisJet->ePart );
+
+        float deltaR_part_jet = thisJet->DeltaR( *parton );
+        if( deltaR_part_jet>0.5 ) thisJet->pdgIdPart = -100;
+
+        if( iJet==0 )
+          h1_deltaR_part_jet0->Fill( deltaR_part_jet, eventWeight );
+        else if( iJet==1 )
+          h1_deltaR_part_jet1->Fill( deltaR_part_jet, eventWeight );
+        else if( iJet==2 )
+          h1_deltaR_part_jet2->Fill( deltaR_part_jet, eventWeight );
+        else if( iJet==3 )
+          h1_deltaR_part_jet3->Fill( deltaR_part_jet, eventWeight );
+
+      } else {
+
+        thisJet->pdgIdPart = 0;
+        thisJet->ptPart = 0.;
+        thisJet->etaPart = 0.;
+        thisJet->phiPart = 0.;
+        thisJet->ePart = 0.;
+        thisJet->pdgIdMom = 0;
+
+      }
+
 
       jets.push_back(thisJet);
 
@@ -543,6 +653,11 @@ void finalize(const std::string& dataset) {
   h1_ht_akt5->Write();
   h1_htmet_akt5->Write();
   h1_sumpt_pfakt5->Write();
+
+  h1_deltaR_part_jet0->Write();
+  h1_deltaR_part_jet1->Write();
+  h1_deltaR_part_jet2->Write();
+  h1_deltaR_part_jet3->Write();
 
   h1_ptJet0->Write();
   h1_etaJet0->Write();
