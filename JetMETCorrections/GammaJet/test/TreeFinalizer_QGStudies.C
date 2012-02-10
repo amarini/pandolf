@@ -640,6 +640,7 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
   tree_passedEvents->Branch( "LS", &LS, "LS/I" );
   tree_passedEvents->Branch( "event", &event, "event/I" );
   tree_passedEvents->Branch( "eventWeight", &eventWeight, "eventWeight/F");
+  tree_passedEvents->Branch( "rhoPF", &rhoPF, "rhoPF/F");
   tree_passedEvents->Branch( "passedPhotonID", &passedID_FULL, "passedID_FULL/O");
   tree_passedEvents->Branch( "secondJetOK", &secondJetOK, "secondJetOK/O");
   tree_passedEvents->Branch( "btagged", &btagged, "btagged/O");
@@ -875,11 +876,8 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
       //  isIsolated_ecal = ( ecalIsoPhotReco<0.05  || ecalIsoPhotReco*ePhotReco<3. );
       //}
 
-////  isIsolated_ptTracks = ( ptTrkIsoPhotReco<0.1 );
-////  isIsolated_nTracks = (nTrkIsoPhotReco < 3 );
-
-      isIsolated_ptTracks = ( ptTrkIsoPhotReco<0.05 );
-      isIsolated_nTracks = true;
+      isIsolated_ptTracks = ( ptTrkIsoPhotReco<0.1 );
+      isIsolated_nTracks = (nTrkIsoPhotReco < 3 );
       clusterMajOK = ( clusterMajPhotReco>0.15 && clusterMajPhotReco<0.35 );
       clusterMinOK = ( clusterMinPhotReco>0.15 && clusterMinPhotReco<0.3 );
       pixelSeedOK = !hasPixelSeedPhotReco;
