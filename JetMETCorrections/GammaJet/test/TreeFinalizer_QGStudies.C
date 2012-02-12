@@ -635,11 +635,13 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
   Bool_t passedID_FULL;
   Bool_t secondJetOK;
   Bool_t btagged;
+  Float_t pUWeight;
 
   tree_passedEvents->Branch( "run", &run, "run/I" );
   tree_passedEvents->Branch( "LS", &LS, "LS/I" );
   tree_passedEvents->Branch( "event", &event, "event/I" );
   tree_passedEvents->Branch( "eventWeight", &eventWeight, "eventWeight/F");
+  tree_passedEvents->Branch( "PUWeight", &pUWeight, "pUWeight/F");
   tree_passedEvents->Branch( "rhoPF", &rhoPF, "rhoPF/F");
   tree_passedEvents->Branch( "passedPhotonID", &passedID_FULL, "passedID_FULL/O");
   tree_passedEvents->Branch( "secondJetOK", &secondJetOK, "secondJetOK/O");
@@ -720,10 +722,9 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
 
     if( isMC ) {
 
-      if( dataset!="G2Jets_alpgen_Spring11" ) {
-        // PU reweighting:
-        eventWeight *= fPUWeight->GetWeight(nPU);
-      }
+      // PU reweighting:
+      pUWeight = fPUWeight->GetWeight(nPU);
+      eventWeight *= pUWeight;
 
     } else { //it's data: remove duplicate events (if any):
 
