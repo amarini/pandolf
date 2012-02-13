@@ -122,6 +122,13 @@ void TreeAnalyzer_PhotonJet::CreateOutputFile() {
   jetTree_->Branch("passed_Photon135", &passed_Photon135_, "passed_Photon135_/O");
   jetTree_->Branch("passed_Photon400", &passed_Photon400_, "passed_Photon400_/O");
 
+  jetTree_->Branch("passed_Photon50_CaloIdVL_IsoL",  &passed_Photon50_CaloIdVL_IsoL_, "passed_Photon50_CaloIdVL_IsoL_/O");
+  jetTree_->Branch("passed_Photon50_CaloIdVL",      &passed_Photon50_CaloIdVL_,      "passed_Photon50_CaloIdVL_/O");
+  jetTree_->Branch("passed_Photon75_CaloIdVL_IsoL", &passed_Photon75_CaloIdVL_IsoL_, "passed_Photon75_CaloIdVL_IsoL_/O");
+  jetTree_->Branch("passed_Photon75_CaloIdVL",      &passed_Photon75_CaloIdVL_,      "passed_Photon75_CaloIdVL_/O");
+  jetTree_->Branch("passed_Photon90_CaloIdVL_IsoL", &passed_Photon90_CaloIdVL_IsoL_, "passed_Photon90_CaloIdVL_IsoL_/O");
+  jetTree_->Branch("passed_Photon90_CaloIdVL",      &passed_Photon90_CaloIdVL_,      "passed_Photon90_CaloIdVL_/O");
+
   jetTree_->Branch("ePhotReco",  &ePhotReco_,  "ePhotReco_/F");
   jetTree_->Branch("ptPhotReco",  &ptPhotReco_,  "ptPhotReco_/F");
   jetTree_->Branch("etaPhotReco",  &etaPhotReco_,  "etaPhotReco_/F");
@@ -883,6 +890,13 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
      passed_Photon125_ = (passedTrigger_regexp("HLT_Photon125_v") || passedTrigger_regexp("HLT_Photon125_L1R_v"));
      passed_Photon135_ = (passedTrigger_regexp("HLT_Photon135_v") || passedTrigger_regexp("HLT_Photon135_L1R_v"));
      passed_Photon400_ = (passedTrigger_regexp("HLT_Photon400_v") || passedTrigger_regexp("HLT_Photon400_L1R_v"));
+
+     passed_Photon50_CaloIdVL_IsoL_ = passedTrigger_regexp("HLT_Photon50_CaloIdVL_IsoL_v");
+     passed_Photon50_CaloIdVL_      = passedTrigger_regexp("HLT_Photon50_CaloIdVL_v");
+     passed_Photon75_CaloIdVL_IsoL_ = passedTrigger_regexp("HLT_Photon75_CaloIdVL_IsoL_v");
+     passed_Photon75_CaloIdVL_      = passedTrigger_regexp("HLT_Photon75_CaloIdVL_v");
+     passed_Photon90_CaloIdVL_IsoL_ = passedTrigger_regexp("HLT_Photon90_CaloIdVL_IsoL_v");
+     passed_Photon90_CaloIdVL_      = passedTrigger_regexp("HLT_Photon90_CaloIdVL_v");
 
 
      //bool eventOK = ( matchedToMC_ || isIsolated_veryloose_);
