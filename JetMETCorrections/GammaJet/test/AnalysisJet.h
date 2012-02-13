@@ -8,7 +8,13 @@
 class AnalysisJet : public TLorentzVector {
 
  public:
-  AnalysisJet() : TLorentzVector() {};
+  AnalysisJet() : TLorentzVector(0.,0.,0.,0.) {
+    ptReco=0.;
+    ptCorrReco=0.;
+    eReco=0.;
+    etaReco=0.;
+    phiReco=0.;
+  };
   ~AnalysisJet(){};
 
   Float_t eReco;
