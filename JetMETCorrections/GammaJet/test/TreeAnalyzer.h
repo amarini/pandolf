@@ -108,6 +108,7 @@ public :
    Float_t         ptDJet[100];   
    Float_t         rmsCandJet[100];   
    Float_t         trackCountingHighEffBJetTags[100];   
+   Float_t         simpleSecondaryVertexHighEffBJetTags[100];   
    Int_t           nChargedHadrons[100];
    Int_t           nPhotons[100]; 
    Int_t           nMuons[100];  
@@ -314,6 +315,7 @@ public :
    TBranch        *b_ptDJet;   //!
    TBranch        *b_rmsCandJet;   //!
    TBranch        *b_trackCountingHighEffBJetTags;   //!
+   TBranch        *b_simpleSecondaryVertexHighEffBJetTags;   //!
    TBranch        *b_nChargedHadrons;   //!
    TBranch        *b_nPhotons;   //!
    TBranch        *b_nMuons;   //!
