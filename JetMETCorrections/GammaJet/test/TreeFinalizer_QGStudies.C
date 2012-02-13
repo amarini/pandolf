@@ -17,8 +17,8 @@
 #include <vector>
 #include <cmath>
 
-#include "/shome/pandolf/CMSSW_4_2_8/src/UserCode/pandolf/QGLikelihood/QGLikelihoodCalculator.C"
-#include "/shome/pandolf/CMSSW_4_2_8/src/UserCode/pandolf/CommonTools/PUWeight.C"
+//#include "/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/QGLikelihood/QGLikelihoodCalculator.C"
+#include "/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/CommonTools/PUWeight.C"
 
 float delta_phi(float phi1, float phi2);
 
@@ -79,6 +79,12 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
 
   outfileName = outfileName + suffix;
   if( photonID!="medium" ) outfileName = outfileName + "_" + photonID;
+//if( secondJetThreshold!=0.1 ) {
+//  char secondJetText[100];
+//  sprintf( secondJetText, "secondJet%.0f", 100.*secondJetThreshold );
+//  std::string secondJetText_str(secondJetText);
+//  outfileName = outfileName + "_" + secondJetText_str;
+//}
   outfileName += ".root";
 
   TFile* outFile = new TFile(outfileName.c_str(), "RECREATE");
@@ -98,32 +104,7 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
 
 
 
-  if( dataset=="G_TuneZ2_7TeV_pythia6" ) {
-
-    addInput( "G_Pt_0to15_TuneZ2_7TeV_pythia6" );
-    addInput( "G_Pt_15to30_TuneZ2_7TeV_pythia6" );
-    addInput( "G_Pt_30to50_TuneZ2_7TeV_pythia6" );
-    addInput( "G_Pt_50to80_TuneZ2_7TeV_pythia6" );
-    addInput( "G_Pt_80to120_TuneZ2_7TeV_pythia6" );
-    addInput( "G_Pt_120to170_TuneZ2_7TeV_pythia6" );
-    addInput( "G_Pt_170to300_TuneZ2_7TeV_pythia6" );
-    addInput( "G_Pt_300to470_TuneZ2_7TeV_pythia6" );
-    addInput( "G_Pt_470to800_TuneZ2_7TeV_pythia6" );
-  //addInput( "G_Pt_800to1400_TuneZ2_7TeV_pythia6" );
-  //addInput( "G_Pt_1400to1800_TuneZ2_7TeV_pythia6" );
-
-  } else if( dataset=="G_TuneZ2_7TeV_pythia6_Fall10_ProbDist_2010Data_BX156_final_38" ) {
-
-    addInput( "G_Pt_15to30_TuneZ2_7TeV_pythia6_Fall10_ProbDist_2010Data_BX156_final_38" );
-    addInput( "G_Pt_30to50_TuneZ2_7TeV_pythia6_Fall10_ProbDist_2010Data_BX156_final_38" );
-    addInput( "G_Pt_50to80_TuneZ2_7TeV_pythia6_Fall10_ProbDist_2010Data_BX156_final_38" );
-    addInput( "G_Pt_80to120_TuneZ2_7TeV_pythia6_Fall10_ProbDist_2010Data_BX156_final_38" );
-    addInput( "G_Pt_120to170_TuneZ2_7TeV_pythia6_Fall10_ProbDist_2010Data_BX156_final_38" );
-    addInput( "G_Pt_170to300_TuneZ2_7TeV_pythia6_Fall10_ProbDist_2010Data_BX156_final_38" );
-    addInput( "G_Pt_300to470_TuneZ2_7TeV_pythia6_Fall10_ProbDist_2010Data_BX156_final_38" );
-    addInput( "G_Pt_470to800_TuneZ2_7TeV_pythia6_Fall10_ProbDist_2010Data_BX156_final_38" );
-
-  } else if( dataset=="G_Spring11" ) {
+  if( dataset=="G_Spring11" ) {
 
     //addInput( "G_Pt_0to15_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1-ntpv4" );
     addInput( "G_Pt_120to170_TuneZ2_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1" );
@@ -141,6 +122,7 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
 
     addInput("G_Pt-15to30_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v2");
     addInput("G_Pt-120to170_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v2");
+    addInput("G_Pt-170to300_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v2");
     addInput("G_Pt-80to120_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v1");
     addInput("G_Pt-50to80_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v2");
     addInput("G_Pt-30to50_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v2");
@@ -570,6 +552,8 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
   tree->SetBranchAddress("nPhotonsReco", &nPhotonsReco);
   Float_t ptDJetReco;
   tree->SetBranchAddress("ptDJetReco", &ptDJetReco);
+  Float_t QGLikelihoodJetReco;
+  tree->SetBranchAddress("QGLikelihoodJetReco", &QGLikelihoodJetReco);
   Float_t trackCountingHighEffBJetTagsJetReco;
   tree->SetBranchAddress("trackCountingHighEffBJetTagsJetReco", &trackCountingHighEffBJetTagsJetReco);
 
@@ -628,10 +612,16 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
   tree->SetBranchAddress("passed_Photon50", &passed_Photon50);
   Bool_t passed_Photon70;
   tree->SetBranchAddress("passed_Photon70", &passed_Photon70);
+  Bool_t passed_Photon135;
+  tree->SetBranchAddress("passed_Photon135", &passed_Photon135);
+
+  Bool_t passed_Photon90_CaloIdVL_IsoL;
+  tree->SetBranchAddress("passed_Photon90_CaloIdVL_IsoL", &passed_Photon90_CaloIdVL_IsoL);
 
 
   Int_t nNeutralJetReco;
   Float_t QGlikelihood;
+  Bool_t passedID_no2ndJet;
   Bool_t passedID_FULL;
   Bool_t secondJetOK;
   Bool_t btagged;
@@ -643,8 +633,11 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
   tree_passedEvents->Branch( "eventWeight", &eventWeight, "eventWeight/F");
   tree_passedEvents->Branch( "PUWeight", &pUWeight, "pUWeight/F");
   tree_passedEvents->Branch( "rhoPF", &rhoPF, "rhoPF/F");
+  tree_passedEvents->Branch( "passedID_no2ndJet", &passedID_no2ndJet, "passedID_no2ndJet/O");
   tree_passedEvents->Branch( "passedPhotonID", &passedID_FULL, "passedID_FULL/O");
   tree_passedEvents->Branch( "secondJetOK", &secondJetOK, "secondJetOK/O");
+  tree_passedEvents->Branch( "passed_Photon90_CaloIdVL_IsoL", &passed_Photon90_CaloIdVL_IsoL, "passed_Photon90_CaloIdVL_IsoL/O");
+  tree_passedEvents->Branch( "passed_Photon135", &passed_Photon135, "passed_Photon135/O");
   tree_passedEvents->Branch( "btagged", &btagged, "btagged/O");
   tree_passedEvents->Branch( "ptPhot", &ptPhotReco, "ptPhotReco/F");
   tree_passedEvents->Branch( "etaPhot", &etaPhotReco, "etaPhotReco/F");
@@ -661,7 +654,8 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
 
 
   //QGLikelihoodCalculator* qglikeli = new QGLikelihoodCalculator("/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt_15to3000_TuneZ2_Flat_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1.root");
-  QGLikelihoodCalculator* qglikeli = new QGLikelihoodCalculator("/shome/pandolf/CMSSW_4_2_8/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
+
+  //QGLikelihoodCalculator* qglikeli = new QGLikelihoodCalculator("/shome/pandolf/CMSSW_4_2_8/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
 
   std::string puType = "Spring11_Flat10";
   if( dataset_tstr.Contains("Summer11") ) puType = "Summer11_S4";
@@ -979,7 +973,7 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
 
 
     bool photonOK = (isIsolated && clusterShapeOK && pixelSeedOK);
-    bool passedID_no2ndJet = photonOK && back2back;
+    passedID_no2ndJet = photonOK && back2back;
     passedID_FULL     = passedID_no2ndJet && secondJetOK;
     bool passedID_noSmaj     = isIsolated && clusterMinOK && pixelSeedOK && (secondJetOK || noJetSelection);
 
@@ -988,7 +982,8 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
 
    nNeutralJetReco = nPhotonsReco + nNeutralHadronsReco;
    //float QGlikelihood = qglikeli->computeQGLikelihoodPU( ptCorrJetReco, rhoPF, nTracksReco, nNeutralJetReco, ptDJetReco, -1. );
-   QGlikelihood = qglikeli->computeQGLikelihoodPU( ptCorrJetReco, rhoPF, nTracksReco, nNeutralJetReco, ptDJetReco, -1. );
+
+   //QGlikelihood = qglikeli->computeQGLikelihoodPU( ptCorrJetReco, rhoPF, nTracksReco, nNeutralJetReco, ptDJetReco, -1. );
   
 
 
@@ -1006,31 +1001,31 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
       if( ptCorrJetReco>30. && ptCorrJetReco<50. ) {
 
         if( abs( pdgIdPart ) < 7 ) {
-          h1_QGLikelihoodJetReco_antibtag_quark_noPhotID_3050->Fill( QGlikelihood, eventWeight );
+          h1_QGLikelihoodJetReco_antibtag_quark_noPhotID_3050->Fill( QGLikelihoodJetReco, eventWeight );
         } else if( pdgIdPart == 21 ) {
           if( parton.Energy() > 2. )
             if( parton.DeltaR(jet) < 0.3 )
-              h1_QGLikelihoodJetReco_antibtag_gluon_noPhotID_3050->Fill( QGlikelihood, eventWeight );
+              h1_QGLikelihoodJetReco_antibtag_gluon_noPhotID_3050->Fill( QGLikelihoodJetReco, eventWeight );
         }
    
       } else if( ptCorrJetReco>50. && ptCorrJetReco<80. ) {
 
         if( abs( pdgIdPart ) < 7 ) {
-          h1_QGLikelihoodJetReco_antibtag_quark_noPhotID_5080->Fill( QGlikelihood, eventWeight );
+          h1_QGLikelihoodJetReco_antibtag_quark_noPhotID_5080->Fill( QGLikelihoodJetReco, eventWeight );
         } else if( pdgIdPart == 21 ) {
           if( parton.Energy() > 2. )
             if( parton.DeltaR(jet) < 0.3 )
-              h1_QGLikelihoodJetReco_antibtag_gluon_noPhotID_5080->Fill( QGlikelihood, eventWeight );
+              h1_QGLikelihoodJetReco_antibtag_gluon_noPhotID_5080->Fill( QGLikelihoodJetReco, eventWeight );
         }
 
       } else if( ptCorrJetReco>80. && ptCorrJetReco<120. ) {
 
         if( abs( pdgIdPart ) < 7 ) {
-          h1_QGLikelihoodJetReco_antibtag_quark_noPhotID_80120->Fill( QGlikelihood, eventWeight );
+          h1_QGLikelihoodJetReco_antibtag_quark_noPhotID_80120->Fill( QGLikelihoodJetReco, eventWeight );
         } else if( pdgIdPart == 21 ) {
           if( parton.Energy() > 2. )
             if( parton.DeltaR(jet) < 0.3 )
-              h1_QGLikelihoodJetReco_antibtag_gluon_noPhotID_80120->Fill( QGlikelihood, eventWeight );
+              h1_QGLikelihoodJetReco_antibtag_gluon_noPhotID_80120->Fill( QGLikelihoodJetReco, eventWeight );
         }
 
       }
@@ -1084,7 +1079,7 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
           h1_nChargedJetReco_3050->Fill( nTracksReco, eventWeight );
           h1_nNeutralJetReco_3050->Fill( nNeutralJetReco, eventWeight );
           h1_ptDJetReco_3050->Fill( ptDJetReco, eventWeight );
-          h1_QGLikelihoodJetReco_3050->Fill( QGlikelihood, eventWeight );
+          h1_QGLikelihoodJetReco_3050->Fill( QGLikelihoodJetReco, eventWeight );
 
           if( !btagged ) {
             nEvents_antibtag_passed_3050 += eventWeight;
@@ -1093,11 +1088,11 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
             h1_nChargedJetReco_antibtag_3050->Fill( nTracksReco, eventWeight );
             h1_nNeutralJetReco_antibtag_3050->Fill( nNeutralJetReco, eventWeight );
             h1_ptDJetReco_antibtag_3050->Fill( ptDJetReco, eventWeight );
-            h1_QGLikelihoodJetReco_antibtag_3050->Fill( QGlikelihood, eventWeight );
+            h1_QGLikelihoodJetReco_antibtag_3050->Fill( QGLikelihoodJetReco, eventWeight );
             if( pdgIdPart==21 )
-              h1_QGLikelihoodJetReco_antibtag_gluon_3050->Fill( QGlikelihood, eventWeight );
+              h1_QGLikelihoodJetReco_antibtag_gluon_3050->Fill( QGLikelihoodJetReco, eventWeight );
             else if( abs(pdgIdPart)<7 ) 
-              h1_QGLikelihoodJetReco_antibtag_quark_3050->Fill( QGlikelihood, eventWeight );
+              h1_QGLikelihoodJetReco_antibtag_quark_3050->Fill( QGLikelihoodJetReco, eventWeight );
           }
 
         //} else if( ptPhotReco>55. && ptPhotReco<78. ) {
@@ -1117,7 +1112,7 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
           h1_nChargedJetReco_5080->Fill( nTracksReco, eventWeight );
           h1_nNeutralJetReco_5080->Fill( nNeutralJetReco, eventWeight );
           h1_ptDJetReco_5080->Fill( ptDJetReco, eventWeight );
-          h1_QGLikelihoodJetReco_5080->Fill( QGlikelihood, eventWeight );
+          h1_QGLikelihoodJetReco_5080->Fill( QGLikelihoodJetReco, eventWeight );
 
           if( !btagged ) {
             nEvents_antibtag_passed_5080 += eventWeight;
@@ -1126,11 +1121,11 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
             h1_nChargedJetReco_antibtag_5080->Fill( nTracksReco, eventWeight );
             h1_nNeutralJetReco_antibtag_5080->Fill( nNeutralJetReco, eventWeight );
             h1_ptDJetReco_antibtag_5080->Fill( ptDJetReco, eventWeight );
-            h1_QGLikelihoodJetReco_antibtag_5080->Fill( QGlikelihood, eventWeight );
+            h1_QGLikelihoodJetReco_antibtag_5080->Fill( QGLikelihoodJetReco, eventWeight );
             if( pdgIdPart==21 )
-              h1_QGLikelihoodJetReco_antibtag_gluon_5080->Fill( QGlikelihood, eventWeight );
+              h1_QGLikelihoodJetReco_antibtag_gluon_5080->Fill( QGLikelihoodJetReco, eventWeight );
             else if( abs(pdgIdPart)<7 ) 
-              h1_QGLikelihoodJetReco_antibtag_quark_5080->Fill( QGlikelihood, eventWeight );
+              h1_QGLikelihoodJetReco_antibtag_quark_5080->Fill( QGLikelihoodJetReco, eventWeight );
           }
 
         //} else if( ptPhotReco>85. && ptPhotReco<115. ) {
@@ -1150,7 +1145,7 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
           h1_nChargedJetReco_80120->Fill( nTracksReco, eventWeight );
           h1_nNeutralJetReco_80120->Fill( nNeutralJetReco, eventWeight );
           h1_ptDJetReco_80120->Fill( ptDJetReco, eventWeight );
-          h1_QGLikelihoodJetReco_80120->Fill( QGlikelihood, eventWeight );
+          h1_QGLikelihoodJetReco_80120->Fill( QGLikelihoodJetReco, eventWeight );
 
           if( !btagged ) {
             nEvents_antibtag_passed_80120 += eventWeight;
@@ -1159,11 +1154,11 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
             h1_nChargedJetReco_antibtag_80120->Fill( nTracksReco, eventWeight );
             h1_nNeutralJetReco_antibtag_80120->Fill( nNeutralJetReco, eventWeight );
             h1_ptDJetReco_antibtag_80120->Fill( ptDJetReco, eventWeight );
-            h1_QGLikelihoodJetReco_antibtag_80120->Fill( QGlikelihood, eventWeight );
+            h1_QGLikelihoodJetReco_antibtag_80120->Fill( QGLikelihoodJetReco, eventWeight );
             if( pdgIdPart==21 )
-              h1_QGLikelihoodJetReco_antibtag_gluon_80120->Fill( QGlikelihood, eventWeight );
+              h1_QGLikelihoodJetReco_antibtag_gluon_80120->Fill( QGLikelihoodJetReco, eventWeight );
             else if( abs(pdgIdPart)<7 ) 
-              h1_QGLikelihoodJetReco_antibtag_quark_80120->Fill( QGlikelihood, eventWeight );
+              h1_QGLikelihoodJetReco_antibtag_quark_80120->Fill( QGLikelihoodJetReco, eventWeight );
           }
 
         }
