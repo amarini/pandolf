@@ -60,6 +60,7 @@ void TreeAnalyzer_MultiJet::CreateOutputFile() {
   jetTree_->Branch( "phiJetGen",  phiJetGen_,  "phiJetGen_[nJet_]/F");
   jetTree_->Branch("pdgIdPartJet", pdgIdPartJet_, "pdgIdPartJet_[nJet_]/I");
   jetTree_->Branch("pdgIdMomJet", pdgIdMomJet_, "pdgIdMomJet_[nJet_]/I");
+  jetTree_->Branch(   "ePartJet",    ePartJet_,    "ePartJet_[nJet_]/F");
   jetTree_->Branch(   "ptPartJet",    ptPartJet_,    "ptPartJet_[nJet_]/F");
   jetTree_->Branch(  "etaPartJet",   etaPartJet_,   "etaPartJet_[nJet_]/F");
   jetTree_->Branch(  "phiPartJet",   phiPartJet_,   "phiPartJet_[nJet_]/F");
