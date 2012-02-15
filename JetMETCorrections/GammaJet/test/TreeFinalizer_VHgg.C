@@ -622,6 +622,7 @@ void finalize(const std::string& dataset) {
   h1_QGLikelihoodJet2->Write();
 
   h1_mjj->Write();
+  h1_deltaRjj->Write();
   h1_QGLikelihoodProd->Write();
 
 
