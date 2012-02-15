@@ -85,6 +85,13 @@ class TreeAnalyzer_MultiJet : public TreeAnalyzer {
    Float_t   ePartJet_[20];
    Int_t   pdgIdMomJet_[20];
 
+   Int_t   pdgIdPartStatus3Jet_[20];
+   Float_t    ptPartStatus3Jet_[20];
+   Float_t   phiPartStatus3Jet_[20];
+   Float_t   etaPartStatus3Jet_[20];
+   Float_t     ePartStatus3Jet_[20];
+   Int_t    pdgIdMomStatus3Jet_[20];
+
    Float_t  eChargedHadronsJet_[20];
    Float_t  ePhotonsJet_[20];
    Float_t  eNeutralHadronsJet_[20];
