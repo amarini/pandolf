@@ -64,6 +64,12 @@ void TreeAnalyzer_MultiJet::CreateOutputFile() {
   jetTree_->Branch(   "ptPartJet",    ptPartJet_,    "ptPartJet_[nJet_]/F");
   jetTree_->Branch(  "etaPartJet",   etaPartJet_,   "etaPartJet_[nJet_]/F");
   jetTree_->Branch(  "phiPartJet",   phiPartJet_,   "phiPartJet_[nJet_]/F");
+  jetTree_->Branch("pdgIdPartStatus3Jet", pdgIdPartStatus3Jet_, "pdgIdPartStatus3Jet_[nJet_]/I");
+  jetTree_->Branch("pdgIdMomStatus3Jet", pdgIdMomStatus3Jet_, "pdgIdMomStatus3Jet_[nJet_]/I");
+  jetTree_->Branch(   "ePartStatus3Jet",    ePartStatus3Jet_,    "ePartStatus3Jet_[nJet_]/F");
+  jetTree_->Branch(   "ptPartStatus3Jet",    ptPartStatus3Jet_,    "ptPartStatus3Jet_[nJet_]/F");
+  jetTree_->Branch(  "etaPartStatus3Jet",   etaPartStatus3Jet_,   "etaPartStatus3Jet_[nJet_]/F");
+  jetTree_->Branch(  "phiPartStatus3Jet",   phiPartStatus3Jet_,   "phiPartStatus3Jet_[nJet_]/F");
 
   jetTree_->Branch("eChargedHadronsJet", &eChargedHadronsJet_, "eChargedHadronsJet_[nJet_]/F");
   jetTree_->Branch("ePhotonsJet", &ePhotonsJet_, "ePhotonsJet_[nJet_]/F");
@@ -246,9 +252,11 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        //match to parton:
        int i_foundPart=-1;
        float bestDeltaRPart=999.;
+       int i_foundPart_status3=-1;
+       float bestDeltaRPart_status3=999.;
        for( unsigned iMC=0; iMC<nMC; ++iMC ) {
  
-         if( statusMC[iMC]!=3 ) continue;
+         if( statusMC[iMC]!=2 && statusMC[iMC]!=3 ) continue;
          if( !(fabs(pdgIdMC[iMC])<7 || pdgIdMC[iMC]==21) ) continue;
 
          TLorentzVector thisPart;
@@ -257,10 +265,21 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
          float thisDeltaR = thisPart.DeltaR(thisJet);
       
-         if( thisDeltaR<bestDeltaRPart ) {
-           bestDeltaRPart = thisDeltaR;
-           i_foundPart = iMC;
+         if( statusMC[iMC]==2 ) {
+           if( thisDeltaR<bestDeltaRPart ) {
+             bestDeltaRPart = thisDeltaR;
+             i_foundPart = iMC;
+           }
          }
+
+      
+         if( statusMC[iMC]==3) {
+           if( thisDeltaR<bestDeltaRPart_status3 ) {
+             bestDeltaRPart_status3 = thisDeltaR;
+             i_foundPart_status3 = iMC;
+           }
+         }
+
 
        } //for partons
 
@@ -273,6 +292,15 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
          thisJet.pdgIdMom = pdgIdMC[motherIDMC[i_foundPart]];
        }
 
+       if( i_foundPart_status3!=-1 ) {
+         thisJet.ptPartStatus3 = ptMC[i_foundPart_status3];
+         thisJet.etaPartStatus3 = etaMC[i_foundPart_status3];
+         thisJet.phiPartStatus3 = phiMC[i_foundPart_status3];
+         thisJet.ePartStatus3 = eMC[i_foundPart_status3];
+         thisJet.pdgIdPartStatus3 = pdgIdMC[i_foundPart_status3];
+         thisJet.pdgIdMomStatus3 = pdgIdMC[motherIDMC[i_foundPart_status3]];
+       }
+
        AnalysisJet* newJet = new AnalysisJet(thisJet);
        jets.push_back(newJet);
        nJet_++;
@@ -281,7 +309,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      } //for reco jets
 
      
-     if( jets.size()<4 ) continue; //at least 4 jets
+     if( jets.size()<2 ) continue; 
 
 
 //   // will be relying mostly on HLT_HT600 trigger, so the following requirement is ~100% efficient:
@@ -324,6 +352,13 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        etaPartJet_[iJet] = jets[iJet]->etaPart;
        pdgIdPartJet_[iJet] = jets[iJet]->pdgIdPart;
        pdgIdMomJet_[iJet] = jets[iJet]->pdgIdMom;
+
+       ePartStatus3Jet_[iJet]  =  jets[iJet]->ePartStatus3;
+       ptPartStatus3Jet_[iJet]  =  jets[iJet]->ptPartStatus3;
+       phiPartStatus3Jet_[iJet] = jets[iJet]->phiPartStatus3;
+       etaPartStatus3Jet_[iJet] = jets[iJet]->etaPartStatus3;
+       pdgIdPartStatus3Jet_[iJet] = jets[iJet]->pdgIdPartStatus3;
+       pdgIdMomStatus3Jet_[iJet] = jets[iJet]->pdgIdMomStatus3;
 
        if( fabs(jets[iJet]->Eta())<2.4 ) 
          QGLikelihoodJet_[iJet] = qglikeli->computeQGLikelihoodPU( jets[iJet]->Pt(), rhoPF, jets[iJet]->nCharged(), jets[iJet]->nNeutral(), jets[iJet]->ptD );
