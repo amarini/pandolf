@@ -168,9 +168,15 @@ void TreeAnalyzer_PhotonJet::CreateOutputFile() {
   jetTree_->Branch( "etaJetGen",  &etaJetGen_,  "etaJetGen_/F");
   jetTree_->Branch( "phiJetGen",  &phiJetGen_,  "phiJetGen_/F");
   jetTree_->Branch("pdgIdPart", &pdgIdPart_, "pdgIdPart_/I");
+  jetTree_->Branch(   "ePart",    &ePart_,    "ePart_/F");
   jetTree_->Branch(   "ptPart",    &ptPart_,    "ptPart_/F");
   jetTree_->Branch(  "etaPart",   &etaPart_,   "etaPart_/F");
   jetTree_->Branch(  "phiPart",   &phiPart_,   "phiPart_/F");
+  jetTree_->Branch("pdgIdPart", &pdgIdPart_, "pdgIdPart_/I");
+  jetTree_->Branch(   "ePartStatus3",    &ePartStatus3_,    "ePartStatus3_/F");
+  jetTree_->Branch(   "ptPartStatus3",    &ptPartStatus3_,    "ptPartStatus3_/F");
+  jetTree_->Branch(  "etaPartStatus3",   &etaPartStatus3_,   "etaPartStatus3_/F");
+  jetTree_->Branch(  "phiPartStatus3",   &phiPartStatus3_,   "phiPartStatus3_/F");
   jetTree_->Branch("pdgIdPart2nd", &pdgIdPart2nd_, "pdgIdPart2nd_/I");
   jetTree_->Branch(   "ptPart2nd",    &ptPart2nd_,    "ptPart2nd_/F");
   jetTree_->Branch(  "etaPart2nd",   &etaPart2nd_,   "etaPart2nd_/F");
@@ -788,38 +794,64 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
      //look for first jet parton:
      Float_t deltaRMCmin = 999.;
      Int_t pdgIdPart_found = 0;
+     Float_t ePart_found;
      Float_t etaPart_found;
      Float_t phiPart_found;
      Float_t ptPart_found;
 
+     Float_t deltaRMCmin_status3 = 999.;
+     Int_t pdgIdPart_found_status3 = 0;
+     Float_t ePart_found_status3;
+     Float_t etaPart_found_status3;
+     Float_t phiPart_found_status3;
+     Float_t ptPart_found_status3;
+
 
      for(Int_t iPartMC=0; iPartMC<nMC; ++iPartMC) {
 
-       if( statusMC[iPartMC]!=3 ) continue;
+       if( statusMC[iPartMC]!=2 && statusMC[iPartMC]!=3 ) continue;
 
-       Float_t pt = ptMC[iPartMC];
-     
-       Float_t eta = etaMC[iPartMC];
-       Float_t phi = phiMC[iPartMC];
-       Int_t   pdgId = pdgIdMC[iPartMC];
-     
-       Float_t deltaEtaMC = eta-firstJet.etaGen;
-       Float_t deltaPhiMC = phi-firstJet.phiGen;
-       if( deltaPhiMC >= TMath::Pi() ) deltaPhiMC -= 2.*TMath::Pi();
-       if( deltaPhiMC <= -TMath::Pi() ) deltaPhiMC += 2.*TMath::Pi();
-     
-       Float_t deltaRMC = sqrt( deltaEtaMC*deltaEtaMC + deltaPhiMC*deltaPhiMC );
+       TLorentzVector parton;
+       parton.SetPtEtaPhiE( ptMC[iPartMC], etaMC[iPartMC], phiMC[iPartMC], eMC[iPartMC] );
 
-       bool goodPdgId = false;
-       if( (fabs(pdgId)<=9) || (fabs(pdgId)==21) ) goodPdgId = true;
+       Int_t pdgId = pdgIdMC[iPartMC];
      
-       if( (deltaRMC < deltaRMCmin) && goodPdgId ) {
-         deltaRMCmin = deltaRMC;
-         pdgIdPart_found = pdgIdMC[iPartMC];
-         etaPart_found = eta;
-         phiPart_found = phi;
-         ptPart_found = pt;
-       }
+//     Float_t deltaEtaMC = eta-firstJet.etaGen;
+//     Float_t deltaPhiMC = phi-firstJet.phiGen;
+//     if( deltaPhiMC >= TMath::Pi() ) deltaPhiMC -= 2.*TMath::Pi();
+//     if( deltaPhiMC <= -TMath::Pi() ) deltaPhiMC += 2.*TMath::Pi();
+//   
+//     Float_t deltaRMC = sqrt( deltaEtaMC*deltaEtaMC + deltaPhiMC*deltaPhiMC );
+       Float_t deltaRMC = firstJet.DeltaR(parton);
+
+       bool goodPdgId = ( (fabs(pdgId)<=9) || (fabs(pdgId)==21) );
+       if( !goodPdgId ) continue;
+     
+       if( statusMC[iPartMC]==2 ) {
+
+         if( (deltaRMC < deltaRMCmin) && goodPdgId ) {
+           deltaRMCmin = deltaRMC;
+           pdgIdPart_found = pdgIdMC[iPartMC];
+           ePart_found = parton.Energy();
+           etaPart_found = parton.Eta();
+           phiPart_found = parton.Phi();
+           ptPart_found = parton.Pt();
+         }
+
+       }  // if status 2
+     
+       if( statusMC[iPartMC]==3 ) {
+
+         if( (deltaRMC < deltaRMCmin_status3) && goodPdgId ) {
+           deltaRMCmin_status3 = deltaRMC;
+           pdgIdPart_found_status3 = pdgIdMC[iPartMC];
+           ePart_found_status3 = parton.Energy();
+           etaPart_found_status3 = parton.Eta();
+           phiPart_found_status3 = parton.Phi();
+           ptPart_found_status3 = parton.Pt();
+         }
+
+       }  // if status 2
 
      } //for MC particles
 
@@ -865,15 +897,21 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
 
 
      pdgIdPart_=  pdgIdPart_found;
+     ePart_=  ePart_found;
      ptPart_=  ptPart_found;
      phiPart_= phiPart_found;
      etaPart_= etaPart_found;
+
+     pdgIdPartStatus3_=  pdgIdPart_found_status3;
+     ePartStatus3_=  ePart_found_status3;
+     ptPartStatus3_=  ptPart_found_status3;
+     phiPartStatus3_= phiPart_found_status3;
+     etaPartStatus3_= etaPart_found_status3;
 
      pdgIdPart2nd_=  pdgIdPart2nd_found;
      ptPart2nd_=  ptPart2nd_found;
      phiPart2nd_= phiPart2nd_found;
      etaPart2nd_= etaPart2nd_found;
-
 
      passed_Photon10_  = (passedTrigger_regexp("HLT_Photon10_v")  || passedTrigger_regexp("HLT_Photon10_L1R_v"));
      passed_Photon15_  = (passedTrigger_regexp("HLT_Photon15_v")  || passedTrigger_regexp("HLT_Photon15_L1R_v"));
