@@ -17,16 +17,16 @@
 #include "AnalysisJet.C"
 #include "AnalysisPhoton.C"
 
-#include "/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/emanuele/CommonTools/src/PUWeight.C"
-#include "/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/pandolf/QGLikelihood/QGLikelihoodCalculator.C"
-#include "/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/pandolf/KinematicFit/TFitParticleEtThetaPhi.cc"
-#include "/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/pandolf/KinematicFit/TAbsFitConstraint.cc"
-#include "/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/pandolf/KinematicFit/TAbsFitParticle.cc"
-#include "/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/pandolf/KinematicFit/TFitConstraintEp.cc"
-#include "/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/pandolf/KinematicFit/TFitConstraintM.cc"
-#include "/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/pandolf/KinematicFit/TFitParticleEtEtaPhi.cc"
-#include "/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/pandolf/KinematicFit/TKinFitter.cc"
-#include "/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/pandolf/KinematicFit/DiJetKinFitter.cc"
+#include "/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/CommonTools/PUWeight.C"
+#include "/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/QGLikelihood/QGLikelihoodCalculator.C"
+#include "/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/KinematicFit/TFitParticleEtThetaPhi.cc"
+#include "/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/KinematicFit/TAbsFitConstraint.cc"
+#include "/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/KinematicFit/TAbsFitParticle.cc"
+#include "/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/KinematicFit/TFitConstraintEp.cc"
+#include "/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/KinematicFit/TFitConstraintM.cc"
+#include "/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/KinematicFit/TFitParticleEtEtaPhi.cc"
+#include "/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/KinematicFit/TKinFitter.cc"
+#include "/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/KinematicFit/DiJetKinFitter.cc"
 
 
 bool isAOD_ = true;
@@ -132,6 +132,9 @@ void finalize(const std::string& dataset) {
   h1_pdgIdJet2->Sumw2();
   TH1D* h1_QGLikelihoodJet2 = new TH1D("QGLikelihoodJet2", "", 100, 0., 1.0001);
   h1_QGLikelihoodJet2->Sumw2();
+
+  TH1D* h1_deltaRjj = new TH1D("deltaRjj", "", 100, 0., 5.);
+  h1_deltaRjj->Sumw2();
 
   TH1D* h1_mjj = new TH1D("mjj", "", 1000, 0., 1000.);
   h1_mjj->Sumw2();
@@ -312,7 +315,7 @@ void finalize(const std::string& dataset) {
   float QGLikelihoodJet1_t, QGLikelihoodJet2_t;
   float simpleSecondaryVertexHighEfficiencyJet1_t, simpleSecondaryVertexHighEfficiencyJet2_t;
   float trackCountingHighEfficiencyJet1_t, trackCountingHighEfficiencyJet2_t;
-  float mgg, mjj;
+  float mgg, mjj, deltaRjj;
   float chiSquareProb, chiSquareProbMax;
 
 
@@ -335,6 +338,7 @@ void finalize(const std::string& dataset) {
   tree_passedEvents->Branch( "simpleSecondaryVertexHighEfficiencyJet2", &simpleSecondaryVertexHighEfficiencyJet2_t, "simpleSecondaryVertexHighEfficiencyJet2_t/F" );
   tree_passedEvents->Branch( "trackCountingHighEfficiencyJet1", &trackCountingHighEfficiencyJet1_t, "trackCountingHighEfficiencyJet1_t/F" );
   tree_passedEvents->Branch( "trackCountingHighEfficiencyJet2", &trackCountingHighEfficiencyJet2_t, "trackCountingHighEfficiencyJet2_t/F" );
+  tree_passedEvents->Branch( "deltaRjj", &deltaRjj, "deltaRjj/F" );
   tree_passedEvents->Branch( "mjj", &mjj, "mjj/F" );
   tree_passedEvents->Branch( "mgg", &mgg, "mgg/F" );
   tree_passedEvents->Branch( "chiSquareProb", &chiSquareProb, "chiSquareProb/F" );
@@ -345,7 +349,7 @@ void finalize(const std::string& dataset) {
 
   PUWeight* fPUWeight = new PUWeight();
 
-  QGLikelihoodCalculator *qglikeli = new QGLikelihoodCalculator("/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
+  QGLikelihoodCalculator *qglikeli = new QGLikelihoodCalculator("/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
 
   DiJetKinFitter* fitter_jetsWZ = new DiJetKinFitter( "fitter_jetsWZ", "fitter_jets", 85. );
 
@@ -552,6 +556,7 @@ void finalize(const std::string& dataset) {
 
     TLorentzVector diJet = jet1 + jet2;
     h1_mjj->Fill( diJet.M(), eventWeight );
+    h1_deltaRjj->Fill( jet1.DeltaR(jet2), eventWeight );
 
     h1_QGLikelihoodProd->Fill( QGLikelihoodJet1*QGLikelihoodJet2, eventWeight );
 
@@ -574,6 +579,7 @@ void finalize(const std::string& dataset) {
 
     mgg = diPhoton.M();
     mjj = diJet.M();
+    deltaRjj = jet1.DeltaR(jet2);
 
     // fill tree:
     tree_passedEvents->Fill();
