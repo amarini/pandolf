@@ -130,9 +130,16 @@ class TreeAnalyzer_PhotonJet : public TreeAnalyzer {
    Float_t  etaJetGen_;
 
    Int_t   pdgIdPart_;
+   Float_t     ePart_;
    Float_t    ptPart_;
    Float_t   phiPart_;
    Float_t   etaPart_;
+
+   Int_t   pdgIdPartStatus3_;
+   Float_t     ePartStatus3_;
+   Float_t    ptPartStatus3_;
+   Float_t   phiPartStatus3_;
+   Float_t   etaPartStatus3_;
 
    Int_t   pdgIdPart2nd_;
    Float_t    ptPart2nd_;
