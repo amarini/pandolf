@@ -615,6 +615,17 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
   Bool_t passed_Photon135;
   tree->SetBranchAddress("passed_Photon135", &passed_Photon135);
 
+  Bool_t passed_Photon50_CaloIdVL;
+  tree->SetBranchAddress("passed_Photon50_CaloIdVL", &passed_Photon50_CaloIdVL);
+  Bool_t passed_Photon75_CaloIdVL;
+  tree->SetBranchAddress("passed_Photon75_CaloIdVL", &passed_Photon75_CaloIdVL);
+  Bool_t passed_Photon90_CaloIdVL;
+  tree->SetBranchAddress("passed_Photon90_CaloIdVL", &passed_Photon90_CaloIdVL);
+
+  Bool_t passed_Photon50_CaloIdVL_IsoL;
+  tree->SetBranchAddress("passed_Photon50_CaloIdVL_IsoL", &passed_Photon50_CaloIdVL_IsoL);
+  Bool_t passed_Photon75_CaloIdVL_IsoL;
+  tree->SetBranchAddress("passed_Photon75_CaloIdVL_IsoL", &passed_Photon75_CaloIdVL_IsoL);
   Bool_t passed_Photon90_CaloIdVL_IsoL;
   tree->SetBranchAddress("passed_Photon90_CaloIdVL_IsoL", &passed_Photon90_CaloIdVL_IsoL);
 
@@ -636,6 +647,11 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
   tree_passedEvents->Branch( "passedID_no2ndJet", &passedID_no2ndJet, "passedID_no2ndJet/O");
   tree_passedEvents->Branch( "passedPhotonID", &passedID_FULL, "passedID_FULL/O");
   tree_passedEvents->Branch( "secondJetOK", &secondJetOK, "secondJetOK/O");
+  tree_passedEvents->Branch( "passed_Photon50_CaloIdVL", &passed_Photon50_CaloIdVL, "passed_Photon50_CaloIdVL/O");
+  tree_passedEvents->Branch( "passed_Photon75_CaloIdVL", &passed_Photon75_CaloIdVL, "passed_Photon75_CaloIdVL/O");
+  tree_passedEvents->Branch( "passed_Photon90_CaloIdVL", &passed_Photon90_CaloIdVL, "passed_Photon90_CaloIdVL/O");
+  tree_passedEvents->Branch( "passed_Photon50_CaloIdVL_IsoL", &passed_Photon50_CaloIdVL_IsoL, "passed_Photon50_CaloIdVL_IsoL/O");
+  tree_passedEvents->Branch( "passed_Photon75_CaloIdVL_IsoL", &passed_Photon75_CaloIdVL_IsoL, "passed_Photon75_CaloIdVL_IsoL/O");
   tree_passedEvents->Branch( "passed_Photon90_CaloIdVL_IsoL", &passed_Photon90_CaloIdVL_IsoL, "passed_Photon90_CaloIdVL_IsoL/O");
   tree_passedEvents->Branch( "passed_Photon135", &passed_Photon135, "passed_Photon135/O");
   tree_passedEvents->Branch( "btagged", &btagged, "btagged/O");
