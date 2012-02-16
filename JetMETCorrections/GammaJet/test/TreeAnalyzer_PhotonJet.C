@@ -536,6 +536,9 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
      //}
        thisJet.phiReco = phiJet[iRecoJet];
        thisJet.etaReco = etaJet[iRecoJet];
+
+       thisJet.SetPtEtaPhiE( ptCorrJet[iRecoJet], etaJet[iRecoJet], phiJet[iRecoJet], eJet[iRecoJet]*ptCorrJet[iRecoJet]/ptJet[iRecoJet] );
+
      //thisJet.eCorrReco  =  eCorrJet[iRecoJet];
 
        thisJet.emfReco = (recoType_=="pf") ? 0. : emfJet[iRecoJet];
@@ -742,7 +745,7 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
      etaJetReco_  =  firstJet.etaReco;
      ptDJetReco_  =  firstJet.ptD;
      if( fabs(etaJetReco_)<2.4 ) {
-       QGLikelihoodJetReco_  =  qglikeli->computeQGLikelihoodPU( firstJet.ptReco, rhoPF, firstJet.nCharged(), firstJet.nNeutral(), firstJet.ptD );
+       QGLikelihoodJetReco_  =  qglikeli->computeQGLikelihoodPU( firstJet.ptCorrReco, rhoPF, firstJet.nCharged(), firstJet.nNeutral(), firstJet.ptD );
      } else {
        QGLikelihoodJetReco_  =  -1.;
      }
@@ -811,6 +814,8 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
 
        if( statusMC[iPartMC]!=2 && statusMC[iPartMC]!=3 ) continue;
 
+       if( ptMC[iPartMC]<0.1 ) continue;
+
        TLorentzVector parton;
        parton.SetPtEtaPhiE( ptMC[iPartMC], etaMC[iPartMC], phiMC[iPartMC], eMC[iPartMC] );
 
@@ -822,6 +827,7 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
 //     if( deltaPhiMC <= -TMath::Pi() ) deltaPhiMC += 2.*TMath::Pi();
 //   
 //     Float_t deltaRMC = sqrt( deltaEtaMC*deltaEtaMC + deltaPhiMC*deltaPhiMC );
+
        Float_t deltaRMC = firstJet.DeltaR(parton);
 
        bool goodPdgId = ( (fabs(pdgId)<=9) || (fabs(pdgId)==21) );
@@ -869,6 +875,7 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
        if( statusMC[iPartMC]!=3 ) continue;
 
        Float_t pt = ptMC[iPartMC];
+       if( pt < 0.1 ) continue;
      
        Float_t eta = etaMC[iPartMC];
        Float_t phi = phiMC[iPartMC];
