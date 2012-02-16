@@ -38,6 +38,13 @@ class AnalysisJet : public TLorentzVector {
   Int_t pdgIdPart;
   Int_t pdgIdMom;
 
+  Float_t ePartStatus3;
+  Float_t ptPartStatus3;
+  Float_t etaPartStatus3;
+  Float_t phiPartStatus3;
+  Int_t pdgIdPartStatus3;
+  Int_t pdgIdMomStatus3;
+
   Float_t thetaReco() const;
   Float_t pReco() const;
   Float_t pxReco() const;
