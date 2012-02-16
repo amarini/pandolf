@@ -17,7 +17,7 @@
 #include <vector>
 #include <cmath>
 
-//#include "/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/QGLikelihood/QGLikelihoodCalculator.C"
+#include "/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/QGLikelihood/QGLikelihoodCalculator.C"
 #include "/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/CommonTools/PUWeight.C"
 
 float delta_phi(float phi1, float phi2);
@@ -653,8 +653,8 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
 
 
 
-  //QGLikelihoodCalculator* qglikeli = new QGLikelihoodCalculator("/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt_15to3000_TuneZ2_Flat_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1.root");
 
+  QGLikelihoodCalculator* qglikeli = new QGLikelihoodCalculator("/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
   //QGLikelihoodCalculator* qglikeli = new QGLikelihoodCalculator("/shome/pandolf/CMSSW_4_2_8/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
 
   std::string puType = "Spring11_Flat10";
@@ -662,7 +662,8 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
   PUWeight* fPUWeight = new PUWeight(-1, "2011A", puType);
   std::string puFileName;
   //if( PUType_=="Run2011A_73pb" )
-    puFileName = "all2011A.pileup_v2.root";
+  //puFileName = "all2011A.pileup_v2.root";
+    puFileName = "all2011B.pileup_v2_73mb.root";
   std::cout << std::endl << "-> Using data pileup file: " << puFileName << std::endl;
   TFile* filePU = TFile::Open(puFileName.c_str());
   TH1F* h1_nPU_data = (TH1F*)filePU->Get("pileup");
@@ -846,6 +847,7 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
     secondJetOK = ( ptCorr2ndJetReco < secondJetThreshold*ptPhotReco || ptCorr2ndJetReco < 10. );
     //secondJetOK = ( pt2ndJetReco < secondJetThreshold*ptPhotReco || pt2ndJetReco < 5. );
 
+    if( ptCorr2ndJetReco> 10. && ptCorr2ndJetReco>0.3*ptPhotReco ) continue;
 
     // do them by hand just to be sure:
     Bool_t isIsolated_hcal;
@@ -983,7 +985,7 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
    nNeutralJetReco = nPhotonsReco + nNeutralHadronsReco;
    //float QGlikelihood = qglikeli->computeQGLikelihoodPU( ptCorrJetReco, rhoPF, nTracksReco, nNeutralJetReco, ptDJetReco, -1. );
 
-   //QGlikelihood = qglikeli->computeQGLikelihoodPU( ptCorrJetReco, rhoPF, nTracksReco, nNeutralJetReco, ptDJetReco, -1. );
+   QGlikelihood = qglikeli->computeQGLikelihoodPU( ptCorrJetReco, rhoPF, nTracksReco, nNeutralJetReco, ptDJetReco, -1. );
   
 
 
