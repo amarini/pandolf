@@ -1,5 +1,6 @@
 #include "AnalysisJet.h"
 #include <cmath>
+#include <iostream>
 
 
 Float_t AnalysisJet::thetaReco() const { return 2.*atan(exp(-etaReco)); };
@@ -19,6 +20,34 @@ Float_t AnalysisJet::pyGen() const { return ptGen*sin(phiGen); };
 Float_t AnalysisJet::pzGen() const { return pGen()*cos(thetaGen()); };
 
 
+Int_t AnalysisJet::nConstituents() const { return nTracksReco+nNeutralHadronsReco+nPhotonsReco+nElectronsReco+nMuonsReco+nHFEMReco+nHFHadronsReco; };
 Int_t AnalysisJet::nCharged() const { return nTracksReco; };
 Int_t AnalysisJet::nNeutral() const { return nNeutralHadronsReco + nPhotonsReco; };
 
+
+Bool_t AnalysisJet::passedJetID( const std::string& strength ) const {
+
+  Bool_t returnBool = false;
+
+  if( strength=="minimal" ) {
+
+    returnBool = (this->nConstituents()>1);
+
+    if( fabs(etaReco)<2.4 ) {
+
+      returnBool = returnBool && 
+                   (eTracksReco>0.) &&
+                   (ePhotonsReco<0.99) &&
+                   (eNeutralHadronsReco<0.99);
+    
+    } //if in tracker region
+
+  } else {
+
+    std::cout << "Jet ID '" << strength << "' not implemented yet. Returning FALSE." << std::endl;
+
+  }
+
+  return returnBool;
+
+}
