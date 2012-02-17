@@ -97,6 +97,8 @@ void TreeAnalyzer_MultiJet::CreateOutputFile() {
 
   jetTree_->Branch("ht_akt5",&ht_akt5_,"ht_akt5_/F");
 
+  jetTree_->Branch("passed_HT150", &passed_HT150_, "passed_HT150_/O");
+  jetTree_->Branch("passed_HT200", &passed_HT200_, "passed_HT200_/O");
   jetTree_->Branch("passed_HT250", &passed_HT250_, "passed_HT250_/O");
   jetTree_->Branch("passed_HT300", &passed_HT300_, "passed_HT300_/O");
   jetTree_->Branch("passed_HT350", &passed_HT350_, "passed_HT350_/O");
@@ -202,8 +204,8 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      }  // for calojets
 
 
-     // will rely on HT600 trigger on data, so preselect:
-     if( ht_akt5_ < 500. ) continue;
+     //// will rely on HT600 trigger on data, so preselect:
+     //if( ht_akt5_ < 500. ) continue;
 
      
 
@@ -261,7 +263,10 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
          TLorentzVector thisPart;
          thisPart.SetPtEtaPhiE( ptMC[iMC], etaMC[iMC], phiMC[iMC], eMC[iMC] );
+
+         if( thisPart.Pt() < 0.01 ) continue;
              
+//std::cout << "status: " << statusMC[iMC] << " pdgIdMC[iMC]: " << pdgIdMC[iMC] << std::endl;
 
          float thisDeltaR = thisPart.DeltaR(thisJet);
       
@@ -370,17 +375,19 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
 
 
-     passed_HT250_ = passedTrigger_regexp("HLT_HT250_");
-     passed_HT300_ = passedTrigger_regexp("HLT_HT300_");
-     passed_HT350_ = passedTrigger_regexp("HLT_HT350_");
-     passed_HT400_ = passedTrigger_regexp("HLT_HT400_");
-     passed_HT450_ = passedTrigger_regexp("HLT_HT450_");
-     passed_HT500_ = passedTrigger_regexp("HLT_HT500_");
-     passed_HT550_ = passedTrigger_regexp("HLT_HT550_");
-     passed_HT600_ = passedTrigger_regexp("HLT_HT600_");
-     passed_HT650_ = passedTrigger_regexp("HLT_HT650_");
-     passed_HT700_ = passedTrigger_regexp("HLT_HT700_");
-     passed_HT750_ = passedTrigger_regexp("HLT_HT750_");
+     passed_HT150_ = passedTrigger_regexp("HLT_HT150_v");
+     passed_HT200_ = passedTrigger_regexp("HLT_HT200_v");
+     passed_HT250_ = passedTrigger_regexp("HLT_HT250_v");
+     passed_HT300_ = passedTrigger_regexp("HLT_HT300_v");
+     passed_HT350_ = passedTrigger_regexp("HLT_HT350_v");
+     passed_HT400_ = passedTrigger_regexp("HLT_HT400_v");
+     passed_HT450_ = passedTrigger_regexp("HLT_HT450_v");
+     passed_HT500_ = passedTrigger_regexp("HLT_HT500_v");
+     passed_HT550_ = passedTrigger_regexp("HLT_HT550_v");
+     passed_HT600_ = passedTrigger_regexp("HLT_HT600_v");
+     passed_HT650_ = passedTrigger_regexp("HLT_HT650_v");
+     passed_HT700_ = passedTrigger_regexp("HLT_HT700_v");
+     passed_HT750_ = passedTrigger_regexp("HLT_HT750_v");
 
 
      jetTree_->Fill(); 
