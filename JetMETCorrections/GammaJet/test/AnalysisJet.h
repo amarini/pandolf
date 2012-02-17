@@ -87,6 +87,7 @@ class AnalysisJet : public TLorentzVector {
 
   Int_t nCharged() const;
   Int_t nNeutral() const;
+  Int_t nConstituents() const;
 
   Float_t eTracksGen;
   Float_t ePhotonsGen;
@@ -115,6 +116,8 @@ class AnalysisJet : public TLorentzVector {
   //btag:
   Float_t trackCountingHighEffBJetTags;
   Float_t simpleSecondaryVertexHighEffBJetTags;
+
+  Bool_t passedJetID( const std::string& strength="minimal" ) const;
 
 };
 
