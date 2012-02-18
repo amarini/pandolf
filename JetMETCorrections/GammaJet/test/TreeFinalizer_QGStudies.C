@@ -259,50 +259,18 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
     addInput( "G2Jets_Pt-180to240_TuneZ2_7TeV-alpgen_Spring11-PU_S1_START311_V1G1-v1" );
     addInput( "G2Jets_Pt-120to180_TuneZ2_7TeV-alpgen_Spring11-PU_S1_START311_V1G1-v1" );
 
-  } else if( dataset=="DATA_EG_35X" ) {
-
-    addInput( "MinimumBias_Commissioning10_May6thPDSkim2_SD_EG" );
-    addInput( "MinimumBias_Commissioning10_SD_EG-v9" );
-    addInput( "EG_Run2010A-PromptReco-v1" );
-    addInput( "EG_Run2010A-PromptReco-v2" );
-
-  } else if( dataset=="DATA_EG" ) {
-
-    addInput( "MinimumBias_Commissioning10_SD_EG_Jun14thSkim_v1" );
-    addInput( "EG_Run2010A-Jun14thReReco_v1" );
-    addInput( "EG_Run2010A-PromptReco-v4" );
-    addInput( "EG_Run2010A_PromptReco_v4_139347_139375" );
-    addInput( "EG_Run2010A_PromptReco_v4_139376_139459" );
-
-  } else if( dataset=="DATA_EG_37X" ) {
-
-    addInput( "EG_Run2010A_Jul15thReReco_v1" );
-    addInput( "EG_Run2010A_Jul26thReReco_v1" );
-
-  } else if( dataset=="EG_3pb" ) {
-
-    addInput( "EG_Run2010A-PromptReco-v4" );
-    addInput( "EG_Run2010A-PromptReco-v4_runs143337-144114" );
-
-  } else if( dataset=="DATA_Nov4ReReco" ) {
-
-    addInput( "EG_Run2010A-Nov4ReReco_v1" );
-    addInput( "Photon_Run2010B_Nov4ReReco" );
-
-  } else if( dataset=="DATA_Nov4ReReco_L1Offset" ) {
-
-    addInput( "EG_Run2010A-Nov4ReReco_L1Offset" );
-    addInput( "Photon_Run2010B-Nov4ReReco_L1Offset" );
-
-  } else if( dataset=="DATA_Nov4ReReco_L1Offset_ALL" ) {
-
-    addInput( "EG_Run2010A-Nov4ReReco_L1Offset_ALL" );
-    addInput( "Photon_Run2010B-Nov4ReReco_L1Offset" );
 
   } else if( dataset=="DATA_Run2011A_1fb" ) {
 
     addInput( "Photon_Run2011A-May10ReReco-v1" );
     addInput( "Photon_Run2011A-PromptReco-v4_3" );
+
+  } else if( dataset=="Photon_Run2011_FULL" ) {
+
+    addInput( "Photon_Run2011A-May10ReReco-v1" );
+    addInput( "Photon_Run2011A-PromptReco-v4" );
+    addInput( "Photon_Run2011A-PromptReco-v6" );
+    addInput( "Photon_Run2011B-PromptReco-v1" );
 
   } else {
 
@@ -999,9 +967,9 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
 
 
    nNeutralJetReco = nPhotonsReco + nNeutralHadronsReco;
-   //float QGlikelihood = qglikeli->computeQGLikelihoodPU( ptCorrJetReco, rhoPF, nTracksReco, nNeutralJetReco, ptDJetReco, -1. );
 
-   QGlikelihood = qglikeli->computeQGLikelihoodPU( ptCorrJetReco, rhoPF, nTracksReco, nNeutralJetReco, ptDJetReco, -1. );
+   //QGlikelihood = qglikeli->computeQGLikelihoodPU( ptCorrJetReco, rhoPF, nTracksReco, nNeutralJetReco, ptDJetReco, -1. );
+   QGlikelihood = QGLikelihoodJetReco;
   
 
 
