@@ -204,7 +204,7 @@ void finalize(const std::string& dataset) {
   tree->SetBranchAddress("eChargedHadronsJet", eChargedHadronsJet);
   Float_t ePhotonsJet[20];
   tree->SetBranchAddress("ePhotonsJet", ePhotonsJet);
-  Int_t eNeutralHadronsJet[20];
+  Float_t eNeutralHadronsJet[20];
   tree->SetBranchAddress("eNeutralHadronsJet", eNeutralHadronsJet);
   Int_t nChargedHadronsJet[20];
   tree->SetBranchAddress("nChargedHadronsJet", nChargedHadronsJet);
@@ -296,12 +296,14 @@ void finalize(const std::string& dataset) {
   float ptDJet0, ptDJet1, ptDJet2, ptDJet3;
   int nChargedJet0, nChargedJet1, nChargedJet2, nChargedJet3;
   int nNeutralJet0, nNeutralJet1, nNeutralJet2, nNeutralJet3;
+  float PUWeight;
 
 
   TTree* tree_passedEvents = new TTree("tree_passedEvents", "");
   tree_passedEvents->Branch( "run", &run, "run/I" );
   tree_passedEvents->Branch( "event", &event, "event/I" );
   tree_passedEvents->Branch( "eventWeight", &eventWeight, "eventWeight/F" );
+  tree_passedEvents->Branch( "PUWeight", &PUWeight, "PUWeight/F" );
   tree_passedEvents->Branch( "rhoPF", &rhoPF, "rhoPF/F" );
   tree_passedEvents->Branch( "ht_akt5", &ht_akt5, "ht_akt5/F" );
 
@@ -471,7 +473,8 @@ void finalize(const std::string& dataset) {
 
     if( isMC ) {
       // PU reweighting:
-     eventWeight *= fPUWeight->GetWeight(nPU);
+     PUWeight = fPUWeight->GetWeight(nPU);
+     eventWeight *= PUWeight;
     }
 
     h1_nvertexPU->Fill( nvertex, eventWeight);
@@ -488,8 +491,8 @@ void finalize(const std::string& dataset) {
 
       if( ptJet[iJet]<20. ) continue;
       if( fabs(etaJet[iJet])>2. ) continue;
-      int nCandidates = nChargedHadronsJet[iJet] + nNeutralHadronsJet[iJet] + nPhotonsJet[iJet];
-      if( nChargedHadronsJet[iJet]==0 || nCandidates<2 ) continue;
+      //int nCandidates = nChargedHadronsJet[iJet] + nNeutralHadronsJet[iJet] + nPhotonsJet[iJet];
+      //if( nChargedHadronsJet[iJet]==0 || nCandidates<2 ) continue;
 
       AnalysisJet* thisJet = new AnalysisJet();
     
@@ -500,6 +503,11 @@ void finalize(const std::string& dataset) {
       thisJet->nTracksReco = nChargedHadronsJet[iJet];
       thisJet->nNeutralHadronsReco = nNeutralHadronsJet[iJet];
       thisJet->nPhotonsReco = nPhotonsJet[iJet];
+      thisJet->eTracksReco = eChargedHadronsJet[iJet];
+      thisJet->eNeutralHadronsReco = eNeutralHadronsJet[iJet];
+      thisJet->ePhotonsReco = ePhotonsJet[iJet];
+
+      if( !(thisJet->passedJetID()) ) continue;
 
       if( isMC ) {
 
