@@ -172,7 +172,7 @@ void TreeAnalyzer_PhotonJet::CreateOutputFile() {
   jetTree_->Branch(   "ptPart",    &ptPart_,    "ptPart_/F");
   jetTree_->Branch(  "etaPart",   &etaPart_,   "etaPart_/F");
   jetTree_->Branch(  "phiPart",   &phiPart_,   "phiPart_/F");
-  jetTree_->Branch("pdgIdPart", &pdgIdPart_, "pdgIdPart_/I");
+  jetTree_->Branch("pdgIdPartStatus3", &pdgIdPartStatus3_, "pdgIdPartStatus3_/I");
   jetTree_->Branch(   "ePartStatus3",    &ePartStatus3_,    "ePartStatus3_/F");
   jetTree_->Branch(   "ptPartStatus3",    &ptPartStatus3_,    "ptPartStatus3_/F");
   jetTree_->Branch(  "etaPartStatus3",   &etaPartStatus3_,   "etaPartStatus3_/F");
