@@ -308,6 +308,8 @@ float getWeight( const std::string& dataset, int nEvents ) {
     xSection = 3.321e-01;
   } else if( dataset_tstr.BeginsWith("QCD_Pt_1400to1800") || dataset_tstr.BeginsWith("QCD_Pt-1400to1800")) {
     xSection = 1.087e-02;
+  } else if( dataset_tstr.BeginsWith("QCD_Pt1800") || dataset_tstr.BeginsWith("QCD_Pt-1800")) {
+    xSection = 3.575e-04;
   } else if( dataset=="PhotonJet_Summer1036X_Pt5to15" ) {
     xSection = 4030000.;
   } else if( dataset=="PhotonJet_Summer1036X_Pt15to20" ) {
