@@ -17,8 +17,11 @@
 #include <vector>
 #include <cmath>
 
-#include "/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/QGLikelihood/QGLikelihoodCalculator.C"
-#include "/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/CommonTools/PUWeight.C"
+#include "/shome/pandolf/CMSSW_4_2_8/src/UserCode/pandolf/CommonTools/PUWeight.C"
+#include "/shome/pandolf/CMSSW_4_2_8/src/UserCode/pandolf/QGLikelihood/QGLikelihoodCalculator.C"
+
+//#include "/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/QGLikelihood/QGLikelihoodCalculator.C"
+//#include "/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/CommonTools/PUWeight.C"
 
 float delta_phi(float phi1, float phi2);
 
@@ -54,7 +57,7 @@ void addInput(const std::string& dataset, bool genjets=false);
 
 
 
-void finalize(const std::string& dataset, std::string recoType="pf", std::string jetAlgo="akt5", std::string photonID="medium", float secondJetThreshold=0.1, std::string partType="") {
+void finalize(const std::string& dataset, const std::string& puReweighing, std::string recoType="pf", std::string jetAlgo="akt5", float secondJetThreshold=0.1, std::string partType="") {
 
   RECOTYPE_ = recoType;
 
@@ -78,6 +81,8 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
   }
 
   outfileName = outfileName + suffix;
+
+  std::string photonID = "medium";
   if( photonID!="medium" ) outfileName = outfileName + "_" + photonID;
 //if( secondJetThreshold!=0.1 ) {
 //  char secondJetText[100];
@@ -85,6 +90,7 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
 //  std::string secondJetText_str(secondJetText);
 //  outfileName = outfileName + "_" + secondJetText_str;
 //}
+  outfileName += "_PU" + puReweighing;
   outfileName += ".root";
 
   TFile* outFile = new TFile(outfileName.c_str(), "RECREATE");
@@ -122,7 +128,7 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
 
     addInput("G_Pt-15to30_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v2");
     addInput("G_Pt-120to170_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v2");
-    addInput("G_Pt-170to300_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v2");
+    addInput("G_Pt-170to300_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v1");
     addInput("G_Pt-80to120_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v1");
     addInput("G_Pt-50to80_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v2");
     addInput("G_Pt-30to50_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v2");
@@ -638,16 +644,20 @@ void finalize(const std::string& dataset, std::string recoType="pf", std::string
 
 
 
-  QGLikelihoodCalculator* qglikeli = new QGLikelihoodCalculator("/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
-  //QGLikelihoodCalculator* qglikeli = new QGLikelihoodCalculator("/shome/pandolf/CMSSW_4_2_8/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
+  //QGLikelihoodCalculator* qglikeli = new QGLikelihoodCalculator("/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
+  QGLikelihoodCalculator* qglikeli = new QGLikelihoodCalculator("/shome/pandolf/CMSSW_4_2_8/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
 
   std::string puType = "Spring11_Flat10";
   if( dataset_tstr.Contains("Summer11") ) puType = "Summer11_S4";
   PUWeight* fPUWeight = new PUWeight(-1, "2011A", puType);
   std::string puFileName;
-  //if( PUType_=="Run2011A_73pb" )
   //puFileName = "all2011A.pileup_v2.root";
+  if( puReweighing=="Run2011A" )
+    puFileName = "all2011A.pileup_v2_73mb.root";
+  if( puReweighing=="Run2011B" )
     puFileName = "all2011B.pileup_v2_73mb.root";
+  if( puReweighing=="Run2011FULL" )
+    puFileName = "all2011AB.pileup_v2_73mb.root";
   std::cout << std::endl << "-> Using data pileup file: " << puFileName << std::endl;
   TFile* filePU = TFile::Open(puFileName.c_str());
   TH1F* h1_nPU_data = (TH1F*)filePU->Get("pileup");
