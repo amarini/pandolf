@@ -705,25 +705,25 @@ std::cout << "quarkFraction_total: " << quarkFraction_total << std::endl;
   // and now subtract gluon component both from data and MC
 
 
-  TH1D* h1_photonjet_quarkOnly = new TH1D(*h1_quark);
+  TH1D* h1_photonjet_quarkOnly = new TH1D(*((TH1D*)h1_quark->Clone()));
   h1_photonjet_quarkOnly->SetName("photonjet_quarkOnly");
   float photonjet_integral_quarkOnly = h1_photonjet_quarkOnly->Integral(1, nBins);
   h1_photonjet_quarkOnly->Scale( 1./photonjet_integral_quarkOnly );
   h1_photonjet_quarkOnly->Scale( quarkFraction_photonjet*h1_photonjet->Integral(1,nBins) );
 
-  TH1D* h1_qcd_quarkOnly = new TH1D(*h1_quark);
+  TH1D* h1_qcd_quarkOnly = new TH1D(*((TH1D*)h1_quark->Clone()));
   h1_qcd_quarkOnly->SetName("qcd_quarkOnly");
   float qcd_integral_quarkOnly = h1_qcd_quarkOnly->Integral(1, nBins);
   h1_qcd_quarkOnly->Scale( 1./qcd_integral_quarkOnly );
   h1_qcd_quarkOnly->Scale( quarkFraction_qcd*h1_qcd_fromFractions->Integral(1,nBins) );
 
-  TH1D* h1_photonjet_gluonOnly = new TH1D(*h1_gluon);
+  TH1D* h1_photonjet_gluonOnly = new TH1D(*((TH1D*)h1_gluon->Clone()));
   h1_photonjet_gluonOnly->SetName("photonjet_gluonOnly");
   float photonjet_integral_gluonOnly = h1_photonjet_gluonOnly->Integral(1, nBins);
   h1_photonjet_gluonOnly->Scale( 1./photonjet_integral_gluonOnly );
   h1_photonjet_gluonOnly->Scale( (1.-quarkFraction_photonjet)*h1_photonjet->Integral(1,nBins) );
 
-  TH1D* h1_qcd_gluonOnly = new TH1D(*h1_gluon);
+  TH1D* h1_qcd_gluonOnly = new TH1D(*((TH1D*)h1_gluon->Clone()));
   h1_qcd_gluonOnly->SetName("qcd_gluonOnly");
   float qcd_integral_gluonOnly = h1_qcd_gluonOnly->Integral(1, nBins);
   h1_qcd_gluonOnly->Scale( 1./qcd_integral_gluonOnly );
@@ -739,7 +739,7 @@ std::cout << "quarkFraction_total: " << quarkFraction_total << std::endl;
 ////h1_qcd_gluon->Add( h1_gluon, -(1.-quarkFraction_qcd)*(h1_qcd_gluon->Integral(1, nBins)) );
 
 
-  TH1D* h1_mc_gluon_only = new TH1D(*h1_photonjet_gluonOnly);
+  TH1D* h1_mc_gluon_only = new TH1D(*((TH1D*)h1_photonjet_gluonOnly->Clone()));
   h1_mc_gluon_only->SetName("mc_gluon_only");
   h1_mc_gluon_only->Add( h1_qcd_gluonOnly );
 
@@ -748,14 +748,14 @@ std::cout << "quarkFraction_total: " << quarkFraction_total << std::endl;
 
   // subtract from mc:
 //  TH1D* h1_mc_quark_only = new TH1D("mc_quark_only", "", nBins, 0., 1.0001);
-  TH1D* h1_mc_quark_only = new TH1D(*h1_photonjet);
+  TH1D* h1_mc_quark_only = new TH1D(*((TH1D*)h1_photonjet->Clone()));
   h1_mc_quark_only->Add(h1_qcd_fromFractions);
 //  h1_mc_quark_only = (mcstack->GetHistogram());
   h1_mc_quark_only->SetName("mc_quark_only");
   h1_mc_quark_only->Add( h1_mc_gluon_only, -1. );
 
   // subtract from data:
-  TH1D* h1_data_quark_only = new TH1D(*h1_data);
+  TH1D* h1_data_quark_only = new TH1D(*((TH1D*)h1_data->Clone()));
   h1_data_quark_only->SetName("data_quark_only");
   h1_data_quark_only->Add( h1_mc_gluon_only, -1. );
 
