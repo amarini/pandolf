@@ -6,9 +6,8 @@
 <use   name="FWCore/ParameterSet"/>
 <use   name="DataFormats/Common"/>
 <use   name="DataFormats/JetReco"/>
-<use   name="DataFormats/JetReco"/>
+<use   name="RecoJets/JetAlgorithms"/>
+<use   name="RecoJets/JetProducers"/>
+<use   name="pandolf/QGLikelihood"/>
 <use   name="JetMETCorrections/Objects"/>
 <flags   EDM_PLUGIN="1"/>
-<export>
-  <lib   name="1"/>
-</export>
