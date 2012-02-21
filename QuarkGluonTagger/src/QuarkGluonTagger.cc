@@ -3,6 +3,8 @@
 #include <iostream>
 #include <vector>
 
+#include "pandolf/QuarkGluonTagger/interface/QuarkGluonTagger.h"
+
 #include "DataFormats/Common/interface/ValueMap.h"
 
 #include "DataFormats/JetReco/interface/PFJet.h"
@@ -11,7 +13,6 @@
 //#include "DataFormats/VertexReco/interface/VertexFwd.h"
 //#include "DataFormats/TrackReco/interface/TrackFwd.h"
 
-#include "JetMETCorrections/Objects/interface/JetCorrector.h"
 
 
 

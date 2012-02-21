@@ -10,7 +10,9 @@
 #include "FWCore/ParameterSet/interface/FileInPath.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
-#include "UserCode/pandolf/QGLikelihood/QGLikelihoodCalculator.h"
+#include "JetMETCorrections/Objects/interface/JetCorrector.h"
+
+#include "pandolf/QGLikelihood/interface/QGLikelihoodCalculator.h"
 
 
 
