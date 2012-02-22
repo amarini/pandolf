@@ -378,6 +378,8 @@ float getWeight( const std::string& dataset, int nEvents ) {
   } else if( dataset_tstr.BeginsWith("G2Jet_Pt-300to5000") ) {
     xSection = 7.233e-01 ;
 
+  } else if( dataset_tstr.BeginsWith("QCD") && dataset_tstr.Contains("HT-100To250_7TeV") ) {
+    xSection = 4194000.0;
   } else if( dataset_tstr.BeginsWith("QCD") && dataset_tstr.Contains("HT-250To500_7TeV") ) {
     xSection = 198500.;
   } else if( dataset_tstr.BeginsWith("QCD") && dataset_tstr.Contains("HT-500To1000_7TeV") ) {
