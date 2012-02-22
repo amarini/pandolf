@@ -1,5 +1,0 @@
-make fitSidebands
-./fitSidebands HR11
-make create_datacards
-./create_datacards HR11
-source create_combinedDatacards.sh HR11
