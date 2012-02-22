@@ -9,6 +9,9 @@
 
 #include "DataFormats/JetReco/interface/PFJet.h"
 #include "DataFormats/JetReco/interface/PFJetCollection.h"
+#include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
+#include "DataFormats/ParticleFlowCandidate/interface/PFCandidateFwd.h"
+
 //#include "DataFormats/VertexReco/interface/Vertex.h"
 //#include "DataFormats/VertexReco/interface/VertexFwd.h"
 //#include "DataFormats/TrackReco/interface/TrackFwd.h"
@@ -44,21 +47,34 @@ QuarkGluonTagger::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   edm::Handle<reco::PFJetCollection> pfjets;
   iEvent.getByLabel(src_,pfjets);
+std::cout << "1" << std::endl;
 
   edm::Handle<double> rho;
   iEvent.getByLabel(srcRho_,rho);
 
+std::cout << "2" << std::endl;
   JEC_ = JetCorrector::getJetCorrector(jecService_,iSetup);
 
   std::vector<float> values;
   values.reserve(pfjets->size());
+std::cout << "3" << std::endl;
     
   for(reco::PFJetCollection::const_iterator ijet = pfjets->begin(); ijet != pfjets->end(); ++ijet) {
     //----- calculate the jec -------------------
     int index = ijet-pfjets->begin();
+std::cout << "jet: " << index << std::endl;
     edm::RefToBase<reco::Jet> jetRef(edm::Ref<PFJetCollection>(pfjets,index));
     double cor = JEC_->correction(*ijet,jetRef,iEvent,iSetup);
-    double ptD = ijet->constituentPtDistribution();
+    //----- calculate the ptD ------------
+    vector<PFCandidatePtr> pfConst(ijet->getPFConstituents());
+    double sumpt(0.0),sumpt2(0.0); 
+std::cout << "a" << std::endl;
+    for(unsigned ipf=0;ipf<pfConst.size();ipf++) {
+      sumpt  += pfConst[ipf]->pt();
+      sumpt2 += pfConst[ipf]->pt() * pfConst[ipf]->pt();
+    }
+std::cout << "b" << std::endl;
+    double ptD = sqrt(sumpt2)/sumpt;
     //----- calculate the likelihood ------------
     int nCharged = ijet->chargedHadronMultiplicity();
     int nNeutral = ijet->neutralHadronMultiplicity()+ijet->photonMultiplicity();
@@ -71,6 +87,7 @@ QuarkGluonTagger::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     values.push_back(qgl);
   }
 
+std::cout << "X" << std::endl;
   std::auto_ptr<edm::ValueMap<float> > out(new edm::ValueMap<float>());
   edm::ValueMap<float>::Filler filler(*out);
   filler.insert(pfjets, values.begin(), values.end());
