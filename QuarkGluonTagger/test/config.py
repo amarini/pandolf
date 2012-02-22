@@ -25,7 +25,7 @@ process.load('Configuration/StandardSequences/Services_cff')
 process.load('Configuration/StandardSequences/GeometryExtended_cff')
 process.load('Configuration/StandardSequences/MagneticField_AutoFromDBCurrent_cff')
 process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
-process.GlobalTag.globaltag = cms.string('START52_V2A::All') 
+process.GlobalTag.globaltag = cms.string('START42_V16::All') 
 
 
 #process.SimpleMemoryCheck = cms.Service("SimpleMemoryCheck")
@@ -33,13 +33,14 @@ process.GlobalTag.globaltag = cms.string('START52_V2A::All')
 process.source = cms.Source("PoolSource",
     skipEvents = cms.untracked.uint32(0),
     fileNames = cms.untracked.vstring(
-    'file:/tmp/pandolf/E45F7AF6-8744-E111-8C3F-003048FFD756.root'
+    #'file:/tmp/pandolf/GluGluToHToGG_M-115_7TeV-powheg-pythia6_AODSIM.root'
+    'file:/tmp/pandolf/events_GluGluToHToZZTo2L2Q_M-550_7TeV-powheg-pythia6_Summer11_PROVA.root'
 )
 
 )
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(1000)
+    input = cms.untracked.int32(100)
 )
 
 process.options = cms.untracked.PSet(
@@ -72,7 +73,7 @@ process.qglAK5PF   = cms.EDProducer("QuarkGluonTagger",
           rho      = cms.InputTag('kt6PFJetsForIsolation','rho'),
           jec      = cms.string('ak5PFL1FastL2L3'),
           #jec      = cms.string('ak5PFL1FastL2L3Residual'),
-          filename = cms.string('~/scratch1/CMSSW_5_2_0_pre3/src/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root')
+          filename = cms.string('/afs/cern.ch/user/p/pandolf/scratch1/CMSSW_4_2_8_patch7/src/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root')
 )
 
 
