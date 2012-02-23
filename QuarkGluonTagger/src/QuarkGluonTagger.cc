@@ -60,7 +60,7 @@ QuarkGluonTagger::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     //----- calculate the jec -------------------
     int index = ijet-pfjets->begin();
     edm::RefToBase<reco::Jet> jetRef(edm::Ref<PFJetCollection>(pfjets,index));
-    double cor = JEC_->correction(*ijet,jetRef,iEvent,iSetup);
+    double cor = JEC_->correction(*ijet,iEvent,iSetup);
     //----- calculate the ptD ------------
     vector<PFCandidatePtr> pfConst(ijet->getPFConstituents());
     double sumpt(0.0),sumpt2(0.0); 
