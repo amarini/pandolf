@@ -3,7 +3,8 @@
 #include <iostream>
 #include <vector>
 
-#include "pandolf/QuarkGluonTagger/interface/QuarkGluonTagger.h"
+//#include "pandolf/QuarkGluonTagger/interface/QuarkGluonTagger.h"
+#include "../interface/QuarkGluonTagger.h"
 
 #include "DataFormats/Common/interface/ValueMap.h"
 
@@ -57,27 +58,24 @@ QuarkGluonTagger::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   values.reserve(pfjets->size());
     
   for(reco::PFJetCollection::const_iterator ijet = pfjets->begin(); ijet != pfjets->end(); ++ijet) {
-    //----- calculate the jec -------------------
-    int index = ijet-pfjets->begin();
-    edm::RefToBase<reco::Jet> jetRef(edm::Ref<PFJetCollection>(pfjets,index));
+    
+    //jet energy correction:
     double cor = JEC_->correction(*ijet,iEvent,iSetup);
-    //----- calculate the ptD ------------
-    vector<PFCandidatePtr> pfConst(ijet->getPFConstituents());
-    double sumpt(0.0),sumpt2(0.0); 
-    for(unsigned ipf=0;ipf<pfConst.size();ipf++) {
-      sumpt  += pfConst[ipf]->pt();
-      sumpt2 += pfConst[ipf]->pt() * pfConst[ipf]->pt();
-    }
-    double ptD = sqrt(sumpt2)/sumpt;
-    //----- calculate the likelihood ------------
+    double corPt = cor*ijet->pt();
+
+    // get the variables for the LD:
+    double ptD = ijet->constituentPtDistribution();
     int nCharged = ijet->chargedHadronMultiplicity();
     int nNeutral = ijet->neutralHadronMultiplicity()+ijet->photonMultiplicity();
-    double corPt = cor*ijet->pt();
+
+    // compute the LD:
     float qgl(-1.0);
     if (nCharged + nNeutral > 0 ) {
       qgl = qglikeli_->computeQGLikelihoodPU(corPt,*rho,nCharged,nNeutral,ptD);
     }
     //cout<<corPt<<" "<<ijet->eta()<<" "<<nCharged<<" "<<nNeutral<<" "<<ptD<<" "<<qgl<<endl;
+    
+    // fill the value map:
     values.push_back(qgl);
   }
 
