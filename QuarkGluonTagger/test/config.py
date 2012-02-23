@@ -9,7 +9,6 @@ process = cms.Process("myprocess")
 
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
 
-is41X=False
 
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 process.load("PhysicsTools.HepMCCandAlgos.genParticleCandidates_cfi")
@@ -25,7 +24,8 @@ process.load('Configuration/StandardSequences/Services_cff')
 process.load('Configuration/StandardSequences/GeometryExtended_cff')
 process.load('Configuration/StandardSequences/MagneticField_AutoFromDBCurrent_cff')
 process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
-process.GlobalTag.globaltag = cms.string('START42_V16::All') 
+process.GlobalTag.globaltag = cms.string('START52_V2A::All') 
+#process.GlobalTag.globaltag = cms.string('START42_V16::All') 
 
 
 #process.SimpleMemoryCheck = cms.Service("SimpleMemoryCheck")
@@ -33,8 +33,7 @@ process.GlobalTag.globaltag = cms.string('START42_V16::All')
 process.source = cms.Source("PoolSource",
     skipEvents = cms.untracked.uint32(0),
     fileNames = cms.untracked.vstring(
-    #'file:/tmp/pandolf/GluGluToHToGG_M-115_7TeV-powheg-pythia6_AODSIM.root'
-    'file:/tmp/pandolf/events_GluGluToHToZZTo2L2Q_M-550_7TeV-powheg-pythia6_Summer11_PROVA.root'
+    'file:/tmp/pandolf/E45F7AF6-8744-E111-8C3F-003048FFD756.root'
 )
 
 )
