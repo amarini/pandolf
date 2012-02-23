@@ -12,7 +12,7 @@
 
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
 
-#include "pandolf/QGLikelihood/interface/QGLikelihoodCalculator.h"
+#include "../interface/QGLikelihoodCalculator.h"
 
 
 
