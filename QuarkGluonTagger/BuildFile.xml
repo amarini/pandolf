@@ -6,7 +6,6 @@
 <use   name="FWCore/ParameterSet"/>
 <use   name="DataFormats/Common"/>
 <use   name="DataFormats/JetReco"/>
-<use   name="DataFormats/ParticleFlowCandidate"/>
 <use   name="RecoJets/JetAlgorithms"/>
 <use   name="RecoJets/JetProducers"/>
 <use   name="JetMETCorrections/Objects"/>
