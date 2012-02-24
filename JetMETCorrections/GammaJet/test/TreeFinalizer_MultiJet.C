@@ -34,13 +34,10 @@ Double_t totalLumi=0.;
 
 
 void addInput(const std::string& dataset);
-void finalize(const std::string& dataset);
 
 
 
-
-
-void finalize(const std::string& dataset) {
+void finalize(const std::string& dataset, bool dijet_selection=false) {
 
   TString dataset_tstr(dataset);
 
@@ -49,6 +46,7 @@ void finalize(const std::string& dataset) {
 
 
   if( dataset=="QCD_HT_Summer11" ) {
+    addInput( "QCD_TuneZ2_HT-100To250_7TeV-madgraph_Summer11-PU_S4_START42_V11-v2" );
     addInput( "QCD_TuneZ2_HT-250To500_7TeV-madgraph_Summer11-PU_S4_START42_V11-v3" );
     addInput( "QCD_TuneZ2_HT-500To1000_7TeV-madgraph_Summer11-PU_S4_START42_V11-v1" );
     addInput( "QCD_TuneZ2_HT-1000_7TeV-madgraph_Summer11-PU_S4_START42_V11-v1" );
@@ -60,6 +58,11 @@ void finalize(const std::string& dataset) {
     addInput( "G_Pt-120to170_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v1");
     addInput( "G_Pt-80to120_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v1");
     addInput( "G_Pt-1400to1800_TuneZ2_7TeV_pythia_Summer11-PU_S4_START42_V11-v1");
+  } else if( dataset=="HT_Run2011_FULL" ) {
+    addInput( "HT_Run2011A-May10ReReco-v1_HLT" );
+    addInput( "HT_Run2011A-PromptReco-v4_HLT" );
+    addInput( "HT_Run2011A-PromptReco-v6_HLT" );
+    addInput( "HT_Run2011B-PromptReco-v1_HLT" );
   } else {
     addInput( dataset );
   }
@@ -231,6 +234,10 @@ void finalize(const std::string& dataset) {
   tree->SetBranchAddress("pdgIdMomJet", pdgIdMomJet);
 
 
+  Bool_t passed_HT150;
+  tree->SetBranchAddress("passed_HT150", &passed_HT150);
+  Bool_t passed_HT200;
+  tree->SetBranchAddress("passed_HT200", &passed_HT200);
   Bool_t passed_HT250;
   tree->SetBranchAddress("passed_HT250", &passed_HT250);
   Bool_t passed_HT300;
@@ -268,8 +275,13 @@ void finalize(const std::string& dataset) {
   TH1F* h1_nPU_data = (TH1F*)filePU->Get("pileup");
   fPUWeight->SetDataHistogram(h1_nPU_data);
 
+  PUWeight* fPUWeightRunA = new PUWeight(-1, "2011A", puType);
+  std::string puFileNameRunA = "all2011A.pileup_v2_73mb.root";
+  TFile* filePURunA = TFile::Open(puFileNameRunA.c_str());
+  TH1F* h1_nPU_dataRunA = (TH1F*)filePURunA->Get("pileup");
+  fPUWeightRunA->SetDataHistogram(h1_nPU_dataRunA);
 
-  //QGLikelihoodCalculator *qglikeli = new QGLikelihoodCalculator("/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
+
 
 
 
@@ -281,6 +293,7 @@ void finalize(const std::string& dataset) {
    else outfileName = "MultiJet";
   }
   if( MCassoc_ ) outfileName = outfileName + "_MCassoc";
+  if( dijet_selection ) outfileName = outfileName + "_DIJET";
   outfileName += ".root";
 
   TFile* outFile = new TFile(outfileName.c_str(), "RECREATE");
@@ -296,16 +309,33 @@ void finalize(const std::string& dataset) {
   float ptDJet0, ptDJet1, ptDJet2, ptDJet3;
   int nChargedJet0, nChargedJet1, nChargedJet2, nChargedJet3;
   int nNeutralJet0, nNeutralJet1, nNeutralJet2, nNeutralJet3;
-  float PUWeight;
+  float eventWeight_noPU;
+  float PUWeight(1.), PUWeightRunA(1.);
 
 
   TTree* tree_passedEvents = new TTree("tree_passedEvents", "");
   tree_passedEvents->Branch( "run", &run, "run/I" );
   tree_passedEvents->Branch( "event", &event, "event/I" );
   tree_passedEvents->Branch( "eventWeight", &eventWeight, "eventWeight/F" );
+  tree_passedEvents->Branch( "eventWeight_noPU", &eventWeight_noPU, "eventWeight_noPU/F" );
   tree_passedEvents->Branch( "PUWeight", &PUWeight, "PUWeight/F" );
+  tree_passedEvents->Branch( "PUWeightRunA", &PUWeightRunA, "PUWeightRunA/F" );
+  tree_passedEvents->Branch( "nvertex", &nvertex, "nvertex/I" );
   tree_passedEvents->Branch( "rhoPF", &rhoPF, "rhoPF/F" );
   tree_passedEvents->Branch( "ht_akt5", &ht_akt5, "ht_akt5/F" );
+  
+  tree_passedEvents->Branch("passed_HT150", &passed_HT150, "passed_HT150/O");
+  tree_passedEvents->Branch("passed_HT200", &passed_HT200, "passed_HT200/O");
+  tree_passedEvents->Branch("passed_HT250", &passed_HT250, "passed_HT250/O");
+  tree_passedEvents->Branch("passed_HT300", &passed_HT300, "passed_HT300/O");
+  tree_passedEvents->Branch("passed_HT350", &passed_HT350, "passed_HT350/O");
+  tree_passedEvents->Branch("passed_HT400", &passed_HT400, "passed_HT400/O");
+  tree_passedEvents->Branch("passed_HT450", &passed_HT450, "passed_HT450/O");
+  tree_passedEvents->Branch("passed_HT500", &passed_HT500, "passed_HT500/O");
+  tree_passedEvents->Branch("passed_HT550", &passed_HT550, "passed_HT550/O");
+  tree_passedEvents->Branch("passed_HT600", &passed_HT600, "passed_HT600/O");
+  tree_passedEvents->Branch("passed_HT650", &passed_HT650, "passed_HT650/O");
+  tree_passedEvents->Branch("passed_HT700", &passed_HT700, "passed_HT700/O");
 
   tree_passedEvents->Branch( "ptJet0", &ptJet0, "ptJet0/F" );
   tree_passedEvents->Branch( "ptJet1", &ptJet1, "ptJet1/F" );
@@ -348,7 +378,7 @@ void finalize(const std::string& dataset) {
 
 
 
-
+  bool debug=true;
 
   std::map< int, std::map<int, std::vector<int> > > run_lumi_ev_map;
 
@@ -453,17 +483,39 @@ void finalize(const std::string& dataset) {
     if( ht_akt5 > 3500. ) continue;
 
 
-    if( !isMC ) {
-      if( !passed_HT600 ) continue; //trigger on data
-      if( run<173236 || run>178380 ) continue; //run range in which HT600 was unprescaled: corresponds to 1894.3 pb-1
+    if( dijet_selection ) {
+
+      if( ht_akt5 < 150. ) continue;
+
+    } else {
+
+      if( !isMC ) {
+        if( !passed_HT600 ) continue; //trigger on data
+        if( run<173236 || run>178380 ) continue; //run range in which HT600 was unprescaled: corresponds to 1894.3 pb-1
+      }
+  
+      // avoid trigger turn-on:
+      if( ht_akt5 < 650. ) continue;
+
+    }
+  
+
+    if( dijet_selection ) {
+
+      if( nJet<2 ) continue;
+    
+    } else {
+
+      if( nJet<4 ) continue;
+      if( ptJet[3]<20. ) continue; //speed it up a little
+
     }
 
-    // avoid trigger turn-on:
-    if( ht_akt5 < 650. ) continue;
-
-
-    if( nJet<4 ) continue;
-    if( ptJet[3]<20. ) continue; //speed it up a little
+ 
+    if( dijet_selection && nJet>2 ) {
+      float ptAve = 0.5*(ptJet[0] + ptJet[1]);
+      if( ptJet[2] > 0.5*ptAve ) continue;
+    }
 
 
     if( eventWeight <= 0. ) eventWeight = 1.;
@@ -473,7 +525,9 @@ void finalize(const std::string& dataset) {
 
     if( isMC ) {
       // PU reweighting:
+     eventWeight_noPU = eventWeight;
      PUWeight = fPUWeight->GetWeight(nPU);
+     PUWeightRunA = fPUWeightRunA->GetWeight(nPU);
      eventWeight *= PUWeight;
     }
 
@@ -550,7 +604,11 @@ void finalize(const std::string& dataset) {
     } //for i jets
 
 
-    if( jets.size()<4 ) continue;
+    if( dijet_selection ) {
+      if( jets.size()<2 ) continue;
+    } else {
+      if( jets.size()<4 ) continue;
+    }
 
 
     float sumpt=0.;
