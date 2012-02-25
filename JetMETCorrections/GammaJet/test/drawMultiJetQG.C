@@ -155,7 +155,7 @@ int main(int argc, char* argv[]) {
 
 
   // HLT_HT150
-  selection_nopt = "ptJet2<0.2*(ptJet0+ptJet1)/2. && passed_HT150 && ht_akt5>160.";
+  selection_nopt = "ptJet2<0.2*(ptJet0+ptJet1)/2. && (passed_HT150||run<5) && ht_akt5>160.";
   selection_noptW = "eventWeight*(" + selection_nopt + ")";
   selection_pt0 = "eventWeight*(" + selection_nopt + " && ptJet0 > 50. && ptJet0 < 100.)";
   selection_pt1 = "eventWeight*(" + selection_nopt + " && ptJet1 > 50. && ptJet1 < 100.)";
@@ -179,7 +179,7 @@ int main(int argc, char* argv[]) {
 
 
   // HLT_HT250
-  selection_nopt = "ptJet2<0.2*(ptJet0+ptJet1)/2. && passed_HT250 && ht_akt5>265.";
+  selection_nopt = "ptJet2<0.2*(ptJet0+ptJet1)/2. && (passed_HT250||run<5) && ht_akt5>265.";
   selection_noptW = "eventWeight*(" + selection_nopt + ")";
   selection_pt0 = "eventWeight*(" + selection_nopt + " && ptJet0 > 100. && ptJet0 < 150.)";
   selection_pt1 = "eventWeight*(" + selection_nopt + " && ptJet1 > 100. && ptJet1 < 150.)";
@@ -203,7 +203,7 @@ int main(int argc, char* argv[]) {
 
 
   // HLT_HT350
-  selection_nopt = "ptJet2<0.2*(ptJet0+ptJet1)/2. && passed_HT350 && ht_akt5>365.";
+  selection_nopt = "ptJet2<0.2*(ptJet0+ptJet1)/2. && (passed_HT350||run<5) && ht_akt5>365.";
   selection_noptW = "eventWeight*(" + selection_nopt + ")";
   selection_pt0 = "eventWeight*(" + selection_nopt + " && ptJet0 > 150. && ptJet0 < 200.)";
   selection_pt1 = "eventWeight*(" + selection_nopt + " && ptJet1 > 150. && ptJet1 < 200.)";
@@ -227,7 +227,7 @@ int main(int argc, char* argv[]) {
 
 
   // HLT_HT400
-  selection_nopt = "ptJet2<0.2*(ptJet0+ptJet1)/2. && passed_HT400 && ht_akt5>420.";
+  selection_nopt = "ptJet2<0.2*(ptJet0+ptJet1)/2. && (passed_HT400||run<5) && ht_akt5>420.";
   selection_noptW = "eventWeight*(" + selection_nopt + ")";
   selection_pt0 = "eventWeight*(" + selection_nopt + " && ptJet0 > 200. && ptJet0 < 250.)";
   selection_pt1 = "eventWeight*(" + selection_nopt + " && ptJet1 > 200. && ptJet1 < 250.)";
@@ -251,7 +251,7 @@ int main(int argc, char* argv[]) {
 
 
   // HLT_HT500
-  selection_nopt = "ptJet2<0.2*(ptJet0+ptJet1)/2. && passed_HT500 && ht_akt5>525.";
+  selection_nopt = "ptJet2<0.2*(ptJet0+ptJet1)/2. && (passed_HT500||run<5) && ht_akt5>525.";
   selection_noptW = "eventWeight*(" + selection_nopt + ")";
   selection_pt0 = "eventWeight*(" + selection_nopt + " && ptJet0 > 250. && ptJet0 < 300.)";
   selection_pt1 = "eventWeight*(" + selection_nopt + " && ptJet1 > 250. && ptJet1 < 300.)";
@@ -275,7 +275,7 @@ int main(int argc, char* argv[]) {
 
 
   // HLT_HT600
-  selection_nopt = "ptJet2<0.2*(ptJet0+ptJet1)/2. && passed_HT600 && ht_akt5>640.";
+  selection_nopt = "ptJet2<0.2*(ptJet0+ptJet1)/2. && (passed_HT600||run<5) && ht_akt5>640.";
   selection_noptW = "eventWeight*(" + selection_nopt + ")";
   selection_pt0 = "eventWeight*(" + selection_nopt + " && ptJet0 > 50. && ptJet0 < 100.)";
   selection_pt1 = "eventWeight*(" + selection_nopt + " && ptJet1 > 50. && ptJet1 < 100.)";
