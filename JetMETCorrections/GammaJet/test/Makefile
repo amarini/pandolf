@@ -90,6 +90,9 @@ drawEfficiencies_vs_QGCut: DrawBase.o fitTools.o drawEfficiencies_vs_QGCut.C
 drawQGStudies: fitTools.o DrawBase.o drawQGStudies.C
 	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/ -o drawQGStudies drawQGStudies.C fitTools.o DrawBase.o $(ROOTFLAG) $(EXTRALIBS)
 
+drawMultiJetQG: fitTools.o DrawBase.o drawMultiJetQG.C
+	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/ -o drawMultiJetQG drawMultiJetQG.C fitTools.o DrawBase.o $(ROOTFLAG) $(EXTRALIBS)
+
 drawVHgg: fitTools.o DrawBase.o drawVHgg.C
 	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/ -o drawVHgg drawVHgg.C fitTools.o DrawBase.o $(ROOTFLAG) $(EXTRALIBS)
 
