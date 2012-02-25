@@ -3,9 +3,8 @@
 #include "CommonTools/fitTools.h"
 
 
-bool useMCassoc_ = false;
-bool ONEVTX = false;
 
+bool dijet_selection=true;
 
 
 void drawHistoWithQuarkGluonComponents( DrawBase* db, const std::string& treeName, const std::string& varName, const std::string& axisName, const std::string& units="", const std::string& instanceName="Events", bool log=false, float ptMin=0., float ptMax=10000. );
@@ -20,7 +19,7 @@ int main(int argc, char* argv[]) {
     exit(23);
   }
 
-  std::string data_dataset = "HT_Run2011B-PromptReco-v1_HLT";
+  std::string data_dataset = "HT_Run2011_FULL";
   if( argc>1 ) {
     std::string dataset_tmp(argv[1]);
     data_dataset = dataset_tmp;
@@ -60,7 +59,10 @@ int main(int argc, char* argv[]) {
   DrawBase* db = new DrawBase("MultiJetQG", recoType, jetAlgo);
 
   char dataFileName[150];
-  sprintf( dataFileName, "MultiJet_%s.root", data_dataset.c_str());
+  if( dijet_selection )
+    sprintf( dataFileName, "MultiJet_%s_DIJET.root", data_dataset.c_str());
+  else
+    sprintf( dataFileName, "MultiJet_%s.root", data_dataset.c_str());
   TFile* dataFile = TFile::Open(dataFileName);
 
   db->add_dataFile( dataFile, data_dataset );
@@ -68,7 +70,10 @@ int main(int argc, char* argv[]) {
 
 
   char mcQCDFile_char[150];
-  sprintf( mcQCDFile_char, "MultiJet_%s.root", mc_QCD.c_str());
+  if( dijet_selection )
+    sprintf( mcQCDFile_char, "MultiJet_%s_DIJET.root", mc_QCD.c_str());
+  else
+    sprintf( mcQCDFile_char, "MultiJet_%s.root", mc_QCD.c_str());
 
   TFile* mcQCDFile = TFile::Open(mcQCDFile_char);
   db->add_mcFile( mcQCDFile, mc_QCD, "QCD MC", 38);
@@ -83,12 +88,12 @@ int main(int argc, char* argv[]) {
 
 
   if( norm=="LUMI" ) {
-    db->set_lumiNormalization(1894.3);
+    db->set_lumiNormalization(4600.);
     std::cout << "-> Lumi normalization." << std::endl;
   } else {
     std::cout << "-> Shape normalization." << std::endl;
     db->set_shapeNormalization();
-    db->set_lumi(1894.3);
+    db->set_lumi(4600.);
   }
 
 
@@ -101,6 +106,7 @@ int main(int argc, char* argv[]) {
   db->set_lumiOnRightSide();
 
 
+/*
   bool log = true;
 
   db->set_yAxisMaxScaleLog( 1000. );
@@ -140,6 +146,159 @@ int main(int argc, char* argv[]) {
   db->drawHisto( "nNeutralJet3", "Fourth Jet Neutral Multiplicity", "", "Events", log);
   db->set_xAxisMax();
 
+*/
+
+  std::string selection_nopt;
+  std::string selection_noptW;
+  std::string selection_pt0;
+  std::string selection_pt1;
+
+
+  // HLT_HT150
+  selection_nopt = "ptJet2<0.2*(ptJet0+ptJet1)/2. && passed_HT150 && ht_akt5>160.";
+  selection_noptW = "eventWeight*(" + selection_nopt + ")";
+  selection_pt0 = "eventWeight*(" + selection_nopt + " && ptJet0 > 50. && ptJet0 < 100.)";
+  selection_pt1 = "eventWeight*(" + selection_nopt + " && ptJet1 > 50. && ptJet1 < 100.)";
+
+  db->drawHisto_fromTree( "tree_passedEvents", "nvertex", selection_noptW.c_str(), 30, 0.5, 30.5, "nvertex_HT150", "Number of Reconstructed Vertexes", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "rhoPF", selection_noptW.c_str(), 50, 0., 20., "rhoPF_HT150", "Particle Flow Energy Density (#rho)", "GeV", "Events", true);
+
+  db->drawHisto_fromTree( "tree_passedEvents", "ht_akt5", selection_noptW.c_str(), 50, 150., 500., "ht_akt5_HT150", "Calo H_{T}", "GeV", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "ptJet0", selection_noptW.c_str(), 50, 0., 250., "ptJet0_HT150", "Lead Jet p_{T}", "GeV", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "ptJet1", selection_noptW.c_str(), 50, 0., 250., "ptJet1_HT150", "Sublead Jet p_{T}", "GeV", "Events", true);
+
+  db->drawHisto_fromTree( "tree_passedEvents", "nChargedJet0", selection_pt0.c_str(), 51, -0.5, 50.5, "nChargedJet0_HT150", "Lead Jet Charged Multiplicity", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "nNeutralJet0", selection_pt0.c_str(), 51, -0.5, 50.5, "nNeutralJet0_HT150", "Lead Jet Neutral Multiplicity", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "ptDJet0", selection_pt0.c_str(),      50, 0., 1.0001, "ptDJet0_HT150", "Lead Jet p_{T}D", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "QGLikelihoodJet0", selection_pt0.c_str(),      50, 0., 1.0001, "QGLikelihoodJet0_HT150", "Lead Jet Q-G LD", "", "Events", true);
+
+  db->drawHisto_fromTree( "tree_passedEvents", "nChargedJet1", selection_pt1.c_str(), 51, -0.5, 50.5, "nChargedJet1_HT150", "Sublead Jet Charged Multiplicity", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "nNeutralJet1", selection_pt1.c_str(), 51, -0.5, 50.5, "nNeutralJet1_HT150", "Sublead Jet Neutral Multiplicity", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "ptDJet1", selection_pt1.c_str(),      50, 0., 1.0001, "ptDJet1_HT150", "Sublead Jet p_{T}D", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "QGLikelihoodJet1", selection_pt1.c_str(),      50, 0., 1.0001, "QGLikelihoodJet1_HT150", "Sublead Jet Q-G LD", "", "Events", true);
+
+
+  // HLT_HT250
+  selection_nopt = "ptJet2<0.2*(ptJet0+ptJet1)/2. && passed_HT250 && ht_akt5>265.";
+  selection_noptW = "eventWeight*(" + selection_nopt + ")";
+  selection_pt0 = "eventWeight*(" + selection_nopt + " && ptJet0 > 100. && ptJet0 < 150.)";
+  selection_pt1 = "eventWeight*(" + selection_nopt + " && ptJet1 > 100. && ptJet1 < 150.)";
+
+  db->drawHisto_fromTree( "tree_passedEvents", "nvertex", selection_noptW.c_str(), 30, 0.5, 30.5, "nvertex_HT250", "Number of Reconstructed Vertexes", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "rhoPF", selection_noptW.c_str(), 50, 0., 20., "rhoPF_HT250", "Particle Flow Energy Density (#rho)", "GeV", "Events", true);
+
+  db->drawHisto_fromTree( "tree_passedEvents", "ht_akt5", selection_noptW.c_str(), 50, 150., 550., "ht_akt5_HT250", "Calo H_{T}", "GeV", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "ptJet0", selection_noptW.c_str(), 50, 0., 250., "ptJet0_HT250", "Lead Jet p_{T}", "GeV", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "ptJet1", selection_noptW.c_str(), 50, 0., 250., "ptJet1_HT250", "Sublead Jet p_{T}", "GeV", "Events", true);
+
+  db->drawHisto_fromTree( "tree_passedEvents", "nChargedJet0", selection_pt0.c_str(), 51, -0.5, 50.5, "nChargedJet0_HT250", "Lead Jet Charged Multiplicity", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "nNeutralJet0", selection_pt0.c_str(), 51, -0.5, 50.5, "nNeutralJet0_HT250", "Lead Jet Neutral Multiplicity", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "ptDJet0", selection_pt0.c_str(),      50, 0., 1.0001, "ptDJet0_HT250", "Lead Jet p_{T}D", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "QGLikelihoodJet0", selection_pt0.c_str(),      50, 0., 1.0001, "QGLikelihoodJet0_HT250", "Lead Jet Q-G LD", "", "Events", true);
+
+  db->drawHisto_fromTree( "tree_passedEvents", "nChargedJet1", selection_pt1.c_str(), 51, -0.5, 50.5, "nChargedJet1_HT250", "Sublead Jet Charged Multiplicity", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "nNeutralJet1", selection_pt1.c_str(), 51, -0.5, 50.5, "nNeutralJet1_HT250", "Sublead Jet Neutral Multiplicity", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "ptDJet1", selection_pt1.c_str(),      50, 0., 1.0001, "ptDJet1_HT250", "Sublead Jet p_{T}D", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "QGLikelihoodJet1", selection_pt1.c_str(),      50, 0., 1.0001, "QGLikelihoodJet1_HT250", "Sublead Jet Q-G LD", "", "Events", true);
+
+
+  // HLT_HT350
+  selection_nopt = "ptJet2<0.2*(ptJet0+ptJet1)/2. && passed_HT350 && ht_akt5>365.";
+  selection_noptW = "eventWeight*(" + selection_nopt + ")";
+  selection_pt0 = "eventWeight*(" + selection_nopt + " && ptJet0 > 150. && ptJet0 < 200.)";
+  selection_pt1 = "eventWeight*(" + selection_nopt + " && ptJet1 > 150. && ptJet1 < 200.)";
+
+  db->drawHisto_fromTree( "tree_passedEvents", "nvertex", selection_noptW.c_str(), 30, 0.5, 30.5, "nvertex_HT350", "Number of Reconstructed Vertexes", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "rhoPF", selection_noptW.c_str(), 50, 0., 20., "rhoPF_HT350", "Particle Flow Energy Density (#rho)", "GeV", "Events", true);
+
+  db->drawHisto_fromTree( "tree_passedEvents", "ht_akt5", selection_noptW.c_str(), 50, 150., 600., "ht_akt5_HT350", "Calo H_{T}", "GeV", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "ptJet0", selection_noptW.c_str(), 50, 0., 250., "ptJet0_HT350", "Lead Jet p_{T}", "GeV", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "ptJet1", selection_noptW.c_str(), 50, 0., 250., "ptJet1_HT350", "Sublead Jet p_{T}", "GeV", "Events", true);
+
+  db->drawHisto_fromTree( "tree_passedEvents", "nChargedJet0", selection_pt0.c_str(), 51, -0.5, 50.5, "nChargedJet0_HT350", "Lead Jet Charged Multiplicity", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "nNeutralJet0", selection_pt0.c_str(), 51, -0.5, 50.5, "nNeutralJet0_HT350", "Lead Jet Neutral Multiplicity", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "ptDJet0", selection_pt0.c_str(),      50, 0., 1.0001, "ptDJet0_HT350", "Lead Jet p_{T}D", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "QGLikelihoodJet0", selection_pt0.c_str(),      50, 0., 1.0001, "QGLikelihoodJet0_HT350", "Lead Jet Q-G LD", "", "Events", true);
+
+  db->drawHisto_fromTree( "tree_passedEvents", "nChargedJet1", selection_pt1.c_str(), 51, -0.5, 50.5, "nChargedJet1_HT350", "Sublead Jet Charged Multiplicity", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "nNeutralJet1", selection_pt1.c_str(), 51, -0.5, 50.5, "nNeutralJet1_HT350", "Sublead Jet Neutral Multiplicity", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "ptDJet1", selection_pt1.c_str(),      50, 0., 1.0001, "ptDJet1_HT350", "Sublead Jet p_{T}D", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "QGLikelihoodJet1", selection_pt1.c_str(),      50, 0., 1.0001, "QGLikelihoodJet1_HT350", "Sublead Jet Q-G LD", "", "Events", true);
+
+
+  // HLT_HT400
+  selection_nopt = "ptJet2<0.2*(ptJet0+ptJet1)/2. && passed_HT400 && ht_akt5>420.";
+  selection_noptW = "eventWeight*(" + selection_nopt + ")";
+  selection_pt0 = "eventWeight*(" + selection_nopt + " && ptJet0 > 200. && ptJet0 < 250.)";
+  selection_pt1 = "eventWeight*(" + selection_nopt + " && ptJet1 > 200. && ptJet1 < 250.)";
+
+  db->drawHisto_fromTree( "tree_passedEvents", "nvertex", selection_noptW.c_str(), 30, 0.5, 30.5, "nvertex_HT400", "Number of Reconstructed Vertexes", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "rhoPF", selection_noptW.c_str(), 50, 0., 20., "rhoPF_HT400", "Particle Flow Energy Density (#rho)", "GeV", "Events", true);
+
+  db->drawHisto_fromTree( "tree_passedEvents", "ht_akt5", selection_noptW.c_str(), 50, 150., 700., "ht_akt5_HT400", "Calo H_{T}", "GeV", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "ptJet0", selection_noptW.c_str(), 50, 0., 250., "ptJet0_HT400", "Lead Jet p_{T}", "GeV", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "ptJet1", selection_noptW.c_str(), 50, 0., 250., "ptJet1_HT400", "Sublead Jet p_{T}", "GeV", "Events", true);
+
+  db->drawHisto_fromTree( "tree_passedEvents", "nChargedJet0", selection_pt0.c_str(), 51, -0.5, 50.5, "nChargedJet0_HT400", "Lead Jet Charged Multiplicity", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "nNeutralJet0", selection_pt0.c_str(), 51, -0.5, 50.5, "nNeutralJet0_HT400", "Lead Jet Neutral Multiplicity", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "ptDJet0", selection_pt0.c_str(),      50, 0., 1.0001, "ptDJet0_HT400", "Lead Jet p_{T}D", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "QGLikelihoodJet0", selection_pt0.c_str(),      50, 0., 1.0001, "QGLikelihoodJet0_HT400", "Lead Jet Q-G LD", "", "Events", true);
+
+  db->drawHisto_fromTree( "tree_passedEvents", "nChargedJet1", selection_pt1.c_str(), 51, -0.5, 50.5, "nChargedJet1_HT400", "Sublead Jet Charged Multiplicity", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "nNeutralJet1", selection_pt1.c_str(), 51, -0.5, 50.5, "nNeutralJet1_HT400", "Sublead Jet Neutral Multiplicity", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "ptDJet1", selection_pt1.c_str(),      50, 0., 1.0001, "ptDJet1_HT400", "Sublead Jet p_{T}D", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "QGLikelihoodJet1", selection_pt1.c_str(),      50, 0., 1.0001, "QGLikelihoodJet1_HT400", "Sublead Jet Q-G LD", "", "Events", true);
+
+
+  // HLT_HT500
+  selection_nopt = "ptJet2<0.2*(ptJet0+ptJet1)/2. && passed_HT500 && ht_akt5>525.";
+  selection_noptW = "eventWeight*(" + selection_nopt + ")";
+  selection_pt0 = "eventWeight*(" + selection_nopt + " && ptJet0 > 250. && ptJet0 < 300.)";
+  selection_pt1 = "eventWeight*(" + selection_nopt + " && ptJet1 > 250. && ptJet1 < 300.)";
+
+  db->drawHisto_fromTree( "tree_passedEvents", "nvertex", selection_noptW.c_str(), 30, 0.5, 30.5, "nvertex_HT500", "Number of Reconstructed Vertexes", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "rhoPF", selection_noptW.c_str(), 50, 0., 20., "rhoPF_HT500", "Particle Flow Energy Density (#rho)", "GeV", "Events", true);
+
+  db->drawHisto_fromTree( "tree_passedEvents", "ht_akt5", selection_noptW.c_str(), 50, 200., 1000., "ht_akt5_HT500", "Calo H_{T}", "GeV", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "ptJet0", selection_noptW.c_str(), 50, 0., 250., "ptJet0_HT500", "Lead Jet p_{T}", "GeV", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "ptJet1", selection_noptW.c_str(), 50, 0., 250., "ptJet1_HT500", "Sublead Jet p_{T}", "GeV", "Events", true);
+
+  db->drawHisto_fromTree( "tree_passedEvents", "nChargedJet0", selection_pt0.c_str(), 51, -0.5, 50.5, "nChargedJet0_HT500", "Lead Jet Charged Multiplicity", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "nNeutralJet0", selection_pt0.c_str(), 51, -0.5, 50.5, "nNeutralJet0_HT500", "Lead Jet Neutral Multiplicity", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "ptDJet0", selection_pt0.c_str(),      50, 0., 1.0001, "ptDJet0_HT500", "Lead Jet p_{T}D", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "QGLikelihoodJet0", selection_pt0.c_str(),      50, 0., 1.0001, "QGLikelihoodJet0_HT500", "Lead Jet Q-G LD", "", "Events", true);
+
+  db->drawHisto_fromTree( "tree_passedEvents", "nChargedJet1", selection_pt1.c_str(), 51, -0.5, 50.5, "nChargedJet1_HT500", "Sublead Jet Charged Multiplicity", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "nNeutralJet1", selection_pt1.c_str(), 51, -0.5, 50.5, "nNeutralJet1_HT500", "Sublead Jet Neutral Multiplicity", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "ptDJet1", selection_pt1.c_str(),      50, 0., 1.0001, "ptDJet1_HT500", "Sublead Jet p_{T}D", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "QGLikelihoodJet1", selection_pt1.c_str(),      50, 0., 1.0001, "QGLikelihoodJet1_HT500", "Sublead Jet Q-G LD", "", "Events", true);
+
+
+  // HLT_HT600
+  selection_nopt = "ptJet2<0.2*(ptJet0+ptJet1)/2. && passed_HT600 && ht_akt5>640.";
+  selection_noptW = "eventWeight*(" + selection_nopt + ")";
+  selection_pt0 = "eventWeight*(" + selection_nopt + " && ptJet0 > 50. && ptJet0 < 100.)";
+  selection_pt1 = "eventWeight*(" + selection_nopt + " && ptJet1 > 50. && ptJet1 < 100.)";
+
+  db->drawHisto_fromTree( "tree_passedEvents", "nvertex", selection_noptW.c_str(), 30, 0.5, 30.5, "nvertex_HT600", "Number of Reconstructed Vertexes", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "rhoPF", selection_noptW.c_str(), 50, 0., 20., "rhoPF_HT600", "Particle Flow Energy Density (#rho)", "GeV", "Events", true);
+
+  db->drawHisto_fromTree( "tree_passedEvents", "ht_akt5", selection_noptW.c_str(), 50, 300., 1200., "ht_akt5_HT600", "Calo H_{T}", "GeV", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "ptJet0", selection_noptW.c_str(), 50, 0., 250., "ptJet0_HT600", "Lead Jet p_{T}", "GeV", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "ptJet1", selection_noptW.c_str(), 50, 0., 250., "ptJet1_HT600", "Sublead Jet p_{T}", "GeV", "Events", true);
+
+  db->drawHisto_fromTree( "tree_passedEvents", "nChargedJet0", selection_pt0.c_str(), 51, -0.5, 50.5, "nChargedJet0_HT600", "Lead Jet Charged Multiplicity", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "nNeutralJet0", selection_pt0.c_str(), 51, -0.5, 50.5, "nNeutralJet0_HT600", "Lead Jet Neutral Multiplicity", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "ptDJet0", selection_pt0.c_str(),      50, 0., 1.0001, "ptDJet0_HT600", "Lead Jet p_{T}D", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "QGLikelihoodJet0", selection_pt0.c_str(),      50, 0., 1.0001, "QGLikelihoodJet0_HT600", "Lead Jet Q-G LD", "", "Events", true);
+
+  db->drawHisto_fromTree( "tree_passedEvents", "nChargedJet1", selection_pt1.c_str(), 51, -0.5, 50.5, "nChargedJet1_HT600", "Sublead Jet Charged Multiplicity", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "nNeutralJet1", selection_pt1.c_str(), 51, -0.5, 50.5, "nNeutralJet1_HT600", "Sublead Jet Neutral Multiplicity", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "ptDJet1", selection_pt1.c_str(),      50, 0., 1.0001, "ptDJet1_HT600", "Sublead Jet p_{T}D", "", "Events", true);
+  db->drawHisto_fromTree( "tree_passedEvents", "QGLikelihoodJet1", selection_pt1.c_str(),      50, 0., 1.0001, "QGLikelihoodJet1_HT600", "Sublead Jet Q-G LD", "", "Events", true);
+
+
+/*
   db->set_rebin(2);
   drawHistoWithQuarkGluonComponents( db, "tree_passedEvents", "QGLikelihoodJet0", "First Jet Q-G Likelihood", "", "Events");
   drawHistoWithQuarkGluonComponents( db, "tree_passedEvents", "QGLikelihoodJet1", "Second Jet Q-G Likelihood", "", "Events");
@@ -153,7 +312,7 @@ int main(int argc, char* argv[]) {
   drawHistoWithQuarkGluonComponents( db, "tree_passedEvents", "QGLikelihoodJet1", "Second Jet Q-G Likelihood", "", "Events", false, 100., 200.);
   drawHistoWithQuarkGluonComponents( db, "tree_passedEvents", "QGLikelihoodJet1", "Second Jet Q-G Likelihood", "", "Events", false, 200., 300.);
   drawHistoWithQuarkGluonComponents( db, "tree_passedEvents", "QGLikelihoodJet1", "Second Jet Q-G Likelihood", "", "Events", false, 300., 400.);
-
+*/
 
   delete db;
   db = 0;
