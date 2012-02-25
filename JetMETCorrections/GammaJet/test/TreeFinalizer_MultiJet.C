@@ -302,6 +302,7 @@ void finalize(const std::string& dataset, bool dijet_selection=false) {
 
 
 
+  float deltaPhi01;
   float ptJet0, ptJet1, ptJet2, ptJet3;
   float etaJet0, etaJet1, etaJet2, etaJet3;
   int pdgIdPartJet0, pdgIdPartJet1, pdgIdPartJet2, pdgIdPartJet3;
@@ -336,6 +337,8 @@ void finalize(const std::string& dataset, bool dijet_selection=false) {
   tree_passedEvents->Branch("passed_HT600", &passed_HT600, "passed_HT600/O");
   tree_passedEvents->Branch("passed_HT650", &passed_HT650, "passed_HT650/O");
   tree_passedEvents->Branch("passed_HT700", &passed_HT700, "passed_HT700/O");
+
+  tree_passedEvents->Branch( "deltaPhi01", &deltaPhi01, "deltaPhi01/F" );
 
   tree_passedEvents->Branch( "ptJet0", &ptJet0, "ptJet0/F" );
   tree_passedEvents->Branch( "ptJet1", &ptJet1, "ptJet1/F" );
@@ -620,6 +623,9 @@ void finalize(const std::string& dataset, bool dijet_selection=false) {
     } else {
       if( jets.size()<4 ) continue;
     }
+
+
+    deltaPhi01 = jets[0]->DeltaPhi(*(jets[1]));
 
 
     float sumpt=0.;
