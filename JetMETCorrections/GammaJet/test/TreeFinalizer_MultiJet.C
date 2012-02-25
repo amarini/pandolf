@@ -514,7 +514,7 @@ void finalize(const std::string& dataset, bool dijet_selection=false) {
  
     if( dijet_selection && nJet>2 ) {
       float ptAve = 0.5*(ptJet[0] + ptJet[1]);
-      if( ptJet[2] > 0.5*ptAve ) continue;
+      if( ptJet[2] > 0.3*ptAve ) continue;
     }
 
 
@@ -543,8 +543,19 @@ void finalize(const std::string& dataset, bool dijet_selection=false) {
     //for( unsigned iJet=0; iJet<1 && jets.size()<4; ++iJet ) {
     for( unsigned iJet=0; iJet<nJet && jets.size()<4; ++iJet ) {
 
+
       if( ptJet[iJet]<20. ) continue;
-      if( fabs(etaJet[iJet])>2. ) continue;
+
+
+      if( jets.size()<2 ) {
+
+        // only teo leading jets are required to be in tracker covered region
+        // (will cut on third jet, but with no eta restrictions)
+        if( fabs(etaJet[iJet])>2. ) continue;
+
+      }
+
+      
       //int nCandidates = nChargedHadronsJet[iJet] + nNeutralHadronsJet[iJet] + nPhotonsJet[iJet];
       //if( nChargedHadronsJet[iJet]==0 || nCandidates<2 ) continue;
 
@@ -655,6 +666,8 @@ void finalize(const std::string& dataset, bool dijet_selection=false) {
       h1_nNeutralJet1->Fill( jets[1]->nNeutral(), eventWeight );
 
     }
+
+    
 
     if( jets.size()>2 ) {
 
