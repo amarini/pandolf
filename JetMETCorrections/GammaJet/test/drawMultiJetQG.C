@@ -277,8 +277,8 @@ int main(int argc, char* argv[]) {
   // HLT_HT600
   selection_nopt = "ptJet2<0.2*(ptJet0+ptJet1)/2. && (passed_HT600||run<5) && ht_akt5>640.";
   selection_noptW = "eventWeight*(" + selection_nopt + ")";
-  selection_pt0 = "eventWeight*(" + selection_nopt + " && ptJet0 > 50. && ptJet0 < 100.)";
-  selection_pt1 = "eventWeight*(" + selection_nopt + " && ptJet1 > 50. && ptJet1 < 100.)";
+  selection_pt0 = "eventWeight*(" + selection_nopt + " && ptJet0 > 300. && ptJet0 < 400.)";
+  selection_pt1 = "eventWeight*(" + selection_nopt + " && ptJet1 > 300. && ptJet1 < 400.)";
 
   db->drawHisto_fromTree( "tree_passedEvents", "nvertex", selection_noptW.c_str(), 30, 0.5, 30.5, "nvertex_HT600", "Number of Reconstructed Vertexes", "", "Events", true);
   db->drawHisto_fromTree( "tree_passedEvents", "rhoPF", selection_noptW.c_str(), 50, 0., 20., "rhoPF_HT600", "Particle Flow Energy Density (#rho)", "GeV", "Events", true);
