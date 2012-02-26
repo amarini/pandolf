@@ -380,13 +380,14 @@ void finalize(const std::string& dataset, bool dijet_selection=false) {
   gROOT->cd();
 
 
+  QGLikelihoodCalculator *qglikeli = new QGLikelihoodCalculator("/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
+
 
   bool debug=true;
 
   std::map< int, std::map<int, std::vector<int> > > run_lumi_ev_map;
 
   int nEntries = tree->GetEntries();
-//nEntries = 100000;
 
   for(int iEntry=0; iEntry<nEntries; ++iEntry) {
 
@@ -483,6 +484,7 @@ void finalize(const std::string& dataset, bool dijet_selection=false) {
 
 
 
+    if( rhoPF > 40. || rhoPF < 0. ) continue;
     if( ht_akt5 > 3500. ) continue;
 
 
@@ -566,7 +568,11 @@ void finalize(const std::string& dataset, bool dijet_selection=false) {
     
       thisJet->SetPtEtaPhiE( ptJet[iJet], etaJet[iJet], phiJet[iJet], ptJet[iJet]/ptRawJet[iJet]*eJet[iJet] );
 
-      thisJet->QGLikelihood = QGLikelihoodJet[iJet];
+
+      if( QGLikelihoodJet[iJet]==0. || QGLikelihoodJet[iJet]==1. )
+        thisJet->QGLikelihood =  qglikeli->computeQGLikelihoodPU( thisJet->Pt(), rhoPF, thisJet->nCharged(), thisJet->nNeutral(), thisJet->ptD );
+      else
+        thisJet->QGLikelihood = QGLikelihoodJet[iJet];
       thisJet->ptD = ptDJet[iJet];
       thisJet->nTracksReco = nChargedHadronsJet[iJet];
       thisJet->nNeutralHadronsReco = nNeutralHadronsJet[iJet];
