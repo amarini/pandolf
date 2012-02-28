@@ -14,6 +14,23 @@ class AnalysisJet : public TLorentzVector {
     eReco=0.;
     etaReco=0.;
     phiReco=0.;
+
+    nTracksReco=0;
+    nNeutralHadronsReco=0;
+    nPhotonsReco=0;
+    nElectronsReco=0;
+    nMuonsReco=0;
+    nHFEMReco=0;
+    nHFHadronsReco=0;
+
+    eTracksReco=0.;
+    eNeutralHadronsReco=0.;
+    ePhotonsReco=0.;
+    eElectronsReco=0.;
+    eMuonsReco=0.;
+    eHFEMReco=0.;
+    eHFHadronsReco=0.;
+
   };
   ~AnalysisJet(){};
 
@@ -112,6 +129,8 @@ class AnalysisJet : public TLorentzVector {
   Int_t nElectronsGen;
   Int_t nHFHadronsGen;
   Int_t nHFEMGen;
+
+  Float_t QGLikelihood;
 
   //btag:
   Float_t trackCountingHighEffBJetTags;
