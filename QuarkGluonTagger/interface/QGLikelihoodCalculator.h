@@ -2,8 +2,6 @@
 //  
 //    QGLikelihoodCalculator - Class
 //    for the computation of the QG likelihood.
-//    Needs files provided by having run the
-//    Ntp1Finalizer_QG on QCD samples.
 //
 // ------------------------------------------------------------
 
