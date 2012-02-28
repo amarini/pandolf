@@ -33,7 +33,7 @@ process.GlobalTag.globaltag = cms.string('START52_V2A::All')
 process.source = cms.Source("PoolSource",
     skipEvents = cms.untracked.uint32(0),
     fileNames = cms.untracked.vstring(
-    'file:/tmp/pandolf/E45F7AF6-8744-E111-8C3F-003048FFD756.root'
+    'file:/tmp/pandolf/EC9EFACC-C34C-E111-B207-003048FFCBA8.root'
 )
 
 )
