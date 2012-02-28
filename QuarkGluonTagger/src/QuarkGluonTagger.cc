@@ -1,9 +1,7 @@
-// system include files
 #include <memory>
 #include <iostream>
 #include <vector>
 
-//#include "pandolf/QuarkGluonTagger/interface/QuarkGluonTagger.h"
 #include "../interface/QuarkGluonTagger.h"
 
 #include "DataFormats/Common/interface/ValueMap.h"
@@ -12,10 +10,6 @@
 #include "DataFormats/JetReco/interface/PFJetCollection.h"
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidateFwd.h"
-
-//#include "DataFormats/VertexReco/interface/Vertex.h"
-//#include "DataFormats/VertexReco/interface/VertexFwd.h"
-//#include "DataFormats/TrackReco/interface/TrackFwd.h"
 
 
 
@@ -26,11 +20,9 @@ QuarkGluonTagger::QuarkGluonTagger(const edm::ParameterSet& iConfig)
         src_        = iConfig.getParameter<edm::InputTag> ("jets");
         srcRho_     = iConfig.getParameter<edm::InputTag> ("rho");
         jecService_ = iConfig.getParameter<std::string>   ("jec");
-        fileName_   = iConfig.getParameter<std::string>   ("filename");
         
         produces<edm::ValueMap<float> >().setBranchAlias("qg");
-        //edm::FileInPath fip(fileName);
-        qglikeli_ = new QGLikelihoodCalculator(fileName_);
+        qglikeli_ = new QGLikelihoodCalculator();
 }
 
 QuarkGluonTagger::~QuarkGluonTagger()
@@ -71,7 +63,10 @@ QuarkGluonTagger::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     // compute the LD:
     float qgl(-1.0);
     if (nCharged + nNeutral > 0 ) {
-      qgl = qglikeli_->computeQGLikelihoodPU(corPt,*rho,nCharged,nNeutral,ptD);
+      if( fabs(ijet->eta())<2.4 )
+        qgl = qglikeli_->computeQGLikelihood(corPt,*rho,nCharged,nNeutral,ptD);
+      else
+        qgl = -1.;
     }
     //cout<<corPt<<" "<<ijet->eta()<<" "<<nCharged<<" "<<nNeutral<<" "<<ptD<<" "<<qgl<<endl;
     

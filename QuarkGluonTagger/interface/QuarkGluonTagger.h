@@ -1,7 +1,5 @@
-// system include files
 #include <string>
 
-// user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDProducer.h"
 
@@ -29,7 +27,7 @@ class QuarkGluonTagger : public edm::EDProducer {
 
       // ----------member data --------------------------
       edm::InputTag src_,srcRho_;
-      std::string result_,jecService_,fileName_;
+      std::string jecService_;
       QGLikelihoodCalculator *qglikeli_;
       const JetCorrector *JEC_;           
 };
