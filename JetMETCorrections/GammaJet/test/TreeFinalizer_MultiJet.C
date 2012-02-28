@@ -512,15 +512,11 @@ void finalize(const std::string& dataset, bool dijet_selection=false) {
     } else {
 
       if( nJet<4 ) continue;
-      if( ptJet[3]<20. ) continue; //speed it up a little
+      if( ptJet[3]<20. ) continue; 
 
     }
 
  
-    if( dijet_selection && nJet>2 ) {
-      float ptAve = 0.5*(ptJet[0] + ptJet[1]);
-      if( ptJet[2] > 0.3*ptAve ) continue;
-    }
 
 
     if( eventWeight <= 0. ) eventWeight = 1.;
@@ -552,13 +548,11 @@ void finalize(const std::string& dataset, bool dijet_selection=false) {
       if( ptJet[iJet]<20. ) continue;
 
 
-      if( jets.size()<2 ) {
-
-        // only teo leading jets are required to be in tracker covered region
-        // (will cut on third jet, but with no eta restrictions)
-        if( fabs(etaJet[iJet])>2. ) continue;
-
-      }
+   // if( jets.size()<2 ) {
+   //   // only two leading jets are required to be in tracker covered region
+   //   // (will cut on third jet, but with no eta restrictions)
+   //   if( fabs(etaJet[iJet])>2. ) continue;
+   // }
 
       
       //int nCandidates = nChargedHadronsJet[iJet] + nNeutralHadronsJet[iJet] + nPhotonsJet[iJet];
@@ -569,10 +563,12 @@ void finalize(const std::string& dataset, bool dijet_selection=false) {
       thisJet->SetPtEtaPhiE( ptJet[iJet], etaJet[iJet], phiJet[iJet], ptJet[iJet]/ptRawJet[iJet]*eJet[iJet] );
 
 
-      if( QGLikelihoodJet[iJet]==0. || QGLikelihoodJet[iJet]==1. )
-        thisJet->QGLikelihood =  qglikeli->computeQGLikelihoodPU( thisJet->Pt(), rhoPF, thisJet->nCharged(), thisJet->nNeutral(), thisJet->ptD );
-      else
-        thisJet->QGLikelihood = QGLikelihoodJet[iJet];
+      if( fabs(thisJet->Eta())<2.4 ) {
+        if( QGLikelihoodJet[iJet]==0. || QGLikelihoodJet[iJet]==1. )
+          thisJet->QGLikelihood =  qglikeli->computeQGLikelihoodPU( thisJet->Pt(), rhoPF, thisJet->nCharged(), thisJet->nNeutral(), thisJet->ptD );
+        else
+          thisJet->QGLikelihood = QGLikelihoodJet[iJet];
+      }
       thisJet->ptD = ptDJet[iJet];
       thisJet->nTracksReco = nChargedHadronsJet[iJet];
       thisJet->nNeutralHadronsReco = nNeutralHadronsJet[iJet];
@@ -581,7 +577,9 @@ void finalize(const std::string& dataset, bool dijet_selection=false) {
       thisJet->eNeutralHadronsReco = eNeutralHadronsJet[iJet];
       thisJet->ePhotonsReco = ePhotonsJet[iJet];
 
-      if( !(thisJet->passedJetID()) ) continue;
+      if( jets.size()<2 ) { //jetID only on two leading jets
+        if( !(thisJet->passedJetID()) ) continue;
+      }
 
       if( isMC ) {
 
@@ -626,6 +624,14 @@ void finalize(const std::string& dataset, bool dijet_selection=false) {
 
     if( dijet_selection ) {
       if( jets.size()<2 ) continue;
+
+      if( jets.size()>2 ) {
+        float ptAve = 0.5*(jets[0]->Pt() + jets[1]->Pt());
+        if( jets[2]->Pt() > 0.3*ptAve ) continue;
+      }
+
+      if( fabs(jets[0]->Eta())>2.4 && fabs(jets[1]->Eta())>2.4 ) continue;
+
     } else {
       if( jets.size()<4 ) continue;
     }
