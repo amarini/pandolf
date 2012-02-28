@@ -9,8 +9,8 @@ Float_t AnalysisJet::pxReco() const { return ptReco*cos(phiReco); };
 Float_t AnalysisJet::pyReco() const { return ptReco*sin(phiReco); };
 Float_t AnalysisJet::pzReco() const { return pReco()*cos(thetaReco()); };
 Float_t AnalysisJet::eCorrReco() const { 
-  Float_t eCorrReco = ( ptReco>0. ) ? ptCorrReco*eReco/ptReco : 0.;
-  return eCorrReco;
+  Float_t eCorr = ( ptReco>0. ) ? ptCorrReco*eReco/ptReco : 0.;
+  return eCorr;
 }
 
 Float_t AnalysisJet::thetaGen() const { return 2.*atan(exp(-etaGen)); };
@@ -31,16 +31,14 @@ Bool_t AnalysisJet::passedJetID( const std::string& strength ) const {
 
   if( strength=="minimal" ) {
 
-    returnBool = (this->nConstituents()>1);
+    returnBool = (this->nConstituents()>1) &&
+                 ((ePhotonsReco + eHFEMReco) <0.99) &&
+                 ((eNeutralHadronsReco + eHFHadronsReco)<0.99);
+
 
     if( fabs(etaReco)<2.4 ) {
-
-      returnBool = returnBool && 
-                   (eTracksReco>0.) &&
-                   (ePhotonsReco<0.99) &&
-                   (eNeutralHadronsReco<0.99);
-    
-    } //if in tracker region
+      returnBool = returnBool &&  (eTracksReco>0.);
+    } 
 
   } else {
 
