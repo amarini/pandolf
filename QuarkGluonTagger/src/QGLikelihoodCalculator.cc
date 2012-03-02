@@ -3,11 +3,8 @@
 
 
 
-QGLikelihoodCalculator::QGLikelihoodCalculator( const std::string& filedirPath ) {
+QGLikelihoodCalculator::QGLikelihoodCalculator( const std::string& fileName_nCharged, const std::string& fileName_nNeutral, const std::string& fileName_ptD ) {
 
-  std::string fileName_nCharged = filedirPath + "/nCharged.txt";
-  std::string fileName_nNeutral = filedirPath + "/nNeutral.txt";
-  std::string fileName_ptD = filedirPath + "/ptD.txt";
 
   jcp_nCharged_quark_ = new JetCorrectorParameters(fileName_nCharged, "quark");
   jcp_nCharged_gluon_ = new JetCorrectorParameters(fileName_nCharged, "gluon");
@@ -17,6 +14,21 @@ QGLikelihoodCalculator::QGLikelihoodCalculator( const std::string& filedirPath )
 
   jcp_ptD_quark_ = new JetCorrectorParameters(fileName_ptD, "quark");
   jcp_ptD_gluon_ = new JetCorrectorParameters(fileName_ptD, "gluon");
+
+ 
+  //check that provided files are for correct variables:
+  if( jcp_nCharged_quark_->definitions().level() != "QGL_nCharged_quark" )
+    throw cms::Exception("QuarkGluonTagger Config File Error") << "quark section of file \'" << fileName_nCharged << "\' is not of the proper format. Check your input files.";
+  if( jcp_nCharged_gluon_->definitions().level() != "QGL_nCharged_gluon" )
+    throw cms::Exception("QuarkGluonTagger Config File Error") << "gluon section of file \'" << fileName_nCharged << "\' is not of the proper format. Check your input files.";
+  if( jcp_nNeutral_quark_->definitions().level() != "QGL_nNeutral_quark" )
+    throw cms::Exception("QuarkGluonTagger Config File Error") << "quark section of file \'" << fileName_nNeutral << "\' is not of the proper format. Check your input files.";
+  if( jcp_nNeutral_gluon_->definitions().level() != "QGL_nNeutral_gluon" )
+    throw cms::Exception("QuarkGluonTagger Config File Error") << "gluon section of file \'" << fileName_nNeutral << "\' is not of the proper format. Check your input files.";
+  if( jcp_ptD_quark_->definitions().level() != "QGL_ptD_quark" )
+    throw cms::Exception("QuarkGluonTagger Config File Error") << "quark section of file \'" << fileName_ptD << "\' is not of the proper format. Check your input files.";
+  if( jcp_ptD_gluon_->definitions().level() != "QGL_ptD_gluon" )
+    throw cms::Exception("QuarkGluonTagger Config File Error") << "gluon section of file \'" << fileName_ptD << "\' is not of the proper format. Check your input files.";
 
 
   sjc_nCharged_quark_ = new SimpleJetCorrector(*jcp_nCharged_quark_);
