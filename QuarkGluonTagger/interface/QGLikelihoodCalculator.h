@@ -20,7 +20,7 @@ class QGLikelihoodCalculator {
 
  public:
 
-  QGLikelihoodCalculator( const std::string& filedirPath="/afs/cern.ch/user/p/pandolf/scratch1/CMSSW_5_2_0_pre3/src/pandolf/QuarkGluonTagger/data/");
+  QGLikelihoodCalculator( const std::string& fileName_nCharged="QGTaggerConfig_nCharged_AK5PF.txt", const std::string& fileName_nNeutral="QGTaggerConfig_nNeutral_AK5PF.txt", const std::string& fileName_ptD="QGTaggerConfig_ptD_AK5PF.txt");
    ~QGLikelihoodCalculator();
 
 
