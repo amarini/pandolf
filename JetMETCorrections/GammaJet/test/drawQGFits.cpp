@@ -35,6 +35,8 @@ int main() {
     for( unsigned irho=0; irho<20; ++irho ) {
 
       drawSingleFit( db, "nCharged", ptBins[ipt], ptBins[ipt+1], irho );
+      drawSingleFit( db, "nNeutral", ptBins[ipt], ptBins[ipt+1], irho );
+      drawSingleFit( db, "ptD", ptBins[ipt], ptBins[ipt+1], irho );
 
     }
   }
