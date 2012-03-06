@@ -18,8 +18,10 @@
 #include "AnalysisJet.C"
 #include "AnalysisPhoton.C"
 
-#include "/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/CommonTools/PUWeight.C"
-#include "/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/QGLikelihood/QGLikelihoodCalculator.C"
+//#include "/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/CommonTools/PUWeight.C"
+//#include "/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/QGLikelihood/QGLikelihoodCalculator.C"
+#include "/shome/pandolf/CMSSW_4_2_8/src/UserCode/pandolf/CommonTools/PUWeight.C"
+#include "/shome/pandolf/CMSSW_4_2_8/src/UserCode/pandolf/QGLikelihood/QGLikelihoodCalculator.C"
 
 
 bool isAOD_ = true;
@@ -229,9 +231,11 @@ void finalize(const std::string& dataset, bool dijet_selection=false) {
   Float_t phiPartJet[20];
   tree->SetBranchAddress("phiPartJet", phiPartJet);
   Int_t pdgIdPartJet[20];
-  tree->SetBranchAddress("pdgIdPartJet", pdgIdPartJet);
+  tree->SetBranchAddress("pdgIdPartStatus3Jet", pdgIdPartJet);
+  //tree->SetBranchAddress("pdgIdPartJet", pdgIdPartJet);
   Int_t pdgIdMomJet[20];
-  tree->SetBranchAddress("pdgIdMomJet", pdgIdMomJet);
+  tree->SetBranchAddress("pdgIdMomStatus3Jet", pdgIdMomJet);
+  //tree->SetBranchAddress("pdgIdMomJet", pdgIdMomJet);
 
 
   Bool_t passed_HT150;
@@ -281,6 +285,42 @@ void finalize(const std::string& dataset, bool dijet_selection=false) {
   TH1F* h1_nPU_dataRunA = (TH1F*)filePURunA->Get("pileup");
   fPUWeightRunA->SetDataHistogram(h1_nPU_dataRunA);
 
+  PUWeight* fPUWeight_HT150 = new PUWeight(-1, "HT150", puType);
+  std::string puFileName_HT150 = "pileup_HT150.root";
+  TFile* filePU_HT150 = TFile::Open(puFileName_HT150.c_str());
+  TH1F* h1_nPU_data_HT150 = (TH1F*)filePU_HT150->Get("pileup");
+  fPUWeight_HT150->SetDataHistogram(h1_nPU_data_HT150);
+
+  PUWeight* fPUWeight_HT250 = new PUWeight(-1, "HT250", puType);
+  std::string puFileName_HT250 = "pileup_HT250.root";
+  TFile* filePU_HT250 = TFile::Open(puFileName_HT250.c_str());
+  TH1F* h1_nPU_data_HT250 = (TH1F*)filePU_HT250->Get("pileup");
+  fPUWeight_HT250->SetDataHistogram(h1_nPU_data_HT250);
+
+  PUWeight* fPUWeight_HT350 = new PUWeight(-1, "HT350", puType);
+  std::string puFileName_HT350 = "pileup_HT350.root";
+  TFile* filePU_HT350 = TFile::Open(puFileName_HT350.c_str());
+  TH1F* h1_nPU_data_HT350 = (TH1F*)filePU_HT350->Get("pileup");
+  fPUWeight_HT350->SetDataHistogram(h1_nPU_data_HT350);
+
+  PUWeight* fPUWeight_HT400 = new PUWeight(-1, "HT400", puType);
+  std::string puFileName_HT400 = "pileup_HT400.root";
+  TFile* filePU_HT400 = TFile::Open(puFileName_HT400.c_str());
+  TH1F* h1_nPU_data_HT400 = (TH1F*)filePU_HT400->Get("pileup");
+  fPUWeight_HT400->SetDataHistogram(h1_nPU_data_HT400);
+
+  PUWeight* fPUWeight_HT500 = new PUWeight(-1, "HT500", puType);
+  std::string puFileName_HT500 = "pileup_HT500.root";
+  TFile* filePU_HT500 = TFile::Open(puFileName_HT500.c_str());
+  TH1F* h1_nPU_data_HT500 = (TH1F*)filePU_HT500->Get("pileup");
+  fPUWeight_HT500->SetDataHistogram(h1_nPU_data_HT500);
+
+  PUWeight* fPUWeight_HT600 = new PUWeight(-1, "HT600", puType);
+  std::string puFileName_HT600 = "pileup_HT600.root";
+  TFile* filePU_HT600 = TFile::Open(puFileName_HT600.c_str());
+  TH1F* h1_nPU_data_HT600 = (TH1F*)filePU_HT600->Get("pileup");
+  fPUWeight_HT600->SetDataHistogram(h1_nPU_data_HT600);
+
 
 
 
@@ -311,7 +351,7 @@ void finalize(const std::string& dataset, bool dijet_selection=false) {
   int nChargedJet0, nChargedJet1, nChargedJet2, nChargedJet3;
   int nNeutralJet0, nNeutralJet1, nNeutralJet2, nNeutralJet3;
   float eventWeight_noPU;
-  float PUWeight(1.), PUWeightRunA(1.);
+  float PUWeight(1.), PUWeight_HT150(1.), PUWeight_HT250(1.), PUWeight_HT350(1.), PUWeight_HT400(1.), PUWeight_HT500(1.), PUWeight_HT600(1.);
 
 
   TTree* tree_passedEvents = new TTree("tree_passedEvents", "");
@@ -320,7 +360,12 @@ void finalize(const std::string& dataset, bool dijet_selection=false) {
   tree_passedEvents->Branch( "eventWeight", &eventWeight, "eventWeight/F" );
   tree_passedEvents->Branch( "eventWeight_noPU", &eventWeight_noPU, "eventWeight_noPU/F" );
   tree_passedEvents->Branch( "PUWeight", &PUWeight, "PUWeight/F" );
-  tree_passedEvents->Branch( "PUWeightRunA", &PUWeightRunA, "PUWeightRunA/F" );
+  tree_passedEvents->Branch( "PUWeight_HT150", &PUWeight_HT150, "PUWeight_HT150/F" );
+  tree_passedEvents->Branch( "PUWeight_HT250", &PUWeight_HT250, "PUWeight_HT250/F" );
+  tree_passedEvents->Branch( "PUWeight_HT350", &PUWeight_HT350, "PUWeight_HT350/F" );
+  tree_passedEvents->Branch( "PUWeight_HT400", &PUWeight_HT400, "PUWeight_HT400/F" );
+  tree_passedEvents->Branch( "PUWeight_HT500", &PUWeight_HT500, "PUWeight_HT500/F" );
+  tree_passedEvents->Branch( "PUWeight_HT600", &PUWeight_HT600, "PUWeight_HT600/F" );
   tree_passedEvents->Branch( "nvertex", &nvertex, "nvertex/I" );
   tree_passedEvents->Branch( "rhoPF", &rhoPF, "rhoPF/F" );
   tree_passedEvents->Branch( "ht_akt5", &ht_akt5, "ht_akt5/F" );
@@ -380,7 +425,8 @@ void finalize(const std::string& dataset, bool dijet_selection=false) {
   gROOT->cd();
 
 
-  QGLikelihoodCalculator *qglikeli = new QGLikelihoodCalculator("/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
+  //QGLikelihoodCalculator *qglikeli = new QGLikelihoodCalculator("/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
+  QGLikelihoodCalculator *qglikeli = new QGLikelihoodCalculator("/shome/pandolf/CMSSW_4_2_8/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
 
 
   bool debug=true;
@@ -528,7 +574,12 @@ void finalize(const std::string& dataset, bool dijet_selection=false) {
       // PU reweighting:
      eventWeight_noPU = eventWeight;
      PUWeight = fPUWeight->GetWeight(nPU);
-     PUWeightRunA = fPUWeightRunA->GetWeight(nPU);
+     PUWeight_HT150 = fPUWeight_HT150->GetWeight(nPU);
+     PUWeight_HT250 = fPUWeight_HT250->GetWeight(nPU);
+     PUWeight_HT350 = fPUWeight_HT350->GetWeight(nPU);
+     PUWeight_HT400 = fPUWeight_HT400->GetWeight(nPU);
+     PUWeight_HT500 = fPUWeight_HT500->GetWeight(nPU);
+     PUWeight_HT600 = fPUWeight_HT600->GetWeight(nPU);
      eventWeight *= PUWeight;
     }
 
