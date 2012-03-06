@@ -78,6 +78,18 @@ TreeAnalyzer_DiJet.o: TreeAnalyzer_DiJet.C
 	$(CC) $(CFLAGS) TreeAnalyzer_DiJet.C $(ROOTFLAG)
 
 
+
+TreeFinalizer.o: $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/TreeFinalizer.C
+	$(CC) $(CFLAGS) $(INCLUDES) $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/TreeFinalizer.C $(ROOTFLAG)
+
+TreeFinalizerC_MultiJet.o: TreeFinalizerC_MultiJet.C TreeFinalizer.o
+	$(CC) $(CFLAGS) $(INCLUDES) TreeFinalizer.o TreeFinalizerC_MultiJet.C $(ROOTFLAG)
+
+finalize_MultiJet: finalize_MultiJet.cpp TreeFinalizer.o TreeFinalizerC_MultiJet.o 
+	$(CC)  $(INCLUDES) -Wall -o finalize_MultiJet TreeFinalizer.o TreeFinalizerC_MultiJet.o finalize_MultiJet.cpp `${ROOTSYS}/bin/root-config --cflags --libs`
+
+
+
 drawPhotonJet_2bkg: fitTools.o DrawBase.o drawPhotonJet_2bkg.C
 	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o drawPhotonJet_2bkg drawPhotonJet_2bkg.C fitTools.o DrawBase.o $(ROOTFLAG) $(EXTRALIBS)
 
