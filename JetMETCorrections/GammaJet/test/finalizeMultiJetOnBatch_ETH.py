@@ -21,7 +21,8 @@ queue = "short.q"
 #  flags
 
 
-application = "finalize_" + analyzerType
+#application = "finalize_" + analyzerType
+application = "finalize_MultiJet"
 
 
 match_Fall11 = re.search( r'Fall11', dataset, re.M|re.I)
