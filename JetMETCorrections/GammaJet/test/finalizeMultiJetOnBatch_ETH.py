@@ -5,15 +5,14 @@ import re
 import time
 
 if len(sys.argv) != 3 and len(sys.argv) != 4:
-    print "usage finalizeMultiJetOnBatch.py dataset nBlocks flags=\"false\""
+    print "usage finalizeMultiJetOnBatch.py dataset nBlocks analyzerType=\"MultiJet\""
     sys.exit(1)
 dataset = sys.argv[1]
 dataset_path = dataset
 nBlocks = int(sys.argv[2])
 analyzerType = "MultiJet"
-dijet_selection = "false"
 if len(sys.argv)==4 :
-  dijet_selection = sys.argv[3]
+  analyzerType = sys.argv[3]
 
 queue = "short.q"
 
@@ -39,9 +38,7 @@ else:
 diskoutputmain = diskoutputdir
 
 
-dir = "MultiJet_" + dataset
-if( dijet_selection=="true" ):
-  dir = dir + "_DIJET"
+dir = analyzerType + "_" + dataset
 os.system("mkdir -p "+dir)
 os.system("mkdir -p "+dir+"/log/")
 os.system("mkdir -p "+dir+"/input/")
@@ -66,13 +63,10 @@ while (ijob<nBlocks):
   outputfile.write('source /swshare/cms/cmsset_default.sh\n')
   outputfile.write('cd /shome/pandolf/CMSSW_4_2_8/src/ ; eval `scramv1 runtime -sh` ; cd -\n')
   outputfile.write('cd '+WORKDIR+'\n')
-  outputfile.write(pwd+'/'+application+" "+dataset+" " + dijet_selection + " "+str(ijob)+" "+ str(nBlocks) + "\n") 
+  outputfile.write(pwd+'/'+application+" "+dataset+" "+str(ijob)+" "+ str(nBlocks) + "\n") 
   # select this for GENJETS ntuples:
   #outputfile.write(pwd+'/'+application+" "+dataset+" "+recoType+" "+jetAlgo+" "+inputfilename+" _"+str(ijob)+" true\n")
-  if( dijet_selection=="true" ):
-    outputfile.write('mv ' + analyzerType + "_" + dataset + "_DIJET_" + str(ijob) + '.root '+diskoutputmain+'\n') 
-  else:
-    outputfile.write('mv ' + analyzerType + "_" + dataset + "_" + str(ijob) + '.root '+diskoutputmain+'\n') 
+  outputfile.write('mv ' + analyzerType + "_" + dataset + "_" + str(ijob) + '.root '+diskoutputmain+'\n') 
   outputfile.close()
   #print "chmod +x "+outputname
   os.popen("chmod +x "+outputname)
