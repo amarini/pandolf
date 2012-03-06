@@ -69,7 +69,7 @@ while (ijob<nBlocks):
   outputfile.write(pwd+'/'+application+" "+dataset+" " + dijet_selection + " "+str(ijob)+" "+ str(nBlocks) + "\n") 
   # select this for GENJETS ntuples:
   #outputfile.write(pwd+'/'+application+" "+dataset+" "+recoType+" "+jetAlgo+" "+inputfilename+" _"+str(ijob)+" true\n")
-  if( dijet_selection ):
+  if( dijet_selection=="true" ):
     outputfile.write('mv ' + analyzerType + "_" + dataset + "_DIJET_" + str(ijob) + '.root '+diskoutputmain+'\n') 
   else:
     outputfile.write('mv ' + analyzerType + "_" + dataset + "_" + str(ijob) + '.root '+diskoutputmain+'\n') 
