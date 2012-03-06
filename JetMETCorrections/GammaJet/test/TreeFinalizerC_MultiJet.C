@@ -527,11 +527,11 @@ void TreeFinalizerC_MultiJet::finalize() {
 
       if( ht_akt5 < 150. ) continue;
 
-    } else {
+    } else { //multijet selection
 
       if( !isMC ) {
         if( !passed_HT600 ) continue; //trigger on data
-        if( run<173236 || run>178380 ) continue; //run range in which HT600 was unprescaled: corresponds to 1894.3 pb-1
+        //if( run<173236 || run>178380 ) continue; //run range in which HT600 was unprescaled: corresponds to 1894.3 pb-1
       }
   
       // avoid trigger turn-on:
