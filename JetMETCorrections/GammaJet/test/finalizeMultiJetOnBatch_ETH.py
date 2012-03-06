@@ -40,7 +40,7 @@ diskoutputmain = diskoutputdir
 
 
 dir = "MultiJet_" + dataset
-if( dijet_selection ):
+if( dijet_selection=="true" ):
   dir = dir + "_DIJET"
 os.system("mkdir -p "+dir)
 os.system("mkdir -p "+dir+"/log/")
@@ -66,7 +66,7 @@ while (ijob<nBlocks):
   outputfile.write('source /swshare/cms/cmsset_default.sh\n')
   outputfile.write('cd /shome/pandolf/CMSSW_4_2_8/src/ ; eval `scramv1 runtime -sh` ; cd -\n')
   outputfile.write('cd '+WORKDIR+'\n')
-  outputfile.write(pwd+'/'+application+" "+dataset+" +" dijet_selection + " "+str(ijob)+" "+ str(nBlocks) + "\n") 
+  outputfile.write(pwd+'/'+application+" "+dataset+" " + dijet_selection + " "+str(ijob)+" "+ str(nBlocks) + "\n") 
   # select this for GENJETS ntuples:
   #outputfile.write(pwd+'/'+application+" "+dataset+" "+recoType+" "+jetAlgo+" "+inputfilename+" _"+str(ijob)+" true\n")
   if( dijet_selection ):
