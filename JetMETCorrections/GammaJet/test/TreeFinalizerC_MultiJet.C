@@ -300,15 +300,16 @@ void TreeFinalizerC_MultiJet::finalize() {
 
 
 
+  std::string analyzerType = (dijet_selection_) ? "DiJet" : "MultiJet";
 
 
   std::string outfileName;
-  if( DEBUG_ ) outfileName = "provaMultiJet_"+dataset_;
+  if( DEBUG_ ) outfileName = "prova" + analyzerType +"_"+dataset_;
   else {
-   if(dataset_!="") outfileName = "MultiJet_"+dataset_;
-   else outfileName = "MultiJet";
+   if(dataset_!="") outfileName = analyzerType + "_"+dataset_;
+   else outfileName = "PROVA";
   }
-  if( dijet_selection_ ) outfileName = outfileName + "_DIJET";
+  //if( dijet_selection_ ) outfileName = outfileName + "_DIJET";
 
   if( nBlocks_ >1 ) {
     char blockText[100];
