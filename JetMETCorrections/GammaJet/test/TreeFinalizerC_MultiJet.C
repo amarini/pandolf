@@ -332,7 +332,7 @@ void TreeFinalizerC_MultiJet::finalize() {
   float ptDJet0, ptDJet1, ptDJet2, ptDJet3;
   int nChargedJet0, nChargedJet1, nChargedJet2, nChargedJet3;
   int nNeutralJet0, nNeutralJet1, nNeutralJet2, nNeutralJet3;
-  float eventWeight_noPU;
+  float eventWeight_noPU(1.);
   float PUWeight(1.), PUWeight_HT150(1.), PUWeight_HT250(1.), PUWeight_HT350(1.), PUWeight_HT400(1.), PUWeight_HT500(1.), PUWeight_HT600(1.);
 
 
