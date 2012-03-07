@@ -10,6 +10,7 @@
 
 
 Float_t ptJet0_out;
+Int_t pdgIdJet0_out;
 Int_t nChargedJet0_out;
 Int_t nNeutralJet0_out;
 Float_t ptDJet0_out;
@@ -20,6 +21,7 @@ struct DummyJet {
 
   float pt;
   float eta;
+  int pdgId;
   int nCharged;
   int nNeutral;
   float ptD;
@@ -35,8 +37,8 @@ bool fillFromTrigger( TTree* tree, bool passedHLT, float HLTvar, float HLTvar_th
 
 int main( int argc, char* argv[] ) {
 
-  if( argc!=2 ) {
-    std::cout << "Usage: ./make_omogeneizzato [DiJet/PhotonJet]" << std::endl;
+  if( argc!=2 && argc!=3 ) {
+    std::cout << "Usage: ./make_omogeneizzato [DiJet/PhotonJet] [dataset]" << std::endl;
     exit(11);
   }
 
@@ -49,7 +51,16 @@ int main( int argc, char* argv[] ) {
   }
 
   std::string analyzerType = (controlSample=="DiJet") ? "DiJet" : "QGStudies";
-  std::string dataset = (controlSample=="DiJet") ? "HT_Run2011_FULL" : "Photon_Run2011_FULL";
+
+  std::string dataset="";
+  if( argc>2 ) {
+    std::string dataset_tmp(argv[2]);
+    dataset=dataset_tmp;
+  }
+
+  if( dataset=="" ) { //default: data
+    dataset = (controlSample=="DiJet") ? "HT_Run2011_FULL" : "Photon_Run2011_FULL";
+  }
 
   std::string infileName = analyzerType + "_" + dataset;
   if( controlSample=="PhotonJet" ) infileName = infileName + "_pfakt5";
@@ -65,6 +76,12 @@ int main( int argc, char* argv[] ) {
 
   
 
+
+  Int_t run;
+  chain->SetBranchAddress( "run", &run );
+
+  Float_t eventWeight;
+  chain->SetBranchAddress( "eventWeight", &eventWeight );
 
   Float_t rhoPF;
   chain->SetBranchAddress( "rhoPF", &rhoPF );
@@ -82,6 +99,12 @@ int main( int argc, char* argv[] ) {
   Float_t etaJet1;
   if( controlSample=="DiJet" )
     chain->SetBranchAddress( "etaJet1", &etaJet1 );
+
+  Int_t pdgIdJet0;
+  chain->SetBranchAddress( "pdgIdPartJet0", &pdgIdJet0 );
+  Int_t pdgIdJet1;
+  if( controlSample=="DiJet" )
+    chain->SetBranchAddress( "pdgIdPartJet1", &pdgIdJet1 );
 
   Int_t nChargedJet0;
   chain->SetBranchAddress( "nChargedJet0", &nChargedJet0 );
@@ -155,8 +178,10 @@ int main( int argc, char* argv[] ) {
   outfile->cd();
 
   TTree* tree_omogeneizzato = new TTree("omog", "");
+  tree_omogeneizzato->Branch( "eventWeight", &eventWeight, "eventWeight/F" );
   tree_omogeneizzato->Branch( "rhoPF", &rhoPF, "rhoPF/F" );
   tree_omogeneizzato->Branch( "ptJet0", &ptJet0_out, "ptJet0_out/F" );
+  tree_omogeneizzato->Branch( "pdgIdJet0", &pdgIdJet0_out, "pdgIdJet0_out/I" );
   tree_omogeneizzato->Branch( "nChargedJet0", &nChargedJet0_out, "nChargedJet0_out/I" );
   tree_omogeneizzato->Branch( "nNeutralJet0", &nNeutralJet0_out, "nNeutralJet0_out/I" );
   tree_omogeneizzato->Branch( "ptDJet0", &ptDJet0_out, "ptDJet0_out/F" );
@@ -202,19 +227,19 @@ int main( int argc, char* argv[] ) {
 
       jets.push_back(jet1);
 
-      if( fillFromTrigger( tree_omogeneizzato, passed_HT150, ht_akt5, 160., jets, 50., 100.) ) continue;
-      if( fillFromTrigger( tree_omogeneizzato, passed_HT250, ht_akt5, 265., jets, 100., 150.) ) continue;
-      if( fillFromTrigger( tree_omogeneizzato, passed_HT350, ht_akt5, 365., jets, 150., 200.) ) continue;
-      if( fillFromTrigger( tree_omogeneizzato, passed_HT400, ht_akt5, 420., jets, 200., 250.) ) continue;
-      if( fillFromTrigger( tree_omogeneizzato, passed_HT500, ht_akt5, 525., jets, 250., 300.) ) continue;
-      if( fillFromTrigger( tree_omogeneizzato, passed_HT600, ht_akt5, 640., jets, 300., 3500.) ) continue;
+      if( fillFromTrigger( tree_omogeneizzato, passed_HT150 || run<5, ht_akt5, 160., jets, 50., 100.) ) continue;
+      if( fillFromTrigger( tree_omogeneizzato, passed_HT250 || run<5, ht_akt5, 265., jets, 100., 150.) ) continue;
+      if( fillFromTrigger( tree_omogeneizzato, passed_HT350 || run<5, ht_akt5, 365., jets, 150., 200.) ) continue;
+      if( fillFromTrigger( tree_omogeneizzato, passed_HT400 || run<5, ht_akt5, 420., jets, 200., 250.) ) continue;
+      if( fillFromTrigger( tree_omogeneizzato, passed_HT500 || run<5, ht_akt5, 525., jets, 250., 300.) ) continue;
+      if( fillFromTrigger( tree_omogeneizzato, passed_HT600 || run<5, ht_akt5, 640., jets, 300., 3500.) ) continue;
 
 
     } else { //photonjet
 
-      if( fillFromTrigger( tree_omogeneizzato, passed_Photon50_CaloIdVL || passed_Photon50_CaloIdVL_IsoL, ptPhot, 53., jets, 50., 100.) ) continue;
-      if( fillFromTrigger( tree_omogeneizzato, passed_Photon90_CaloIdVL || passed_Photon90_CaloIdVL_IsoL, ptPhot, 95., jets, 100., 150.) ) continue;
-      if( fillFromTrigger( tree_omogeneizzato, passed_Photon135, ptPhot, 145., jets, 150., 3500.) ) continue;
+      if( fillFromTrigger( tree_omogeneizzato, passed_Photon50_CaloIdVL || passed_Photon50_CaloIdVL_IsoL || run<5, ptPhot, 53., jets, 50., 100.) ) continue;
+      if( fillFromTrigger( tree_omogeneizzato, passed_Photon90_CaloIdVL || passed_Photon90_CaloIdVL_IsoL || run<5, ptPhot, 95., jets, 100., 150.) ) continue;
+      if( fillFromTrigger( tree_omogeneizzato, passed_Photon135 || run<5, ptPhot, 145., jets, 150., 3500.) ) continue;
 
     }
 
@@ -456,6 +481,7 @@ bool fillFromTrigger( TTree* tree, bool passedHLT, float HLTvar, float HLTvar_th
     nChargedJet0_out = jets[i].nCharged;
     nNeutralJet0_out = jets[i].nNeutral;
     ptDJet0_out = jets[i].ptD;
+    pdgIdJet0_out = jets[i].pdgId;
     QGLikelihoodJet0_out = jets[i].QGLikelihood;
 
     tree->Fill();
