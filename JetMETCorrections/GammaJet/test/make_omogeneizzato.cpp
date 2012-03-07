@@ -211,6 +211,7 @@ int main( int argc, char* argv[] ) {
     jet0.nNeutral = nNeutralJet0;
     jet0.ptD = ptDJet0;
     jet0.QGLikelihood = QGLikelihoodJet0;
+    jet0.pdgId = pdgIdJet0;
 
     std::vector<DummyJet> jets;
     jets.push_back(jet0);
@@ -224,6 +225,7 @@ int main( int argc, char* argv[] ) {
       jet1.nNeutral = nNeutralJet1;
       jet1.ptD = ptDJet1;
       jet1.QGLikelihood = QGLikelihoodJet1;
+      jet1.pdgId = pdgIdJet1;
 
       jets.push_back(jet1);
 
