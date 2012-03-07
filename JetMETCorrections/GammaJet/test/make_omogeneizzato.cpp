@@ -51,7 +51,9 @@ int main( int argc, char* argv[] ) {
   std::string analyzerType = (controlSample=="DiJet") ? "DiJet" : "QGStudies";
   std::string dataset = (controlSample=="DiJet") ? "HT_Run2011_FULL" : "Photon_Run2011_FULL";
 
-  std::string infileName = analyzerType + "_" + dataset + ".root";
+  std::string infileName = analyzerType + "_" + dataset;
+  if( controlSample=="PhotonJet" ) infileName = infileName + "_pfakt5";
+  infileName = infileName + ".root";
   TFile* infile = TFile::Open(infileName.c_str());
   TTree* chain = (TTree*)infile->Get("tree_passedEvents");
 
