@@ -22,7 +22,7 @@ int main( int argc, char* argv[] ) {
     }
   }
 
-  int iBlock=1;
+  int iBlock=0;
   if( argc>3 ) {
     iBlock = atoi(argv[3]);
   }
@@ -51,6 +51,18 @@ int main( int argc, char* argv[] ) {
     tf->addInput( "QCD_TuneZ2_HT-250To500_7TeV-madgraph_Summer11-PU_S4_START42_V11-v3" );
     tf->addInput( "QCD_TuneZ2_HT-500To1000_7TeV-madgraph_Summer11-PU_S4_START42_V11-v1" );
     tf->addInput( "QCD_TuneZ2_HT-1000_7TeV-madgraph_Summer11-PU_S4_START42_V11-v1" );
+  } else if( dataset=="QCD_Summer11" ) {
+    tf->addInput("QCD_Pt-1400to1800_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v1");
+    tf->addInput("QCD_Pt-15to30_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v1");
+    tf->addInput("QCD_Pt-170to300_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v1");
+    tf->addInput("QCD_Pt-1800_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v1");
+    tf->addInput("QCD_Pt-300to470_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v1");
+    tf->addInput("QCD_Pt-30to50_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v1");
+    tf->addInput("QCD_Pt-470to600_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v1");
+    tf->addInput("QCD_Pt-50to80_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v1");
+    tf->addInput("QCD_Pt-600to800_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v1");
+    tf->addInput("QCD_Pt-800to1000_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v1");
+    tf->addInput("QCD_Pt-80to120_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v1");
   } else if( dataset=="G_Summer11" ) {
     tf->addInput( "G_Pt-170to300_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v1");
     tf->addInput( "G_Pt-300to470_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v1");
