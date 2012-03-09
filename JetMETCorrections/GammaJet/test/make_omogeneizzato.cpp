@@ -9,6 +9,7 @@
 
 
 
+Float_t eventWeight_out;
 Float_t ptJet0_out;
 Int_t pdgIdJet0_out;
 Int_t nChargedJet0_out;
@@ -30,7 +31,7 @@ struct DummyJet {
 };
 
 
-bool fillFromTrigger( TTree* tree, bool passedHLT, float HLTvar, float HLTvar_thresh, const std::vector<DummyJet>& jets, float ptMin, float ptMax );
+bool fillFromTrigger( TTree* tree, bool passedHLT, float HLTvar, float HLTvar_thresh, float weight, const std::vector<DummyJet>& jets, float ptMin, float ptMax );
 
 
 
@@ -82,6 +83,8 @@ int main( int argc, char* argv[] ) {
 
   Float_t eventWeight;
   chain->SetBranchAddress( "eventWeight", &eventWeight );
+  Float_t eventWeight_noPU;
+  chain->SetBranchAddress( "eventWeight_noPU", &eventWeight_noPU );
 
   Float_t rhoPF;
   chain->SetBranchAddress( "rhoPF", &rhoPF );
@@ -133,6 +136,7 @@ int main( int argc, char* argv[] ) {
   Float_t ht_akt5;
   if( controlSample=="DiJet" )
     chain->SetBranchAddress( "ht_akt5", &ht_akt5 );
+
   Bool_t passed_HT150;
   if( controlSample=="DiJet" )
     chain->SetBranchAddress( "passed_HT150", &passed_HT150);
@@ -151,6 +155,25 @@ int main( int argc, char* argv[] ) {
   Bool_t passed_HT600;
   if( controlSample=="DiJet" )
     chain->SetBranchAddress( "passed_HT600", &passed_HT600);
+
+  Float_t PUWeight_HT150;
+  if( controlSample=="DiJet" )
+    chain->SetBranchAddress( "PUWeight_HT150", &PUWeight_HT150);
+  Float_t PUWeight_HT250;
+  if( controlSample=="DiJet" )
+    chain->SetBranchAddress( "PUWeight_HT250", &PUWeight_HT250);
+  Float_t PUWeight_HT350;
+  if( controlSample=="DiJet" )
+    chain->SetBranchAddress( "PUWeight_HT350", &PUWeight_HT350);
+  Float_t PUWeight_HT400;
+  if( controlSample=="DiJet" )
+    chain->SetBranchAddress( "PUWeight_HT400", &PUWeight_HT400);
+  Float_t PUWeight_HT500;
+  if( controlSample=="DiJet" )
+    chain->SetBranchAddress( "PUWeight_HT500", &PUWeight_HT500);
+  Float_t PUWeight_HT600;
+  if( controlSample=="DiJet" )
+    chain->SetBranchAddress( "PUWeight_HT600", &PUWeight_HT600);
 
 
   Float_t ptPhot;
@@ -178,7 +201,7 @@ int main( int argc, char* argv[] ) {
   outfile->cd();
 
   TTree* tree_omogeneizzato = new TTree("omog", "");
-  tree_omogeneizzato->Branch( "eventWeight", &eventWeight, "eventWeight/F" );
+  tree_omogeneizzato->Branch( "eventWeight", &eventWeight_out, "eventWeight/F" );
   tree_omogeneizzato->Branch( "rhoPF", &rhoPF, "rhoPF/F" );
   tree_omogeneizzato->Branch( "ptJet0", &ptJet0_out, "ptJet0_out/F" );
   tree_omogeneizzato->Branch( "pdgIdJet0", &pdgIdJet0_out, "pdgIdJet0_out/I" );
@@ -229,19 +252,23 @@ int main( int argc, char* argv[] ) {
 
       jets.push_back(jet1);
 
-      if( fillFromTrigger( tree_omogeneizzato, passed_HT150 || run<5, ht_akt5, 160., jets, 50., 100.) ) continue;
-      if( fillFromTrigger( tree_omogeneizzato, passed_HT250 || run<5, ht_akt5, 265., jets, 100., 150.) ) continue;
-      if( fillFromTrigger( tree_omogeneizzato, passed_HT350 || run<5, ht_akt5, 365., jets, 150., 200.) ) continue;
-      if( fillFromTrigger( tree_omogeneizzato, passed_HT400 || run<5, ht_akt5, 420., jets, 200., 250.) ) continue;
-      if( fillFromTrigger( tree_omogeneizzato, passed_HT500 || run<5, ht_akt5, 525., jets, 250., 300.) ) continue;
-      if( fillFromTrigger( tree_omogeneizzato, passed_HT600 || run<5, ht_akt5, 640., jets, 300., 3500.) ) continue;
+      if( fillFromTrigger( tree_omogeneizzato, (passed_HT150 && run<175000) || run<5, ht_akt5, 160., eventWeight_noPU*PUWeight_HT150, jets, 50., 100.) ) continue;
+      if( fillFromTrigger( tree_omogeneizzato, passed_HT250 || run<5, ht_akt5, 265., eventWeight_noPU*PUWeight_HT250, jets, 100., 150.) ) continue;
+      if( fillFromTrigger( tree_omogeneizzato, passed_HT350 || run<5, ht_akt5, 365., eventWeight_noPU*PUWeight_HT350, jets, 150., 200.) ) continue;
+      if( fillFromTrigger( tree_omogeneizzato, passed_HT400 || run<5, ht_akt5, 420., eventWeight_noPU*PUWeight_HT400, jets, 200., 250.) ) continue;
+      if( fillFromTrigger( tree_omogeneizzato, passed_HT500 || run<5, ht_akt5, 525., eventWeight_noPU*PUWeight_HT500, jets, 250., 300.) ) continue;
+      if( fillFromTrigger( tree_omogeneizzato, passed_HT600 || run<5, ht_akt5, 640., eventWeight_noPU*PUWeight_HT600, jets, 300., 3500.) ) continue;
 
 
     } else { //photonjet
 
-      if( fillFromTrigger( tree_omogeneizzato, passed_Photon50_CaloIdVL || passed_Photon50_CaloIdVL_IsoL || run<5, ptPhot, 53., jets, 50., 100.) ) continue;
-      if( fillFromTrigger( tree_omogeneizzato, passed_Photon90_CaloIdVL || passed_Photon90_CaloIdVL_IsoL || run<5, ptPhot, 95., jets, 100., 150.) ) continue;
-      if( fillFromTrigger( tree_omogeneizzato, passed_Photon135 || run<5, ptPhot, 145., jets, 150., 3500.) ) continue;
+      if( fillFromTrigger( tree_omogeneizzato, passed_Photon50_CaloIdVL || passed_Photon50_CaloIdVL_IsoL || run<5, ptPhot, 53., eventWeight, jets, 50., 100.) ) continue;
+      if( fillFromTrigger( tree_omogeneizzato, passed_Photon90_CaloIdVL || passed_Photon90_CaloIdVL_IsoL || run<5, ptPhot, 95., eventWeight, jets, 100., 150.) ) continue;
+      if( fillFromTrigger( tree_omogeneizzato, passed_Photon135 || run<5, ptPhot, 145., eventWeight, jets, 150., 3500.) ) continue;
+
+      //if( fillFromTrigger( tree_omogeneizzato, passed_Photon50_CaloIdVL || passed_Photon50_CaloIdVL_IsoL || run<5, ptPhot, eventWeight_noPU*PUWeight_Photon50, 53., jets, 50., 100.) ) continue;
+      //if( fillFromTrigger( tree_omogeneizzato, passed_Photon90_CaloIdVL || passed_Photon90_CaloIdVL_IsoL || run<5, ptPhot, eventWeight_noPU*PUWeight_Photon90, 95., jets, 100., 150.) ) continue;
+      //if( fillFromTrigger( tree_omogeneizzato, passed_Photon135 || run<5, ptPhot, eventWeight_noPU*PUWeight_Photon135, 145., jets, 150., 3500.) ) continue;
 
     }
 
@@ -467,7 +494,9 @@ int main( int argc, char* argv[] ) {
 
 
 
-bool fillFromTrigger( TTree* tree, bool passedHLT, float HLTvar, float HLTvar_thresh, const std::vector<DummyJet>& jets, float ptMin, float ptMax ) {
+bool fillFromTrigger( TTree* tree, bool passedHLT, float HLTvar, float HLTvar_thresh, float weight, const std::vector<DummyJet>& jets, float ptMin, float ptMax ) {
+
+  eventWeight_out = weight;
 
   bool filledTree = false;
 
