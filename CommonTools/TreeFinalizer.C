@@ -75,7 +75,7 @@ void TreeFinalizer::createOutputFile( const std::string& additionalFlags ) {
 
 void TreeFinalizer::addInput( const std::string& dataset ) {
 
-    std::string infileName = analyzerType_ + "_2ndLevelTreeW_" + dataset + "_" + this->getJetType();
+    std::string infileName = inputAnalyzerType_ + "_2ndLevelTreeW_" + dataset + "_" + this->getJetType();
     infileName += ".root";
     TFile* infile = TFile::Open(infileName.c_str(), "read");
     if( infile==0 ) {
