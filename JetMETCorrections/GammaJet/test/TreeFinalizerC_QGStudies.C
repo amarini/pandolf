@@ -499,9 +499,16 @@ void TreeFinalizerC_QGStudies::finalize() {
   std::map< int, std::map<int, std::vector<int> > > run_lumi_ev_map;
 
 
-  for(int iEntry=0; iEntry<nEntries; ++iEntry) {
+  int blockSize = TMath::Floor( (float)nEntries/nBlocks_ );
+  int iEventMin = iBlock_*blockSize;
+  int iEventMax = (iBlock_+1)*blockSize;
+  if( iEventMax>nEntries ) iEventMax = nEntries;
 
-    if( (iEntry % 100000)==0 ) std::cout << "Entry: " << iEntry << " /" << nEntries << std::endl;
+  std::cout << "-> Running on events: " << iEventMin << " - " << iEventMax << std::endl;
+
+  for(int iEntry=iEventMin; iEntry<iEventMax; ++iEntry) {
+
+    if( ((iEntry-iEventMin) % 100000)==0 ) std::cout << "Entry: " << (iEntry-iEventMin) << " /" << blockSize << std::endl;
 
     tree_->GetEntry(iEntry);
 
