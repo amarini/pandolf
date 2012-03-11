@@ -555,6 +555,7 @@ ofstream ofs("run_event.txt");
     h1_rhoPF_presel->Fill( rhoPF, eventWeight);
 
 
+    if( pfMet < pfMet_thresh_ ) continue;
 
     if( chargeLept1!=chargeLept2 ) continue;
 
@@ -603,7 +604,7 @@ ofstream ofs("run_event.txt");
 
 
 
-
+    
     if( nJets<4 ) continue;
 
 
@@ -634,6 +635,7 @@ ofstream ofs("run_event.txt");
       thisJet.SetPtEtaPhiE( ptJet[iJet], etaJet[iJet], phiJet[iJet], eJet[iJet]);
 
       if( thisJet.Pt()<ptJet_thresh_ ) continue;
+      if( fabs(thisJet.Eta())>etaJet_thresh_ ) continue;
 
       thisJet.rmsCand = rmsCandJet[iJet];
       thisJet.ptD = ptDJet[iJet];
@@ -724,6 +726,7 @@ ofstream ofs("run_event.txt");
       thisJet.SetPtEtaPhiE( ptJet[iJet], etaJet[iJet], phiJet[iJet], eJet[iJet]);
 
       if( thisJet.Pt()<ptJet_thresh_ ) continue;
+      if( fabs(thisJet.Eta())>etaJet_thresh_ ) continue;
 
       thisJet.rmsCand = rmsCandJet[iJet];
       thisJet.ptD = ptDJet[iJet];
@@ -794,10 +797,10 @@ ofstream ofs("run_event.txt");
 
 
     h1_bTagJet1->Fill( bTaggerJet1, eventWeight );
-    h1_bTagJet2->Fill( bTaggerJet1, eventWeight );
+    h1_bTagJet2->Fill( bTaggerJet2, eventWeight );
 
-    float btag_threshold = (bTaggerType_=="TCHE" ) ? 1.7 : 2.0;
-    if( bTaggerJet1<btag_threshold && bTaggerJet2<btag_threshold ) continue;
+    if( !(this->passedBTag( bTaggerJet1, bTaggerJet2, bTaggerType_ ) ) ) continue;
+    //if( bTaggerJet1<btag_threshold && bTaggerJet2<btag_threshold ) continue;
 
 
     h1_leptType->Fill( leptType, eventWeight );
@@ -962,7 +965,14 @@ void Ntp1Finalizer_TTW::setSelectionType( const std::string& selectionType ) {
     ptLept2_thresh_ = 10.;
     etaLept1_thresh_ = 3.;
     etaLept2_thresh_ = 3.;
+
+    pfMet_thresh_ = 0.;
+
+    btagSelectionType_ = "looseloose";
+
     ptJet_thresh_ = 20.;
+    etaJet_thresh_ = 5.;
+
     ptJet1_thresh_ = 20.;
     ptJet2_thresh_ = 20.;
     ptJet3_thresh_ = 20.;
@@ -971,6 +981,29 @@ void Ntp1Finalizer_TTW::setSelectionType( const std::string& selectionType ) {
     etaJet2_thresh_ = 2.4;
     etaJet3_thresh_ = 2.4;
     etaJet4_thresh_ = 2.4;
+
+  } else if( selectionType_=="sel1" ) {
+
+    ptLept1_thresh_ = 10.;
+    ptLept2_thresh_ = 10.;
+    etaLept1_thresh_ = 3.;
+    etaLept2_thresh_ = 3.;
+
+    pfMet_thresh_ = 40.;
+
+    btagSelectionType_ = "loosemed";
+
+    ptJet_thresh_ = 20.;
+    etaJet_thresh_ = 20.;
+
+    ptJet1_thresh_ = 20.;
+    ptJet2_thresh_ = 20.;
+    ptJet3_thresh_ = 20.;
+    ptJet4_thresh_ = 20.;
+    etaJet1_thresh_ = 5.;
+    etaJet2_thresh_ = 5.;
+    etaJet3_thresh_ = 5.;
+    etaJet4_thresh_ = 5.;
 
   } else {
 
@@ -984,3 +1017,36 @@ void Ntp1Finalizer_TTW::setSelectionType( const std::string& selectionType ) {
 
 
 
+
+bool Ntp1Finalizer_TTW::passedBTag( float btag1, float btag2, const std::string& btagger ) {
+
+  float loose_thresh = -99999.;
+  float med_thresh = -99999.;
+
+  if( btagger=="TCHE" ) {
+    loose_thresh = 1.7;
+    med_thresh = 3.3;
+  } else if( btagger=="SSVHE" ) {
+    med_thresh = 2.0;
+  }
+
+
+  bool returnBool = false;
+
+  if( btagSelectionType_=="looseloose" ) {
+
+    returnBool = ( btag1>loose_thresh && btag2>loose_thresh );  
+
+  } else if( btagSelectionType_=="loosemed" ) {
+
+    returnBool = ( (btag1>med_thresh && btag2>loose_thresh) || (btag1>loose_thresh && btag2>med_thresh) );  
+
+  } else if( btagSelectionType_=="medmed" ) {
+
+    returnBool = ( btag1>med_thresh && btag2>med_thresh );  
+ 
+  }
+
+  return returnBool;
+
+}
