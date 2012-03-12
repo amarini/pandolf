@@ -4,25 +4,20 @@ import sys
 import re
 import time
 
-if len(sys.argv) != 3 and len(sys.argv) != 4:
-    print "usage finalizeMultiJetOnBatch.py dataset nBlocks analyzerType=\"MultiJet\""
+if len(sys.argv) != 3 :
+    print "usage finalizeQGStudiesOnBatch.py dataset nBlocks"
     sys.exit(1)
 dataset = sys.argv[1]
 dataset_path = dataset
 nBlocks = int(sys.argv[2])
-analyzerType = "MultiJet"
-if len(sys.argv)==4 :
-  analyzerType = sys.argv[3]
+analyzerType = "QGStudies"
 
 queue = "short.q"
 
-#if analyzerType=="MultiJet_DIJET":
-#  analyzerType = "MultiJet"
-#  flags
 
 
 #application = "finalize_" + analyzerType
-application = "finalize_MultiJet"
+application = "finalize_QGStudies"
 
 
 match_Fall11 = re.search( r'Fall11', dataset, re.M|re.I)
@@ -51,31 +46,23 @@ if diskoutputdir != "none":
 
 pwd = os.environ['PWD']
 
-dijet="false"
-if( analyzerType=="DiJet" ):
-  dijet="true"
 
 ijob=0
 
 while (ijob<nBlocks):
 
   print( str(ijob) + " / " + str(nBlocks) +"\n\n" )
-  #WORKDIR=os.getenv("PWD")
+  WORKDIR=os.getenv("PWD")
   outputname = dir+"/src/submit_"+str(ijob)+".src"
   outputfile = open(outputname,'w')
   outputfile.write('#!/bin/bash\n')
   outputfile.write('source /swshare/cms/cmsset_default.sh\n')
   outputfile.write('cd /shome/pandolf/CMSSW_4_2_8/src/ ; eval `scramv1 runtime -sh` ; cd -\n')
-  outputfile.write('cp '+ pwd + '/' + analyzerType + "_2ndLevelTreeW_" + dataset + "_pfakt5.root ./\n")
-  outputfile.write('cp '+ pwd + '/' + application + " ./\n")
-  outputfile.write('cp '+ pwd + '/all*pileup_*root ./\n')
-  outputfile.write('cp '+ pwd + '/pileup_*root ./\n')
-  outputfile.write('cp /shome/pandolf/CMSSW_4_2_8/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root ./\n')
-  #outputfile.write('cd '+WORKDIR+'\n')
-  outputfile.write(pwd+'/'+application+" "+dataset+" " + dijet + " " +str(ijob)+" "+ str(nBlocks) + "\n") 
+  outputfile.write('cd '+WORKDIR+'\n')
+  outputfile.write(pwd+'/'+application+" "+dataset+" " + str(ijob)+" "+ str(nBlocks) + "\n") 
   # select this for GENJETS ntuples:
   #outputfile.write(pwd+'/'+application+" "+dataset+" "+recoType+" "+jetAlgo+" "+inputfilename+" _"+str(ijob)+" true\n")
-  outputfile.write('mv ' + analyzerType + "_" + dataset + "_" + str(ijob) + '.root '+diskoutputmain+'\n') 
+  outputfile.write('mv ' + analyzerType + "_" + dataset + "_pfakt5_" + str(ijob) + '.root '+diskoutputmain+'\n') 
   outputfile.close()
   #print "chmod +x "+outputname
   os.popen("chmod +x "+outputname)
