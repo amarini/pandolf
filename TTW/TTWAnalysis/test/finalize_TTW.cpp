@@ -52,6 +52,11 @@ int main( int argc, char* argv[] ) {
     nf->addFile("WZ_TuneZ2_7TeV_pythia6_tauola_Summer11-PU_S4_START42_V11-v1");
     nf->addFile("WW_TuneZ2_7TeV_pythia6_tauola_Summer11-PU_S4_START42_V11-v1");
 
+  } else if( dataset=="SingleTop_Summer11" ) {
+
+    nf->addFile("T_TuneZ2_tW-channel-DR_7TeV-powheg-tauola_Summer11-PU_S4_START42_V11-v1");
+    nf->addFile("Tbar_TuneZ2_tW-channel-DR_7TeV-powheg-tauola_Summer11-PU_S4_START42_V11-v1");
+
   } else {
   
     nf->addFile( dataset );
