@@ -22,7 +22,8 @@ int DEBUG_EVENTNUMBER = 715236831;
 
 double trackDxyPV(float PVx, float PVy, float PVz, float eleVx, float eleVy, float eleVz, float elePx, float elePy, float elePz);
 float getWeightPU(Int_t nPU);
-std::vector<AnalysisLepton> findLeptons( std::vector<AnalysisLepton> lPlus, std::vector<AnalysisLepton> lMinus );
+//std::vector<AnalysisLepton> findLeptons( std::vector<AnalysisLepton> lPlus, std::vector<AnalysisLepton> lMinus );
+bool findZ( std::vector<AnalysisLepton> leptPlus, std::vector<AnalysisLepton> leptMinus, float ZVetoWindow );
 
 
 
@@ -78,13 +79,13 @@ void Ntp1Analyzer_TTW::CreateOutputFile() {
 
   reducedTree_->Branch("ptHat",&ptHat_,"ptHat_/F");
 
-  reducedTree_->Branch("leptType",  &leptType_,  "leptType_/I");
   
   reducedTree_->Branch("eLept1",  &eLept1_,  "eLept1_/F");
   reducedTree_->Branch("ptLept1",  &ptLept1_,  "ptLept1_/F");
   reducedTree_->Branch("etaLept1",  &etaLept1_,  "etaLept1_/F");
   reducedTree_->Branch("phiLept1",  &phiLept1_,  "phiLept1_/F");
   reducedTree_->Branch("chargeLept1",  &chargeLept1_,  "chargeLept1_/I");
+  reducedTree_->Branch("leptTypeLept1",  &leptTypeLept1_,  "leptTypeLept1_/I");
 
   reducedTree_->Branch("eLept1Gen",  &eLept1Gen_,  "eLept1Gen_/F");
   reducedTree_->Branch("ptLept1Gen",  &ptLept1Gen_,  "ptLept1Gen_/F");
@@ -96,6 +97,7 @@ void Ntp1Analyzer_TTW::CreateOutputFile() {
   reducedTree_->Branch("etaLept2",  &etaLept2_,  "etaLept2_/F");
   reducedTree_->Branch("phiLept2",  &phiLept2_,  "phiLept2_/F");
   reducedTree_->Branch("chargeLept2",  &chargeLept2_,  "chargeLept2_/I");
+  reducedTree_->Branch("leptTypeLept2",  &leptTypeLept2_,  "leptTypeLept2_/I");
 
   reducedTree_->Branch("eLept2Gen",  &eLept2Gen_,  "eLept2Gen_/F");
   reducedTree_->Branch("ptLept2Gen",  &ptLept2Gen_,  "ptLept2Gen_/F");
@@ -224,13 +226,13 @@ void Ntp1Analyzer_TTW::Loop()
      puType = "Summer11_S4";
      puType_ave = "Summer11_S4_ave";
    }
-   PUWeight* fPUWeight = new PUWeight(-1, "2011A", puType);
-   PUWeight* fPUWeight_ave = new PUWeight(-1, "2011A", puType_ave);
-   //PUWeight* fPUWeight = new PUWeight(1089.2, "2011A", puType);
-   TFile* filePU = TFile::Open("Pileup_2011_to_173692_LPLumiScale_68mb.root");
-   TH1F* h1_nPU_data = (TH1F*)filePU->Get("pileup");
-   fPUWeight->SetDataHistogram(h1_nPU_data);
-   fPUWeight_ave->SetDataHistogram(h1_nPU_data);
+  // PUWeight* fPUWeight = new PUWeight(-1, "2011A", puType);
+  // PUWeight* fPUWeight_ave = new PUWeight(-1, "2011A", puType_ave);
+  // //PUWeight* fPUWeight = new PUWeight(1089.2, "2011A", puType);
+  // TFile* filePU = TFile::Open("Pileup_2011_to_173692_LPLumiScale_68mb.root");
+  // TH1F* h1_nPU_data = (TH1F*)filePU->Get("pileup");
+  // fPUWeight->SetDataHistogram(h1_nPU_data);
+  // fPUWeight_ave->SetDataHistogram(h1_nPU_data);
 
    float nCounterPU=0.;
    float nCounterPU_ave=0.;
@@ -275,10 +277,10 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      // PU reweighting:
      eventWeightPU_=1.;
      eventWeightPU_ave_=1.;
-     if( isMC_ ) {
-       eventWeightPU_ = fPUWeight->GetWeight(nPU_);
-       eventWeightPU_ave_ = fPUWeight_ave->GetWeight(nPU_ave_);
-     }
+    // if( isMC_ ) {
+    //   eventWeightPU_ = fPUWeight->GetWeight(nPU_);
+    //   eventWeightPU_ave_ = fPUWeight_ave->GetWeight(nPU_ave_);
+    // }
      nCounterPU += eventWeightPU_;
      nCounterPU_ave += eventWeightPU_ave_;
 
@@ -316,7 +318,6 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      //      FROM NOW ON RECO
      // -----------------------------
 
-     float mZ = 91.1876;
 
      epfMet_ = energyPFMet[0];
      sumEtpfMet_ = sumEtPFMet[0];
@@ -331,6 +332,10 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        std::cout << std::endl << "*** Muons:" << std::endl;
      }
 
+
+     std::vector<AnalysisLepton> leptPlus;
+     std::vector<AnalysisLepton> leptMinus;
+
      // ------------------
      // MUONS
      // ------------------
@@ -338,7 +343,6 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      std::vector<AnalysisLepton> muonsPlus;
      std::vector<AnalysisLepton> muonsMinus;
      std::vector<AnalysisLepton> muons;
-     int chargeFirstMuon;
 
 
      //for( unsigned int iMuon=0; iMuon<nMuon && (muons.size()<2); ++iMuon ) {
@@ -346,6 +350,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
        AnalysisMuon thisMuon( pxMuon[iMuon], pyMuon[iMuon], pzMuon[iMuon], energyMuon[iMuon] );
        thisMuon.charge = chargeMuon[iMuon];
+       thisMuon.leptType = 0;
 
        if( event_==DEBUG_EVENTNUMBER ) {
          std::cout << "thisMuon.Pt: " << thisMuon.Pt() << std::endl;
@@ -421,14 +426,22 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
          else std::cout << "Adding to collection of negative muons." << std::endl;
        }
 
-       if( thisMuon.charge > 0 ) muonsPlus.push_back(thisMuon);
-       else muonsMinus.push_back(thisMuon);
+       if( thisMuon.charge > 0 ) {
+         muonsPlus.push_back(thisMuon);
+         leptPlus.push_back(thisMuon);
+       } else {
+         muonsMinus.push_back(thisMuon);
+         leptMinus.push_back(thisMuon);
+       }
 
        muons.push_back(thisMuon);
 
      } //for muons
 
 
+     // Z veto:
+     float ZVetoWindow=15.;
+     if( findZ( muonsPlus, muonsMinus, ZVetoWindow ) ) continue;
 
 
 
@@ -438,7 +451,6 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
      std::vector<AnalysisLepton> electronsPlus;
      std::vector<AnalysisLepton> electronsMinus;
-     int chargeFirstEle = 0;
      bool firstPassedVBTF80 = false;
 
      if( event_==DEBUG_EVENTNUMBER )
@@ -450,6 +462,13 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
        AnalysisElectron thisEle( pxEle[iEle], pyEle[iEle], pzEle[iEle], energyEle[iEle] );
        thisEle.charge = chargeEle[iEle];
+       thisEle.leptType = 1;
+
+       // triple charge consistency:
+       int scCharge = scPixChargeEle[iEle];
+       int ctfCharge = chargeTrack[trackIndexEle[iEle]];
+       int gsfCharge = chargeGsfTrack[gsfTrackIndexEle[iEle]];
+       if( (scCharge!=ctfCharge) || (scCharge!=gsfCharge) || (gsfCharge!=ctfCharge) ) continue;
 
        float scEta = (superClusterIndexEle[iEle]>=0) ? etaSC[superClusterIndexEle[iEle]] : etaPFSC[PFsuperClusterIndexEle[iEle]];
 
@@ -532,46 +551,56 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
          else std::cout << "Adding to collection of negative electrons." << std::endl;
        }
 
-       if( thisEle.charge > 0 ) electronsPlus.push_back(thisEle);
-       else electronsMinus.push_back(thisEle);
+       if( thisEle.charge > 0 ) {
+         electronsPlus.push_back(thisEle);
+         leptPlus.push_back(thisEle);
+       } else {
+         electronsMinus.push_back(thisEle);
+         leptMinus.push_back(thisEle);
+       }
 
      } //for electrons
 
+     
+     // Z veto:
+     if( findZ( electronsPlus, electronsMinus, ZVetoWindow ) ) continue;
+
+
 
      // now define lepton candidates
-     // algo: look at highest-pt lepton and search for same charged same flavor one
-     // if not found, pick a same-flavour, opposite charged one (for control regions)
-
      std::vector<AnalysisLepton> leptons;
 
-     nMuons_ = muonsPlus.size() + muonsMinus.size();
-     nElectrons_ = electronsPlus.size() + electronsMinus.size();
 
-     if( (nMuons_<2&&nElectrons_<2) || nMuons_+nElectrons_>3 ) { 
-    
-       continue;
+     if( leptPlus.size()>=2 && leptMinus.size()<2 ) {
+
+       leptons.push_back( leptPlus[0] );
+       leptons.push_back( leptPlus[1] );
+
+     } else if( leptPlus.size()<2 && leptMinus.size()>=2 ) {
+
+       leptons.push_back( leptMinus[0] );
+       leptons.push_back( leptMinus[1] );
+
+     } else if( leptPlus.size()>=2 && leptMinus.size()>=2 ) {
+
+       float sumPtPlus = leptPlus[0].Pt()+leptPlus[1].Pt();
+       float sumPtMinus = leptMinus[0].Pt()+leptMinus[1].Pt();
+
+       if( sumPtPlus>sumPtMinus ) {
+
+         leptons.push_back( leptPlus[0] );
+         leptons.push_back( leptPlus[1] );
+
+       } else {
+
+         leptons.push_back( leptMinus[0] );
+         leptons.push_back( leptMinus[1] );
+
+       }
 
      } else {
 
-       // remaining cases:
-       // m - e
-       // 0 - 3
-       // 1 - 2
-       // 2 - 1
-       // 3 - 0
-       // 0 - 2
-       // 2 - 0
-
-       if( nMuons_>=2 ) {
-         leptons = findLeptons( muonsPlus, muonsMinus );
-         leptType_ = 0;
-       } else if( nElectrons_>=2 ) {
-         leptons = findLeptons( electronsPlus, electronsMinus );
-         leptType_ = 1;
-       } else {
-         std::cout << "This is not possible!" << std::endl;
-         exit(1111);
-       }
+       continue;
 
      }
 
@@ -591,12 +620,14 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      etaLept1_ = leptons[0].Eta();
      phiLept1_ = leptons[0].Phi();
      chargeLept1_ = leptons[0].charge;
+     leptTypeLept1_ = leptons[0].leptType;
      
      eLept2_ = leptons[1].Energy();
      ptLept2_ = leptons[1].Pt();
      etaLept2_ = leptons[1].Eta();
      phiLept2_ = leptons[1].Phi();
      chargeLept2_ = leptons[1].charge;
+     leptTypeLept2_ = leptons[1].leptType;
 
 
 /*
@@ -879,6 +910,7 @@ double trackDxyPV(float PVx, float PVy, float PVz, float eleVx, float eleVy, flo
 
 
 
+/*
 std::vector<AnalysisLepton> findLeptons( std::vector<AnalysisLepton> lPlus, std::vector<AnalysisLepton> lMinus ) {
 
   float maxPt = 0.;
@@ -941,5 +973,26 @@ std::vector<AnalysisLepton> findLeptons( std::vector<AnalysisLepton> lPlus, std:
   return leptons;
 
 }
+*/
 
 
+
+bool findZ( std::vector<AnalysisLepton> leptPlus, std::vector<AnalysisLepton> leptMinus, float ZVetoWindow ) {
+
+  bool foundZ = false;
+
+  for( unsigned iLeptPlus=0; iLeptPlus<leptPlus.size() && !foundZ; ++iLeptPlus ) {
+
+    for( unsigned iLeptMinus=0; iLeptMinus<leptMinus.size() && !foundZ; ++iLeptMinus ) {
+
+      TLorentzVector diLepton = leptPlus[iLeptPlus] + leptMinus[iLeptMinus];
+   
+      if( fabs(diLepton.M()-91.19)<ZVetoWindow ) foundZ = true;
+
+    } // for minus
+
+  } // for plus
+
+  return foundZ;
+
+}
