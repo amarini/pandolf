@@ -1370,8 +1370,10 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
 
       if( !noDATA && !noMC ) { //normalize mc to data shape
         // default: choose first data histo:
-        Float_t dataIntegral = dataHistos[0]->Integral(0, dataHistos[0]->GetNbinsX()+1);
-        Float_t mcIntegral = mcHisto_sum->Integral(0, mcHisto_sum->GetNbinsX()+1);
+        Float_t dataIntegral = dataHistos[0]->Integral();
+        Float_t mcIntegral = mcHisto_sum->Integral();
+        //Float_t dataIntegral = dataHistos[0]->Integral(0, dataHistos[0]->GetNbinsX()+1);
+        //Float_t mcIntegral = mcHisto_sum->Integral(0, mcHisto_sum->GetNbinsX()+1);
         mcHisto_sum->Scale( dataIntegral/mcIntegral );
         for( unsigned i=0; i<mcHistos.size(); ++i )
           mcHistos[i]->Scale( dataIntegral/mcIntegral );
@@ -2716,6 +2718,8 @@ LegendBox DrawBase::get_legendBox( int legendQuadrant, const std::vector<std::st
 
     int nNames_total = 0;
     if( legendTitle_ != "" ) nNames_total+=1;
+    TString legendTitle_tstr(legendTitle_);
+    if( legendTitle_tstr.Contains("splitline") ) nNames_total+=1;
     if( legendNames!=0 ) {
       nNames_total += legendNames->size();
     } else {
