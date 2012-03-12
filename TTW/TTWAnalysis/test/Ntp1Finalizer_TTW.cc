@@ -88,6 +88,10 @@ void Ntp1Finalizer_TTW::finalize() {
 
   TH1D* h1_leptType = new TH1D("leptType", "", 3, -0.5, 2.5 );
   h1_leptType->Sumw2();
+  //h1_leptType->GetXaxis()->SetLabelSize(0.1);
+  h1_leptType->GetXaxis()->SetBinLabel(1, "#mu#mu");
+  h1_leptType->GetXaxis()->SetBinLabel(2, "ee");
+  h1_leptType->GetXaxis()->SetBinLabel(3, "e#mu");
 
   TH1D* h1_pfMet = new TH1D("pfMet", "", 500, 0., 500.);
   h1_pfMet->Sumw2();
@@ -110,6 +114,11 @@ void Ntp1Finalizer_TTW::finalize() {
   h1_etaLept1->Sumw2();
   TH1D* h1_etaLept2 = new TH1D("etaLept2", "", 50, -2.5, 2.5);
   h1_etaLept2->Sumw2();
+
+  TH1D* h1_etaMu = new TH1D("etaMu", "", 50, -2.5, 2.5);
+  h1_etaMu->Sumw2();
+  TH1D* h1_etaEle = new TH1D("etaEle", "", 50, -2.5, 2.5);
+  h1_etaEle->Sumw2();
 
 
   TH1D* h1_deltaRll = new TH1D("deltaRll", "", 500, 0., 5.);
@@ -572,6 +581,13 @@ ofstream ofs("run_event.txt");
     h1_ptLept2->Fill( Lept2.Pt(), eventWeight );
     h1_etaLept1->Fill( Lept1.Eta(), eventWeight );
     h1_etaLept2->Fill( Lept2.Eta(), eventWeight );
+    if( leptType_==0 ) {
+      h1_etaMu->Fill( Lept1.Eta(), eventWeight );
+      h1_etaMu->Fill( Lept2.Eta(), eventWeight );
+    } else if( leptType_==1 ) {
+      h1_etaEle->Fill( Lept1.Eta(), eventWeight );
+      h1_etaEle->Fill( Lept2.Eta(), eventWeight );
+    }
 
     h1_deltaRll->Fill( Lept2.DeltaR(Lept2), eventWeight );
 
@@ -910,6 +926,9 @@ ofstream ofs("run_event.txt");
   h1_etaLept1->Write();
   h1_etaLept2->Write();
 
+  h1_etaMu->Write();
+  h1_etaEle->Write();
+
 
   h1_deltaRll->Write();
 
@@ -961,8 +980,8 @@ void Ntp1Finalizer_TTW::setSelectionType( const std::string& selectionType ) {
 
   if( selectionType_=="presel" ) {
 
-    ptLept1_thresh_ = 10.;
-    ptLept2_thresh_ = 10.;
+    ptLept1_thresh_ = 20.;
+    ptLept2_thresh_ = 20.;
     etaLept1_thresh_ = 3.;
     etaLept2_thresh_ = 3.;
 
@@ -971,7 +990,7 @@ void Ntp1Finalizer_TTW::setSelectionType( const std::string& selectionType ) {
     btagSelectionType_ = "looseloose";
 
     ptJet_thresh_ = 20.;
-    etaJet_thresh_ = 5.;
+    etaJet_thresh_ = 2.4;
 
     ptJet1_thresh_ = 20.;
     ptJet2_thresh_ = 20.;
@@ -984,8 +1003,8 @@ void Ntp1Finalizer_TTW::setSelectionType( const std::string& selectionType ) {
 
   } else if( selectionType_=="sel1" ) {
 
-    ptLept1_thresh_ = 10.;
-    ptLept2_thresh_ = 10.;
+    ptLept1_thresh_ = 20.;
+    ptLept2_thresh_ = 20.;
     etaLept1_thresh_ = 3.;
     etaLept2_thresh_ = 3.;
 
@@ -994,7 +1013,7 @@ void Ntp1Finalizer_TTW::setSelectionType( const std::string& selectionType ) {
     btagSelectionType_ = "loosemed";
 
     ptJet_thresh_ = 20.;
-    etaJet_thresh_ = 20.;
+    etaJet_thresh_ = 2.4;
 
     ptJet1_thresh_ = 20.;
     ptJet2_thresh_ = 20.;
