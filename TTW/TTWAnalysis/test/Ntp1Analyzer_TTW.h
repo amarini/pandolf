@@ -48,14 +48,13 @@ class Ntp1Analyzer_TTW : public Ntp1Analyzer {
    int leptType_; //0: muon; 1: electron
    int leptTypeMC_; //0: muon; 1: electron
 
-   int nMuons_;
-   int nElectrons_;
 
    Float_t eLept1_;
    Float_t ptLept1_;
    Float_t etaLept1_;
    Float_t phiLept1_;
    Int_t   chargeLept1_;
+   Int_t   leptTypeLept1_;
 
    Float_t eLept1Gen_;
    Float_t ptLept1Gen_;
@@ -67,6 +66,7 @@ class Ntp1Analyzer_TTW : public Ntp1Analyzer {
    Float_t etaLept2_;
    Float_t phiLept2_;
    Int_t   chargeLept2_;
+   Int_t   leptTypeLept2_;
 
    Float_t eLept2Gen_;
    Float_t ptLept2Gen_;
