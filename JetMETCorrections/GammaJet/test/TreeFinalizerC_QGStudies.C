@@ -73,7 +73,15 @@ void TreeFinalizerC_QGStudies::finalize() {
 
   std::string photonID = "medium";
   if( photonID!="medium" ) outfileName = outfileName + "_" + photonID;
+
+  if( nBlocks_ >1 ) {
+    char blockText[100];
+    sprintf( blockText, "_%d", iBlock_ );
+    std::string iBlockString(blockText); 
+    outfileName = outfileName + iBlockString;
+  }
   outfileName += ".root";
+
 
   TFile* outFile = new TFile(outfileName.c_str(), "RECREATE");
   outFile->cd();
@@ -318,6 +326,10 @@ void TreeFinalizerC_QGStudies::finalize() {
   tree_->SetBranchAddress("nNeutralHadronsReco", &nNeutralHadronsReco);
   Int_t nPhotonsReco;
   tree_->SetBranchAddress("nPhotonsReco", &nPhotonsReco);
+  Float_t eNeutralHadronsReco;
+  tree_->SetBranchAddress("eNeutralHadronsReco", &eNeutralHadronsReco);
+  Float_t ePhotonsReco;
+  tree_->SetBranchAddress("ePhotonsReco", &ePhotonsReco);
   Float_t ptDJetReco;
   tree_->SetBranchAddress("ptDJetReco", &ptDJetReco);
   Float_t QGLikelihoodJetReco;
@@ -452,13 +464,15 @@ void TreeFinalizerC_QGStudies::finalize() {
   if( dataset_tstr.Contains("Summer11") ) puType = "Summer11_S4";
 
   PUWeight* fPUWeight_Photon50 = new PUWeight(-1, "Photon50", puType);
-  std::string puFileName_Photon50 = "pileup_Photon50.root";
+  //std::string puFileName_Photon50 = "pileup_Photon50.root";
+  std::string puFileName_Photon50 = "pileup_Photon135.root";
   TFile* filePU_Photon50 = TFile::Open(puFileName_Photon50.c_str());
   TH1F* h1_nPU_data_Photon50 = (TH1F*)filePU_Photon50->Get("pileup");
   fPUWeight_Photon50->SetDataHistogram(h1_nPU_data_Photon50);
 
   PUWeight* fPUWeight_Photon90 = new PUWeight(-1, "Photon90", puType);
-  std::string puFileName_Photon90 = "pileup_Photon90.root";
+  //std::string puFileName_Photon90 = "pileup_Photon90.root";
+  std::string puFileName_Photon90 = "pileup_Photon135.root";
   TFile* filePU_Photon90 = TFile::Open(puFileName_Photon90.c_str());
   TH1F* h1_nPU_data_Photon90 = (TH1F*)filePU_Photon90->Get("pileup");
   fPUWeight_Photon90->SetDataHistogram(h1_nPU_data_Photon90);
@@ -587,11 +601,15 @@ void TreeFinalizerC_QGStudies::finalize() {
     if( ptPhotReco<20. ) continue;
     if( fabs(etaPhotReco)>1.3 ) continue;
     if( clusterMinPhotReco<0.15 ) continue; //protection vs EB spikes
-    if( fabs(etaJetReco)>2. ) continue; //jet in tracker region
+    if( fabs(etaJetReco)>2.4 ) continue; //jet in tracker region
 
     // jet id:
     if( nTracksReco==0 ) continue;
     if( (nTracksReco+nPhotonsReco+nNeutralHadronsReco)==1 ) continue;
+    if( ePhotonsReco>0.99 ) continue;
+    if( eNeutralHadronsReco>0.99 ) continue;
+
+
 
 
 
