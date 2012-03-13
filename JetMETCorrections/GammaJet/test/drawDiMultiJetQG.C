@@ -368,7 +368,7 @@ int main(int argc, char* argv[]) {
 
 
   db->set_rebin(2);
-  db->set_yAxisMaxScale(1.8);
+  db->set_yAxisMaxScale(1.3);
   drawHistoWithQuarkGluonComponents( db, "omog", "", "QGLikelihoodJet0", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 80., 100. );
 
   // 50-80
@@ -524,8 +524,13 @@ void drawHistoWithQuarkGluonComponents( DrawBase* db, const std::string& treeNam
   TLegend* legend;
   if( ptMin !=0. && ptMax != 10000. && rhoMin!=0. && rhoMax !=30. ) {
     char legendTitle[250];
-    sprintf( legendTitle, "%.0f < p_{T} < %.0f GeV,  %.0f < #rho < %.0f GeV", ptMin, ptMax, rhoMin, rhoMax );
-    legend = new TLegend( 0.32, 0.55, 0.8, 0.9, legendTitle );
+    if( varName=="QGLikelihoodJet0" ) {
+      sprintf( legendTitle, "%.0f < p_{T} < %.0f GeV,  %.0f < #rho < %.0f GeV", ptMin, ptMax, rhoMin, rhoMax );
+      legend = new TLegend( 0.32, 0.55, 0.8, 0.9, legendTitle );
+    } else {
+      sprintf( legendTitle, "#splitline{%.0f < p_{T} < %.0f GeV}{%.0f < #rho < %.0f GeV}", ptMin, ptMax, rhoMin, rhoMax );
+      legend = new TLegend( 0.55, 0.5, 0.88, 0.9, legendTitle );
+    }
   } else if( ptMin !=0. && ptMax != 10000. ) {
     char legendTitle[150];
     sprintf( legendTitle, "%.0f < p_{T} < %.0f GeV", ptMin, ptMax);
@@ -585,7 +590,8 @@ void drawHistoWithQuarkGluonComponents( DrawBase* db, const std::string& treeNam
   TH2D* h2_axes = new TH2D("axes", "", 10, xMin, xMax, 10, 0., yMax );
   h2_axes->SetXTitle( axisName.c_str() );
   h2_axes->SetYTitle( yAxisTitle );
-  
+  if( yMax>1000. )
+    h2_axes->GetYaxis()->SetTitleOffset(1.55); 
 
   TCanvas* c1 = new TCanvas("c1", "", 600, 600);
   c1->cd();
