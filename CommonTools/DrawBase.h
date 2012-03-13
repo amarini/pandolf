@@ -142,6 +142,7 @@ class DrawBase {
   Float_t get_etamax() const { return etamax_; };
   std::string get_raw_corr() const { return raw_corr_; };
   bool get_pdf_aussi() const { return pdf_aussi_; };
+  int get_rebin() const { return rebin_; };
 
   std::string get_etaRangeText( const std::string& etaRegion ) const;
   std::string get_sqrtText() const;
