@@ -29,12 +29,7 @@ int DEBUG_EVENTNUMBER = 98901397;
 
 // constructor:
 
-Ntp1Finalizer_TTW::Ntp1Finalizer_TTW( const std::string& dataset, const std::string& selectionType, const std::string& bTaggerType, const std::string& leptType ) : Ntp1Finalizer( "TTW", dataset, leptType ) {
-
-  if( leptType!="ALL" && leptType!="MU" && leptType!="ELE" ) {
-    std::cout << "Lept type '" << leptType << "' currently not supported. Exiting." << std::endl;
-    exit(9177);
-  }
+Ntp1Finalizer_TTW::Ntp1Finalizer_TTW( const std::string& dataset, const std::string& selectionType, const std::string& bTaggerType ) : Ntp1Finalizer( "TTW", dataset, "ALL" ) {
 
   if( bTaggerType!="SSVHE" && bTaggerType!="TCHE" ) {
     std::cout << "b-Tagger type '" << bTaggerType << "' currently not supported. Exiting." << std::endl;
@@ -42,7 +37,6 @@ Ntp1Finalizer_TTW::Ntp1Finalizer_TTW( const std::string& dataset, const std::str
   }
 
   bTaggerType_ = bTaggerType;
-  leptType_ = leptType;
 
   setSelectionType(selectionType);
 
@@ -61,7 +55,6 @@ void Ntp1Finalizer_TTW::finalize() {
   bool isMC = (run < 160000);
   std::string fullFlags = selectionType_;
   if( bTaggerType_!="TCHE" ) fullFlags = fullFlags + "_" + bTaggerType_;
-  fullFlags = fullFlags + "_" + leptType_;
   this->set_flags(fullFlags); //this is for the outfile name
   this->createOutputFile();
 
@@ -208,9 +201,6 @@ void Ntp1Finalizer_TTW::finalize() {
   tree_->SetBranchAddress("phipfMet", &phiMet);
 
 
-  int leptType;
-  tree_->SetBranchAddress("leptType", &leptType);
-
   Float_t eLept1;
   tree_->SetBranchAddress("eLept1", &eLept1);
   Float_t ptLept1;
@@ -221,6 +211,8 @@ void Ntp1Finalizer_TTW::finalize() {
   tree_->SetBranchAddress("phiLept1", &phiLept1);
   Int_t chargeLept1;
   tree_->SetBranchAddress("chargeLept1", &chargeLept1);
+  Int_t leptTypeLept1;
+  tree_->SetBranchAddress("leptTypeLept1", &leptTypeLept1);
 
   Float_t eLept2;
   tree_->SetBranchAddress("eLept2", &eLept2);
@@ -232,6 +224,8 @@ void Ntp1Finalizer_TTW::finalize() {
   tree_->SetBranchAddress("phiLept2", &phiLept2);
   Int_t chargeLept2;
   tree_->SetBranchAddress("chargeLept2", &chargeLept2);
+  Int_t leptTypeLept2;
+  tree_->SetBranchAddress("leptTypeLept2", &leptTypeLept2);
 
 
   Int_t nLept;
@@ -377,10 +371,11 @@ void Ntp1Finalizer_TTW::finalize() {
 
 
   float ptLept1_t, ptLept2_t, etaLept1_t, etaLept2_t;
-  float ptJet1_t, ptJet2_t, ptJet3_t, ptJet4_t, ptJet5_t, ptJet6_t;
-  float etaJet1_t, etaJet2_t, etaJet3_t, etaJet4_t, etaJet5_t, etaJet6_t;
+  float ptJet1_t, ptJet2_t, ptJet3_t, ptJet4_t;
+  float etaJet1_t, etaJet2_t, etaJet3_t, etaJet4_t;
   float bTagJet1_t, bTagJet2_t;
   float HLTSF;
+  int leptType;
 
   tree_passedEvents->Branch( "run", &run, "run/I" );
   tree_passedEvents->Branch( "LS", &LS, "LS/I" );
@@ -396,14 +391,10 @@ void Ntp1Finalizer_TTW::finalize() {
   tree_passedEvents->Branch( "bTagJet2", &bTagJet2_t, "bTagJet2_t/F" );
   tree_passedEvents->Branch( "ptJet3", &ptJet3_t, "ptJet3_t/F" );
   tree_passedEvents->Branch( "ptJet4", &ptJet4_t, "ptJet4_t/F" );
-  tree_passedEvents->Branch( "ptJet5", &ptJet5_t, "ptJet5_t/F" );
-  tree_passedEvents->Branch( "ptJet6", &ptJet6_t, "ptJet6_t/F" );
   tree_passedEvents->Branch( "etaJet1", &etaJet1_t, "etaJet1_t/F" );
   tree_passedEvents->Branch( "etaJet2", &etaJet2_t, "etaJet2_t/F" );
   tree_passedEvents->Branch( "etaJet3", &etaJet3_t, "etaJet3_t/F" );
   tree_passedEvents->Branch( "etaJet4", &etaJet4_t, "etaJet4_t/F" );
-  tree_passedEvents->Branch( "etaJet5", &etaJet5_t, "etaJet5_t/F" );
-  tree_passedEvents->Branch( "etaJet6", &etaJet6_t, "etaJet6_t/F" );
   tree_passedEvents->Branch( "eventWeight", &eventWeight, "eventWeight/F" );
   tree_passedEvents->Branch( "HLTSF", &HLTSF, "HLTSF/F" );
 
@@ -432,12 +423,6 @@ ofstream ofs("run_event.txt");
 
 
     if( eventWeight <= 0. ) eventWeight = 1.;
-
-    if( leptType_!="ALL" ) {
-      if( leptType_=="ELE" && leptType==0 ) continue;
-      if( leptType_=="MU" && leptType==1 ) continue;
-    }
-
 
 
 
@@ -576,16 +561,26 @@ ofstream ofs("run_event.txt");
 
     TLorentzVector diLepton = Lept1+Lept2;
 
+    if( leptTypeLept1==0 && leptTypeLept2==0 ) 
+      leptType=0;
+    else if( leptTypeLept1==1 && leptTypeLept2==1 )
+      leptType=1;
+    else 
+      leptType=2;
+  
 
     h1_ptLept1->Fill( Lept1.Pt(), eventWeight );
     h1_ptLept2->Fill( Lept2.Pt(), eventWeight );
     h1_etaLept1->Fill( Lept1.Eta(), eventWeight );
     h1_etaLept2->Fill( Lept2.Eta(), eventWeight );
-    if( leptType_==0 ) {
+    if( leptTypeLept1==0 ) {
       h1_etaMu->Fill( Lept1.Eta(), eventWeight );
-      h1_etaMu->Fill( Lept2.Eta(), eventWeight );
-    } else if( leptType_==1 ) {
+    } else {
       h1_etaEle->Fill( Lept1.Eta(), eventWeight );
+    }
+    if( leptTypeLept2==0 ) {
+      h1_etaMu->Fill( Lept2.Eta(), eventWeight );
+    } else {
       h1_etaEle->Fill( Lept2.Eta(), eventWeight );
     }
 
