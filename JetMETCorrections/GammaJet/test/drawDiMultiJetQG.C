@@ -371,13 +371,19 @@ int main(int argc, char* argv[]) {
   drawHistoWithQuarkGluonComponents( db, "omog", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 80., 100. );
   drawHistoWithQuarkGluonComponents( db, "omog", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 80., 100., 4., 5.);
   drawHistoWithQuarkGluonComponents( db, "omog", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 80., 100., 4., 6.);
-  drawHistoWithQuarkGluonComponents( db, "omog", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 50., 100., 50, 0., 1.0001);
-  drawHistoWithQuarkGluonComponents( db, "omog", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 100., 150., 50, 0., 1.0001);
-  drawHistoWithQuarkGluonComponents( db, "omog", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 150., 200., 50, 0., 1.0001);
-  drawHistoWithQuarkGluonComponents( db, "omog", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 200., 250., 50, 0., 1.0001);
-  drawHistoWithQuarkGluonComponents( db, "omog", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 250., 300., 50, 0., 1.0001);
-  drawHistoWithQuarkGluonComponents( db, "omog", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 300., 400., 50, 0., 1.0001);
-  drawHistoWithQuarkGluonComponents( db, "omog", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 400., 500., 50, 0., 1.0001);
+  drawHistoWithQuarkGluonComponents( db, "omog", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 100., 127., 4., 6.);
+  drawHistoWithQuarkGluonComponents( db, "omog", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 150., 200., 4., 6.);
+  drawHistoWithQuarkGluonComponents( db, "omog", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 200., 250., 4., 6.);
+  drawHistoWithQuarkGluonComponents( db, "omog", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 300., 400., 4., 6.);
+  drawHistoWithQuarkGluonComponents( db, "omog", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 400., 500., 4., 6.);
+
+  //drawHistoWithQuarkGluonComponents( db, "omog", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 50., 100., 50, 0., 1.0001);
+  //drawHistoWithQuarkGluonComponents( db, "omog", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 100., 150., 50, 0., 1.0001);
+  //drawHistoWithQuarkGluonComponents( db, "omog", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 150., 200., 50, 0., 1.0001);
+  //drawHistoWithQuarkGluonComponents( db, "omog", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 200., 250., 50, 0., 1.0001);
+  //drawHistoWithQuarkGluonComponents( db, "omog", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 250., 300., 50, 0., 1.0001);
+  //drawHistoWithQuarkGluonComponents( db, "omog", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 300., 400., 50, 0., 1.0001);
+  //drawHistoWithQuarkGluonComponents( db, "omog", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 400., 500., 50, 0., 1.0001);
 
 //drawHistoWithQuarkGluonComponents( db, "omog", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 100., 200.);
 //drawHistoWithQuarkGluonComponents( db, "omog", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 200., 300.);
@@ -402,10 +408,18 @@ void drawHistoWithQuarkGluonComponents( DrawBase* db, const std::string& treeNam
 
 
   TH1D* h1_data = new TH1D( "data", "", nBins, xMin, xMax );
+
+  // these histos are for signal only (to have high stat -> smooth shapes):
   TH1D* h1_all = new TH1D( "all", "", nBins, xMin, xMax );
   TH1D* h1_quark = new TH1D( "quark", "", nBins, xMin, xMax );
   TH1D* h1_gluon = new TH1D( "gluon", "", nBins, xMin, xMax );
   TH1D* h1_b = new TH1D( "b", "", nBins, xMin, xMax );
+
+  // these ones for all processes (to get the fractions right):
+  TH1D* h1_all_all = new TH1D( "all_all", "", nBins, xMin, xMax );
+  TH1D* h1_quark_all = new TH1D( "quark_all", "", nBins, xMin, xMax );
+  TH1D* h1_gluon_all = new TH1D( "gluon_all", "", nBins, xMin, xMax );
+  TH1D* h1_b_all = new TH1D( "b_all", "", nBins, xMin, xMax );
 
 
 
@@ -426,24 +440,36 @@ void drawHistoWithQuarkGluonComponents( DrawBase* db, const std::string& treeNam
   treeDATA->Project( "data", varName.c_str(), commonCondition );
 
 
-  TChain* treeMC = new TChain(treeName.c_str());
+  // this one to get the fractions:
+  TChain* treeMC_all = new TChain(treeName.c_str());
+  // this one to get the shapes (avoid huge QCD weights for gamma+jet):
+  TChain* treeMC_signal = new TChain(treeName.c_str());
   for( unsigned iFile=0; iFile<db->get_mcFiles().size(); ++iFile ) {
     std::string fileName(db->get_mcFile(iFile).file->GetName());
     std::string treeFullName = fileName + "/" + treeName;
-    treeMC->Add(treeFullName.c_str());
+    treeMC_all->Add(treeFullName.c_str());
+    if( iFile==0 ) //signal only
+      treeMC_signal->Add(treeFullName.c_str());
   }
-  treeMC->Project( "all",   varName.c_str(), allCondition );
-  treeMC->Project( "quark", varName.c_str(), quarkCondition );
-  treeMC->Project( "gluon", varName.c_str(), gluonCondition );
-  treeMC->Project( "b", varName.c_str(), bCondition );
+
+  treeMC_signal->Project( "all",   varName.c_str(), allCondition );
+  treeMC_signal->Project( "quark", varName.c_str(), quarkCondition );
+  treeMC_signal->Project( "gluon", varName.c_str(), gluonCondition );
+  treeMC_signal->Project( "b", varName.c_str(), bCondition );
+
+  treeMC_all->Project( "all_all",   varName.c_str(), allCondition );
+  treeMC_all->Project( "quark_all", varName.c_str(), quarkCondition );
+  treeMC_all->Project( "gluon_all", varName.c_str(), gluonCondition );
+  treeMC_all->Project( "b_all", varName.c_str(), bCondition );
 
   float data_int = h1_data->Integral();
   float mc_int = h1_all->Integral();
+  float mc_int_all = h1_all_all->Integral();
   float scaleFactor = data_int/mc_int;
 
-  float quark_fraction = h1_quark->Integral()/mc_int;
-  float gluon_fraction = h1_gluon->Integral()/mc_int;
-  float b_fraction = h1_b->Integral()/mc_int;
+  float quark_fraction = h1_quark_all->Integral()/mc_int_all;
+  float gluon_fraction = h1_gluon_all->Integral()/mc_int_all;
+  float b_fraction = h1_b_all->Integral()/mc_int_all;
   float other_fraction = 1.-quark_fraction-gluon_fraction-b_fraction;
 
   char quarkText[300];
@@ -471,8 +497,8 @@ void drawHistoWithQuarkGluonComponents( DrawBase* db, const std::string& treeNam
   legend->SetFillColor( kWhite );
   legend->SetTextSize(0.035);
   legend->AddEntry( h1_data, "Data", "p" );
-  legend->AddEntry( h1_gluon, gluonText, "F" );
   legend->AddEntry( h1_quark, quarkText, "F" );
+  legend->AddEntry( h1_gluon, gluonText, "F" );
   legend->AddEntry( h1_b, bText, "F" );
   legend->AddEntry( h1_all, otherText, "F" );
 
@@ -553,6 +579,11 @@ void drawHistoWithQuarkGluonComponents( DrawBase* db, const std::string& treeNam
   delete h1_quark;
   delete h1_gluon;
   delete h1_b;
+  
+  delete h1_all_all;
+  delete h1_quark_all;
+  delete h1_gluon_all;
+  delete h1_b_all;
   
 }
 
