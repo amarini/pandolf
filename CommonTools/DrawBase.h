@@ -135,6 +135,8 @@ class DrawBase {
   std::string get_legendTitle() const { return legendTitle_; };
   InputFile get_dataFile( int i ) const { return dataFiles_[i]; };
   InputFile get_mcFile( int i ) const { return mcFiles_[i]; };
+  std::vector< InputFile >  get_dataFiles() const { return dataFiles_; };
+  std::vector< InputFile >  get_mcFiles() const { return mcFiles_; };
   std::string get_outputdir() const { return outputdir_; };
   Int_t get_pt_thresh() const { return pt_thresh_; };
   Float_t get_etamax() const { return etamax_; };
