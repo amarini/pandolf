@@ -8,7 +8,7 @@
 
 
 
-void drawHistoWithQuarkGluonComponents( DrawBase* db, const std::string& treeName, const std::string& additionalCuts, const std::string& varName, const std::string& canvasSaveName, const std::string& axisName, const std::string& units="", const std::string& instanceName="Events", bool log=false, float ptMin=0., float ptMax=10000., float rhoMin=0., float rhoMax=30., int nBins=30, float xMin=0., float xMax=1.0001 );
+void drawHistoWithQuarkGluonComponents( DrawBase* db, const std::string& treeName, const std::string& additionalCuts, const std::string& varName, const std::string& canvasSaveName, std::string axisName, const std::string& units="", const std::string& instanceName="Events", bool log=false, float ptMin=0., float ptMax=10000., float rhoMin=0., float rhoMax=30., int nBins=30, float xMin=0., float xMax=1.0001 );
 std::pair<TH1D,TH1D> drawVariable_BGsubtr( const std::string& varName, int ptMin, int ptMax, DrawBase* db );
 //void drawSignalPtMix( std::pair<TH1D*,TH1D*> h1pair_3050, std::pair<TH1D*,TH1D*> h1pair_5080, std::pair<TH1D*,TH1D*> h1pair_80120, int mass, float frac_3050, float frac_5080, float frac_80120, DrawBase* db );
 
@@ -120,10 +120,18 @@ int main(int argc, char* argv[]) {
   std::string triggerVar = (analyzerType=="QGStudies") ? "Photon p_{T}" : "Calo H_{T}";
 
 
-  selection_pt0 = "eventWeight*(ptJet0 > 80. && ptJet0 < 100.)";
-  db->set_legendTitle( "80 < p_{T} < 100 GeV");
+  //selection_pt0 = "eventWeight*(ptJet0 > 80. && ptJet0 < 100.)";
+  //db->set_legendTitle( "80 < p_{T} < 100 GeV");
 
-  db->drawHisto_fromTree( "omog", "rhoPF", selection_pt0.c_str(), 50, 0., 20., "rhoPF_pt80100", "Particle Flow Energy Density (#rho)", "GeV", "Events", true);
+  //db->drawHisto_fromTree( "omog", "rhoPF", selection_pt0.c_str(), 50, 0., 20., "rhoPF_pt80100", "Particle Flow Energy Density (#rho)", "GeV", "Events", true);
+
+  //selection_pt0 = "eventWeight*(ptJet0 > 100. && ptJet0 < 150.)";
+  //db->set_legendTitle( "100 < p_{T} < 150 GeV");
+  //db->drawHisto_fromTree( "omog", "rhoPF", selection_pt0.c_str(), 50, 0., 20., "rhoPF_pt100150", "Particle Flow Energy Density (#rho)", "GeV", "Events", true);
+  //
+  //selection_pt0 = "eventWeight*(ptJet0 > 100. && ptJet0 < 150. && rhoPF>4. && rhoPF<6.)";
+  //db->set_legendTitle( "#splitline{100 < p_{T} < 150 GeV}{4 < #rho < 6 GeV}");
+  //db->drawHisto_fromTree( "omog", "trigVar", selection_pt0.c_str(), 50, 100., 150., "trigVar_pt100150_rho46", "Photon p_{T}", "GeV", "Events");
   
 /*
 
@@ -371,50 +379,73 @@ int main(int argc, char* argv[]) {
   if( analyzerType=="QGStudies" )
     db->set_rebin(2);
 
-  db->set_yAxisMaxScale(1.3);
-  drawHistoWithQuarkGluonComponents( db, "omog", "", "QGLikelihoodJet0", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 80., 100. );
 
-  // 50-80
-  drawHistoWithQuarkGluonComponents( db, "omog", "", "nChargedJet0", "nChargedJet0", "Charged Multiplicity", "", "Events", false, 50., 80., 4., 6., 50, 0.5, 50.5);
-  drawHistoWithQuarkGluonComponents( db, "omog", "", "nNeutralJet0", "nNeutralJet0", "Neutral Multiplicity", "", "Events", false, 50., 80., 4., 6., 50, 0.5, 50.5);
-  drawHistoWithQuarkGluonComponents( db, "omog", "", "ptDJet0", "ptDJet0", "p_{T}D", "", "Events", false, 50., 80., 4., 6., 40, 0.1);
-  drawHistoWithQuarkGluonComponents( db, "omog", "", "QGLikelihoodJet0", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 50., 80., 4., 6.);
+  //// 50-80
+  //drawHistoWithQuarkGluonComponents( db, "omog", "", "nChargedJet0", "nChargedJet0", "Charged Multiplicity", "", "Events", false, 50., 80., 4., 6., 50, 0.5, 50.5);
+  //drawHistoWithQuarkGluonComponents( db, "omog", "", "nNeutralJet0", "nNeutralJet0", "Neutral Multiplicity", "", "Events", false, 50., 80., 4., 6., 50, 0.5, 50.5);
+  //drawHistoWithQuarkGluonComponents( db, "omog", "", "ptDJet0", "ptDJet0", "p_{T}D", "", "Events", false, 50., 80., 4., 6., 40, 0.1);
+  //drawHistoWithQuarkGluonComponents( db, "omog", "", "QGLikelihoodJet0", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 50., 80., 4., 6.);
 
-  // 80-100
-  drawHistoWithQuarkGluonComponents( db, "omog", "", "nChargedJet0", "nChargedJet0", "Charged Multiplicity", "", "Events", false, 80., 100., 4., 6., 50, 0.5, 50.5);
-  drawHistoWithQuarkGluonComponents( db, "omog", "", "nNeutralJet0", "nNeutralJet0", "Neutral Multiplicity", "", "Events", false, 80., 100., 4., 6., 50, 0.5, 50.5);
-  drawHistoWithQuarkGluonComponents( db, "omog", "", "ptDJet0", "ptDJet0", "p_{T}D", "", "Events", false, 80., 100., 4., 6., 40, 0.1);
-  drawHistoWithQuarkGluonComponents( db, "omog", "", "QGLikelihoodJet0", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 80., 100., 4., 6.);
+  // 50-100
+  db->set_yAxisMaxScale( 1.6 );
+  drawHistoWithQuarkGluonComponents( db, "omog", "", "ptJet0", "ptJet0", "Jet Transverse Momentum", "GeV", "Events", false, 50., 100., 4., 6., 50, 50., 100.);
+  db->set_yAxisMaxScale( );
+  drawHistoWithQuarkGluonComponents( db, "omog", "", "nChargedJet0", "nChargedJet0", "Charged Multiplicity", "", "Events", false, 50., 100., 4., 6., 50, 0.5, 50.5);
+  drawHistoWithQuarkGluonComponents( db, "omog", "", "nNeutralJet0", "nNeutralJet0", "Neutral Multiplicity", "", "Events", false, 50., 100., 4., 6., 50, 0.5, 50.5);
+  drawHistoWithQuarkGluonComponents( db, "omog", "", "ptDJet0", "ptDJet0", "p_{T}D", "", "Events", false, 50., 100., 4., 6., 40, 0.1);
+  drawHistoWithQuarkGluonComponents( db, "omog", "", "QGLikelihoodJet0", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 50., 100., 4., 6.);
+
+
+  //// 80-100
+  //drawHistoWithQuarkGluonComponents( db, "omog", "", "nChargedJet0", "nChargedJet0", "Charged Multiplicity", "", "Events", false, 80., 100., 4., 6., 50, 0.5, 50.5);
+  //drawHistoWithQuarkGluonComponents( db, "omog", "", "nNeutralJet0", "nNeutralJet0", "Neutral Multiplicity", "", "Events", false, 80., 100., 4., 6., 50, 0.5, 50.5);
+  //drawHistoWithQuarkGluonComponents( db, "omog", "", "ptDJet0", "ptDJet0", "p_{T}D", "", "Events", false, 80., 100., 4., 6., 40, 0.1);
+  //drawHistoWithQuarkGluonComponents( db, "omog", "", "QGLikelihoodJet0", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 80., 100., 4., 6.);
 
   // 100-150
+  db->set_rebin();
+  drawHistoWithQuarkGluonComponents( db, "omog", "", "ptJet0", "ptJet0", "Jet Transverse Momentum", "GeV", "Events", false, 100., 150., 4., 6., 50, 100., 150.);
   drawHistoWithQuarkGluonComponents( db, "omog", "", "nChargedJet0", "nChargedJet0", "Charged Multiplicity", "", "Events", false, 100., 150., 4., 6., 50, 0.5, 50.5);
   drawHistoWithQuarkGluonComponents( db, "omog", "", "nNeutralJet0", "nNeutralJet0", "Neutral Multiplicity", "", "Events", false, 100., 150., 4., 6., 50, 0.5, 50.5);
   drawHistoWithQuarkGluonComponents( db, "omog", "", "ptDJet0", "ptDJet0", "p_{T}D", "", "Events", false, 100., 150., 4., 6., 40, 0.1);
   drawHistoWithQuarkGluonComponents( db, "omog", "", "QGLikelihoodJet0", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 100., 150., 4., 6.);
 
   // 150-200
+  drawHistoWithQuarkGluonComponents( db, "omog", "", "ptJet0", "ptJet0", "Jet Transverse Momentum", "GeV", "Events", false, 150., 200., 4., 6., 50, 150., 200.);
   drawHistoWithQuarkGluonComponents( db, "omog", "", "nChargedJet0", "nChargedJet0", "Charged Multiplicity", "", "Events", false, 150., 200., 4., 6., 50, 0.5, 50.5);
   drawHistoWithQuarkGluonComponents( db, "omog", "", "nNeutralJet0", "nNeutralJet0", "Neutral Multiplicity", "", "Events", false, 150., 200., 4., 6., 50, 0.5, 50.5);
   drawHistoWithQuarkGluonComponents( db, "omog", "", "ptDJet0", "ptDJet0", "p_{T}D", "", "Events", false, 150., 200., 4., 6., 40, 0.1);
   drawHistoWithQuarkGluonComponents( db, "omog", "", "QGLikelihoodJet0", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 150., 200., 4., 6.);
 
   // 200-250
+  if( analyzerType=="QGStudies" ) db->set_rebin(2);
+  drawHistoWithQuarkGluonComponents( db, "omog", "", "ptJet0", "ptJet0", "Jet Transverse Momentum", "GeV", "Events", false, 200., 250., 4., 6., 50, 200., 250.);
+  db->set_rebin();
   drawHistoWithQuarkGluonComponents( db, "omog", "", "nChargedJet0", "nChargedJet0", "Charged Multiplicity", "", "Events", false, 200., 250., 4., 6., 50, 0.5, 50.5);
   drawHistoWithQuarkGluonComponents( db, "omog", "", "nNeutralJet0", "nNeutralJet0", "Neutral Multiplicity", "", "Events", false, 200., 250., 4., 6., 50, 0.5, 50.5);
   drawHistoWithQuarkGluonComponents( db, "omog", "", "ptDJet0", "ptDJet0", "p_{T}D", "", "Events", false, 200., 250., 4., 6., 40, 0.1);
   drawHistoWithQuarkGluonComponents( db, "omog", "", "QGLikelihoodJet0", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 200., 250., 4., 6.);
 
   // 250-300
+  drawHistoWithQuarkGluonComponents( db, "omog", "", "ptJet0", "ptJet0", "Jet Transverse Momentum", "GeV", "Events", false, 250., 300., 4., 6., 50, 250., 300.);
   drawHistoWithQuarkGluonComponents( db, "omog", "", "nChargedJet0", "nChargedJet0", "Charged Multiplicity", "", "Events", false, 250., 300., 4., 6., 50, 0.5, 50.5);
   drawHistoWithQuarkGluonComponents( db, "omog", "", "nNeutralJet0", "nNeutralJet0", "Neutral Multiplicity", "", "Events", false, 250., 300., 4., 6., 50, 0.5, 50.5);
   drawHistoWithQuarkGluonComponents( db, "omog", "", "ptDJet0", "ptDJet0", "p_{T}D", "", "Events", false, 250., 300., 4., 6., 40, 0.1);
   drawHistoWithQuarkGluonComponents( db, "omog", "", "QGLikelihoodJet0", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 250., 300., 4., 6.);
 
   // 300-400
+  drawHistoWithQuarkGluonComponents( db, "omog", "", "ptJet0", "ptJet0", "Jet Transverse Momentum", "GeV", "Events", false, 300., 400., 4., 6., 50, 300., 400.);
   drawHistoWithQuarkGluonComponents( db, "omog", "", "nChargedJet0", "nChargedJet0", "Charged Multiplicity", "", "Events", false, 300., 400., 4., 6., 50, 0.5, 50.5);
   drawHistoWithQuarkGluonComponents( db, "omog", "", "nNeutralJet0", "nNeutralJet0", "Neutral Multiplicity", "", "Events", false, 300., 400., 4., 6., 50, 0.5, 50.5);
   drawHistoWithQuarkGluonComponents( db, "omog", "", "ptDJet0", "ptDJet0", "p_{T}D", "", "Events", false, 300., 400., 4., 6., 40, 0.1);
   drawHistoWithQuarkGluonComponents( db, "omog", "", "QGLikelihoodJet0", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 300., 400., 4., 6.);
+
+  // 400-500
+  drawHistoWithQuarkGluonComponents( db, "omog", "", "ptJet0", "ptJet0", "Jet Transverse Momentum", "GeV", "Events", false, 400., 500., 4., 6., 50, 400., 500.);
+  drawHistoWithQuarkGluonComponents( db, "omog", "", "nChargedJet0", "nChargedJet0", "Charged Multiplicity", "", "Events", false, 400., 500., 4., 6., 80, 0.5, 80.5);
+  drawHistoWithQuarkGluonComponents( db, "omog", "", "nNeutralJet0", "nNeutralJet0", "Neutral Multiplicity", "", "Events", false, 400., 500., 4., 6., 80, 0.5, 80.5);
+  drawHistoWithQuarkGluonComponents( db, "omog", "", "ptDJet0", "ptDJet0", "p_{T}D", "", "Events", false, 400., 500., 4., 6., 40, 0.1);
+  drawHistoWithQuarkGluonComponents( db, "omog", "", "QGLikelihoodJet0", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 400., 500., 4., 6.);
 
   //drawHistoWithQuarkGluonComponents( db, "omog", "", "QGLikelihoodJet0", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 100., 150., 4., 6.);
   //drawHistoWithQuarkGluonComponents( db, "omog", "", "QGLikelihoodJet0", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 150., 200., 4., 6.);
@@ -423,11 +454,6 @@ int main(int argc, char* argv[]) {
 
   //drawHistoWithQuarkGluonComponents( db, "omog", "", "QGLikelihoodJet0", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 300., 400., 4., 6.);
   //drawHistoWithQuarkGluonComponents( db, "omog", "", "QGLikelihoodJet0", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 400., 500., 4., 6.);
-
-  drawHistoWithQuarkGluonComponents( db, "omog", "QGLikelihoodJet0<0.2", "nChargedJet0", "nChargedJet0_QG02", "Charged Multiplicity", "", "Events", false, 200., 250., 4., 6., 50, 0.5, 50.5);
-  drawHistoWithQuarkGluonComponents( db, "omog", "QGLikelihoodJet0<0.2", "nNeutralJet0", "nNeutralJet0_QG02", "Neutral Multiplicity", "", "Events", false, 200., 250., 4., 6., 50, 0.5, 50.5);
-  drawHistoWithQuarkGluonComponents( db, "omog", "QGLikelihoodJet0<0.2", "ptDJet0", "ptDJet0_QG02", "p_{T}D", "", "Events", false, 200., 250., 4., 6.);
-
 
 
   delete db;
@@ -439,7 +465,7 @@ int main(int argc, char* argv[]) {
 
 
 
-void drawHistoWithQuarkGluonComponents( DrawBase* db, const std::string& treeName, const std::string& additionalCuts, const std::string& varName, const std::string& canvasSaveName, const std::string& axisName, const std::string& units, const std::string& instanceName, bool log, float ptMin, float ptMax, float rhoMin, float rhoMax, int nBins, float xMin, float xMax ) {
+void drawHistoWithQuarkGluonComponents( DrawBase* db, const std::string& treeName, const std::string& additionalCuts, const std::string& varName, const std::string& canvasSaveName, std::string axisName, const std::string& units, const std::string& instanceName, bool log, float ptMin, float ptMax, float rhoMin, float rhoMax, int nBins, float xMin, float xMax ) {
 
 
   TString varName_tstr(varName);
@@ -464,9 +490,9 @@ void drawHistoWithQuarkGluonComponents( DrawBase* db, const std::string& treeNam
 
   char commonCondition[500];
   if( additionalCuts!="" )
-    sprintf( commonCondition, "%s && ptJet0>%f && ptJet0<%f && QGLikelihoodJet0>0. && rhoPF>%f && rhoPF<%f", additionalCuts.c_str(), ptMin, ptMax, rhoMin, rhoMax ); 
+    sprintf( commonCondition, "%s && ptJet0>%f && ptJet0<%f && QGLikelihoodJet0>0. && QGLikelihoodJet0<1. && rhoPF>%f && rhoPF<%f", additionalCuts.c_str(), ptMin, ptMax, rhoMin, rhoMax ); 
   else
-    sprintf( commonCondition, "ptJet0>%f && ptJet0<%f && QGLikelihoodJet0>0. && rhoPF>%f && rhoPF<%f", ptMin, ptMax, rhoMin, rhoMax ); 
+    sprintf( commonCondition, "ptJet0>%f && ptJet0<%f && QGLikelihoodJet0>0. && QGLikelihoodJet0<1. && rhoPF>%f && rhoPF<%f", ptMin, ptMax, rhoMin, rhoMax ); 
   //sprintf( commonCondition, "ptJet0>%f && ptJet0<%f", ptMin, ptMax ); 
 
   char allCondition[800];
@@ -582,12 +608,16 @@ void drawHistoWithQuarkGluonComponents( DrawBase* db, const std::string& treeNam
   TPaveText* sqrtLabel = db->get_labelSqrt();
 
   char yAxisTitle[200];
+  std::string units_text = (units!="") ? (" "+units) : "";
   if( (h1_data->GetBinWidth(1)) < 0.1 )
-    sprintf( yAxisTitle, "Events / (%.2f)", h1_data->GetBinWidth(1) );
+    sprintf( yAxisTitle, "Events / (%.2f%s)", h1_data->GetBinWidth(1), units_text.c_str() );
   else if( ((int)(10.*h1_data->GetBinWidth(1)) % 10) == 0 )
-    sprintf( yAxisTitle, "Events / (%.0f)", h1_data->GetBinWidth(1) );
+    sprintf( yAxisTitle, "Events / (%.0f%s)", h1_data->GetBinWidth(1), units_text.c_str() );
   else
-    sprintf( yAxisTitle, "Events / (%.1f)", h1_data->GetBinWidth(1) );
+    sprintf( yAxisTitle, "Events / (%.1f%s)", h1_data->GetBinWidth(1), units_text.c_str() );
+
+
+  if( units!="" ) axisName = axisName + " [" + units + "]";
 
 
   TH2D* h2_axes = new TH2D("axes", "", 10, xMin, xMax, 10, 0., yMax );
