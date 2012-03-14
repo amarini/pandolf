@@ -108,6 +108,12 @@ drawQGStudies: fitTools.o DrawBase.o drawQGStudies.C
 drawMultiJetQG: fitTools.o DrawBase.o drawMultiJetQG.C
 	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/ -o drawMultiJetQG drawMultiJetQG.C fitTools.o DrawBase.o $(ROOTFLAG) $(EXTRALIBS)
 
+drawDiMultiJetQG: fitTools.o DrawBase.o drawDiMultiJetQG.C
+	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/ -o drawDiMultiJetQG drawDiMultiJetQG.C fitTools.o DrawBase.o $(ROOTFLAG) $(EXTRALIBS)
+
+drawQGFits: fitTools.o DrawBase.o drawQGFits.cpp
+	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/ -o drawQGFits drawQGFits.cpp fitTools.o DrawBase.o $(ROOTFLAG) $(EXTRALIBS)
+
 drawVHgg: fitTools.o DrawBase.o drawVHgg.C
 	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/ -o drawVHgg drawVHgg.C fitTools.o DrawBase.o $(ROOTFLAG) $(EXTRALIBS)
 
