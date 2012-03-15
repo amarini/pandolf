@@ -62,7 +62,9 @@ while (ijob<nBlocks):
   outputfile.write(pwd+'/'+application+" "+dataset+" " + str(ijob)+" "+ str(nBlocks) + "\n") 
   # select this for GENJETS ntuples:
   #outputfile.write(pwd+'/'+application+" "+dataset+" "+recoType+" "+jetAlgo+" "+inputfilename+" _"+str(ijob)+" true\n")
-  outputfile.write('scp -o BatchMode=yes -o StrictHostKeyChecking=no ' + analyzerType + "_" + dataset + "_pfakt5_" + str(ijob) + '.root pccmsrm25:'+diskoutputmain+'\n') 
+  outfilename = analyzerType + "_" + dataset + "_pfakt5_" + str(ijob) + '.root'
+  outputfile.write('scp -o BatchMode=yes -o StrictHostKeyChecking=no ' + outfilename+ ' pccmsrm25:'+diskoutputmain+'\n') 
+  outputfile.write('rm ' + outfilename+ '\n') 
   outputfile.close()
   #print "chmod +x "+outputname
   os.popen("chmod +x "+outputname)
