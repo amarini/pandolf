@@ -88,6 +88,12 @@ TreeFinalizerC_MultiJet.o: TreeFinalizerC_MultiJet.C TreeFinalizer.o
 finalize_MultiJet: finalize_MultiJet.cpp TreeFinalizer.o TreeFinalizerC_MultiJet.o 
 	$(CC)  $(INCLUDES) -Wall -o finalize_MultiJet TreeFinalizer.o TreeFinalizerC_MultiJet.o finalize_MultiJet.cpp `${ROOTSYS}/bin/root-config --cflags --libs`
 
+TreeFinalizerC_QGStudies.o: TreeFinalizerC_QGStudies.C TreeFinalizer.o
+	$(CC) $(CFLAGS) $(INCLUDES) TreeFinalizer.o TreeFinalizerC_QGStudies.C $(ROOTFLAG)
+
+finalize_QGStudies: finalize_QGStudies.cpp TreeFinalizer.o TreeFinalizerC_QGStudies.o 
+	$(CC)  $(INCLUDES) -Wall -o finalize_QGStudies TreeFinalizer.o TreeFinalizerC_QGStudies.o finalize_QGStudies.cpp `${ROOTSYS}/bin/root-config --cflags --libs`
+
 
 make_omogeneizzato: make_omogeneizzato.cpp
 	$(CC)  $(INCLUDES) -Wall -o make_omogeneizzato make_omogeneizzato.cpp `${ROOTSYS}/bin/root-config --cflags --libs`
