@@ -11,6 +11,7 @@
 
 Float_t eventWeight_out;
 Float_t ptJet0_out;
+Float_t etaJet0_out;
 Int_t pdgIdJet0_out;
 Int_t nChargedJet0_out;
 Int_t nNeutralJet0_out;
@@ -194,9 +195,15 @@ int main( int argc, char* argv[] ) {
   Bool_t passed_Photon135;
   if( controlSample=="PhotonJet" )
     chain->SetBranchAddress( "passed_Photon135", &passed_Photon135);
+  Bool_t passedID_no2ndJet;
+  if( controlSample=="PhotonJet" )
+    chain->SetBranchAddress( "passedID_no2ndJet", &passedID_no2ndJet);
+  Bool_t btagged;
+  if( controlSample=="PhotonJet" )
+    chain->SetBranchAddress( "btagged", &btagged);
 
 
-  std::string outfileName = "Omog_" + controlSample + "_" + dataset + ".root";
+  std::string outfileName = "Omog_" + analyzerType + "_" + dataset + ".root";
   TFile* outfile = TFile::Open( outfileName.c_str(), "RECREATE" );
   outfile->cd();
 
@@ -204,6 +211,7 @@ int main( int argc, char* argv[] ) {
   tree_omogeneizzato->Branch( "eventWeight", &eventWeight_out, "eventWeight/F" );
   tree_omogeneizzato->Branch( "rhoPF", &rhoPF, "rhoPF/F" );
   tree_omogeneizzato->Branch( "ptJet0", &ptJet0_out, "ptJet0_out/F" );
+  tree_omogeneizzato->Branch( "etaJet0", &etaJet0_out, "etaJet0_out/F" );
   tree_omogeneizzato->Branch( "pdgIdJet0", &pdgIdJet0_out, "pdgIdJet0_out/I" );
   tree_omogeneizzato->Branch( "nChargedJet0", &nChargedJet0_out, "nChargedJet0_out/I" );
   tree_omogeneizzato->Branch( "nNeutralJet0", &nNeutralJet0_out, "nNeutralJet0_out/I" );
@@ -222,6 +230,8 @@ int main( int argc, char* argv[] ) {
     if( controlSample=="DiJet" ) {
       if( ptJet2 > 0.2*(ptJet0+ptJet1)/2. ) continue; //dijet selection
     } else {
+      if( !passedID_no2ndJet ) continue;
+      if( btagged ) continue;
       if( ptJet1 > 0.2*(ptPhot) && ptJet1>10. ) continue; //dijet selection
     }
 
@@ -509,6 +519,7 @@ bool fillFromTrigger( TTree* tree, bool passedHLT, float HLTvar, float HLTvar_th
     if( jets[i].pt<ptMin || jets[i].pt>ptMax ) continue;
 
     ptJet0_out = jets[i].pt;
+    etaJet0_out = jets[i].eta;
     nChargedJet0_out = jets[i].nCharged;
     nNeutralJet0_out = jets[i].nNeutral;
     ptDJet0_out = jets[i].ptD;
