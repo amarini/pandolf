@@ -41,9 +41,7 @@ os.system("mkdir -p "+dir+"/input/")
 os.system("mkdir -p "+dir+"/src/")
 
 if diskoutputdir != "none": 
-    os.system("mkdir -p "+diskoutputmain)
-
-os.system("ssh -o BatchMode=yes -o StrictHostKeyChecking=no pccmsrm25 mkdir -p "+diskoutputmain)
+  os.system("ssh -o BatchMode=yes -o StrictHostKeyChecking=no pccmsrm25 mkdir -p "+diskoutputmain)
 
 pwd = os.environ['PWD']
 
@@ -64,14 +62,15 @@ while (ijob<nBlocks):
   outputfile.write(pwd+'/'+application+" "+dataset+" " + str(ijob)+" "+ str(nBlocks) + "\n") 
   # select this for GENJETS ntuples:
   #outputfile.write(pwd+'/'+application+" "+dataset+" "+recoType+" "+jetAlgo+" "+inputfilename+" _"+str(ijob)+" true\n")
-  outputfile.write('mv /tmp/pandolf/' + analyzerType + "_" + dataset + "_pfakt5_" + str(ijob) + '.root '+diskoutputmain+'\n') 
+  outputfile.write('scp -o BatchMode=yes -o StrictHostKeyChecking=no ' + analyzerType + "_" + dataset + "_pfakt5_" + str(ijob) + '.root pccmsrm25:'+diskoutputmain+'\n') 
   outputfile.close()
   #print "chmod +x "+outputname
   os.popen("chmod +x "+outputname)
-  #os.system("echo qsub -q "+queue+" -o "+dir+"/log/"+dataset+"_"+str(ijob)+".log "+pwd+"/"+outputname)
-  #out = os.popen("echo qsub -q "+queue+" -o "+dir+"/log/"+dataset+"_"+str(ijob)+".log "+pwd+"/"+outputname+" -copyInput="+dataset+"_"+str(ijob))
+  #os.system("echo bsub -q "+queue+" -o "+dir+"/log/"+dataset+"_"+str(ijob)+".log "+pwd+"/"+outputname)
+  #out = os.popen("echo bsub -q "+queue+" -o "+dir+"/log/"+dataset+"_"+str(ijob)+".log "+pwd+"/"+outputname+" -copyInput="+dataset+"_"+str(ijob))
   os.system("ls -lah "+pwd+"/"+outputname)
-  command = "qsub -q "+queue+" -o "+pwd+"/"+dir+"/log/"+dataset+"_"+str(ijob)+".log  -e "+pwd+"/"+dir+"/log/"+dataset+"_"+str(ijob)+".err "+pwd+"/"+outputname+" -copyInput="+dataset+"_"+str(ijob)
+  command = "bsub -q "+queue+" -o "+pwd+"/"+dir+"/log/"+dataset+"_"+str(ijob)+".log  -e "+pwd+"/"+dir+"/log/"+dataset+"_"+str(ijob)+".err "+pwd+"/"+outputname+" -copyInput="+dataset+"_"+str(ijob)
   print command
   os.system(command)
   ijob = ijob+1
+  time.sleep(2.)
