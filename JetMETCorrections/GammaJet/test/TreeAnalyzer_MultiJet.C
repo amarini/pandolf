@@ -251,6 +251,39 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        thisJet.nHFEMReco = nHFEM[iRecoJet];
 
 
+       //match to gen jet:
+       int i_foundJetGen=-1;
+       float bestDeltaRJetGen=999.;
+       for( unsigned iJetGen=0; iJetGen<nJetGen; ++iJetGen ) {
+ 
+         TLorentzVector thisJetGen;
+         thisJetGen.SetPtEtaPhiE( ptJetGen[iJetGen], etaJetGen[iJetGen], phiJetGen[iJetGen], eJetGen[iJetGen] );
+
+         if( thisJetGen.Pt() < 3. ) continue;
+             
+         float thisDeltaR = thisJetGen.DeltaR(thisJet);
+      
+           if( thisDeltaR<bestDeltaRJetGen ) {
+             bestDeltaRJetGen = thisDeltaR;
+             i_foundJetGen = iJetGen;
+           }
+
+       } //for gen jets
+
+       if( i_foundJetGen!=-1 ) {
+         thisJet.ptGen = ptJetGen[i_foundJetGen];
+         thisJet.etaGen = etaJetGen[i_foundJetGen];
+         thisJet.phiGen = phiJetGen[i_foundJetGen];
+         thisJet.eGen = eJetGen[i_foundJetGen];
+       } else {
+         thisJet.ptGen = 0.;
+         thisJet.etaGen = 0.;
+         thisJet.phiGen = 0.;
+         thisJet.eGen = 0.;
+       }
+
+
+
        //match to parton:
        int i_foundPart=-1;
        float bestDeltaRPart=999.;
@@ -350,6 +383,11 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        nElectronsJet_[iJet] = jets[iJet]->nElectronsReco;
        nHFHadronsJet_[iJet] = jets[iJet]->nHFHadronsReco;
        nHFEMJet_[iJet] = jets[iJet]->nHFEMReco;
+
+       eJetGen_[iJet]  =  jets[iJet]->eGen;
+       ptJetGen_[iJet]  =  jets[iJet]->ptGen;
+       phiJetGen_[iJet] = jets[iJet]->phiGen;
+       etaJetGen_[iJet] = jets[iJet]->etaGen;
 
        ePartJet_[iJet]  =  jets[iJet]->ePart;
        ptPartJet_[iJet]  =  jets[iJet]->ptPart;
