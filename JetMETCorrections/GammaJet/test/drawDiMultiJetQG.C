@@ -135,12 +135,12 @@ int main(int argc, char* argv[]) {
   
 
 
-  //selection_pt0 = "eventWeight*(ptJet0 > 50. && ptJet0 < 100.)";
-  //std::string triggerPath = ( analyzerType=="QGStudies" ) ? "HLT_Photon50" : "HLT_HT150";
-  //db->set_legendTitle( triggerPath );
+  selection_pt0 = "eventWeight*(ptJet0 > 50. && ptJet0 < 100.)";
+  std::string triggerPath = ( analyzerType=="QGStudies" ) ? "HLT_Photon50" : "HLT_HT150";
+  db->set_legendTitle( triggerPath );
 
-  //db->drawHisto_fromTree( "omog", "nvertex", selection_pt0.c_str(), 20, 0.5, 20.5, "nvertex_pt50100", "Number of Reconstructed Vertexes", "", "Events", true);
-  //db->drawHisto_fromTree( "omog", "rhoPF", selection_pt0.c_str(), 50, 0., 20., "rhoPF_pt50100", "Particle Flow Energy Density (#rho)", "GeV", "Events", true);
+  db->drawHisto_fromTree( "omog", "nvertex", selection_pt0.c_str(), 20, 0.5, 20.5, "nvertex_pt50100", "Number of Reconstructed Vertexes", "", "Events", true);
+  db->drawHisto_fromTree( "omog", "rhoPF", selection_pt0.c_str(), 50, 0., 20., "rhoPF_pt50100", "Particle Flow Energy Density (#rho)", "GeV", "Events", true);
 /*
 
   db->drawHisto_fromTree( "omog", "trigVar", selection_pt0.c_str(), 50, 150., 500., "triggerVar_pt50100", triggerVar, "GeV", "Events", true);
@@ -242,12 +242,12 @@ int main(int argc, char* argv[]) {
 
 */
 
-  //selection_pt0 = "eventWeight*(ptJet0 > 100. && ptJet0 < 150.)";
-  //triggerPath = ( analyzerType=="QGStudies" ) ? "HLT_Photon90" : "HLT_HT400";
-  //db->set_legendTitle( triggerPath );
+  selection_pt0 = "eventWeight*(ptJet0 > 100. && ptJet0 < 150.)";
+  triggerPath = ( analyzerType=="QGStudies" ) ? "HLT_Photon90" : "HLT_HT200";
+  db->set_legendTitle( triggerPath );
 
-  //db->drawHisto_fromTree( "omog", "nvertex", selection_pt0.c_str(), 20, 0.5, 20.5, "nvertex_pt100150", "Number of Reconstructed Vertexes", "", "Events", true);
-  //db->drawHisto_fromTree( "omog", "rhoPF", selection_pt0.c_str(), 50, 0., 20., "rhoPF_pt100150", "Particle Flow Energy Density (#rho)", "GeV", "Events", true);
+  db->drawHisto_fromTree( "omog", "nvertex", selection_pt0.c_str(), 20, 0.5, 20.5, "nvertex_pt100150", "Number of Reconstructed Vertexes", "", "Events", true);
+  db->drawHisto_fromTree( "omog", "rhoPF", selection_pt0.c_str(), 50, 0., 20., "rhoPF_pt100150", "Particle Flow Energy Density (#rho)", "GeV", "Events", true);
 
 
 /*
@@ -263,18 +263,19 @@ int main(int argc, char* argv[]) {
   //db->drawHisto_fromTree( "omog", "QGLikelihoodJet0", selection_pt0.c_str(),      50, 0., 1.0001, "QGLikelihoodJet0_pt100150", "Jet Q-G LD", "", "Events", true);
 
 
-
+*/
 
 
   
   selection_pt0 = "eventWeight*(ptJet0 > 150. && ptJet0 < 200.)";
-  db->set_legendTitle( "150 < p_{T} < 200 GeV");
+  triggerPath = ( analyzerType=="QGStudies" ) ? "HLT_Photon135" : "HLT_HT350";
+  db->set_legendTitle( triggerPath );
 
   db->drawHisto_fromTree( "omog", "nvertex", selection_pt0.c_str(), 30, 0.5, 30.5, "nvertex_pt150200", "Number of Reconstructed Vertexes", "", "Events", true);
-  //db->drawHisto_fromTree( "omog", "rhoPF", selection_pt0.c_str(), 50, 0., 20., "rhoPF_pt150200", "Particle Flow Energy Density (#rho)", "GeV", "Events", true);
+  db->drawHisto_fromTree( "omog", "rhoPF", selection_pt0.c_str(), 50, 0., 20., "rhoPF_pt150200", "Particle Flow Energy Density (#rho)", "GeV", "Events", true);
 
-  db->drawHisto_fromTree( "omog", "trigVar", selection_pt0.c_str(), 50, 150., 600., "triggerVar_pt150200", triggerVar, "GeV", "Events", true);
-  db->drawHisto_fromTree( "omog", "ptJet0", selection_pt0.c_str(), 25, 150., 200., "ptJet0_pt150200", "Jet p_{T}", "GeV", "Events", true);
+  //db->drawHisto_fromTree( "omog", "trigVar", selection_pt0.c_str(), 50, 150., 600., "triggerVar_pt150200", triggerVar, "GeV", "Events", true);
+  //db->drawHisto_fromTree( "omog", "ptJet0", selection_pt0.c_str(), 25, 150., 200., "ptJet0_pt150200", "Jet p_{T}", "GeV", "Events", true);
 
   //db->set_legendTitle( "150 < p_{T} < 200 GeV");
   //db->drawHisto_fromTree( "omog", "nChargedJet0", selection_pt0.c_str(), 51, -0.5, 50.5, "nChargedJet0_pt150200", "Jet Charged Multiplicity", "", "Events", true);
@@ -291,14 +292,14 @@ int main(int argc, char* argv[]) {
 
  
 
-*/
 
-  //selection_pt0 = "eventWeight*(ptJet0 > 200. && ptJet0 < 250.)";
-  //triggerPath = ( analyzerType=="QGStudies" ) ? "HLT_Photon135" : "HLT_HT400";
-  //db->set_legendTitle( triggerPath );
 
-  //db->drawHisto_fromTree( "omog", "nvertex", selection_pt0.c_str(), 20, 0.5, 20.5, "nvertex_pt200250", "Number of Reconstructed Vertexes", "", "Events", true);
-  //db->drawHisto_fromTree( "omog", "rhoPF", selection_pt0.c_str(), 50, 0., 20., "rhoPF_pt200250", "Particle Flow Energy Density (#rho)", "GeV", "Events", true);
+  selection_pt0 = "eventWeight*(ptJet0 > 200. && ptJet0 < 250.)";
+  triggerPath = ( analyzerType=="QGStudies" ) ? "HLT_Photon135" : "HLT_HT400";
+  db->set_legendTitle( triggerPath );
+
+  db->drawHisto_fromTree( "omog", "nvertex", selection_pt0.c_str(), 20, 0.5, 20.5, "nvertex_pt200250", "Number of Reconstructed Vertexes", "", "Events", true);
+  db->drawHisto_fromTree( "omog", "rhoPF", selection_pt0.c_str(), 50, 0., 20., "rhoPF_pt200250", "Particle Flow Energy Density (#rho)", "GeV", "Events", true);
 
 /*
 
@@ -314,15 +315,18 @@ int main(int argc, char* argv[]) {
 
   db->set_legendTitle("");
 
-
+*/
   
   
   selection_pt0 = "eventWeight*(ptJet0 > 250. && ptJet0 < 300.)";
-  db->set_legendTitle( "250 < p_{T} < 300 GeV");
+  triggerPath = ( analyzerType=="QGStudies" ) ? "HLT_Photon135" : "HLT_HT500";
+  db->set_legendTitle( triggerPath );
 
-  db->drawHisto_fromTree( "omog", "nvertex", selection_pt0.c_str(), 30, 0.5, 30.5, "nvertex_pt250300", "Number of Reconstructed Vertexes", "", "Events", true);
-  //db->drawHisto_fromTree( "omog", "rhoPF", selection_pt0.c_str(), 50, 0., 20., "rhoPF_pt250300", "Particle Flow Energy Density (#rho)", "GeV", "Events", true);
+  db->drawHisto_fromTree( "omog", "nvertex", selection_pt0.c_str(), 20, 0.5, 20.5, "nvertex_pt250300", "Number of Reconstructed Vertexes", "", "Events", true);
+  db->drawHisto_fromTree( "omog", "rhoPF", selection_pt0.c_str(), 50, 0., 20., "rhoPF_pt250300", "Particle Flow Energy Density (#rho)", "GeV", "Events", true);
 
+
+/*
   db->drawHisto_fromTree( "omog", "trigVar", selection_pt0.c_str(), 50, 200., 1000., "triggerVar_pt250300", triggerVar, "GeV", "Events", true);
   db->drawHisto_fromTree( "omog", "ptJet0", selection_pt0.c_str(), 25, 250., 300., "ptJet0_pt250300", "Jet p_{T}", "GeV", "Events", true);
 
@@ -335,28 +339,38 @@ int main(int argc, char* argv[]) {
 
   db->set_legendTitle("");
 
+*/
 
 
   selection_pt0 = "eventWeight*(ptJet0 > 300. && ptJet0 < 400.)";
-  db->set_legendTitle( "300 < p_{T} < 400 GeV");
+  triggerPath = ( analyzerType=="QGStudies" ) ? "HLT_Photon135" : "HLT_HT600";
+  db->set_legendTitle( triggerPath );
 
-  db->drawHisto_fromTree( "omog", "nvertex", selection_pt0.c_str(), 30, 0.5, 30.5, "nvertex_pt300400", "Number of Reconstructed Vertexes", "", "Events", true);
-//db->drawHisto_fromTree( "omog", "rhoPF", selection_pt0.c_str(), 50, 0., 20., "rhoPF_pt300400", "Particle Flow Energy Density (#rho)", "GeV", "Events", true);
+  db->drawHisto_fromTree( "omog", "nvertex", selection_pt0.c_str(), 20, 0.5, 20.5, "nvertex_pt300400", "Number of Reconstructed Vertexes", "", "Events", true);
+  db->drawHisto_fromTree( "omog", "rhoPF", selection_pt0.c_str(), 50, 0., 20., "rhoPF_pt300400", "Particle Flow Energy Density (#rho)", "GeV", "Events", true);
 
-  db->drawHisto_fromTree( "omog", "trigVar", selection_pt0.c_str(), 50, 300., 1200., "triggerVar_pt300400", triggerVar, "GeV", "Events", true);
-  db->drawHisto_fromTree( "omog", "ptJet0", selection_pt0.c_str(), 25, 300., 400., "ptJet0_pt300400", "Jet p_{T}", "GeV", "Events", true);
+
+
+//db->drawHisto_fromTree( "omog", "trigVar", selection_pt0.c_str(), 50, 300., 1200., "triggerVar_pt300400", triggerVar, "GeV", "Events", true);
+//db->drawHisto_fromTree( "omog", "ptJet0", selection_pt0.c_str(), 25, 300., 400., "ptJet0_pt300400", "Jet p_{T}", "GeV", "Events", true);
 
 //db->drawHisto_fromTree( "omog", "nChargedJet0", selection_pt0.c_str(), 51, -0.5, 50.5, "nChargedJet0_pt300400", "Jet Charged Multiplicity", "", "Events", true);
 //db->drawHisto_fromTree( "omog", "nNeutralJet0", selection_pt0.c_str(), 51, -0.5, 50.5, "nNeutralJet0_pt300400", "Jet Neutral Multiplicity", "", "Events", true);
 //db->drawHisto_fromTree( "omog", "ptDJet0", selection_pt0.c_str(),      50, 0., 1.0001, "ptDJet0_pt300400", "Jet p_{T}D", "", "Events", true);
-  db->drawHisto_fromTree( "omog", "QGLikelihoodJet0", selection_pt0.c_str(),      50, 0., 1.0001, "QGLikelihoodJet0_pt300400", "Jet Q-G LD", "", "Events", true);
+//db->drawHisto_fromTree( "omog", "QGLikelihoodJet0", selection_pt0.c_str(),      50, 0., 1.0001, "QGLikelihoodJet0_pt300400", "Jet Q-G LD", "", "Events", true);
 
 
   db->set_legendTitle("");
 
 
-*/
 //// other pt bin:
+  selection_pt0 = "eventWeight*(ptJet0 > 400. && ptJet0 < 500.)";
+  triggerPath = ( analyzerType=="QGStudies" ) ? "HLT_Photon135" : "HLT_HT600";
+  db->set_legendTitle( triggerPath );
+
+  db->drawHisto_fromTree( "omog", "nvertex", selection_pt0.c_str(), 20, 0.5, 20.5, "nvertex_pt400500", "Number of Reconstructed Vertexes", "", "Events", true);
+  db->drawHisto_fromTree( "omog", "rhoPF", selection_pt0.c_str(), 50, 0., 20., "rhoPF_pt400500", "Particle Flow Energy Density (#rho)", "GeV", "Events", true);
+
 //selection_pt0 = "eventWeight*(ptJet0 > 400. && ptJet0 < 500.)";
 //db->set_legendTitle( "400 < p_{T} < 500 GeV");
 
