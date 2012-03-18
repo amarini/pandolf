@@ -40,19 +40,19 @@ bool fillFromTrigger( TTree* tree, bool passedHLT, float HLTvar, float HLTvar_th
 int main( int argc, char* argv[] ) {
 
   if( argc!=2 && argc!=3 ) {
-    std::cout << "Usage: ./make_omogeneizzato [DiJet/PhotonJet] [dataset]" << std::endl;
+    std::cout << "Usage: ./make_omogeneizzato [DiJet/MultiJet/PhotonJet] [dataset]" << std::endl;
     exit(11);
   }
 
 
   std::string controlSample(argv[1]);
 
-  if( controlSample!="DiJet" && controlSample!="PhotonJet" ) {
-    std::cout << "Only Dijet and PhotonJet analyzer types supported." << std::endl;
+  if( controlSample!="DiJet" && controlSample!="PhotonJet" && controlSample!="MultiJet" ) {
+    std::cout << "Only Dijet, MultiJet and PhotonJet analyzer types supported." << std::endl;
     exit(13);
   }
 
-  std::string analyzerType = (controlSample=="DiJet") ? "DiJet" : "QGStudies";
+  std::string analyzerType = (controlSample=="PhotonJet") ? "QGStudies" : controlSample;
 
   std::string dataset="";
   if( argc>2 ) {
@@ -61,11 +61,10 @@ int main( int argc, char* argv[] ) {
   }
 
   if( dataset=="" ) { //default: data
-    dataset = (controlSample=="DiJet") ? "HT_Run2011_FULL" : "Photon_Run2011_FULL";
+    dataset = (controlSample=="PhotonJet") ? "Photon_Run2011_FULL" : "HT_Run2011_FULL";
   }
 
   std::string infileName = analyzerType + "_" + dataset;
-  if( controlSample=="PhotonJet" ) infileName = infileName + "_pfakt5";
   infileName = infileName + ".root";
   TFile* infile = TFile::Open(infileName.c_str());
   TTree* chain = (TTree*)infile->Get("tree_passedEvents");
@@ -87,6 +86,8 @@ int main( int argc, char* argv[] ) {
   Float_t eventWeight_noPU;
   chain->SetBranchAddress( "eventWeight_noPU", &eventWeight_noPU );
 
+  Int_t nvertex;
+  chain->SetBranchAddress( "nvertex", &nvertex );
   Float_t rhoPF;
   chain->SetBranchAddress( "rhoPF", &rhoPF );
 
@@ -95,85 +96,85 @@ int main( int argc, char* argv[] ) {
   Float_t ptJet1;
   chain->SetBranchAddress( "ptJet1", &ptJet1 );
   Float_t ptJet2;
-  if( controlSample=="DiJet" )
+  if( controlSample=="DiJet" || controlSample=="MultiJet" )
     chain->SetBranchAddress( "ptJet2", &ptJet2 );
 
   Float_t etaJet0;
   chain->SetBranchAddress( "etaJet0", &etaJet0 );
   Float_t etaJet1;
-  if( controlSample=="DiJet" )
+  if( controlSample=="DiJet" || controlSample=="MultiJet" )
     chain->SetBranchAddress( "etaJet1", &etaJet1 );
 
   Int_t pdgIdJet0;
   chain->SetBranchAddress( "pdgIdPartJet0", &pdgIdJet0 );
   Int_t pdgIdJet1;
-  if( controlSample=="DiJet" )
+  if( controlSample=="DiJet" || controlSample=="MultiJet" )
     chain->SetBranchAddress( "pdgIdPartJet1", &pdgIdJet1 );
 
   Int_t nChargedJet0;
   chain->SetBranchAddress( "nChargedJet0", &nChargedJet0 );
   Int_t nChargedJet1;
-  if( controlSample=="DiJet" )
+  if( controlSample=="DiJet" || controlSample=="MultiJet" )
     chain->SetBranchAddress( "nChargedJet1", &nChargedJet1 );
 
   Int_t nNeutralJet0;
   chain->SetBranchAddress( "nNeutralJet0", &nNeutralJet0 );
   Int_t nNeutralJet1;
-  if( controlSample=="DiJet" )
+  if( controlSample=="DiJet" || controlSample=="MultiJet" )
     chain->SetBranchAddress( "nNeutralJet1", &nNeutralJet1 );
 
   Float_t ptDJet0;
   chain->SetBranchAddress( "ptDJet0", &ptDJet0 );
   Float_t ptDJet1;
-  if( controlSample=="DiJet" )
+  if( controlSample=="DiJet" || controlSample=="MultiJet" )
     chain->SetBranchAddress( "ptDJet1", &ptDJet1 );
 
   Float_t QGLikelihoodJet0;
   chain->SetBranchAddress( "QGLikelihoodJet0", &QGLikelihoodJet0 );
   Float_t QGLikelihoodJet1;
-  if( controlSample=="DiJet" )
+  if( controlSample=="DiJet" || controlSample=="MultiJet" )
     chain->SetBranchAddress( "QGLikelihoodJet1", &QGLikelihoodJet1 );
 
   Float_t ht_akt5;
-  if( controlSample=="DiJet" )
+  if( controlSample=="DiJet" || controlSample=="MultiJet" )
     chain->SetBranchAddress( "ht_akt5", &ht_akt5 );
 
   Bool_t passed_HT150;
-  if( controlSample=="DiJet" )
+  if( controlSample=="DiJet" || controlSample=="MultiJet" )
     chain->SetBranchAddress( "passed_HT150", &passed_HT150);
   Bool_t passed_HT250;
-  if( controlSample=="DiJet" )
+  if( controlSample=="DiJet" || controlSample=="MultiJet" )
     chain->SetBranchAddress( "passed_HT250", &passed_HT250);
   Bool_t passed_HT350;
-  if( controlSample=="DiJet" )
+  if( controlSample=="DiJet" || controlSample=="MultiJet" )
     chain->SetBranchAddress( "passed_HT350", &passed_HT350);
   Bool_t passed_HT400;
-  if( controlSample=="DiJet" )
+  if( controlSample=="DiJet" || controlSample=="MultiJet" )
     chain->SetBranchAddress( "passed_HT400", &passed_HT400);
   Bool_t passed_HT500;
-  if( controlSample=="DiJet" )
+  if( controlSample=="DiJet" || controlSample=="MultiJet" )
     chain->SetBranchAddress( "passed_HT500", &passed_HT500);
   Bool_t passed_HT600;
-  if( controlSample=="DiJet" )
+  if( controlSample=="DiJet" || controlSample=="MultiJet" )
     chain->SetBranchAddress( "passed_HT600", &passed_HT600);
 
   Float_t PUWeight_HT150;
-  if( controlSample=="DiJet" )
+  if( controlSample=="DiJet" || controlSample=="MultiJet" )
     chain->SetBranchAddress( "PUWeight_HT150", &PUWeight_HT150);
   Float_t PUWeight_HT250;
-  if( controlSample=="DiJet" )
+  if( controlSample=="DiJet" || controlSample=="MultiJet" )
     chain->SetBranchAddress( "PUWeight_HT250", &PUWeight_HT250);
   Float_t PUWeight_HT350;
-  if( controlSample=="DiJet" )
+  if( controlSample=="DiJet" || controlSample=="MultiJet" )
     chain->SetBranchAddress( "PUWeight_HT350", &PUWeight_HT350);
   Float_t PUWeight_HT400;
-  if( controlSample=="DiJet" )
+  if( controlSample=="DiJet" || controlSample=="MultiJet" )
     chain->SetBranchAddress( "PUWeight_HT400", &PUWeight_HT400);
   Float_t PUWeight_HT500;
-  if( controlSample=="DiJet" )
+  if( controlSample=="DiJet" || controlSample=="MultiJet" )
     chain->SetBranchAddress( "PUWeight_HT500", &PUWeight_HT500);
   Float_t PUWeight_HT600;
-  if( controlSample=="DiJet" )
+  if( controlSample=="DiJet" || controlSample=="MultiJet" )
     chain->SetBranchAddress( "PUWeight_HT600", &PUWeight_HT600);
 
 
@@ -207,9 +208,15 @@ int main( int argc, char* argv[] ) {
   TFile* outfile = TFile::Open( outfileName.c_str(), "RECREATE" );
   outfile->cd();
 
+
   TTree* tree_omogeneizzato = new TTree("omog", "");
   tree_omogeneizzato->Branch( "eventWeight", &eventWeight_out, "eventWeight/F" );
+  tree_omogeneizzato->Branch( "nvertex", &nvertex, "nvertex/I" );
   tree_omogeneizzato->Branch( "rhoPF", &rhoPF, "rhoPF/F" );
+  if( controlSample=="PhotonJet" )
+    tree_omogeneizzato->Branch( "trigVar", &ptPhot, "ptPhot/F" );
+  else if( controlSample=="DiJet" || controlSample=="MultiJet" )
+    tree_omogeneizzato->Branch( "trigVar", &ht_akt5, "ht_akt5/F" );
   tree_omogeneizzato->Branch( "ptJet0", &ptJet0_out, "ptJet0_out/F" );
   tree_omogeneizzato->Branch( "etaJet0", &etaJet0_out, "etaJet0_out/F" );
   tree_omogeneizzato->Branch( "pdgIdJet0", &pdgIdJet0_out, "pdgIdJet0_out/I" );
@@ -229,10 +236,10 @@ int main( int argc, char* argv[] ) {
 
     if( controlSample=="DiJet" ) {
       if( ptJet2 > 0.2*(ptJet0+ptJet1)/2. ) continue; //dijet selection
-    } else {
-      if( !passedID_no2ndJet ) continue;
+    } else if( controlSample=="PhotonJet" ) {
+      if( !passedID_no2ndJet ) continue; 
       if( btagged ) continue;
-      if( ptJet1 > 0.2*(ptPhot) && ptJet1>10. ) continue; //dijet selection
+      if( ptJet1 > 0.2*(ptPhot) && ptJet1>10. ) continue; //photonjet selection
     }
 
 
@@ -249,7 +256,7 @@ int main( int argc, char* argv[] ) {
     std::vector<DummyJet> jets;
     jets.push_back(jet0);
 
-    if( controlSample=="DiJet" ) {
+    if( controlSample=="DiJet" || controlSample=="MultiJet" ) {
 
       DummyJet jet1;
       jet1.pt  = ptJet1;
@@ -285,212 +292,6 @@ int main( int argc, char* argv[] ) {
 
   } // for entries
 
-/*
-    if( passed_HT150 ) {
-
-      if( ht_akt5 < 160. ) continue;
-
-      bool firstJetOK =  ( ptJet0>50. && ptJet0<100. && fabs(etaJet0)<2. );
-      bool secondJetOK = ( ptJet1>50. && ptJet1<100. && fabs(etaJet1)<2. );
-
-      if( firstJetOK ) {
-  
-        ptJet0_out = ptJet0;
-        nChargedJet0_out = nChargedJet0;
-        nNeutralJet0_out = nNeutralJet0;
-        ptDJet0_out = ptDJet0;
-        QGLikelihoodJet0_out = QGLikelihoodJet0;
-
-        tree_omogeneizzato->Fill();
-
-      }
-
-      if( secondJetOK ) {
-  
-        ptJet0_out = ptJet1;
-        nChargedJet0_out = nChargedJet1;
-        nNeutralJet0_out = nNeutralJet1;
-        ptDJet0_out = ptDJet1;
-        QGLikelihoodJet0_out = QGLikelihoodJet1;
-
-        tree_omogeneizzato->Fill();
-
-      }
-
-    } // if HT150
-
-
-    else if( passed_HT250 ) {
-
-      if( ht_akt5 < 265. ) continue;
-
-      bool firstJetOK = ( ptJet0>100. && ptJet0<150. && fabs(etaJet0)<2. );
-      bool secondJetOK = ( ptJet1>100. && ptJet1<150.&& fabs(etaJet1)<2.  );
-
-      if( firstJetOK ) {
-  
-        ptJet0_out = ptJet0;
-        nChargedJet0_out = nChargedJet0;
-        nNeutralJet0_out = nNeutralJet0;
-        ptDJet0_out = ptDJet0;
-        QGLikelihoodJet0_out = QGLikelihoodJet0;
-
-        tree_omogeneizzato->Fill();
-
-      }
-
-      if( secondJetOK ) {
-  
-        ptJet0_out = ptJet1;
-        nChargedJet0_out = nChargedJet1;
-        nNeutralJet0_out = nNeutralJet1;
-        ptDJet0_out = ptDJet1;
-        QGLikelihoodJet0_out = QGLikelihoodJet1;
-
-        tree_omogeneizzato->Fill();
-
-      }
-
-    } // if HT250
-
-
-    else if( passed_HT350 ) {
-
-      if( ht_akt5 < 365. ) continue;
-
-      bool firstJetOK =  ( ptJet0>150. && ptJet0<200. && fabs(etaJet0)<2. );
-      bool secondJetOK = ( ptJet1>150. && ptJet1<200. && fabs(etaJet1)<2. );
-
-      if( firstJetOK ) {
-  
-        ptJet0_out = ptJet0;
-        nChargedJet0_out = nChargedJet0;
-        nNeutralJet0_out = nNeutralJet0;
-        ptDJet0_out = ptDJet0;
-        QGLikelihoodJet0_out = QGLikelihoodJet0;
-
-        tree_omogeneizzato->Fill();
-
-      }
-
-      if( secondJetOK ) {
-  
-        ptJet0_out = ptJet1;
-        nChargedJet0_out = nChargedJet1;
-        nNeutralJet0_out = nNeutralJet1;
-        ptDJet0_out = ptDJet1;
-        QGLikelihoodJet0_out = QGLikelihoodJet1;
-
-        tree_omogeneizzato->Fill();
-
-      }
-
-    } // if HT350
-
-
-    else if( passed_HT400 ) {
-
-      if( ht_akt5 < 420. ) continue;
-
-      bool firstJetOK =  ( ptJet0>200. && ptJet0<250. && fabs(etaJet0)<2. );
-      bool secondJetOK = ( ptJet1>200. && ptJet1<250. && fabs(etaJet1)<2. );
-
-      if( firstJetOK ) {
-  
-        ptJet0_out = ptJet0;
-        nChargedJet0_out = nChargedJet0;
-        nNeutralJet0_out = nNeutralJet0;
-        ptDJet0_out = ptDJet0;
-        QGLikelihoodJet0_out = QGLikelihoodJet0;
-
-        tree_omogeneizzato->Fill();
-
-      }
-
-      if( secondJetOK ) {
-  
-        ptJet0_out = ptJet1;
-        nChargedJet0_out = nChargedJet1;
-        nNeutralJet0_out = nNeutralJet1;
-        ptDJet0_out = ptDJet1;
-        QGLikelihoodJet0_out = QGLikelihoodJet1;
-
-        tree_omogeneizzato->Fill();
-
-      }
-
-    } // if HT400
-
-
-    else if( passed_HT500 ) {
-
-      if( ht_akt5 < 525. ) continue;
-
-      bool firstJetOK =  ( ptJet0>250. && ptJet0<300. && fabs(etaJet0)<2. );
-      bool secondJetOK = ( ptJet1>250. && ptJet1<300. && fabs(etaJet1)<2. );
-
-      if( firstJetOK ) {
-  
-        ptJet0_out = ptJet0;
-        nChargedJet0_out = nChargedJet0;
-        nNeutralJet0_out = nNeutralJet0;
-        ptDJet0_out = ptDJet0;
-        QGLikelihoodJet0_out = QGLikelihoodJet0;
-
-        tree_omogeneizzato->Fill();
-
-      }
-
-      if( secondJetOK ) {
-  
-        ptJet0_out = ptJet1;
-        nChargedJet0_out = nChargedJet1;
-        nNeutralJet0_out = nNeutralJet1;
-        ptDJet0_out = ptDJet1;
-        QGLikelihoodJet0_out = QGLikelihoodJet1;
-
-        tree_omogeneizzato->Fill();
-
-      }
-
-    } // if HT500
-
-
-    else if( passed_HT600 ) {
-
-      if( ht_akt5 < 640. ) continue;
-
-      bool firstJetOK =  ( ptJet0>300. && fabs(etaJet0)<2. );
-      bool secondJetOK = ( ptJet1>300. && fabs(etaJet1)<2. );
-
-      if( firstJetOK ) {
-  
-        ptJet0_out = ptJet0;
-        nChargedJet0_out = nChargedJet0;
-        nNeutralJet0_out = nNeutralJet0;
-        ptDJet0_out = ptDJet0;
-        QGLikelihoodJet0_out = QGLikelihoodJet0;
-
-        tree_omogeneizzato->Fill();
-
-      }
-
-      if( secondJetOK ) {
-  
-        ptJet0_out = ptJet1;
-        nChargedJet0_out = nChargedJet1;
-        nNeutralJet0_out = nNeutralJet1;
-        ptDJet0_out = ptDJet1;
-        QGLikelihoodJet0_out = QGLikelihoodJet1;
-
-        tree_omogeneizzato->Fill();
-
-      }
-
-    } // if HT500
-
-  } // for entries
-*/
 
   outfile->cd();
   
