@@ -133,15 +133,15 @@ int main(int argc, char* argv[]) {
   //db->set_legendTitle( "#splitline{100 < p_{T} < 150 GeV}{4 < #rho < 6 GeV}");
   //db->drawHisto_fromTree( "omog", "trigVar", selection_pt0.c_str(), 50, 100., 150., "trigVar_pt100150_rho46", "Photon p_{T}", "GeV", "Events");
   
+
+
+  //selection_pt0 = "eventWeight*(ptJet0 > 50. && ptJet0 < 100.)";
+  //std::string triggerPath = ( analyzerType=="QGStudies" ) ? "HLT_Photon50" : "HLT_HT150";
+  //db->set_legendTitle( triggerPath );
+
+  //db->drawHisto_fromTree( "omog", "nvertex", selection_pt0.c_str(), 20, 0.5, 20.5, "nvertex_pt50100", "Number of Reconstructed Vertexes", "", "Events", true);
+  //db->drawHisto_fromTree( "omog", "rhoPF", selection_pt0.c_str(), 50, 0., 20., "rhoPF_pt50100", "Particle Flow Energy Density (#rho)", "GeV", "Events", true);
 /*
-
-  selection_pt0 = "eventWeight*(ptJet0 > 50. && ptJet0 < 100.)";
-  db->set_legendTitle( "50 < p_{T} < 100 GeV");
-
-  db->drawHisto_fromTree( "omog", "rhoPF", selection_pt0.c_str(), 50, 0., 20., "rhoPF_pt50100", "Particle Flow Energy Density (#rho)", "GeV", "Events", true);
-
-  db->drawHisto_fromTree( "omog", "nvertex", selection_pt0.c_str(), 30, 0.5, 30.5, "nvertex_pt50100", "Number of Reconstructed Vertexes", "", "Events", true);
-  db->drawHisto_fromTree( "omog", "rhoPF", selection_pt0.c_str(), 50, 0., 20., "rhoPF_pt50100", "Particle Flow Energy Density (#rho)", "GeV", "Events", true);
 
   db->drawHisto_fromTree( "omog", "trigVar", selection_pt0.c_str(), 50, 150., 500., "triggerVar_pt50100", triggerVar, "GeV", "Events", true);
   db->drawHisto_fromTree( "omog", "ptJet0", selection_pt0.c_str(), 25, 50., 100., "ptJet0_pt50100", "Jet p_{T}", "GeV", "Events", true);
@@ -240,14 +240,17 @@ int main(int argc, char* argv[]) {
 
 
 
+*/
 
+  //selection_pt0 = "eventWeight*(ptJet0 > 100. && ptJet0 < 150.)";
+  //triggerPath = ( analyzerType=="QGStudies" ) ? "HLT_Photon90" : "HLT_HT400";
+  //db->set_legendTitle( triggerPath );
 
-  selection_pt0 = "eventWeight*(ptJet0 > 100. && ptJet0 < 150.)";
-  db->set_legendTitle( "100 < p_{T} < 150 GeV");
-
-  db->drawHisto_fromTree( "omog", "nvertex", selection_pt0.c_str(), 30, 0.5, 30.5, "nvertex_pt100150", "Number of Reconstructed Vertexes", "", "Events", true);
+  //db->drawHisto_fromTree( "omog", "nvertex", selection_pt0.c_str(), 20, 0.5, 20.5, "nvertex_pt100150", "Number of Reconstructed Vertexes", "", "Events", true);
   //db->drawHisto_fromTree( "omog", "rhoPF", selection_pt0.c_str(), 50, 0., 20., "rhoPF_pt100150", "Particle Flow Energy Density (#rho)", "GeV", "Events", true);
 
+
+/*
   db->drawHisto_fromTree( "omog", "trigVar", selection_pt0.c_str(), 50, 150., 550., "triggerVar_pt100150", triggerVar, "GeV", "Events", true);
   db->drawHisto_fromTree( "omog", "ptJet0", selection_pt0.c_str(), 25, 100., 150., "ptJet0_pt100150", "Jet p_{T}", "GeV", "Events", true);
 
@@ -288,27 +291,26 @@ int main(int argc, char* argv[]) {
 
  
 
+*/
 
+  //selection_pt0 = "eventWeight*(ptJet0 > 200. && ptJet0 < 250.)";
+  //triggerPath = ( analyzerType=="QGStudies" ) ? "HLT_Photon135" : "HLT_HT400";
+  //db->set_legendTitle( triggerPath );
 
-  selection_pt0 = "eventWeight*(ptJet0 > 200. && ptJet0 < 250.)";
-  db->set_legendTitle( "200 < p_{T} < 250 GeV");
-
-  db->drawHisto_fromTree( "omog", "nvertex", selection_pt0.c_str(), 30, 0.5, 30.5, "nvertex_pt200250", "Number of Reconstructed Vertexes", "", "Events", true);
+  //db->drawHisto_fromTree( "omog", "nvertex", selection_pt0.c_str(), 20, 0.5, 20.5, "nvertex_pt200250", "Number of Reconstructed Vertexes", "", "Events", true);
   //db->drawHisto_fromTree( "omog", "rhoPF", selection_pt0.c_str(), 50, 0., 20., "rhoPF_pt200250", "Particle Flow Energy Density (#rho)", "GeV", "Events", true);
+
+/*
 
   db->drawHisto_fromTree( "omog", "trigVar", selection_pt0.c_str(), 50, 150., 700., "triggerVar_pt200250", triggerVar, "GeV", "Events", true);
   db->drawHisto_fromTree( "omog", "ptJet0", selection_pt0.c_str(), 25, 200., 250., "ptJet0_pt200250", "Jet p_{T}", "GeV", "Events", true);
 
-  //db->set_legendTitle( "200 < p_{T} < 300 GeV");
+  //db->set_legendTitle( "200 < p_{T} < 250 GeV");
   //db->drawHisto_fromTree( "omog", "nChargedJet0", selection_pt0.c_str(), 51, -0.5, 50.5, "nChargedJet0_pt200250", "Jet Charged Multiplicity", "", "Events", true);
   //db->drawHisto_fromTree( "omog", "nNeutralJet0", selection_pt0.c_str(), 51, -0.5, 50.5, "nNeutralJet0_pt200250", "Jet Neutral Multiplicity", "", "Events", true);
   //db->drawHisto_fromTree( "omog", "ptDJet0", selection_pt0.c_str(),      50, 0., 1.0001, "ptDJet0_pt200250", "Jet p_{T}D", "", "Events", true);
   //db->drawHisto_fromTree( "omog", "QGLikelihoodJet0", selection_pt0.c_str(),      50, 0., 1.0001, "QGLikelihoodJet0_pt200250", "Jet Q-G LD", "", "Events", true);
 
-  //db->drawHisto_fromTree( "omog", "nChargedJet1", selection_pt1.c_str(), 51, -0.5, 50.5, "nChargedJet1_pt200250", "SubJet Charged Multiplicity", "", "Events", true);
-  //db->drawHisto_fromTree( "omog", "nNeutralJet1", selection_pt1.c_str(), 51, -0.5, 50.5, "nNeutralJet1_pt200250", "SubJet Neutral Multiplicity", "", "Events", true);
-  //db->drawHisto_fromTree( "omog", "ptDJet1", selection_pt1.c_str(),      50, 0., 1.0001, "ptDJet1_pt200250", "SubJet p_{T}D", "", "Events", true);
-  //db->drawHisto_fromTree( "omog", "QGLikelihoodJet1", selection_pt1.c_str(),      50, 0., 1.0001, "QGLikelihoodJet1_pt200250", "SubJet Q-G LD", "", "Events", true);
 
   db->set_legendTitle("");
 
@@ -353,14 +355,15 @@ int main(int argc, char* argv[]) {
   db->set_legendTitle("");
 
 
+*/
+//// other pt bin:
+//selection_pt0 = "eventWeight*(ptJet0 > 400. && ptJet0 < 500.)";
+//db->set_legendTitle( "400 < p_{T} < 500 GeV");
 
-  // other pt bin:
-  selection_pt0 = "eventWeight*(ptJet0 > 400. && ptJet0 < 500.)";
-  db->set_legendTitle( "400 < p_{T} < 500 GeV");
-
-  db->drawHisto_fromTree( "omog", "nvertex", selection_pt0.c_str(), 30, 0.5, 30.5, "nvertex_pt400500", "Number of Reconstructed Vertexes", "", "Events", true);
+//db->drawHisto_fromTree( "omog", "nvertex", selection_pt0.c_str(), 20, 0.5, 20.5, "nvertex_pt400500", "Number of Reconstructed Vertexes", "", "Events", true);
 //db->drawHisto_fromTree( "omog", "rhoPF", selection_pt0.c_str(), 50, 0., 20., "rhoPF_pt400500", "Particle Flow Energy Density (#rho)", "GeV", "Events", true);
 
+/*
   db->drawHisto_fromTree( "omog", "trigVar", selection_pt0.c_str(), 50, 300., 1200., "triggerVar_pt400500", triggerVar, "GeV", "Events", true);
   db->drawHisto_fromTree( "omog", "ptJet0", selection_pt0.c_str(), 25, 400., 500., "ptJet0_pt400500", "Jet p_{T}", "GeV", "Events", true);
 
@@ -378,6 +381,14 @@ int main(int argc, char* argv[]) {
 
   if( analyzerType=="QGStudies" )
     db->set_rebin(2);
+
+
+  // 400-500 eta<1.5
+  drawHistoWithQuarkGluonComponents( db, "omog", "abs(etaJet0)<1.5", "ptJet0", "ptJet0", "Jet Transverse Momentum", "GeV", "Events", false, 400., 500., 4., 6., 50, 400., 500.);
+  drawHistoWithQuarkGluonComponents( db, "omog", "abs(etaJet0)<1.5", "nChargedJet0", "nChargedJet0", "Charged Multiplicity", "", "Events", false, 400., 500., 4., 6., 80, 0.5, 80.5);
+  drawHistoWithQuarkGluonComponents( db, "omog", "abs(etaJet0)<1.5", "nNeutralJet0", "nNeutralJet0", "Neutral Multiplicity", "", "Events", false, 400., 500., 4., 6., 80, 0.5, 80.5);
+  drawHistoWithQuarkGluonComponents( db, "omog", "abs(etaJet0)<1.5", "ptDJet0", "ptDJet0", "p_{T}D", "", "Events", false, 400., 500., 4., 6., 40, 0.1);
+  drawHistoWithQuarkGluonComponents( db, "omog", "abs(etaJet0)<1.5", "QGLikelihoodJet0", "QGLikelihoodJet0", "Quark-Gluon LD", "", "Events", false, 400., 500., 4., 6.);
 
 
   //// 50-80
@@ -490,9 +501,11 @@ void drawHistoWithQuarkGluonComponents( DrawBase* db, const std::string& treeNam
 
   char commonCondition[500];
   if( additionalCuts!="" )
-    sprintf( commonCondition, "%s && ptJet0>%f && ptJet0<%f && QGLikelihoodJet0>0. && QGLikelihoodJet0<1. && rhoPF>%f && rhoPF<%f", additionalCuts.c_str(), ptMin, ptMax, rhoMin, rhoMax ); 
+    sprintf( commonCondition, "%s && ptJet0>%f && ptJet0<%f && rhoPF>%f && rhoPF<%f", additionalCuts.c_str(), ptMin, ptMax, rhoMin, rhoMax ); 
+    //sprintf( commonCondition, "%s && ptJet0>%f && ptJet0<%f && QGLikelihoodJet0>0. && QGLikelihoodJet0<1. && rhoPF>%f && rhoPF<%f", additionalCuts.c_str(), ptMin, ptMax, rhoMin, rhoMax ); 
   else
-    sprintf( commonCondition, "ptJet0>%f && ptJet0<%f && QGLikelihoodJet0>0. && QGLikelihoodJet0<1. && rhoPF>%f && rhoPF<%f", ptMin, ptMax, rhoMin, rhoMax ); 
+    sprintf( commonCondition, "ptJet0>%f && ptJet0<%f && rhoPF>%f && rhoPF<%f", ptMin, ptMax, rhoMin, rhoMax ); 
+    //sprintf( commonCondition, "ptJet0>%f && ptJet0<%f && QGLikelihoodJet0>0. && QGLikelihoodJet0<1. && rhoPF>%f && rhoPF<%f", ptMin, ptMax, rhoMin, rhoMax ); 
   //sprintf( commonCondition, "ptJet0>%f && ptJet0<%f", ptMin, ptMax ); 
 
   char allCondition[800];
