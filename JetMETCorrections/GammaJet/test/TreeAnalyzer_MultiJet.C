@@ -408,7 +408,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        else if(  fabs(jets[iJet]->Eta())>3. &&  fabs(jets[iJet]->Eta())<5. )
          QGLikelihoodJet_[iJet] = qglikeli->computeQGLikelihoodFwd( jets[iJet]->Pt(), rhoPF, jets[iJet]->ptD, -log( jets[iJet]->rmsCand ) );
        else
-         QGLikelihoodJet_[iJet] = 0.;
+         QGLikelihoodJet_[iJet] = -1.;
 
 
      }
