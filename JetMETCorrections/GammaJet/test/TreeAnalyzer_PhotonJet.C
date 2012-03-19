@@ -744,12 +744,14 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
      phiJetReco_  =  firstJet.phiReco;
      etaJetReco_  =  firstJet.etaReco;
      ptDJetReco_  =  firstJet.ptD;
+ rmsCandJetReco_  =  firstJet.rmsCand;
      if( fabs(etaJetReco_)<2.4 ) {
        QGLikelihoodJetReco_  =  qglikeli->computeQGLikelihoodPU( firstJet.ptCorrReco, rhoPF, firstJet.nCharged(), firstJet.nNeutral(), firstJet.ptD );
+     } else if(  fabs(etaJetReco_)>3. &&  fabs(etaJetReco_)<5. ) {
+       QGLikelihoodJetReco_  =  qglikeli->computeQGLikelihoodFwd( firstJet.ptCorrReco, rhoPF, firstJet.ptD, -log( firstJet.rmsCand ) );
      } else {
        QGLikelihoodJetReco_  =  -1.;
      }
- rmsCandJetReco_  =  firstJet.rmsCand;
  trackCountingHighEffBJetTagsJetReco_  =  firstJet.trackCountingHighEffBJetTags;
         eJetGen_  =  firstJet.eGen;
        ptJetGen_  =  firstJet.ptGen;
