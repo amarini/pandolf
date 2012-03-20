@@ -57,7 +57,8 @@ if( analyzerType=="DiJet" ):
 
 ijob=0
 
-while (ijob<nBlocks):
+#while (ijob<nBlocks):
+while (ijob<1):
 
   print( str(ijob) + " / " + str(nBlocks) +"\n\n" )
   #WORKDIR=os.getenv("PWD")
@@ -66,7 +67,6 @@ while (ijob<nBlocks):
   outputfile.write('#!/bin/bash\n')
   outputfile.write('source /swshare/cms/cmsset_default.sh\n')
   outputfile.write('cd /shome/pandolf/CMSSW_4_2_8/src/ ; eval `scramv1 runtime -sh` ; cd -\n')
-  outputfile.write('cp '+ pwd + '/' + analyzerType + "_2ndLevelTreeW_" + dataset + "_pfakt5.root ./\n")
   outputfile.write('cp '+ pwd + '/' + application + " ./\n")
   outputfile.write('cp '+ pwd + '/all*pileup_*root ./\n')
   outputfile.write('cp '+ pwd + '/pileup_*root ./\n')
