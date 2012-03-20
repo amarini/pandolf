@@ -187,14 +187,24 @@ void TreeFinalizerC_MultiJet::finalize() {
   tree_->SetBranchAddress("ePhotonsJet", ePhotonsJet);
   Float_t eNeutralHadronsJet[20];
   tree_->SetBranchAddress("eNeutralHadronsJet", eNeutralHadronsJet);
+  Float_t eHFHadronsJet[20];
+  tree_->SetBranchAddress("eHFHadronsJet", eHFHadronsJet);
+  Float_t eHFEMJet[20];
+  tree_->SetBranchAddress("eHFEMJet", eHFEMJet);
   Int_t nChargedHadronsJet[20];
   tree_->SetBranchAddress("nChargedHadronsJet", nChargedHadronsJet);
   Int_t nPhotonsJet[20];
   tree_->SetBranchAddress("nPhotonsJet", nPhotonsJet);
   Int_t nNeutralHadronsJet[20];
   tree_->SetBranchAddress("nNeutralHadronsJet", nNeutralHadronsJet);
+  Int_t nHFHadronsJet[20];
+  tree_->SetBranchAddress("nHFHadronsJet", nHFHadronsJet);
+  Int_t nHFEMJet[20];
+  tree_->SetBranchAddress("nHFEMJet", nHFEMJet);
   Float_t ptDJet[20];
   tree_->SetBranchAddress("ptDJet", ptDJet);
+  Float_t rmsCandJet[20];
+  tree_->SetBranchAddress("rmsCandJet", rmsCandJet);
   Float_t QGLikelihoodJet[20];
   tree_->SetBranchAddress("QGLikelihoodJet", QGLikelihoodJet);
 
@@ -249,11 +259,6 @@ void TreeFinalizerC_MultiJet::finalize() {
   //if( PUType_=="Run2011A_73pb" )
   //puFileName = "all2011A.pileup_v2.root";
   //puFileName = "PUTarget.Run2011B.175832-180252.root";
-    puFileName = "PileUpTarget_runs_173236_178380.root";
-  std::cout << std::endl << "-> Using data pileup file: " << puFileName << std::endl;
-  TFile* filePU = TFile::Open(puFileName.c_str());
-  TH1F* h1_nPU_data = (TH1F*)filePU->Get("pileup");
-  fPUWeight->SetDataHistogram(h1_nPU_data);
 
   PUWeight* fPUWeightRunA = new PUWeight(-1, "2011A", puType);
   std::string puFileNameRunA = "all2011A.pileup_v2_73mb.root";
@@ -371,37 +376,50 @@ void TreeFinalizerC_MultiJet::finalize() {
   tree_passedEvents->Branch( "ptJet0", &ptJet0, "ptJet0/F" );
   tree_passedEvents->Branch( "ptJet1", &ptJet1, "ptJet1/F" );
   tree_passedEvents->Branch( "ptJet2", &ptJet2, "ptJet2/F" );
-  tree_passedEvents->Branch( "ptJet3", &ptJet3, "ptJet3/F" );
+  if( analyzerType_=="MultiJet" )
+    tree_passedEvents->Branch( "ptJet3", &ptJet3, "ptJet3/F" );
 
   tree_passedEvents->Branch( "etaJet0", &etaJet0, "etaJet0/F" );
   tree_passedEvents->Branch( "etaJet1", &etaJet1, "etaJet1/F" );
-  tree_passedEvents->Branch( "etaJet2", &etaJet2, "etaJet2/F" );
-  tree_passedEvents->Branch( "etaJet3", &etaJet3, "etaJet3/F" );
+  if( analyzerType_=="MultiJet" ) {
+    tree_passedEvents->Branch( "etaJet2", &etaJet2, "etaJet2/F" );
+    tree_passedEvents->Branch( "etaJet3", &etaJet3, "etaJet3/F" );
+  }
 
   tree_passedEvents->Branch( "pdgIdPartJet0", &pdgIdPartJet0, "pdgIdPartJet0/I" );
   tree_passedEvents->Branch( "pdgIdPartJet1", &pdgIdPartJet1, "pdgIdPartJet1/I" );
-  tree_passedEvents->Branch( "pdgIdPartJet2", &pdgIdPartJet2, "pdgIdPartJet2/I" );
-  tree_passedEvents->Branch( "pdgIdPartJet3", &pdgIdPartJet3, "pdgIdPartJet3/I" );
+  if( analyzerType_=="MultiJet" ) {
+    tree_passedEvents->Branch( "pdgIdPartJet2", &pdgIdPartJet2, "pdgIdPartJet2/I" );
+    tree_passedEvents->Branch( "pdgIdPartJet3", &pdgIdPartJet3, "pdgIdPartJet3/I" );
+  }
 
   tree_passedEvents->Branch( "QGLikelihoodJet0", &QGLikelihoodJet0, "QGLikelihoodJet0/F" );
   tree_passedEvents->Branch( "QGLikelihoodJet1", &QGLikelihoodJet1, "QGLikelihoodJet1/F" );
-  tree_passedEvents->Branch( "QGLikelihoodJet2", &QGLikelihoodJet2, "QGLikelihoodJet2/F" );
-  tree_passedEvents->Branch( "QGLikelihoodJet3", &QGLikelihoodJet3, "QGLikelihoodJet3/F" );
+  if( analyzerType_=="MultiJet" ) {
+    tree_passedEvents->Branch( "QGLikelihoodJet2", &QGLikelihoodJet2, "QGLikelihoodJet2/F" );
+    tree_passedEvents->Branch( "QGLikelihoodJet3", &QGLikelihoodJet3, "QGLikelihoodJet3/F" );
+  }
 
   tree_passedEvents->Branch( "ptDJet0", &ptDJet0, "ptDJet0/F" );
   tree_passedEvents->Branch( "ptDJet1", &ptDJet1, "ptDJet1/F" );
-  tree_passedEvents->Branch( "ptDJet2", &ptDJet2, "ptDJet2/F" );
-  tree_passedEvents->Branch( "ptDJet3", &ptDJet3, "ptDJet3/F" );
+  if( analyzerType_=="MultiJet" ) {
+    tree_passedEvents->Branch( "ptDJet2", &ptDJet2, "ptDJet2/F" );
+    tree_passedEvents->Branch( "ptDJet3", &ptDJet3, "ptDJet3/F" );
+  }
 
   tree_passedEvents->Branch( "nChargedJet0", &nChargedJet0, "nChargedJet0/I" );
   tree_passedEvents->Branch( "nChargedJet1", &nChargedJet1, "nChargedJet1/I" );
-  tree_passedEvents->Branch( "nChargedJet2", &nChargedJet2, "nChargedJet2/I" );
-  tree_passedEvents->Branch( "nChargedJet3", &nChargedJet3, "nChargedJet3/I" );
+  if( analyzerType_=="MultiJet" ) {
+    tree_passedEvents->Branch( "nChargedJet2", &nChargedJet2, "nChargedJet2/I" );
+    tree_passedEvents->Branch( "nChargedJet3", &nChargedJet3, "nChargedJet3/I" );
+  }
 
   tree_passedEvents->Branch( "nNeutralJet0", &nNeutralJet0, "nNeutralJet0/I" );
   tree_passedEvents->Branch( "nNeutralJet1", &nNeutralJet1, "nNeutralJet1/I" );
-  tree_passedEvents->Branch( "nNeutralJet2", &nNeutralJet2, "nNeutralJet2/I" );
-  tree_passedEvents->Branch( "nNeutralJet3", &nNeutralJet3, "nNeutralJet3/I" );
+  if( analyzerType_=="MultiJet" ) {
+    tree_passedEvents->Branch( "nNeutralJet2", &nNeutralJet2, "nNeutralJet2/I" );
+    tree_passedEvents->Branch( "nNeutralJet3", &nNeutralJet3, "nNeutralJet3/I" );
+  }
 
 
 
@@ -409,7 +427,8 @@ void TreeFinalizerC_MultiJet::finalize() {
 
 
   //QGLikelihoodCalculator *qglikeli = new QGLikelihoodCalculator("/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
-  QGLikelihoodCalculator *qglikeli = new QGLikelihoodCalculator("/shome/pandolf/CMSSW_4_2_8/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
+  //QGLikelihoodCalculator *qglikeli = new QGLikelihoodCalculator("/shome/pandolf/CMSSW_4_2_8/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
+  QGLikelihoodCalculator *qglikeli = new QGLikelihoodCalculator("QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
 
 
   bool debug=true;
@@ -530,13 +549,13 @@ void TreeFinalizerC_MultiJet::finalize() {
 
     } else { //multijet selection
 
-      if( !isMC ) {
-        if( !passed_HT600 ) continue; //trigger on data
-        //if( run<173236 || run>178380 ) continue; //run range in which HT600 was unprescaled: corresponds to 1894.3 pb-1
-      }
+      //if( !isMC ) {
+      //  if( !passed_HT600 ) continue; //trigger on data
+      //  //if( run<173236 || run>178380 ) continue; //run range in which HT600 was unprescaled: corresponds to 1894.3 pb-1
+      //}
   
-      // avoid trigger turn-on:
-      if( ht_akt5 < 650. ) continue;
+      //// avoid trigger turn-on:
+      //if( ht_akt5 < 650. ) continue;
 
     }
   
@@ -563,14 +582,12 @@ void TreeFinalizerC_MultiJet::finalize() {
     if( isMC ) {
       // PU reweighting:
      eventWeight_noPU = eventWeight;
-     PUWeight = fPUWeight->GetWeight(nPU);
      PUWeight_HT150 = fPUWeight_HT150->GetWeight(nPU);
      PUWeight_HT250 = fPUWeight_HT250->GetWeight(nPU);
      PUWeight_HT350 = fPUWeight_HT350->GetWeight(nPU);
      PUWeight_HT400 = fPUWeight_HT400->GetWeight(nPU);
      PUWeight_HT500 = fPUWeight_HT500->GetWeight(nPU);
      PUWeight_HT600 = fPUWeight_HT600->GetWeight(nPU);
-     eventWeight *= PUWeight;
     }
 
     h1_nvertexPU->Fill( nvertex, eventWeight);
@@ -602,21 +619,27 @@ void TreeFinalizerC_MultiJet::finalize() {
       AnalysisJet* thisJet = new AnalysisJet();
     
       thisJet->SetPtEtaPhiE( ptJet[iJet], etaJet[iJet], phiJet[iJet], ptJet[iJet]/ptRawJet[iJet]*eJet[iJet] );
-
+      thisJet->ptD = ptDJet[iJet];
+      thisJet->rmsCand = rmsCandJet[iJet];
+      thisJet->nTracksReco = nChargedHadronsJet[iJet];
+      thisJet->nNeutralHadronsReco = nNeutralHadronsJet[iJet];
+      thisJet->nPhotonsReco = nPhotonsJet[iJet];
+      thisJet->nHFHadronsReco = nHFHadronsJet[iJet];
+      thisJet->nHFEMReco = nHFEMJet[iJet];
+      thisJet->eTracksReco = eChargedHadronsJet[iJet];
+      thisJet->eNeutralHadronsReco = eNeutralHadronsJet[iJet];
+      thisJet->ePhotonsReco = ePhotonsJet[iJet];
+      thisJet->eHFHadronsReco = eHFHadronsJet[iJet];
+      thisJet->eHFEMReco = eHFEMJet[iJet];
 
       if( fabs(thisJet->Eta())<2.4 ) {
         if( QGLikelihoodJet[iJet]==0. || QGLikelihoodJet[iJet]==1. )
           thisJet->QGLikelihood =  qglikeli->computeQGLikelihoodPU( thisJet->Pt(), rhoPF, thisJet->nCharged(), thisJet->nNeutral(), thisJet->ptD );
         else
           thisJet->QGLikelihood = QGLikelihoodJet[iJet];
+      } else if( fabs(thisJet->Eta())>3. & fabs(thisJet->Eta())<5. ) {
+        thisJet->QGLikelihood =  qglikeli->computeQGLikelihoodFwd( thisJet->Pt(), rhoPF, thisJet->ptD, -log( thisJet->rmsCand ) );
       }
-      thisJet->ptD = ptDJet[iJet];
-      thisJet->nTracksReco = nChargedHadronsJet[iJet];
-      thisJet->nNeutralHadronsReco = nNeutralHadronsJet[iJet];
-      thisJet->nPhotonsReco = nPhotonsJet[iJet];
-      thisJet->eTracksReco = eChargedHadronsJet[iJet];
-      thisJet->eNeutralHadronsReco = eNeutralHadronsJet[iJet];
-      thisJet->ePhotonsReco = ePhotonsJet[iJet];
 
       if( jets.size()<2 ) { //jetID only on two leading jets
         if( !(thisJet->passedJetID()) ) continue;
