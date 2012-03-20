@@ -41,7 +41,6 @@ class TreeFinalizer {
   void set_outFile( const std::string& fileName="", const std::string& suffix="" );
   void set_inputAnalyzerType( const std::string& analyzerType ) { inputAnalyzerType_ = analyzerType; };
   void set_inputFileDir( const std::string& inputDir ) { inputFileDir_ = inputDir; };
-  void set_inputFileDir( const std::string& dir ) { inputFileDir_ = dir; };
   void set_flags( const std::string& flags ) { flags_ = flags; };
   void set_DEBUG( bool DEBUG ) { DEBUG_ = DEBUG; };
 
