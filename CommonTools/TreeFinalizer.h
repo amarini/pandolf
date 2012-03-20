@@ -56,7 +56,6 @@ class TreeFinalizer {
   std::string analyzerType_;
   std::string inputFileDir_;
   std::string inputAnalyzerType_;
-  std::string inputFileDir_;
   std::string dataset_;
   std::string flags_;
 
