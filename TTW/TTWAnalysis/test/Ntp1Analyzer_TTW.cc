@@ -14,10 +14,11 @@
 
 #include "PUWeight.h"
 
+
 //#include "fitTools.h"
 
 
-int DEBUG_EVENTNUMBER = 715236831;
+int DEBUG_EVENTNUMBER = 4213;
 
 
 double trackDxyPV(float PVx, float PVy, float PVz, float eleVx, float eleVy, float eleVz, float elePx, float elePy, float elePz);
@@ -125,6 +126,7 @@ void Ntp1Analyzer_TTW::CreateOutputFile() {
   reducedTree_->Branch("rmsCandJet", rmsCandJet_, "rmsCandJet_[nJets_]/F");
   reducedTree_->Branch("nChargedJet", nChargedJet_, "nChargedJet_[nJets_]/F");
   reducedTree_->Branch("nNeutralJet", nNeutralJet_, "nNeutralJet_[nJets_]/F");
+  reducedTree_->Branch("QGLikelihoodJet", QGLikelihoodJet_, "QGLikelihoodJet_[nJets_]/F");
 
   reducedTree_->Branch("eChargedHadronsJet", eChargedHadronsJet_, "eChargedHadronsJet_[nJets_]/F");
   reducedTree_->Branch("ePhotonsJet", ePhotonsJet_, "ePhotonsJet_[nJets_]/F");
@@ -176,7 +178,8 @@ void Ntp1Analyzer_TTW::CreateOutputFile() {
   reducedTree_->Branch("mEtSig", &mEtSig_,"mEtSig_/F");
   reducedTree_->Branch("phipfMet",&phipfMet_,"phipfMet_/F");
 
-  
+
+  qglikeli_ = new QGLikelihoodCalculator("/afs/cern.ch/user/p/pandolf/scratch1/CMSSW_4_2_3_patch5/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
 
 } 
 
@@ -187,6 +190,8 @@ Ntp1Analyzer_TTW::~Ntp1Analyzer_TTW() {
   outfile_->cd();
   h1_nCounter_Zee_->Write();
   h1_nCounter_Zmumu_->Write();
+
+  if( qglikeli_!=0 ) delete qglikeli_;
 
 }
 
@@ -517,24 +522,27 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        }
 
 
-       bool passed_VBTF95 = thisEle.passedVBTF95();
-       bool passed_VBTF80 = thisEle.passedVBTF80();
+
+       // electron ID used in AN 2011-466
+       bool passed_electronID = thisEle.electronIDVBTF80() 
+                             && thisEle.conversionRejectionVBTF80() 
+                             && thisEle.combinedIsoRel()<0.15
+                             && thisEle.dr03EcalRecHitSumEt/thisEle.Pt()<0.07;
 
 
-       if( !passed_VBTF95 ) continue;
-       //if( !passed_VBTF80 ) continue;
+       if( !passed_electronID ) continue;
 
-       if( event_==DEBUG_EVENTNUMBER ) std::cout << "Passed VBTF95." << std::endl;
+       if( event_==DEBUG_EVENTNUMBER ) std::cout << "Passed ElectronID." << std::endl;
 
-       // additional ID to be as tight as trigger (HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL):
-       if( fabs(scEta)<1.4442 ) { //barrel
-         if( fabs(thisEle.deltaPhiAtVtx) > 0.15 ) continue;
-       } else { //endcaps
-         if( fabs(thisEle.deltaPhiAtVtx) > 0.1 ) continue;
-         if( thisEle.hOverE > 0.1 ) continue;
-       }
+      // // additional ID to be as tight as trigger (HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL):
+      // if( fabs(scEta)<1.4442 ) { //barrel
+      //   if( fabs(thisEle.deltaPhiAtVtx) > 0.15 ) continue;
+      // } else { //endcaps
+      //   if( fabs(thisEle.deltaPhiAtVtx) > 0.1 ) continue;
+      //   if( thisEle.hOverE > 0.1 ) continue;
+      // }
 
-       if( event_==DEBUG_EVENTNUMBER ) std::cout << "Passed additional eleID cuts (HLT)." << std::endl;
+      // if( event_==DEBUG_EVENTNUMBER ) std::cout << "Passed additional eleID cuts (HLT)." << std::endl;
 
 
        // check that not matched to muon (clean electrons faked by muon MIP):
@@ -615,19 +623,39 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
 
 
-     eLept1_ = leptons[0].Energy();
-     ptLept1_ = leptons[0].Pt();
-     etaLept1_ = leptons[0].Eta();
-     phiLept1_ = leptons[0].Phi();
-     chargeLept1_ = leptons[0].charge;
-     leptTypeLept1_ = leptons[0].leptType;
-     
-     eLept2_ = leptons[1].Energy();
-     ptLept2_ = leptons[1].Pt();
-     etaLept2_ = leptons[1].Eta();
-     phiLept2_ = leptons[1].Phi();
-     chargeLept2_ = leptons[1].charge;
-     leptTypeLept2_ = leptons[1].leptType;
+     if( leptons[0].Pt()>leptons[1].Pt() ) {
+
+       eLept1_ = leptons[0].Energy();
+       ptLept1_ = leptons[0].Pt();
+       etaLept1_ = leptons[0].Eta();
+       phiLept1_ = leptons[0].Phi();
+       chargeLept1_ = leptons[0].charge;
+       leptTypeLept1_ = leptons[0].leptType;
+       
+       eLept2_ = leptons[1].Energy();
+       ptLept2_ = leptons[1].Pt();
+       etaLept2_ = leptons[1].Eta();
+       phiLept2_ = leptons[1].Phi();
+       chargeLept2_ = leptons[1].charge;
+       leptTypeLept2_ = leptons[1].leptType;
+
+     } else {
+
+       eLept2_ = leptons[0].Energy();
+       ptLept2_ = leptons[0].Pt();
+       etaLept2_ = leptons[0].Eta();
+       phiLept2_ = leptons[0].Phi();
+       chargeLept2_ = leptons[0].charge;
+       leptTypeLept2_ = leptons[0].leptType;
+       
+       eLept1_ = leptons[1].Energy();
+       ptLept1_ = leptons[1].Pt();
+       etaLept1_ = leptons[1].Eta();
+       phiLept1_ = leptons[1].Phi();
+       chargeLept1_ = leptons[1].charge;
+       leptTypeLept1_ = leptons[1].leptType;
+
+     }
 
 
 /*
@@ -706,7 +734,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        thisJet.nElectrons      = electronMultiplicityAK5PFPUcorrJet[iJet];
        thisJet.nMuons          = muonMultiplicityAK5PFPUcorrJet[iJet];
 
-       thisJet.nCharged = chargedHadronMultiplicityAK5PFPUcorrJet[iJet]+electronMultiplicityAK5PFPUcorrJet[iJet]+muonMultiplicityAK5PFPUcorrJet[iJet];
+       thisJet.nCharged = chargedHadronMultiplicityAK5PFPUcorrJet[iJet];
        thisJet.nNeutral = neutralHadronMultiplicityAK5PFPUcorrJet[iJet]+photonMultiplicityAK5PFPUcorrJet[iJet];
        thisJet.rmsCand =  rmsCandAK5PFPUcorrJet[iJet];
        thisJet.ptD =  ptDAK5PFPUcorrJet[iJet];
@@ -822,6 +850,8 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        rmsCandJet_[nJets_] = leadJets[iJet].rmsCand;
        nChargedJet_[nJets_] = leadJets[iJet].nCharged;
        nNeutralJet_[nJets_] = leadJets[iJet].nNeutral;
+
+       QGLikelihoodJet_[nJets_] = qglikeli_->computeQGLikelihoodPU( leadJets[iJet].Pt(), rhoPF_, leadJets[iJet].nCharged, leadJets[iJet].nNeutral, leadJets[iJet].ptD );
 
        trackCountingHighEffBJetTagJet_[nJets_] = leadJets[iJet].trackCountingHighEffBJetTag;
        trackCountingHighPurBJetTagJet_[nJets_] = leadJets[iJet].trackCountingHighPurBJetTag;
