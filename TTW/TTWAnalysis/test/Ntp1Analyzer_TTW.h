@@ -12,6 +12,7 @@
 
 #include "Ntp1Analyzer.h"
 #include "TH1F.h"
+#include "QGLikelihood/QGLikelihoodCalculator.h"
 
 
 class Ntp1Analyzer_TTW : public Ntp1Analyzer {
@@ -98,7 +99,7 @@ class Ntp1Analyzer_TTW : public Ntp1Analyzer {
    Float_t rmsCandJet_[50];
    Int_t nChargedJet_[50];
    Int_t nNeutralJet_[50];
-   Float_t QGlikelihoodJet_[50];
+   Float_t QGLikelihoodJet_[50];
 
    Float_t  eChargedHadronsJet_[50];
    Float_t  ePhotonsJet_[50];
@@ -158,6 +159,7 @@ class Ntp1Analyzer_TTW : public Ntp1Analyzer {
    TH1D* h1_nCounter_Zee_;
    TH1D* h1_nCounter_Zmumu_;
 
+   QGLikelihoodCalculator* qglikeli_;
 
    bool DEBUG_VERBOSE_;
 
