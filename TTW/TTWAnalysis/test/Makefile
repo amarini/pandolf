@@ -17,8 +17,8 @@ merge_and_setWeights: $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/merge_and_s
 	$(CC) -Wall $(INCLUDES) -o merge_and_setWeights $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/merge_and_setWeights.cpp $(ROOTFLAG) $(EXTRALIBS)
 
 
-do2ndLevel_TTW: Ntp1Analyzer.o Ntp1Analyzer_TTW.o AnalysisElectron.o AnalysisMuon.o AnalysisJet.o PUWeight.o do2ndLevel_TTW.cpp
-	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o do2ndLevel_TTW do2ndLevel_TTW.cpp Ntp1Analyzer.o PUWeight.o Ntp1Analyzer_TTW.o AnalysisElectron.o AnalysisMuon.o AnalysisJet.o $(ROOTFLAG) 
+do2ndLevel_TTW: Ntp1Analyzer.o Ntp1Analyzer_TTW.o AnalysisElectron.o AnalysisMuon.o AnalysisJet.o PUWeight.o QGLikelihoodCalculator.o do2ndLevel_TTW.cpp
+	$(CC) -Wall $(INCLUDES) -o do2ndLevel_TTW do2ndLevel_TTW.cpp Ntp1Analyzer.o PUWeight.o QGLikelihoodCalculator.o Ntp1Analyzer_TTW.o AnalysisElectron.o AnalysisMuon.o AnalysisJet.o $(ROOTFLAG) 
 
 do2ndLevel_TTW_DATA: Ntp1Analyzer.o Ntp1Analyzer_TTW.o AnalysisElectron.o AnalysisMuon.o AnalysisJet.o PUWeight.o do2ndLevel_TTW_DATA.cpp
 	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o do2ndLevel_TTW_DATA do2ndLevel_TTW_DATA.cpp Ntp1Analyzer.o Ntp1Analyzer_TTW.o AnalysisElectron.o AnalysisMuon.o AnalysisJet.o PUWeight.o $(ROOTFLAG)
@@ -45,8 +45,8 @@ drawTTWTrilepton_DATA: DrawBase.o fitTools.o drawTTWTrilepton_DATA.cpp
 Ntp1Analyzer.o: $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/Ntp1Analyzer.C
 	$(CC) $(CFLAGS) $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/Ntp1Analyzer.C $(ROOTFLAG)
 
-Ntp1Analyzer_TTW.o: Ntp1Analyzer_TTW.cc
-	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -I$(CMSSW_BASE)/src/UserCode/emanuele/CommonTools Ntp1Analyzer_TTW.cc $(ROOTFLAG)
+Ntp1Analyzer_TTW.o: Ntp1Analyzer_TTW.cc QGLikelihoodCalculator.o
+	$(CC) $(CFLAGS) $(INCLUDES) QGLikelihoodCalculator.o Ntp1Analyzer_TTW.cc $(ROOTFLAG)
 
 
 Ntp1Finalizer.o: $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/Ntp1Finalizer.C
