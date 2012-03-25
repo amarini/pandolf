@@ -147,6 +147,15 @@ void Ntp1Finalizer_TTW::finalize() {
   TH1D* h1_etaJet4 = new TH1D("etaJet4", "", 200, -5., 5.);
   h1_etaJet4->Sumw2();
 
+  TH1D* h1_QGLikelihoodJet1 = new TH1D("QGLikelihoodJet1", "", 50, 0., 1.0001);
+  h1_QGLikelihoodJet1->Sumw2();
+  TH1D* h1_QGLikelihoodJet2 = new TH1D("QGLikelihoodJet2", "", 50, 0., 1.0001);
+  h1_QGLikelihoodJet2->Sumw2();
+  TH1D* h1_QGLikelihoodJet3 = new TH1D("QGLikelihoodJet3", "", 50, 0., 1.0001);
+  h1_QGLikelihoodJet3->Sumw2();
+  TH1D* h1_QGLikelihoodJet4 = new TH1D("QGLikelihoodJet4", "", 50, 0., 1.0001);
+  h1_QGLikelihoodJet4->Sumw2();
+
   TH1D* h1_partFlavorJet1 = new TH1D("partFlavorJet1", "", 38, -15.5, 22.5);
   h1_partFlavorJet1->Sumw2();
   TH1D* h1_partFlavorJet2 = new TH1D("partFlavorJet2", "", 38, -15.5, 22.5);
@@ -161,6 +170,11 @@ void Ntp1Finalizer_TTW::finalize() {
   h1_deltaRbb->Sumw2();
   TH1D* h1_deltaRqq = new TH1D("deltaRqq", "", 200, 0., 5.);
   h1_deltaRqq->Sumw2();
+  
+  TH1D* h1_deltaR_b_lept_max = new TH1D("deltaR_b_lept_max", "", 200, 0., 5.);
+  h1_deltaR_b_lept_max->Sumw2();
+  TH1D* h1_deltaR_b_lept_min = new TH1D("deltaR_b_lept_min", "", 200, 0., 5.);
+  h1_deltaR_b_lept_min->Sumw2();
   
   TH1D* h1_mbb = new TH1D("mbb", "", 500, 0., 1000.);
   h1_mbb->Sumw2();
@@ -289,6 +303,8 @@ void Ntp1Finalizer_TTW::finalize() {
   tree_->SetBranchAddress("jetBProbabilityBJetTagJet", jetBProbabilityBJetTagJet);
   Float_t jetProbabilityBJetTagJet[50];
   tree_->SetBranchAddress("jetProbabilityBJetTagJet", jetProbabilityBJetTagJet);
+  Float_t QGLikelihoodJet[50];
+  tree_->SetBranchAddress("QGLikelihoodJet", QGLikelihoodJet);
 
 
 
@@ -373,7 +389,9 @@ void Ntp1Finalizer_TTW::finalize() {
   float ptLept1_t, ptLept2_t, etaLept1_t, etaLept2_t;
   float ptJet1_t, ptJet2_t, ptJet3_t, ptJet4_t;
   float etaJet1_t, etaJet2_t, etaJet3_t, etaJet4_t;
+  float QGLikelihoodJet1_t, QGLikelihoodJet2_t, QGLikelihoodJet3_t, QGLikelihoodJet4_t;
   float bTagJet1_t, bTagJet2_t;
+  float mll, deltaRll;
   float HLTSF;
   int leptType;
 
@@ -385,6 +403,9 @@ void Ntp1Finalizer_TTW::finalize() {
   tree_passedEvents->Branch( "ptLept2", &ptLept2_t, "ptLept2_t/F" );
   tree_passedEvents->Branch( "etaLept1", &etaLept1_t, "etaLept1_t/F" );
   tree_passedEvents->Branch( "etaLept2", &etaLept2_t, "etaLept2_t/F" );
+  tree_passedEvents->Branch( "mll", &mll, "mll/F" );
+  tree_passedEvents->Branch( "deltaRll", &deltaRll, "deltaRll/F" );
+  tree_passedEvents->Branch( "pfMet", &pfMet, "pfMet/F" );
   tree_passedEvents->Branch( "ptJet1", &ptJet1_t, "ptJet1_t/F" );
   tree_passedEvents->Branch( "ptJet2", &ptJet2_t, "ptJet2_t/F" );
   tree_passedEvents->Branch( "bTagJet1", &bTagJet1_t, "bTagJet1_t/F" );
@@ -395,6 +416,10 @@ void Ntp1Finalizer_TTW::finalize() {
   tree_passedEvents->Branch( "etaJet2", &etaJet2_t, "etaJet2_t/F" );
   tree_passedEvents->Branch( "etaJet3", &etaJet3_t, "etaJet3_t/F" );
   tree_passedEvents->Branch( "etaJet4", &etaJet4_t, "etaJet4_t/F" );
+  tree_passedEvents->Branch( "QGLikelihoodJet1", &QGLikelihoodJet1_t, "QGLikelihoodJet1_t/F" );
+  tree_passedEvents->Branch( "QGLikelihoodJet2", &QGLikelihoodJet2_t, "QGLikelihoodJet2_t/F" );
+  tree_passedEvents->Branch( "QGLikelihoodJet3", &QGLikelihoodJet3_t, "QGLikelihoodJet3_t/F" );
+  tree_passedEvents->Branch( "QGLikelihoodJet4", &QGLikelihoodJet4_t, "QGLikelihoodJet4_t/F" );
   tree_passedEvents->Branch( "eventWeight", &eventWeight, "eventWeight/F" );
   tree_passedEvents->Branch( "HLTSF", &HLTSF, "HLTSF/F" );
 
@@ -569,24 +594,6 @@ ofstream ofs("run_event.txt");
       leptType=2;
   
 
-    h1_ptLept1->Fill( Lept1.Pt(), eventWeight );
-    h1_ptLept2->Fill( Lept2.Pt(), eventWeight );
-    h1_etaLept1->Fill( Lept1.Eta(), eventWeight );
-    h1_etaLept2->Fill( Lept2.Eta(), eventWeight );
-    if( leptTypeLept1==0 ) {
-      h1_etaMu->Fill( Lept1.Eta(), eventWeight );
-    } else {
-      h1_etaEle->Fill( Lept1.Eta(), eventWeight );
-    }
-    if( leptTypeLept2==0 ) {
-      h1_etaMu->Fill( Lept2.Eta(), eventWeight );
-    } else {
-      h1_etaEle->Fill( Lept2.Eta(), eventWeight );
-    }
-
-    h1_deltaRll->Fill( Lept2.DeltaR(Lept2), eventWeight );
-
-
 
 
 
@@ -607,11 +614,13 @@ ofstream ofs("run_event.txt");
     // KINEMATIC SELECTION: LEPTONS
     // ----------------------------
 
+    mll = diLepton.M();
+
     if( Lept1.Pt() < ptLept1_thresh_ ) continue;
     if( Lept2.Pt() < ptLept2_thresh_ ) continue;
     if( fabs(Lept1.Eta()) > etaLept1_thresh_ ) continue;
     if( fabs(Lept2.Eta()) > etaLept2_thresh_ ) continue;
-    //if( diLepton.M() < mZll_threshLo_ || diLepton.M() > mZll_threshHi_ ) continue;
+    if( mll < mll_thresh_ ) continue;
 
 
 
@@ -661,6 +670,8 @@ ofstream ofs("run_event.txt");
       thisJet.simpleSecondaryVertexHighPurBJetTag = simpleSecondaryVertexHighPurBJetTagJet[iJet];
       thisJet.jetBProbabilityBJetTag              = jetBProbabilityBJetTagJet[iJet];
       thisJet.jetProbabilityBJetTag               = jetProbabilityBJetTagJet[iJet];
+
+      thisJet.QGLikelihood               = QGLikelihoodJet[iJet];
 
       thisJet.ptGen = ptJetGen[iJet];
       thisJet.etaGen = etaJetGen[iJet];
@@ -753,6 +764,8 @@ ofstream ofs("run_event.txt");
       thisJet.jetBProbabilityBJetTag              = jetBProbabilityBJetTagJet[iJet];
       thisJet.jetProbabilityBJetTag               = jetProbabilityBJetTagJet[iJet];
 
+      thisJet.QGLikelihood               = QGLikelihoodJet[iJet];
+
       thisJet.ptGen = ptJetGen[iJet];
       thisJet.etaGen = etaJetGen[iJet];
       thisJet.phiGen = phiJetGen[iJet];
@@ -816,6 +829,26 @@ ofstream ofs("run_event.txt");
 
     h1_leptType->Fill( leptType, eventWeight );
 
+    h1_ptLept1->Fill( Lept1.Pt(), eventWeight );
+    h1_ptLept2->Fill( Lept2.Pt(), eventWeight );
+    h1_etaLept1->Fill( Lept1.Eta(), eventWeight );
+    h1_etaLept2->Fill( Lept2.Eta(), eventWeight );
+    if( leptTypeLept1==0 ) {
+      h1_etaMu->Fill( Lept1.Eta(), eventWeight );
+    } else {
+      h1_etaEle->Fill( Lept1.Eta(), eventWeight );
+    }
+    if( leptTypeLept2==0 ) {
+      h1_etaMu->Fill( Lept2.Eta(), eventWeight );
+    } else {
+      h1_etaEle->Fill( Lept2.Eta(), eventWeight );
+    }
+
+
+    deltaRll = Lept1.DeltaR(Lept2);
+    h1_deltaRll->Fill( deltaRll, eventWeight );
+
+
     h1_nJets->Fill( jets.size(), eventWeight );
     h1_pfMet->Fill( pfMet, eventWeight );
     h1_metSignificance->Fill( metSignificance, eventWeight );
@@ -829,6 +862,11 @@ ofstream ofs("run_event.txt");
     h1_etaJet2->Fill( jets[1].Eta(), eventWeight );
     h1_etaJet3->Fill( jets[2].Eta(), eventWeight );
     h1_etaJet4->Fill( jets[3].Eta(), eventWeight );
+
+    h1_QGLikelihoodJet1->Fill( jets[0].QGLikelihood, eventWeight );
+    h1_QGLikelihoodJet2->Fill( jets[1].QGLikelihood, eventWeight );
+    h1_QGLikelihoodJet3->Fill( jets[2].QGLikelihood, eventWeight );
+    h1_QGLikelihoodJet4->Fill( jets[3].QGLikelihood, eventWeight );
 
     h1_partFlavorJet1->Fill( jets[0].pdgIdPart, eventWeight );
     h1_partFlavorJet2->Fill( jets[1].pdgIdPart, eventWeight );
@@ -849,7 +887,34 @@ ofstream ofs("run_event.txt");
     h1_deltaRqq->Fill( jets[2].DeltaR(jets[3]), eventWeight );
 
 
+    float deltaR_b0_lept1 = jets[0].DeltaR(Lept1);
+    float deltaR_b0_lept2 = jets[0].DeltaR(Lept2);
+    float deltaR_b1_lept1 = jets[1].DeltaR(Lept1);
+    float deltaR_b1_lept2 = jets[1].DeltaR(Lept2);
 
+    float deltaR_b0_lept_max, deltaR_b0_lept_min;
+    if( deltaR_b0_lept1>deltaR_b0_lept2 ) {
+      deltaR_b0_lept_max = deltaR_b0_lept1;
+      deltaR_b0_lept_min = deltaR_b0_lept2;
+    } else {
+      deltaR_b0_lept_min = deltaR_b0_lept1;
+      deltaR_b0_lept_max = deltaR_b0_lept2;
+    }
+
+    float deltaR_b1_lept_max, deltaR_b1_lept_min;
+    if( deltaR_b1_lept1>deltaR_b1_lept2 ) {
+      deltaR_b1_lept_max = deltaR_b1_lept1;
+      deltaR_b1_lept_min = deltaR_b1_lept2;
+    } else {
+      deltaR_b1_lept_min = deltaR_b1_lept1;
+      deltaR_b1_lept_max = deltaR_b1_lept2;
+    }
+
+    float deltaR_b_lept_max = (deltaR_b1_lept_max>deltaR_b0_lept_max) ? deltaR_b1_lept_max : deltaR_b0_lept_max;
+    float deltaR_b_lept_min = (deltaR_b1_lept_min>deltaR_b0_lept_min) ? deltaR_b1_lept_min : deltaR_b0_lept_min;
+
+    h1_deltaR_b_lept_max->Fill(deltaR_b_lept_max, eventWeight);
+    h1_deltaR_b_lept_min->Fill(deltaR_b_lept_min, eventWeight);
 
 
     ptLept1_t = Lept1.Pt();
@@ -869,6 +934,11 @@ ofstream ofs("run_event.txt");
     etaJet2_t = jets[1].Eta();
     etaJet3_t = jets[2].Eta();
     etaJet4_t = jets[3].Eta();
+
+    QGLikelihoodJet1_t = jets[0].QGLikelihood;
+    QGLikelihoodJet2_t = jets[1].QGLikelihood;
+    QGLikelihoodJet3_t = jets[2].QGLikelihood;
+    QGLikelihoodJet4_t = jets[3].QGLikelihood;
 
 
 
@@ -946,6 +1016,11 @@ ofstream ofs("run_event.txt");
   h1_etaJet3->Write();
   h1_etaJet4->Write();
 
+  h1_QGLikelihoodJet1->Write();
+  h1_QGLikelihoodJet2->Write();
+  h1_QGLikelihoodJet3->Write();
+  h1_QGLikelihoodJet4->Write();
+
   h1_partFlavorJet1->Write();
   h1_partFlavorJet2->Write();
   h1_partFlavorJet3->Write();
@@ -954,6 +1029,9 @@ ofstream ofs("run_event.txt");
 
   h1_deltaRbb->Write();
   h1_deltaRqq->Write();
+
+  h1_deltaR_b_lept_max->Write();
+  h1_deltaR_b_lept_min->Write();
 
   h1_mbb->Write();
   h1_mqq->Write();
@@ -980,6 +1058,8 @@ void Ntp1Finalizer_TTW::setSelectionType( const std::string& selectionType ) {
     etaLept1_thresh_ = 3.;
     etaLept2_thresh_ = 3.;
 
+    mll_thresh_ = 8.;
+
     pfMet_thresh_ = 0.;
 
     btagSelectionType_ = "looseloose";
@@ -1003,7 +1083,34 @@ void Ntp1Finalizer_TTW::setSelectionType( const std::string& selectionType ) {
     etaLept1_thresh_ = 3.;
     etaLept2_thresh_ = 3.;
 
+    mll_thresh_ = 8.;
+
     pfMet_thresh_ = 40.;
+
+    btagSelectionType_ = "loosemed";
+
+    ptJet_thresh_ = 20.;
+    etaJet_thresh_ = 2.4;
+
+    ptJet1_thresh_ = 20.;
+    ptJet2_thresh_ = 20.;
+    ptJet3_thresh_ = 20.;
+    ptJet4_thresh_ = 20.;
+    etaJet1_thresh_ = 5.;
+    etaJet2_thresh_ = 5.;
+    etaJet3_thresh_ = 5.;
+    etaJet4_thresh_ = 5.;
+
+  } else if( selectionType_=="sel2" ) {
+
+    ptLept1_thresh_ = 40.;
+    ptLept2_thresh_ = 20.;
+    etaLept1_thresh_ = 3.;
+    etaLept2_thresh_ = 3.;
+
+    mll_thresh_ = 8.;
+
+    pfMet_thresh_ = 0.;
 
     btagSelectionType_ = "loosemed";
 
