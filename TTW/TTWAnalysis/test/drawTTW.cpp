@@ -143,7 +143,7 @@ int main(int argc, char* argv[]) {
   mcWZFileName += "_" + selType;
   mcWZFileName += ".root";
   TFile* mcWZFile = TFile::Open(mcWZFileName.c_str());
-  db->add_mcFile( mcWZFile, "WZtoAnything_TuneZ2", "WW / WZ / ZZ", 38, 3004);
+  db->add_mcFile( mcWZFile, "WZtoAnything_TuneZ2", "Diboson", 38, 3004);
 
 
   std::string TTZFileName = "TTW_TTZ_TuneZ2_7TeV-madgraphCMSSW42xPUv3_spadhi";
