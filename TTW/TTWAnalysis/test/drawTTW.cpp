@@ -27,6 +27,7 @@ int main(int argc, char* argv[]) {
 
 
 
+  float lumi_fb = 4.6;
 
   DrawBase* db = new DrawBase("TTW");
 
@@ -86,8 +87,9 @@ int main(int argc, char* argv[]) {
   db->drawHisto("deltaR_b_lept_max", "#DeltaR Between b and Farthest Lepton", "" );
 
 
-  db->set_rebin(1);
+  db->set_rebin(10);
   db->drawHisto("deltaRll", "#DeltaR Between Leptons", "", "Lepton Pairs");
+  db->set_rebin(1);
   db->set_yAxisMaxScale( 1.6 );
   db->drawHisto("etaLept1", "Lead Lepton Pseudorapidity", "", "Events");
   db->drawHisto("etaLept2", "Sublead Lepton Pseudorapidity", "", "Events");
@@ -156,7 +158,8 @@ int main(int argc, char* argv[]) {
   TFile* singleTopFile = TFile::Open(singleTopFileName.c_str());
   db->add_mcFile( singleTopFile, "Singletop", "Single Top", 42, 3003);
 
-  db->set_lumiNormalization(5000.);
+
+  db->set_lumiNormalization(1000.*lumi_fb);
   db->set_noStack(false);
   db->set_yAxisMaxScale(2.3);
   db->set_getBinLabels(true);
@@ -167,7 +170,7 @@ int main(int argc, char* argv[]) {
   ofstream yieldsFile(yieldsFileName.c_str());
 
   yieldsFile << "------------------------" << std::endl;
-  yieldsFile << "Expected Yields @ 5 fb-1" << std::endl;
+  yieldsFile << "Expected Yields @ " << lumi_fb << " fb-1" << std::endl;
   yieldsFile << "------------------------" << std::endl;
   yieldsFile << "Dataset \t\t& #mu#mu \t& ee \t\t& e#mu " << std::endl;
 
