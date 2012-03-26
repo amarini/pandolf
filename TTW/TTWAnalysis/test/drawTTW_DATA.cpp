@@ -156,7 +156,7 @@ int main(int argc, char* argv[]) {
   yieldsFile << "Total Background\t& " << b_mumu << "\t& " << b_ee << "\t& " << b_emu << "\\\\" << std::endl;
 
   //yieldsFile << "s/sqrt(b)    \t& " << s_mumu/sqrt(b_mumu) << "\t& " << s_ee/sqrt(b_ee) << "\t& " << s_emu/sqrt(b_emu) << "\\\\" << std::endl;
-  yieldsFile << "Observed:    \t& " << db->get_lastHistos_mc()[0]->GetBinContent(1) << "\t& " << db->get_lastHistos_mc()[0]->GetBinContent(2) << "\t& " << db->get_lastHistos_mc()[0]->GetBinContent(3) << "\\\\" << std::endl;
+  yieldsFile << "Observed:    \t& " << db->get_lastHistos_data()[0]->GetBinContent(1) << "\t\t& " << db->get_lastHistos_data()[0]->GetBinContent(2) << "\t\t& " << db->get_lastHistos_data()[0]->GetBinContent(3) << "\\\\" << std::endl;
   yieldsFile.close();
 
 
