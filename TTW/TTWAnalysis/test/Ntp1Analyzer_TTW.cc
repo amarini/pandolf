@@ -76,6 +76,9 @@ void Ntp1Analyzer_TTW::CreateOutputFile() {
   reducedTree_->Branch("passed_HLT_TripleMu5",   &passed_HLT_TripleMu5_,  "passed_HLT_TripleMu5_/O)");
   reducedTree_->Branch("passed_HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL", &passed_HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_, "passed_HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_/O");
   reducedTree_->Branch("passed_HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL", &passed_HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_, "passed_HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_/O");
+  reducedTree_->Branch("passed_HLT_Mu17_Ele8_CaloIdL",   &passed_HLT_Mu17_Ele8_CaloIdL_,  "passed_HLT_Mu17_Ele8_CaloIdL_/O)");
+  reducedTree_->Branch("passed_HLT_Mu8_Ele17_CaloIdL",   &passed_HLT_Mu8_Ele17_CaloIdL_,  "passed_HLT_Mu8_Ele17_CaloIdL_/O)");
+  reducedTree_->Branch("passed_HLT_Mu8_Ele17_CaloIdT_CaloIsoVL",   &passed_HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_,  "passed_HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_/O)");
 
 
   reducedTree_->Branch("ptHat",&ptHat_,"ptHat_/F");
@@ -297,19 +300,22 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
 
      // save trigger info:
-     passed_HLT_DoubleMu6_ = this->PassedHLT( jentry, "HLT_DoubleMu6");
-     passed_HLT_DoubleMu7_ = this->PassedHLT( jentry, "HLT_DoubleMu7");
-     passed_HLT_Mu13_Mu8_ = this->PassedHLT( jentry, "HLT_Mu13_Mu8");
-     passed_HLT_Mu17_Mu8_ = this->PassedHLT( jentry, "HLT_Mu17_Mu8");
-     passed_HLT_IsoMu17_ = this->PassedHLT( jentry, "HLT_IsoMu17");
+     passed_HLT_DoubleMu6_ = this->PassedHLT( jentry, "HLT_DoubleMu6_v");
+     passed_HLT_DoubleMu7_ = this->PassedHLT( jentry, "HLT_DoubleMu7_v");
+     passed_HLT_Mu13_Mu8_ = this->PassedHLT( jentry, "HLT_Mu13_Mu8_v");
+     passed_HLT_Mu17_Mu8_ = this->PassedHLT( jentry, "HLT_Mu17_Mu8_v");
+     passed_HLT_IsoMu17_ = this->PassedHLT( jentry, "HLT_IsoMu17_v");
      passed_HLT_IsoMu24_ = this->PassedHLT( jentry, "HLT_IsoMu24_v");
      passed_HLT_IsoMu24_eta2p1_ = this->PassedHLT( jentry, "HLT_IsoMu24_eta2p1_v");
-     passed_HLT_Mu8_Jet40_ = this->PassedHLT( jentry, "HLT_Mu8_Jet40");
-     passed_HLT_L2DoubleMu23_NoVertex_ = this->PassedHLT( jentry, "HLT_L2DoubleMu23_NoVertex");
-     passed_HLT_L2DoubleMu30_NoVertex_ = this->PassedHLT( jentry, "HLT_L2DoubleMu30_NoVertex");
-     passed_HLT_TripleMu5_ = this->PassedHLT( jentry, "HLT_TripleMu5");
-     passed_HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_ = this->PassedHLT( jentry, "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL");
-     passed_HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_ = this->PassedHLT( jentry, "HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL");
+     passed_HLT_Mu8_Jet40_ = this->PassedHLT( jentry, "HLT_Mu8_Jet40_v");
+     passed_HLT_L2DoubleMu23_NoVertex_ = this->PassedHLT( jentry, "HLT_L2DoubleMu23_NoVertex_v");
+     passed_HLT_L2DoubleMu30_NoVertex_ = this->PassedHLT( jentry, "HLT_L2DoubleMu30_NoVertex_v");
+     passed_HLT_TripleMu5_ = this->PassedHLT( jentry, "HLT_TripleMu5_v");
+     passed_HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_ = this->PassedHLT( jentry, "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v");
+     passed_HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_ = this->PassedHLT( jentry, "HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v");
+     passed_HLT_Mu17_Ele8_CaloIdL_ = this->PassedHLT( jentry, "HLT_Mu17_Ele8_CaloIdL_v" );
+     passed_HLT_Mu8_Ele17_CaloIdL_ = this->PassedHLT( jentry, "HLT_Mu8_Ele17_CaloIdL_v" );
+     passed_HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_ = this->PassedHLT( jentry, "HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_v" );
   
 
 
@@ -492,6 +498,8 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        if( fabs(thisEle.Eta()) > 2.5 ) continue; //acceptance cut with electron eta
 
 
+       thisEle.etaSC = scEta;
+
        // isolation
        thisEle.dr03TkSumPt = dr03TkSumPtEle[iEle];
        thisEle.dr03EcalRecHitSumEt = dr03EcalRecHitSumEtEle[iEle];
@@ -502,6 +510,8 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        thisEle.deltaPhiAtVtx = deltaPhiAtVtxEle[iEle];
        thisEle.deltaEtaAtVtx = deltaEtaAtVtxEle[iEle];
        thisEle.hOverE = hOverEEle[iEle];
+       thisEle.fBrem = fbremEle[iEle];
+       thisEle.eOverP = eSuperClusterOverPEle[iEle];
 
        // conversion rejection
        thisEle.expInnerLayersGsfTrack = expInnerLayersGsfTrack[gsfTrackIndexEle[iEle]];
@@ -527,7 +537,8 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        bool passed_electronID = thisEle.electronIDVBTF80() 
                              && thisEle.conversionRejectionVBTF80() 
                              && thisEle.combinedIsoRel()<0.15
-                             && thisEle.dr03EcalRecHitSumEt/thisEle.Pt()<0.07;
+                             && thisEle.dr03EcalRecHitSumEt/thisEle.Pt()<0.07
+                             && thisEle.passedAdditionalCuts();
 
 
        if( !passed_electronID ) continue;
