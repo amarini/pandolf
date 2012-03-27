@@ -16,6 +16,7 @@ Int_t pdgIdJet0_out;
 Int_t nChargedJet0_out;
 Int_t nNeutralJet0_out;
 Float_t ptDJet0_out;
+Float_t rmsCandJet0_out;
 Float_t QGLikelihoodJet0_out;
 
 
@@ -27,6 +28,7 @@ struct DummyJet {
   int nCharged;
   int nNeutral;
   float ptD;
+  float rmsCand;
   float QGLikelihood;
 
 };
@@ -129,6 +131,12 @@ int main( int argc, char* argv[] ) {
   if( controlSample=="DiJet" || controlSample=="MultiJet" )
     chain->SetBranchAddress( "ptDJet1", &ptDJet1 );
 
+  Float_t rmsCandJet0;
+  chain->SetBranchAddress( "rmsCandJet0", &rmsCandJet0 );
+  Float_t rmsCandJet1;
+  if( controlSample=="DiJet" || controlSample=="MultiJet" )
+    chain->SetBranchAddress( "rmsCandJet1", &rmsCandJet1 );
+
   Float_t QGLikelihoodJet0;
   chain->SetBranchAddress( "QGLikelihoodJet0", &QGLikelihoodJet0 );
   Float_t QGLikelihoodJet1;
@@ -142,15 +150,24 @@ int main( int argc, char* argv[] ) {
   Bool_t passed_HT150;
   if( controlSample=="DiJet" || controlSample=="MultiJet" )
     chain->SetBranchAddress( "passed_HT150", &passed_HT150);
+  Bool_t passed_HT200;
+  if( controlSample=="DiJet" || controlSample=="MultiJet" )
+    chain->SetBranchAddress( "passed_HT200", &passed_HT200);
   Bool_t passed_HT250;
   if( controlSample=="DiJet" || controlSample=="MultiJet" )
     chain->SetBranchAddress( "passed_HT250", &passed_HT250);
+  Bool_t passed_HT300;
+  if( controlSample=="DiJet" || controlSample=="MultiJet" )
+    chain->SetBranchAddress( "passed_HT300", &passed_HT300);
   Bool_t passed_HT350;
   if( controlSample=="DiJet" || controlSample=="MultiJet" )
     chain->SetBranchAddress( "passed_HT350", &passed_HT350);
   Bool_t passed_HT400;
   if( controlSample=="DiJet" || controlSample=="MultiJet" )
     chain->SetBranchAddress( "passed_HT400", &passed_HT400);
+  Bool_t passed_HT450;
+  if( controlSample=="DiJet" || controlSample=="MultiJet" )
+    chain->SetBranchAddress( "passed_HT450", &passed_HT450);
   Bool_t passed_HT500;
   if( controlSample=="DiJet" || controlSample=="MultiJet" )
     chain->SetBranchAddress( "passed_HT500", &passed_HT500);
@@ -164,6 +181,9 @@ int main( int argc, char* argv[] ) {
   Float_t PUWeight_HT250;
   if( controlSample=="DiJet" || controlSample=="MultiJet" )
     chain->SetBranchAddress( "PUWeight_HT250", &PUWeight_HT250);
+  Float_t PUWeight_HT300;
+  if( controlSample=="DiJet" || controlSample=="MultiJet" )
+    chain->SetBranchAddress( "PUWeight_HT300", &PUWeight_HT300);
   Float_t PUWeight_HT350;
   if( controlSample=="DiJet" || controlSample=="MultiJet" )
     chain->SetBranchAddress( "PUWeight_HT350", &PUWeight_HT350);
@@ -223,6 +243,7 @@ int main( int argc, char* argv[] ) {
   tree_omogeneizzato->Branch( "nChargedJet0", &nChargedJet0_out, "nChargedJet0_out/I" );
   tree_omogeneizzato->Branch( "nNeutralJet0", &nNeutralJet0_out, "nNeutralJet0_out/I" );
   tree_omogeneizzato->Branch( "ptDJet0", &ptDJet0_out, "ptDJet0_out/F" );
+  tree_omogeneizzato->Branch( "rmsCandJet0", &rmsCandJet0_out, "rmsCandJet0_out/F" );
   tree_omogeneizzato->Branch( "QGLikelihoodJet0", &QGLikelihoodJet0_out, "QGLikelihoodJet0_out/F" );
 
   
@@ -250,11 +271,13 @@ int main( int argc, char* argv[] ) {
     jet0.nCharged = nChargedJet0;
     jet0.nNeutral = nNeutralJet0;
     jet0.ptD = ptDJet0;
+    jet0.rmsCand = -log(rmsCandJet0);
     jet0.QGLikelihood = QGLikelihoodJet0;
     jet0.pdgId = pdgIdJet0;
 
     std::vector<DummyJet> jets;
-    jets.push_back(jet0);
+    //if( fabs(jet0.eta)<2.4 ) 
+      jets.push_back(jet0);
 
     if( controlSample=="DiJet" || controlSample=="MultiJet" ) {
 
@@ -264,17 +287,22 @@ int main( int argc, char* argv[] ) {
       jet1.nCharged = nChargedJet1;
       jet1.nNeutral = nNeutralJet1;
       jet1.ptD = ptDJet1;
+      jet1.rmsCand = -log(rmsCandJet1);
       jet1.QGLikelihood = QGLikelihoodJet1;
       jet1.pdgId = pdgIdJet1;
 
       jets.push_back(jet1);
 
-      if( fillFromTrigger( tree_omogeneizzato, (passed_HT150 && run<175000) || run<5, ht_akt5, 160., eventWeight_noPU*PUWeight_HT150, jets, 50., 100.) ) continue;
-      if( fillFromTrigger( tree_omogeneizzato, passed_HT250 || run<5, ht_akt5, 265., eventWeight_noPU*PUWeight_HT250, jets, 100., 150.) ) continue;
-      if( fillFromTrigger( tree_omogeneizzato, passed_HT350 || run<5, ht_akt5, 365., eventWeight_noPU*PUWeight_HT350, jets, 150., 200.) ) continue;
-      if( fillFromTrigger( tree_omogeneizzato, passed_HT400 || run<5, ht_akt5, 420., eventWeight_noPU*PUWeight_HT400, jets, 200., 250.) ) continue;
-      if( fillFromTrigger( tree_omogeneizzato, passed_HT500 || run<5, ht_akt5, 525., eventWeight_noPU*PUWeight_HT500, jets, 250., 300.) ) continue;
-      if( fillFromTrigger( tree_omogeneizzato, passed_HT600 || run<5, ht_akt5, 640., eventWeight_noPU*PUWeight_HT600, jets, 300., 3500.) ) continue;
+      if( fillFromTrigger( tree_omogeneizzato, passed_HT150 || run<5, ht_akt5, 160., eventWeight_noPU*PUWeight_HT150, jets, 50., 100.) ) continue;
+
+      std::vector<DummyJet> only_secondJet;
+      only_secondJet.push_back(jet1); //only sublead jet for this bin (hope doesnt bias)
+      if( fillFromTrigger( tree_omogeneizzato, passed_HT200 || run<5, ht_akt5, 215., eventWeight_noPU*PUWeight_HT250, only_secondJet, 100., 150.) ) continue;
+      if( fillFromTrigger( tree_omogeneizzato, passed_HT250 || run<5, ht_akt5, 268., eventWeight_noPU*PUWeight_HT350, jets, 150., 200.) ) continue;
+      if( fillFromTrigger( tree_omogeneizzato, passed_HT350 || run<5, ht_akt5, 370., eventWeight_noPU*PUWeight_HT400, jets, 200., 250.) ) continue;
+      if( fillFromTrigger( tree_omogeneizzato, passed_HT450 || run<5, ht_akt5, 475., eventWeight_noPU*PUWeight_HT500, jets, 250., 300.) ) continue;
+      if( fillFromTrigger( tree_omogeneizzato, passed_HT500 || run<5, ht_akt5, 530., eventWeight_noPU*PUWeight_HT600, jets, 300., 350.) ) continue;
+      if( fillFromTrigger( tree_omogeneizzato, passed_HT600 || run<5, ht_akt5, 640., eventWeight_noPU*PUWeight_HT600, jets, 350., 3500.) ) continue;
 
 
     } else { //photonjet
@@ -316,7 +344,6 @@ bool fillFromTrigger( TTree* tree, bool passedHLT, float HLTvar, float HLTvar_th
 
   for( unsigned i=0; i<jets.size(); ++i) {
 
-    if( fabs(jets[i].eta)>2. ) continue;
     if( jets[i].pt<ptMin || jets[i].pt>ptMax ) continue;
 
     ptJet0_out = jets[i].pt;
@@ -324,6 +351,7 @@ bool fillFromTrigger( TTree* tree, bool passedHLT, float HLTvar, float HLTvar_th
     nChargedJet0_out = jets[i].nCharged;
     nNeutralJet0_out = jets[i].nNeutral;
     ptDJet0_out = jets[i].ptD;
+    rmsCandJet0_out = jets[i].rmsCand;
     pdgIdJet0_out = jets[i].pdgId;
     QGLikelihoodJet0_out = jets[i].QGLikelihood;
 
