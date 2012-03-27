@@ -607,7 +607,7 @@ float getWeight( const std::string& dataset, int nEvents ) {
     xSection = 7.46;
   } else if( dataset_tstr.BeginsWith("Tbar_") && dataset_tstr.Contains("tW-channel") ) { 	 
     xSection = 7.466;
-  } else if( dataset_tsrt.BeginsWith("WJetsToLNu") ) {//## W+Jets
+  } else if( dataset_tstr.BeginsWith("WJetsToLNu") ) {//## W+Jets
     xSection = 31314.; //NNLO taken from https://twiki.cern.ch/twiki/pub/CMS/GeneratorMain/ShortXsec.pdf
   } else if( dataset=="DYToEE_M-10To20_TuneZ2_7TeV-pythia6_Spring11-PU_S1_START311_V1G1-v1_2" ) {//## DY. EE 10to20
     xSection = 3457./3.;//##
