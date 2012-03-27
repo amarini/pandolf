@@ -37,10 +37,14 @@ class AnalysisElectron : public AnalysisLepton {
   bool passedVBTF95();
   bool passedTrigger80();//
 
+  bool passedAdditionalCuts();
+
   double combinedIsoRel();
 
 
   // public data members:
+
+  double etaSC; //supercluster eta
 
   // isolation:
   double dr03TkSumPt;
@@ -52,6 +56,8 @@ class AnalysisElectron : public AnalysisLepton {
   double deltaPhiAtVtx; 
   double deltaEtaAtVtx; 
   double hOverE; 
+  double fBrem; 
+  double eOverP; 
 
   // conversion rejection:
   int expInnerLayersGsfTrack;

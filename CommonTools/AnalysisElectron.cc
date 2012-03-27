@@ -64,6 +64,17 @@ bool AnalysisElectron::electronIDVBTF80() {
 
 }
 
+
+
+bool AnalysisElectron::passedAdditionalCuts() {
+
+  bool passedAC = ( fBrem>0.15 || (fabs(etaSC)<1. && eOverP>0.95) );
+
+  return passedAC;
+
+}
+
+
 bool AnalysisElectron::separatedIDVBTF80() {
 
   double sigmaIetaIeta_thresh80;
