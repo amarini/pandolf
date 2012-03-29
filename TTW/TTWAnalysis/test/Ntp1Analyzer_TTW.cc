@@ -90,6 +90,7 @@ void Ntp1Analyzer_TTW::CreateOutputFile() {
   reducedTree_->Branch("phiLept1",  &phiLept1_,  "phiLept1_/F");
   reducedTree_->Branch("chargeLept1",  &chargeLept1_,  "chargeLept1_/I");
   reducedTree_->Branch("leptTypeLept1",  &leptTypeLept1_,  "leptTypeLept1_/I");
+  reducedTree_->Branch("combinedIsoRelLept1",  &combinedIsoRelLept1_,  "combinedIsoRelLept1_/F");
 
   reducedTree_->Branch("eLept1Gen",  &eLept1Gen_,  "eLept1Gen_/F");
   reducedTree_->Branch("ptLept1Gen",  &ptLept1Gen_,  "ptLept1Gen_/F");
@@ -102,6 +103,7 @@ void Ntp1Analyzer_TTW::CreateOutputFile() {
   reducedTree_->Branch("phiLept2",  &phiLept2_,  "phiLept2_/F");
   reducedTree_->Branch("chargeLept2",  &chargeLept2_,  "chargeLept2_/I");
   reducedTree_->Branch("leptTypeLept2",  &leptTypeLept2_,  "leptTypeLept2_/I");
+  reducedTree_->Branch("combinedIsoRelLept2",  &combinedIsoRelLept2_,  "combinedIsoRelLept2_/F");
 
   reducedTree_->Branch("eLept2Gen",  &eLept2Gen_,  "eLept2Gen_/F");
   reducedTree_->Branch("ptLept2Gen",  &ptLept2Gen_,  "ptLept2Gen_/F");
@@ -417,9 +419,11 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        thisMuon.dxy = dxy;
        thisMuon.dz = dz;
 
+       // isolation:
        thisMuon.sumPt03 = sumPt03Muon[iMuon];
        thisMuon.emEt03  = emEt03Muon[iMuon];
        thisMuon.hadEt03 = hadEt03Muon[iMuon];
+       thisMuon.isolation = thisMuon.combinedIsoRel();
 
        if( event_==DEBUG_EVENTNUMBER ) {
          std::cout << "thisMuon.dxy: " << thisMuon.dxy << std::endl;
@@ -504,6 +508,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        thisEle.dr03TkSumPt = dr03TkSumPtEle[iEle];
        thisEle.dr03EcalRecHitSumEt = dr03EcalRecHitSumEtEle[iEle];
        thisEle.dr03HcalTowerSumEt = dr03HcalTowerSumEtEle[iEle];
+       thisEle.isolation = thisEle.combinedIsoRel();
 
        // electron ID
        thisEle.sigmaIetaIeta = (superClusterIndexEle[iEle]>=0) ? sqrt(covIEtaIEtaSC[superClusterIndexEle[iEle]]) : sqrt(covIEtaIEtaPFSC[PFsuperClusterIndexEle[iEle]]);
@@ -642,6 +647,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        phiLept1_ = leptons[0].Phi();
        chargeLept1_ = leptons[0].charge;
        leptTypeLept1_ = leptons[0].leptType;
+       combinedIsoRelLept1_ = leptons[0].isolation;
        
        eLept2_ = leptons[1].Energy();
        ptLept2_ = leptons[1].Pt();
@@ -649,6 +655,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        phiLept2_ = leptons[1].Phi();
        chargeLept2_ = leptons[1].charge;
        leptTypeLept2_ = leptons[1].leptType;
+       combinedIsoRelLept2_ = leptons[1].isolation;
 
      } else {
 
@@ -658,6 +665,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        phiLept2_ = leptons[0].Phi();
        chargeLept2_ = leptons[0].charge;
        leptTypeLept2_ = leptons[0].leptType;
+       combinedIsoRelLept2_ = leptons[0].isolation;
        
        eLept1_ = leptons[1].Energy();
        ptLept1_ = leptons[1].Pt();
@@ -665,6 +673,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        phiLept1_ = leptons[1].Phi();
        chargeLept1_ = leptons[1].charge;
        leptTypeLept1_ = leptons[1].leptType;
+       combinedIsoRelLept1_ = leptons[1].isolation;
 
      }
 
