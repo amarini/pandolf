@@ -17,13 +17,18 @@ class AnalysisLepton : public TLorentzVector {
 
   AnalysisLepton( float x=0., float y=0., float z=0., float t=0.) : TLorentzVector( x, y, z, t ) {
     charge=0;
+    leptType=-1;
   }
 
   AnalysisLepton( const TLorentzVector &v) : TLorentzVector( v ) {
     charge=0;
+    leptType=-1;
   }
 
+
   int charge;
+  int leptType;
+  float isolation;
 
 };
 
