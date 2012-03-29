@@ -41,6 +41,9 @@ class Ntp1Analyzer_TTW : public Ntp1Analyzer {
    Bool_t passed_HLT_L2DoubleMu23_NoVertex_;
    Bool_t passed_HLT_L2DoubleMu30_NoVertex_;
    Bool_t passed_HLT_TripleMu5_;
+   Bool_t passed_HLT_Mu17_Ele8_CaloIdL_;
+   Bool_t passed_HLT_Mu8_Ele17_CaloIdL_;
+   Bool_t passed_HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_;
 
    Bool_t passed_HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_;
    Bool_t passed_HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_;
@@ -56,6 +59,7 @@ class Ntp1Analyzer_TTW : public Ntp1Analyzer {
    Float_t phiLept1_;
    Int_t   chargeLept1_;
    Int_t   leptTypeLept1_;
+   Float_t combinedIsoRelLept1_;
 
    Float_t eLept1Gen_;
    Float_t ptLept1Gen_;
@@ -68,6 +72,7 @@ class Ntp1Analyzer_TTW : public Ntp1Analyzer {
    Float_t phiLept2_;
    Int_t   chargeLept2_;
    Int_t   leptTypeLept2_;
+   Float_t combinedIsoRelLept2_;
 
    Float_t eLept2Gen_;
    Float_t ptLept2Gen_;
