@@ -20,7 +20,7 @@
 
 bool USE_MC_MASS=false;
 
-int DEBUG_EVENTNUMBER = 98901397;
+int DEBUG_EVENTNUMBER = 696;
 
 
 
@@ -242,20 +242,20 @@ void Ntp1Finalizer_TTW::finalize() {
   tree_->SetBranchAddress("leptTypeLept2", &leptTypeLept2);
 
 
-  Int_t nLept;
-  tree_->SetBranchAddress("nLept", &nLept);
-  Int_t leptTypeLept[10];
-  tree_->SetBranchAddress("leptTypeLept", leptTypeLept);
-  Float_t eLept[10];
-  tree_->SetBranchAddress("eLept", eLept);
-  Float_t ptLept[10];
-  tree_->SetBranchAddress("ptLept", ptLept);
-  Float_t etaLept[10];
-  tree_->SetBranchAddress("etaLept", etaLept);
-  Float_t phiLept[10];
-  tree_->SetBranchAddress("phiLept", phiLept);
-  Int_t chargeLept[10];
-  tree_->SetBranchAddress("chargeLept", chargeLept);
+  //Int_t nLept;
+  //tree_->SetBranchAddress("nLept", &nLept);
+  //Int_t leptTypeLept[10];
+  //tree_->SetBranchAddress("leptTypeLept", leptTypeLept);
+  //Float_t eLept[10];
+  //tree_->SetBranchAddress("eLept", eLept);
+  //Float_t ptLept[10];
+  //tree_->SetBranchAddress("ptLept", ptLept);
+  //Float_t etaLept[10];
+  //tree_->SetBranchAddress("etaLept", etaLept);
+  //Float_t phiLept[10];
+  //tree_->SetBranchAddress("phiLept", phiLept);
+  //Int_t chargeLept[10];
+  //tree_->SetBranchAddress("chargeLept", chargeLept);
 
 
   Int_t nJets;
@@ -269,14 +269,14 @@ void Ntp1Finalizer_TTW::finalize() {
   tree_->SetBranchAddress("etaJet", etaJet);
   Float_t phiJet[50];
   tree_->SetBranchAddress("phiJet", phiJet);
-  Float_t eJetGen[50];
-  tree_->SetBranchAddress("eJetGen", eJetGen);
-  Float_t ptJetGen[50];
-  tree_->SetBranchAddress("ptJetGen", ptJetGen);
-  Float_t etaJetGen[50];
-  tree_->SetBranchAddress("etaJetGen", etaJetGen);
-  Float_t phiJetGen[50];
-  tree_->SetBranchAddress("phiJetGen", phiJetGen);
+  Float_t eGenJet[50];
+  tree_->SetBranchAddress("eGenJet", eGenJet);
+  Float_t ptGenJet[50];
+  tree_->SetBranchAddress("ptGenJet", ptGenJet);
+  Float_t etaGenJet[50];
+  tree_->SetBranchAddress("etaGenJet", etaGenJet);
+  Float_t phiGenJet[50];
+  tree_->SetBranchAddress("phiGenJet", phiGenJet);
   Float_t eChargedHadronsJet[50];
   tree_->SetBranchAddress("eChargedHadronsJet", eChargedHadronsJet);
   Float_t rmsCandJet[50];
@@ -623,10 +623,24 @@ ofstream ofs("run_event.txt");
     if( mll < mll_thresh_ ) continue;
 
 
+    if( event==DEBUG_EVENTNUMBER ) {
+      std::cout << std::endl << std::endl << "----------------------------------" << std::endl;
+      std::cout << "-> LEPTONS PASSED CUTS" << std::endl;
+    }
 
+    
+    if( event==DEBUG_EVENTNUMBER ) {
+      std::cout << std::endl << std::endl << "----------------------------------" << std::endl;
+      std::cout << "-> TOTAL NUMBER OF JETS IN EVENT: " << nJets << std::endl;
+    }
     
     if( nJets<4 ) continue;
 
+    if( event==DEBUG_EVENTNUMBER ) {
+      std::cout << std::endl << std::endl << "----------------------------------" << std::endl;
+      std::cout << "-> FIRST: LOOK FOR BEST B-TAGGED ONES" << std::endl;
+    }
+    
 
     std::vector<AnalysisJet> jets;
 
@@ -654,8 +668,18 @@ ofstream ofs("run_event.txt");
       AnalysisJet thisJet;
       thisJet.SetPtEtaPhiE( ptJet[iJet], etaJet[iJet], phiJet[iJet], eJet[iJet]);
 
-      if( thisJet.Pt()<ptJet_thresh_ ) continue;
-      if( fabs(thisJet.Eta())>etaJet_thresh_ ) continue;
+      if( event==DEBUG_EVENTNUMBER ) {
+        std::cout << std::endl << "Jet N." << iJet << " Pt: " << ptJet[iJet] << " \tEta: " << etaJet[iJet];
+      }
+
+      if( thisJet.Pt()<ptJet_thresh_ ) {
+        if( event==DEBUG_EVENTNUMBER ) std::cout << "\t (didn't pass pt cut)";
+        continue;
+      }
+      if( fabs(thisJet.Eta())>etaJet_thresh_ ) {
+        if( event==DEBUG_EVENTNUMBER ) std::cout << "\t (didn't pass eta cut)";
+        continue;
+      }
 
       thisJet.rmsCand = rmsCandJet[iJet];
       thisJet.ptD = ptDJet[iJet];
@@ -673,10 +697,10 @@ ofstream ofs("run_event.txt");
 
       thisJet.QGLikelihood               = QGLikelihoodJet[iJet];
 
-      thisJet.ptGen = ptJetGen[iJet];
-      thisJet.etaGen = etaJetGen[iJet];
-      thisJet.phiGen = phiJetGen[iJet];
-      thisJet.eGen = eJetGen[iJet];
+      thisJet.ptGen = ptGenJet[iJet];
+      thisJet.etaGen = etaGenJet[iJet];
+      thisJet.phiGen = phiGenJet[iJet];
+      thisJet.eGen = eGenJet[iJet];
 
       //match to parton:
       int partFlavor=0;
@@ -699,9 +723,17 @@ ofstream ofs("run_event.txt");
       else if( bTaggerType_=="SSVHE" ) 
         thisBtag = thisJet.simpleSecondaryVertexHighEffBJetTag;
 
+      if( event==DEBUG_EVENTNUMBER ) {
+        std::cout << " \tbtag: " << thisBtag;
+      }
+
 
       if( thisBtag > bestBtag ) {
 
+        if( event==DEBUG_EVENTNUMBER ) {
+          std::cout << "\t <--- THIS IS NEW LEADING BTAG JET IN EVENT";
+        }
+        
         bestBtag2 = bestBtag;
         bestBtag = thisBtag;
         i_bestBtag2 = i_bestBtag;
@@ -725,6 +757,10 @@ ofstream ofs("run_event.txt");
 
         bestBtag2 = thisBtag;
         i_bestBtag2 = iJet;
+
+        if( event==DEBUG_EVENTNUMBER ) {
+          std::cout << "\t <--- THIS IS NEW SUBLEADING BTAG JET IN EVENT";
+        }
         
         if( jets.size()==1 ) {
           AnalysisJet* newJet = new AnalysisJet(thisJet);
@@ -734,8 +770,17 @@ ofstream ofs("run_event.txt");
         }
   
       }
-
+      
     } // for jets
+
+    
+
+    if( event==DEBUG_EVENTNUMBER ) {
+      std::cout << std::endl << std::endl << std::endl << "-> So here are two best-btag jets: " << std::endl;
+      std::cout << "[1]  Pt: " << jets[0].Pt() << " \tEta: " << jets[0].Eta() << " btag: " << bestBtag << std::endl;
+      std::cout << "[2]  Pt: " << jets[1].Pt() << " \tEta: " << jets[1].Eta() << " btag: " << bestBtag2 << std::endl;
+      std::cout << std::endl << "NOW ADDING OTHER JETS (ORDERED IN PT)" << std::endl;
+    }
 
 
 
@@ -766,10 +811,10 @@ ofstream ofs("run_event.txt");
 
       thisJet.QGLikelihood               = QGLikelihoodJet[iJet];
 
-      thisJet.ptGen = ptJetGen[iJet];
-      thisJet.etaGen = etaJetGen[iJet];
-      thisJet.phiGen = phiJetGen[iJet];
-      thisJet.eGen = eJetGen[iJet];
+      thisJet.ptGen = ptGenJet[iJet];
+      thisJet.etaGen = etaGenJet[iJet];
+      thisJet.phiGen = phiGenJet[iJet];
+      thisJet.eGen = eGenJet[iJet];
 
       //match to parton:
       int partFlavor=0;
@@ -790,6 +835,15 @@ ofstream ofs("run_event.txt");
       jets.push_back(*newJet);
 
     } //for additional jets
+
+
+    if( event==DEBUG_EVENTNUMBER ) {
+      std::cout << std::endl << std::endl << "----------------------------------" << std::endl;
+      std::cout << "-> JETS PASSING REQUIREMENTS: " << std::endl;
+      for( unsigned ijet=0; ijet<jets.size(); ++ijet ) 
+        std::cout << ijet << "  Pt: " << jets[ijet].Pt() << " \tEta: " << jets[ijet].Eta() << std::endl;
+    }
+    
  
         
     if( jets.size()<4 ) continue;
@@ -809,7 +863,7 @@ ofstream ofs("run_event.txt");
     //if( event==DEBUG_EVENTNUMBER ) std::cout << "first jet eta OK" << std::endl;
     //if( fabs(jet2.Eta()) > etaJet2_thresh_ ) continue;
     //if( event==DEBUG_EVENTNUMBER ) std::cout << "second jet eta OK" << std::endl;
-
+    
     float bTaggerJet1, bTaggerJet2;
     if( bTaggerType_=="TCHE" ) {
       bTaggerJet1 = jets[0].trackCountingHighEffBJetTag;
@@ -817,6 +871,14 @@ ofstream ofs("run_event.txt");
     } else if( bTaggerType_=="SSVHE" ) {
       bTaggerJet1 = jets[0].simpleSecondaryVertexHighEffBJetTag;
       bTaggerJet2 = jets[1].simpleSecondaryVertexHighEffBJetTag;
+    }
+
+    if( event==DEBUG_EVENTNUMBER ) {
+      std::cout << std::endl << "-- FOUND JETS: " << std::endl;
+      std::cout << "jet1: \tpt:" << jets[0].Pt() << " \teta: " << jets[0].Eta() << "\tbtag: " << bTaggerJet1 << std::endl;
+      std::cout << "jet2: \tpt:" << jets[1].Pt() << " \teta: " << jets[1].Eta() << "\tbtag: " << bTaggerJet2 << std::endl;
+      std::cout << "jet3: \tpt:" << jets[2].Pt() << " \teta: " << jets[2].Eta() << std::endl;
+      std::cout << "jet4: \tpt:" << jets[3].Pt() << " \teta: " << jets[3].Eta() << std::endl;
     }
 
 
@@ -1113,6 +1175,31 @@ void Ntp1Finalizer_TTW::setSelectionType( const std::string& selectionType ) {
     pfMet_thresh_ = 0.;
 
     btagSelectionType_ = "loosemed";
+
+    ptJet_thresh_ = 20.;
+    etaJet_thresh_ = 2.4;
+
+    ptJet1_thresh_ = 20.;
+    ptJet2_thresh_ = 20.;
+    ptJet3_thresh_ = 20.;
+    ptJet4_thresh_ = 20.;
+    etaJet1_thresh_ = 5.;
+    etaJet2_thresh_ = 5.;
+    etaJet3_thresh_ = 5.;
+    etaJet4_thresh_ = 5.;
+
+  } else if( selectionType_=="sel3" ) {
+
+    ptLept1_thresh_ = 40.;
+    ptLept2_thresh_ = 40.;
+    etaLept1_thresh_ = 3.;
+    etaLept2_thresh_ = 3.;
+
+    mll_thresh_ = 8.;
+
+    pfMet_thresh_ = 0.;
+
+    btagSelectionType_ = "looseloose";
 
     ptJet_thresh_ = 20.;
     etaJet_thresh_ = 2.4;
