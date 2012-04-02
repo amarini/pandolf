@@ -28,8 +28,21 @@ class AnalysisJet : public TLorentzVector {
   float QGLikelihood;
   float QGLikelihoodNoPU;
 
-  float muonEnergyFraction;
-  float electronEnergyFraction;
+  float eChargedHadrons;
+  float ePhotons;
+  float eNeutralHadrons;
+  float eElectrons;
+  float eMuons;
+  float eHFHadrons;
+  float eHFEM;
+
+  int nChargedHadrons;
+  int nPhotons;
+  int nNeutralHadrons;
+  int nElectrons;
+  int nMuons;
+  int nHFHadrons;
+  int nHFEM;
 
   float pt_preKinFit;
   float eta_preKinFit;
@@ -40,6 +53,11 @@ class AnalysisJet : public TLorentzVector {
   float etaGen;
   float phiGen;
   float eGen;
+
+  float ptPart;
+  float etaPart;
+  float phiPart;
+  float ePart;
 
   int pdgIdPart;
 
