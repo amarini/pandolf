@@ -18,7 +18,7 @@
 //#include "fitTools.h"
 
 
-int DEBUG_EVENTNUMBER = 4213;
+int DEBUG_EVENTNUMBER = 2515;
 
 
 double trackDxyPV(float PVx, float PVy, float PVz, float eleVx, float eleVy, float eleVz, float elePx, float elePy, float elePz);
@@ -527,6 +527,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
          std::cout << "thisEle.dr03TkSumPt: " << thisEle.dr03TkSumPt << std::endl;
          std::cout << "thisEle.dr03EcalRecHitSumEt: " << thisEle.dr03EcalRecHitSumEt << std::endl;
          std::cout << "thisEle.dr03HcalTowerSumEt: " << thisEle.dr03HcalTowerSumEt << std::endl;
+         std::cout << "thisEle.combinedIsoRel: " << thisEle.combinedIsoRel() << std::endl;
          std::cout << "thisEle.sigmaIetaIeta: " << thisEle.sigmaIetaIeta << std::endl;
          std::cout << "thisEle.deltaPhiAtVtx: " << thisEle.deltaPhiAtVtx << std::endl;
          std::cout << "thisEle.deltaEtaAtVtx: " << thisEle.deltaEtaAtVtx << std::endl;
@@ -542,8 +543,16 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        bool passed_electronID = thisEle.electronIDVBTF80() 
                              && thisEle.conversionRejectionVBTF80() 
                              && thisEle.combinedIsoRel()<0.15
-                             && thisEle.dr03EcalRecHitSumEt/thisEle.Pt()<0.07
+                             && thisEle.dr03EcalRecHitSumEt/thisEle.Pt()<0.2
                              && thisEle.passedAdditionalCuts();
+
+       if( event_==DEBUG_EVENTNUMBER ) {
+         if( !(thisEle.electronIDVBTF80()) ) std::cout << "-> DIDN'T pass electronIDVBTF80" << std::endl;
+         if( !(thisEle.conversionRejectionVBTF80()) ) std::cout << "-> DIDN'T pass conversion rejection" << std::endl;
+         if( !(thisEle.combinedIsoRel()<0.15) ) std::cout << "-> DIDN'T pass combined iso rel" << std::endl;
+         if( !(thisEle.dr03EcalRecHitSumEt/thisEle.Pt()<0.2)) std::cout << "-> DIDN'T pass rechit sum ecal iso" << std::endl;
+         if( !(thisEle.passedAdditionalCuts()) ) std::cout << "-> DIDN'T pass additional cuts" << std::endl;
+       }
 
 
        if( !passed_electronID ) continue;
