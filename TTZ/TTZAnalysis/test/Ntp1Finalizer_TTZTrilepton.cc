@@ -390,67 +390,67 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
     puType = "Summer11_S4";
     //puType = "Fall11";
   }
-  PUWeight* fPUWeight = new PUWeight(-1, "2011A", puType);
-  PUWeight* fPUWeight_ave = new PUWeight(-1, "2011A", puType_ave);
-  std::string puFileName;
-  if( PUType_=="HR11" || PUType_=="HR11_v3")
-    puFileName = "Pileup_DATA_up_to_178479_SiXie.root";
-    //puFileName = "Pileup_DATA_up_to_178078.root";
-  else if( PUType_=="Run2011A" )
-    puFileName = "Pileup_DATA_up_to_173692.root";
-  else if( PUType_=="Run2011A_73pb" )
-    puFileName = "all2011A.pileup_v2_73mb.root";
-  else if( PUType_=="Run2011B" )
-    puFileName = "Pileup_DATA_Run2011B.root";
-    //puFileName = "Pileup_DATA_173692_to_178078.root";
-  else if( PUType_=="Run2011B_73pb" )
-    puFileName = "all2011B.pileup_v2_73mb.root";
-  else if( PUType_=="HR11_73pb" || PUType_=="HR11_73pb_DY" )
-    puFileName = "all2011AB.pileup_v2_73mb.root";
-  else if( PUType_!="HR11_v2" ) {
-    std::cout << "-> Unknown PU Type: '" << PUType_ << "'. Will use HR11 default." << std::endl;
-    puFileName = "Pileup_DATA_up_to_178078.root";
-  }
+  //PUWeight* fPUWeight = new PUWeight(-1, "2011A", puType);
+  //PUWeight* fPUWeight_ave = new PUWeight(-1, "2011A", puType_ave);
+  //std::string puFileName;
+  //if( PUType_=="HR11" || PUType_=="HR11_v3")
+  //  puFileName = "Pileup_DATA_up_to_178479_SiXie.root";
+  //  //puFileName = "Pileup_DATA_up_to_178078.root";
+  //else if( PUType_=="Run2011A" )
+  //  puFileName = "Pileup_DATA_up_to_173692.root";
+  //else if( PUType_=="Run2011A_73pb" )
+  //  puFileName = "all2011A.pileup_v2_73mb.root";
+  //else if( PUType_=="Run2011B" )
+  //  puFileName = "Pileup_DATA_Run2011B.root";
+  //  //puFileName = "Pileup_DATA_173692_to_178078.root";
+  //else if( PUType_=="Run2011B_73pb" )
+  //  puFileName = "all2011B.pileup_v2_73mb.root";
+  //else if( PUType_=="HR11_73pb" || PUType_=="HR11_73pb_DY" )
+  //  puFileName = "all2011AB.pileup_v2_73mb.root";
+  //else if( PUType_!="HR11_v2" ) {
+  //  std::cout << "-> Unknown PU Type: '" << PUType_ << "'. Will use HR11 default." << std::endl;
+  //  puFileName = "Pileup_DATA_up_to_178078.root";
+  //}
 
 
-  if( PUType_!="HR11_v2" ) {
-    std::cout << std::endl << "-> Using data pileup file: " << puFileName << std::endl;
-    TFile* filePU = TFile::Open(puFileName.c_str());
-    TH1F* h1_nPU_data = (TH1F*)filePU->Get("pileup");
-    fPUWeight->SetDataHistogram(h1_nPU_data);
-    fPUWeight_ave->SetDataHistogram(h1_nPU_data);
-  } else {  // HR11_v2: 4.6fb-1 = 2.1 (A) + 2.5 (B)
-    TFile* filePU_RunA = TFile::Open("all2011A.pileup_v2_73mb.root");
-    TFile* filePU_RunB = TFile::Open("all2011B.pileup_v2_73mb.root");
-    TH1F* h1_PURunA = (TH1F*)filePU_RunA->Get("pileup");
-    TH1F* h1_PURunB = (TH1F*)filePU_RunB->Get("pileup");
-    h1_PURunA->Scale(2.1/h1_PURunA->Integral());
-    h1_PURunB->Scale(2.5/h1_PURunB->Integral());
-    TH1F* h1_PU_weightedAverage = new TH1F(*h1_PURunA);
-    h1_PU_weightedAverage->Add(h1_PURunB);
-    fPUWeight->SetDataHistogram(h1_PU_weightedAverage);
-    fPUWeight_ave->SetDataHistogram(h1_PU_weightedAverage);
-  }
-    
-     
+  //if( PUType_!="HR11_v2" ) {
+  //  std::cout << std::endl << "-> Using data pileup file: " << puFileName << std::endl;
+  //  TFile* filePU = TFile::Open(puFileName.c_str());
+  //  TH1F* h1_nPU_data = (TH1F*)filePU->Get("pileup");
+  //  fPUWeight->SetDataHistogram(h1_nPU_data);
+  //  fPUWeight_ave->SetDataHistogram(h1_nPU_data);
+  //} else {  // HR11_v2: 4.6fb-1 = 2.1 (A) + 2.5 (B)
+  //  TFile* filePU_RunA = TFile::Open("all2011A.pileup_v2_73mb.root");
+  //  TFile* filePU_RunB = TFile::Open("all2011B.pileup_v2_73mb.root");
+  //  TH1F* h1_PURunA = (TH1F*)filePU_RunA->Get("pileup");
+  //  TH1F* h1_PURunB = (TH1F*)filePU_RunB->Get("pileup");
+  //  h1_PURunA->Scale(2.1/h1_PURunA->Integral());
+  //  h1_PURunB->Scale(2.5/h1_PURunB->Integral());
+  //  TH1F* h1_PU_weightedAverage = new TH1F(*h1_PURunA);
+  //  h1_PU_weightedAverage->Add(h1_PURunB);
+  //  fPUWeight->SetDataHistogram(h1_PU_weightedAverage);
+  //  fPUWeight_ave->SetDataHistogram(h1_PU_weightedAverage);
+  //}
+  //  
+  //   
 
 
-  if( PUType_=="HR11_73pb_DY" ) {
-    TFile* filePUMC = TFile::Open("generatedpileup_Zjets_MADGRAPH_AOD423.root");
-    TH1F* h1_nPU_mc = (TH1F*)filePUMC->Get("GenLevelInfoModule/npileup");
-    std::cout << "-> Switching MC PU file to: generatedpileup_Zjets_MADGRAPH_AOD423.root" << std::endl;
-    fPUWeight->SetMCHistogram(h1_nPU_mc);
-  } else if( dataset_tstr.Contains("Summer11") && dataset_tstr.Contains("PU_S4") && PUType_!="HR11_v3" ) {
-    TFile* filePUMC = TFile::Open("Pileup_MC_Summer11_S4.root");
-    TH1F* h1_nPU_mc = (TH1F*)filePUMC->Get("hNPU");
-    std::cout << "-> Switching MC PU file to: Pileup_MC_Summer11_S4.root" << std::endl;
-    fPUWeight->SetMCHistogram(h1_nPU_mc);
-//} else if( dataset_tstr.Contains("Fall11") ) {
-//  TFile* filePUMC = TFile::Open("s6MCPileUp.root");
-//  TH1F* h1_nPU_mc = (TH1F*)filePUMC->Get("pileup");
-//  std::cout << "-> Switching MC PU file to: s6MCPileUp.root" << std::endl;
-//  fPUWeight->SetMCHistogram(h1_nPU_mc);
-  }
+  //if( PUType_=="HR11_73pb_DY" ) {
+  //  TFile* filePUMC = TFile::Open("generatedpileup_Zjets_MADGRAPH_AOD423.root");
+  //  TH1F* h1_nPU_mc = (TH1F*)filePUMC->Get("GenLevelInfoModule/npileup");
+  //  std::cout << "-> Switching MC PU file to: generatedpileup_Zjets_MADGRAPH_AOD423.root" << std::endl;
+  //  fPUWeight->SetMCHistogram(h1_nPU_mc);
+  //} else if( dataset_tstr.Contains("Summer11") && dataset_tstr.Contains("PU_S4") && PUType_!="HR11_v3" ) {
+  //  TFile* filePUMC = TFile::Open("Pileup_MC_Summer11_S4.root");
+  //  TH1F* h1_nPU_mc = (TH1F*)filePUMC->Get("hNPU");
+  //  std::cout << "-> Switching MC PU file to: Pileup_MC_Summer11_S4.root" << std::endl;
+  //  fPUWeight->SetMCHistogram(h1_nPU_mc);
+////} else if( dataset_tstr.Contains("Fall11") ) {
+////  TFile* filePUMC = TFile::Open("s6MCPileUp.root");
+////  TH1F* h1_nPU_mc = (TH1F*)filePUMC->Get("pileup");
+////  std::cout << "-> Switching MC PU file to: s6MCPileUp.root" << std::endl;
+////  fPUWeight->SetMCHistogram(h1_nPU_mc);
+  //}
 
 
 
@@ -754,8 +754,8 @@ ofstream ofs("run_event.txt");
       thisJet.ptD = ptDJet[iJet];
       thisJet.nCharged = nChargedJet[iJet];
       thisJet.nNeutral = nNeutralJet[iJet];
-      thisJet.muonEnergyFraction = eMuonsJet[iJet]/thisJet.Energy();
-      thisJet.electronEnergyFraction = eElectronsJet[iJet]/thisJet.Energy();
+      thisJet.eMuons = eMuonsJet[iJet]/thisJet.Energy();
+      thisJet.eElectrons = eElectronsJet[iJet]/thisJet.Energy();
 
       thisJet.trackCountingHighEffBJetTag = trackCountingHighEffBJetTagJet[iJet];
       thisJet.trackCountingHighPurBJetTag = trackCountingHighPurBJetTagJet[iJet];
@@ -822,8 +822,8 @@ ofstream ofs("run_event.txt");
       thisJet.ptD = ptDJet[iJet];
       thisJet.nCharged = nChargedJet[iJet];
       thisJet.nNeutral = nNeutralJet[iJet];
-      thisJet.muonEnergyFraction = eMuonsJet[iJet]/thisJet.Energy();
-      thisJet.electronEnergyFraction = eElectronsJet[iJet]/thisJet.Energy();
+      thisJet.eMuons = eMuonsJet[iJet]/thisJet.Energy();
+      thisJet.eElectrons = eElectronsJet[iJet]/thisJet.Energy();
 
       thisJet.trackCountingHighEffBJetTag = trackCountingHighEffBJetTagJet[iJet];
       thisJet.trackCountingHighPurBJetTag = trackCountingHighPurBJetTagJet[iJet];
