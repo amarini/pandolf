@@ -57,24 +57,6 @@ int main(int argc, char* argv[]) {
   TFile* mcZJetsFile = TFile::Open(mcZJetsFileName.c_str());
   db->add_mcFile( mcZJetsFile, "ZJets", "Z + jets", 30, 3001);
 
-  std::string mcTTbarFileName = "TTZTrilepton_TTJets_TuneZ2_7TeV-madgraph-tauola_Fall11";
-  mcTTbarFileName += "_" + selType;
-  mcTTbarFileName += "_" + bTaggerType;
-  //mcTTbarFileName += "_" + PUType;
-  mcTTbarFileName += "_" + leptType;
-  mcTTbarFileName += ".root";
-  TFile* mcTTbarFile = TFile::Open(mcTTbarFileName.c_str());
-  db->add_mcFile( mcTTbarFile, "TT", "t#bar{t}", 39, 3003);
-
-  std::string mcWZFileName = "TTZTrilepton_WZJetsTo3LNu_TuneZ2_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1";
-  mcWZFileName += "_" + selType;
-  mcWZFileName += "_" + bTaggerType;
-  //mcWZFileName += "_" + PUType;
-  mcWZFileName += "_" + leptType;
-  mcWZFileName += ".root";
-  TFile* mcWZFile = TFile::Open(mcWZFileName.c_str());
-  db->add_mcFile( mcWZFile, "WZtoAnything_TuneZ2", "WZ + jets", 38, 3004);
-
   //std::string mcTTbarFileName = "TTZTrilepton_TTJets_TuneZ2_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1";
   std::string mcTTbarFileName = "TTZTrilepton_TTJ_Fall11_highstat";
   mcTTbarFileName += "_" + selType;
@@ -84,6 +66,15 @@ int main(int argc, char* argv[]) {
   mcTTbarFileName += ".root";
   TFile* mcTTbarFile = TFile::Open(mcTTbarFileName.c_str());
   db->add_mcFile( mcTTbarFile, "TTtW", "t#bar{t}", 39, 3003);
+
+  std::string mcWZFileName = "TTZTrilepton_WZJetsTo3LNu_TuneZ2_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1";
+  mcWZFileName += "_" + selType;
+  mcWZFileName += "_" + bTaggerType;
+  //mcWZFileName += "_" + PUType;
+  mcWZFileName += "_" + leptType;
+  mcWZFileName += ".root";
+  TFile* mcWZFile = TFile::Open(mcWZFileName.c_str());
+  db->add_mcFile( mcWZFile, "WZtoAnything_TuneZ2", "WZ + jets", 38, 3004);
 
 
   std::string mcTTWFileName = "TTZTrilepton_TTW_TuneZ2_7TeV-madgraphCMSSW42xPUv2_spadhi";
