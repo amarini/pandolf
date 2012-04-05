@@ -1,6 +1,6 @@
 // ------------------------------------------------------------
 //  
-//    Ntp1Finalizer_TTZTriplepton - Derived class 
+//    Ntp1Finalizer_TTZTrilepton - Derived class 
 //    for the finalization of the H->ZZ->lljj analysis.
 //
 // ------------------------------------------------------------
@@ -13,12 +13,12 @@
 
 
 
-class Ntp1Finalizer_TTZTriplepton : public Ntp1Finalizer {
+class Ntp1Finalizer_TTZTrilepton : public Ntp1Finalizer {
 
  public:
 
-  Ntp1Finalizer_TTZTriplepton( const std::string& dataset, const std::string& selectionType, const std::string& PUType="HR11", const std::string& leptType="ALL");
-  virtual ~Ntp1Finalizer_TTZTriplepton() {};
+  Ntp1Finalizer_TTZTrilepton( const std::string& dataset, const std::string& selectionType, const std::string& bTaggerType="TCHE", const std::string& PUType="HR11", const std::string& leptType="ALL");
+  virtual ~Ntp1Finalizer_TTZTrilepton() {};
 
   virtual void finalize();
   void setSelectionType( const std::string& selectionType );
@@ -31,6 +31,7 @@ class Ntp1Finalizer_TTZTriplepton : public Ntp1Finalizer {
    std::string leptType_;
    std::string PUType_;
    std::string selectionType_;
+   std::string bTaggerType_;
 
    float  ptLeptZ1_thresh_;
    float  ptLeptZ2_thresh_;
