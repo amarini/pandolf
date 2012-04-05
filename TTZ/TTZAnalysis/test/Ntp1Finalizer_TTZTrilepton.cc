@@ -61,7 +61,7 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   tree_->GetEntry(0);
   bool isMC = (run < 160000);
   std::string fullFlags = selectionType_ + "_" + bTaggerType_;
-  if( isMC ) fullFlags = fullFlags + "_PU" + PUType_;
+  //if( isMC ) fullFlags = fullFlags + "_PU" + PUType_;
   fullFlags = fullFlags + "_" + leptType_;
   this->set_flags(fullFlags); //this is for the outfile name
   this->createOutputFile();
@@ -380,16 +380,16 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   float tmass = 172.9;
 
 
-  std::string puType = "Spring11_Flat10";
-  std::string puType_ave = "Spring11_Flat10";
-  TString dataset_tstr(dataset_);
-  if( dataset_tstr.Contains("Summer11") && dataset_tstr.Contains("PU_S4") ) {
-    puType = "Summer11_S4";
-    puType_ave = "Summer11_S4_ave";
-  } else if( dataset_tstr.Contains("Fall11") ) {
-    puType = "Summer11_S4";
-    //puType = "Fall11";
-  }
+  //std::string puType = "Spring11_Flat10";
+  //std::string puType_ave = "Spring11_Flat10";
+  //TString dataset_tstr(dataset_);
+  //if( dataset_tstr.Contains("Summer11") && dataset_tstr.Contains("PU_S4") ) {
+  //  puType = "Summer11_S4";
+  //  puType_ave = "Summer11_S4_ave";
+  //} else if( dataset_tstr.Contains("Fall11") ) {
+  //  puType = "Summer11_S4";
+  //  //puType = "Fall11";
+  //}
   //PUWeight* fPUWeight = new PUWeight(-1, "2011A", puType);
   //PUWeight* fPUWeight_ave = new PUWeight(-1, "2011A", puType_ave);
   //std::string puFileName;
