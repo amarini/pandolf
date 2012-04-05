@@ -51,7 +51,7 @@ int main(int argc, char* argv[]) {
   std::string mcZJetsFileName = "TTZTrilepton_DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1";
   mcZJetsFileName += "_" + selType;
   mcZJetsFileName += "_" + bTaggerType;
-  mcZJetsFileName += "_" + PUType;
+  //mcZJetsFileName += "_" + PUType;
   mcZJetsFileName += "_" + leptType;
   mcZJetsFileName += ".root";
   TFile* mcZJetsFile = TFile::Open(mcZJetsFileName.c_str());
@@ -60,7 +60,7 @@ int main(int argc, char* argv[]) {
   std::string mcTTbarFileName = "TTZTrilepton_TTJets_TuneZ2_7TeV-madgraph-tauola_Fall11";
   mcTTbarFileName += "_" + selType;
   mcTTbarFileName += "_" + bTaggerType;
-  mcTTbarFileName += "_" + PUType;
+  //mcTTbarFileName += "_" + PUType;
   mcTTbarFileName += "_" + leptType;
   mcTTbarFileName += ".root";
   TFile* mcTTbarFile = TFile::Open(mcTTbarFileName.c_str());
@@ -69,17 +69,27 @@ int main(int argc, char* argv[]) {
   std::string mcWZFileName = "TTZTrilepton_WZJetsTo3LNu_TuneZ2_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1";
   mcWZFileName += "_" + selType;
   mcWZFileName += "_" + bTaggerType;
-  mcWZFileName += "_" + PUType;
+  //mcWZFileName += "_" + PUType;
   mcWZFileName += "_" + leptType;
   mcWZFileName += ".root";
   TFile* mcWZFile = TFile::Open(mcWZFileName.c_str());
   db->add_mcFile( mcWZFile, "WZtoAnything_TuneZ2", "WZ + jets", 38, 3004);
 
+  //std::string mcTTbarFileName = "TTZTrilepton_TTJets_TuneZ2_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1";
+  std::string mcTTbarFileName = "TTZTrilepton_TTJ_Fall11_highstat";
+  mcTTbarFileName += "_" + selType;
+  mcTTbarFileName += "_" + bTaggerType;
+  //mcTTWFileName += "_" + PUType;
+  mcTTbarFileName += "_" + leptType;
+  mcTTbarFileName += ".root";
+  TFile* mcTTbarFile = TFile::Open(mcTTbarFileName.c_str());
+  db->add_mcFile( mcTTbarFile, "TTtW", "t#bar{t}", 39, 3003);
+
 
   std::string mcTTWFileName = "TTZTrilepton_TTW_TuneZ2_7TeV-madgraphCMSSW42xPUv2_spadhi";
   mcTTWFileName += "_" + selType;
   mcTTWFileName += "_" + bTaggerType;
-  mcTTWFileName += "_" + PUType;
+  //mcTTWFileName += "_" + PUType;
   mcTTWFileName += "_" + leptType;
   mcTTWFileName += ".root";
   TFile* mcTTWFile = TFile::Open(mcTTWFileName.c_str());
