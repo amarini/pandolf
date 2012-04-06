@@ -74,7 +74,7 @@ class DrawBase {
   //void drawHisto( const std::string& name, const std::string& etaRegion, const std::string& flags, const std::string& axisName="", const std::string& units="", int legendQuadrant=1, bool log_aussi=false);
   void drawHisto_vs_pt( int nBinsPt, float* ptBins, const std::string& name, const std::string& axisName, const std::string& units="", const std::string& instanceName="Entries", bool log_aussi=false, int legendQuadrant=1, std::string flags="", const std::string& labelText="" );
   void drawHisto_vs_pt( std::vector<float> ptBins, const std::string& name, const std::string& axisName, const std::string& units="", const std::string& instanceName="Entries", bool log_aussi=false, int legendQuadrant=1, std::string flags="", const std::string& labelText="" );
-  void drawHisto( const std::string& name, const std::string& axisName, const std::string& units="", const std::string& instanceName="Entries", bool log_aussi=false, int legendQuadrant=1, const std::string& flags="", const std::string& labelText="", bool add_jetAlgoText=false );
+  void drawHisto( const std::string& name, const std::string& axisName="", const std::string& units="", const std::string& instanceName="Events", bool log_aussi=false, int legendQuadrant=1, const std::string& flags="", const std::string& labelText="", bool add_jetAlgoText=false );
   void drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<TH1D*> mcHistos, std::vector<TH1D*> mcHistos_superimp, const std::string& name, const std::string& axisName, const std::string& units="", const std::string& instanceName="Entries", bool log_aussi=false, int legendQuadrant=1, const std::string& flags="", const std::string& labelText="", bool add_jetAlgoText=false );
   void drawHisto_fromTree( const std::string& treeName, const std::string& varName, const std::string& selection, int nBins, float xMin, float xMax, const std::string& name, const std::string& axisName, const std::string& units="", const std::string& instanceName="Entries", bool log_aussi=false, int legendQuadrant=1, const std::string& flags="", const std::string& labelText="", bool add_jetAlgoText=false );
   void drawProfile( const std::string& yVar, const std::string& xVar, int legendQuadrant=1);
@@ -114,13 +114,14 @@ class DrawBase {
   void set_yAxisMaxScaleLog( float yAxisMaxScale=5. ) { yAxisMaxScaleLog_ = yAxisMaxScale;};
   void set_noStack( bool set=true ) { noStack_ = set; };
   void set_isCMSArticle( bool set=true );
+  void set_drawZeros( bool set=true ) { drawZeros_=set; };
   void set_lumiOnRightSide( bool set=true );
   void set_rebin( int rebin=1 ) { rebin_ = rebin; };
   void set_mcMarkers( bool set=true );
   void set_markerSize( float markerSize ) { markerSize_ = markerSize; };
   void set_getBinLabels( bool getBinL=true ) { getBinLabels_ = getBinL; };
   void set_legendTitle( const std::string& title ) { legendTitle_ = title; };
-  void add_label( const std::string& text, float xmin, float ymin, float xmax, float ymax, float textSize=0.035 );
+  void add_label( const std::string& text, float xmin=0.23, float ymin=0.87, float xmax=0.36, float ymax=0.9, float textSize=0.035 );
   void delete_label();
 
   LegendBox get_legendBox( int legendQuadrant=1, const std::vector<std::string>* legendNames=0 ) const;
@@ -208,6 +209,7 @@ class DrawBase {
   float legendTextSize_;
 
   bool poissonAsymmErrors_;
+  bool drawZeros_;
 
   TPaveText* additionalLabel_;
 
