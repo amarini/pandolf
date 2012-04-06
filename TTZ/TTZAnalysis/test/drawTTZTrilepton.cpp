@@ -6,12 +6,13 @@
 
 
 
+void drawChannelYieldPlot( DrawBase* db, float lumi_fb, const std::string& saveName, std::string additionalCuts );
 
 
 int main(int argc, char* argv[]) {
 
   if(  argc != 2 && argc != 3 ) {
-    std::cout << "USAGE: ./drawTTZTrilepton [(string)selType] [bTaggerType=\"SSVHE\"]" << std::endl;
+    std::cout << "USAGE: ./drawTTZTrilepton [(string)selType] [bTaggerType=\"TCHE\"]" << std::endl;
     exit(23);
   }
 
@@ -21,17 +22,27 @@ int main(int argc, char* argv[]) {
 
   std::string PUType = "PUHR11_73pb";
 
-  std::string bTaggerType = "SSVHE";
+  std::string bTaggerType = "TCHE";
   if( argc>=3 ) {
     std::string bTaggerType_str(argv[2]);
     bTaggerType = bTaggerType_str;
   }
 
+  float btag_thresh;
+  if( bTaggerType == "TCHE" ) 
+    btag_thresh = 3.3;
+  else if( bTaggerType == "SSVHE" )
+    btag_thresh = 1.74;
+  else {
+    std::cout << "Btagger: " << bTaggerType << " not supported. Exiting." << std::endl;
+    exit(1111);
+  }
 
 
 
   DrawBase* db = new DrawBase("TTZTrilepton");
 
+  db->set_lumiOnRightSide();
 
   std::string outputdir_str = "TTZTrileptonPlots_MConly_" + selType + "_" + bTaggerType + "_" + leptType;
   db->set_outputdir(outputdir_str);
@@ -41,7 +52,7 @@ int main(int argc, char* argv[]) {
   std::string TTZFileName = "TTZTrilepton_TTZ_TuneZ2_7TeV-madgraphCMSSW42xPUv3_spadhi";
   TTZFileName += "_" + selType;
   TTZFileName += "_" + bTaggerType;
-  TTZFileName += "_" + PUType;
+  //TTZFileName += "_" + PUType;
   TTZFileName += "_" + leptType;
   TTZFileName += ".root";
   TFile* TTZFile = TFile::Open(TTZFileName.c_str());
@@ -55,7 +66,8 @@ int main(int argc, char* argv[]) {
   mcZJetsFileName += "_" + leptType;
   mcZJetsFileName += ".root";
   TFile* mcZJetsFile = TFile::Open(mcZJetsFileName.c_str());
-  db->add_mcFile( mcZJetsFile, "ZJets", "Z + jets", 30, 3001);
+  db->add_mcFile( mcZJetsFile, "ZJets", "Z + jets", 46, 3004);
+  //db->add_mcFile( mcZJetsFile, "ZJets", "Z + jets", 30, 3004);
 
   //std::string mcTTbarFileName = "TTZTrilepton_TTJets_TuneZ2_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1";
   std::string mcTTbarFileName = "TTZTrilepton_TTJ_Fall11_highstat";
@@ -65,7 +77,66 @@ int main(int argc, char* argv[]) {
   mcTTbarFileName += "_" + leptType;
   mcTTbarFileName += ".root";
   TFile* mcTTbarFile = TFile::Open(mcTTbarFileName.c_str());
-  db->add_mcFile( mcTTbarFile, "TTtW", "t#bar{t}", 39, 3003);
+  db->add_mcFile( mcTTbarFile, "TTtW", "t#bar{t}", 39, 0);
+
+
+
+
+  db->set_shapeNormalization();
+
+
+
+
+  bool log = true;
+
+
+  //db->set_legendTitle("Trilepton channel");
+
+  db->drawHisto("nJets", "Jet Multiplicity (p_{T} > 10 GeV)", "", "Events", log);
+  db->drawHisto("mZll", "Dilepton mass", "GeV", "Events");
+
+
+  db->set_rebin(4); 
+  db->set_xAxisMax(250.); 
+  db->drawHisto("pfMet", "pfME_{T}", "GeV", "Events", log);
+  db->set_xAxisMax();
+  db->drawHisto("ptLept3_presel", "Third Lepton p_{T}", "GeV", "Events");
+  db->set_xAxisMax(0.15);
+  db->set_rebin(); 
+  db->drawHisto("combinedIsoRelLept3_presel", "Third Lepton Isolation", "", "Events");
+
+
+  
+  db->set_xAxisMax(5.);
+  db->drawHisto("bTagJetB1");
+  db->drawHisto("bTagJetB2");
+
+  db->set_xAxisMax();
+  db->set_rebin(5);
+  db->drawHisto("mTW", "", "GeV", "Events");
+  db->drawHisto("mT_lZmet", "", "GeV", "Events");
+
+  db->drawHisto("deltaRbb", "", "GeV", "Events");
+
+  db->drawHisto("mb1jj", "", "GeV", "Events");
+  db->drawHisto("mb2jj", "", "GeV", "Events");
+  db->drawHisto("mbjj_best", "", "GeV", "Events");
+
+  db->drawHisto("mb1jjZ", "", "GeV", "Events");
+  db->drawHisto("mb2jjZ", "", "GeV", "Events");
+  db->drawHisto("mbjjZ_best", "", "GeV", "Events");
+
+  db->drawHisto("mTb1W", "", "GeV", "Events");
+  db->drawHisto("mTb2W", "", "GeV", "Events");
+  db->drawHisto("mTbW_best", "", "GeV", "Events");
+
+  db->drawHisto("mTb1WZ", "", "GeV", "Events");
+  db->drawHisto("mTb2WZ", "", "GeV", "Events");
+  db->drawHisto("mTbWZ_best", "", "GeV", "Events");
+
+
+
+
 
   std::string mcWZFileName = "TTZTrilepton_WZJetsTo3LNu_TuneZ2_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1";
   mcWZFileName += "_" + selType;
@@ -87,32 +158,23 @@ int main(int argc, char* argv[]) {
   db->add_mcFile( mcTTWFile, "ttW", "t#bar{t} + W", 33, 3002);
 
 
-
-
-  db->set_shapeNormalization();
-
-
-
-
-  bool log = true;
-
-
-  db->set_legendTitle("Trilepton channel");
-
-  db->drawHisto("nJets", "Jet Multiplicity (p_{T} > 10 GeV)", "", "Events", log);
-  db->drawHisto("nvertex", "Number of Reconstructed Vertexes", "", "Events", log);
-
-  float lumifb = 20.;
+  float lumifb = 4.6;
 
   db->set_lumiNormalization(lumifb*1000.);
   db->set_noStack(false);
+
+  db->set_rebin(2);
+  db->drawHisto( "ptZll", "Z p_{T}", "GeV" );
+  drawChannelYieldPlot( db, lumifb, "", "" );
+  drawChannelYieldPlot( db, lumifb, "ptZll80", "ptZll > 80." );
 
   std::vector<TH1D*> lastHistosMC;
   float signalYield;
   float channelYieldGen = lumifb * 139 * 0.06 * 0.2 * 0.67;
 
-  db->drawHisto_fromTree("tree_passedEvents", "ptZll", "eventWeight*(mZll>70. && mZll<110.)", 30, 0., 300., "ptZll", "p_{T} (Z)", "GeV");
-  db->drawHisto_fromTree("tree_passedEvents", "ptZll", "eventWeight*(mZll>70. && mZll<110. && ptJetB1>20. && ptJetB2>20. && ptJet3>20. && ptJet4>20. )", 30, 0., 300., "ptZll_jetpt20", "p_{T} (Z)", "GeV", "Events");
+
+  db->drawHisto_fromTree("tree_passedEvents", "ptZll", "eventWeight*(mZll>81. && mZll<101.)", 30, 0., 300., "ptZll", "p_{T} (Z)", "GeV");
+  db->drawHisto_fromTree("tree_passedEvents", "ptZll", "eventWeight*(mZll>81. && mZll<101. && ptJetB1>20. && ptJetB2>20. && ptJet3>20. && ptJet4>20. )", 30, 0., 300., "ptZll_jetpt20", "p_{T} (Z)", "GeV", "Events");
   lastHistosMC = db->get_lastHistos_mc();
   for( unsigned int iHisto=0; iHisto<lastHistosMC.size(); ++iHisto ) {
     if( lastHistosMC[iHisto]->GetFillColor()==signalFillColor ) {
@@ -121,7 +183,9 @@ int main(int argc, char* argv[]) {
     }
   }
   std::cout << "Signal yield: " << signalYield << " (" << signalYield/channelYieldGen << "%)" << std::endl;
-  db->drawHisto_fromTree("tree_passedEvents", "ptZll", "eventWeight*(mZll>70. && mZll<110. && bTagJetB1>0. && ptJetB1>20. && ptJetB2>20. && ptJet3>20. && ptJet4>20.)", 30, 0., 300., "ptZll_jetpt20_btag", "p_{T} (Z)", "GeV", "Events");
+  char selection[1000];
+  sprintf( selection, "eventWeight*(mZll>81. && mZll<101. && bTagJetB1>%f && ptJetB1>20. && ptJetB2>20. && ptJet3>20. && ptJet4>20.)", btag_thresh);
+  db->drawHisto_fromTree("tree_passedEvents", "ptZll", selection, 30, 0., 300., "ptZll_jetpt20_btag", "p_{T} (Z)", "GeV", "Events");
   lastHistosMC = db->get_lastHistos_mc();
   for( unsigned int iHisto=0; iHisto<lastHistosMC.size(); ++iHisto ) {
     if( lastHistosMC[iHisto]->GetFillColor()==signalFillColor ) {
@@ -130,7 +194,8 @@ int main(int argc, char* argv[]) {
     }
   }
   std::cout << "Signal yield: " << signalYield << " (" << signalYield/channelYieldGen << "%)" << std::endl;
-  db->drawHisto_fromTree("tree_passedEvents", "ptZll", "eventWeight*(mZll>70. && mZll<110. && pfMet>30. && bTagJetB1>0. && ptJetB1>20. && ptJetB2>20. && ptJet3>20. && ptJet4>20.)", 30, 0., 300., "ptZll_jetpt20_btag_met", "p_{T} (Z)", "GeV", "Events");
+  sprintf(selection, "eventWeight*(mZll>81. && mZll<101. && pfMet>30. && bTagJetB1>%f && ptJetB1>20. && ptJetB2>20. && ptJet3>20. && ptJet4>20.)", btag_thresh);
+  db->drawHisto_fromTree("tree_passedEvents", "ptZll", selection, 30, 0., 300., "ptZll_jetpt20_btag_met", "p_{T} (Z)", "GeV", "Events");
   lastHistosMC = db->get_lastHistos_mc();
   for( unsigned int iHisto=0; iHisto<lastHistosMC.size(); ++iHisto ) {
     if( lastHistosMC[iHisto]->GetFillColor()==signalFillColor ) {
@@ -140,7 +205,8 @@ int main(int argc, char* argv[]) {
   }
   std::cout << "Signal yield: " << signalYield << " (" << signalYield/channelYieldGen << "%)" << std::endl;
 
-  db->drawHisto_fromTree("tree_passedEvents", "ptZll", "eventWeight*(ptZll>100. && mZll>70. && mZll<110. && pfMet>30. && bTagJetB1>0. && ptJetB1>20. && ptJetB2>20. && ptJet3>20. && ptJet4>20.)", 30, 0., 300., "ptZll_jetpt20_btag_met_ptZll", "p_{T} (Z)", "GeV", "Events");
+  sprintf( selection, "eventWeight*(ptZll>100. && mZll>81. && mZll<101. && pfMet>30. && bTagJetB1>%f && ptJetB1>20. && ptJetB2>20. && ptJet3>20. && ptJet4>20.)", btag_thresh);
+  db->drawHisto_fromTree("tree_passedEvents", "ptZll", selection, 30, 0., 300., "ptZll_jetpt20_btag_met_ptZll", "p_{T} (Z)", "GeV", "Events");
   lastHistosMC = db->get_lastHistos_mc();
   for( unsigned int iHisto=0; iHisto<lastHistosMC.size(); ++iHisto ) {
     if( lastHistosMC[iHisto]->GetFillColor()==signalFillColor ) {
@@ -159,4 +225,113 @@ int main(int argc, char* argv[]) {
 
 }  
 
+
+void drawChannelYieldPlot( DrawBase* db, float lumi_fb, const std::string& saveName, std::string additionalCuts ) {
+
+
+  if( additionalCuts!="" ) additionalCuts += " && ";
+
+  // and now lepton channel definitions:
+  std::string sel_mmm = "eventWeight*( " + additionalCuts + " leptType==0 && leptType3==0)";
+  std::string sel_mme = "eventWeight*( " + additionalCuts + " leptType==0 && leptType3==1)";
+  std::string sel_eem = "eventWeight*( " + additionalCuts + " leptType==1 && leptType3==0)";
+  std::string sel_eee = "eventWeight*( " + additionalCuts + " leptType==1 && leptType3==1)";
+
+
+
+  TLegend* legend = new TLegend( 0.6, 0.57, 0.92, 0.9 );
+  legend->SetFillColor(0);
+  legend->SetTextSize(0.042);
+
+
+  THStack* stackMC = new THStack();
+  std::vector<TH1D*> vh1_yields_mc;
+
+
+  for( unsigned i=0; i<db->get_mcFiles().size(); ++i) {
+
+    // reverse order:
+    int iMC = db->get_mcFiles().size()-i-1;
+
+    TTree* tree_mc = (TTree*)(db->get_mcFile(iMC).file->Get("tree_passedEvents"));
+
+    TH1D* h1_mc_mmm = new TH1D("mc_mmm", "", 100, 0., 10000.);
+    TH1D* h1_mc_mme = new TH1D("mc_mme", "", 100, 0., 10000.);
+    TH1D* h1_mc_eem = new TH1D("mc_eem", "", 100, 0., 10000.);
+    TH1D* h1_mc_eee = new TH1D("mc_eee", "", 100, 0., 10000.);
+
+    tree_mc->Project("mc_mmm", "ptZll", sel_mmm.c_str());
+    tree_mc->Project("mc_mme", "ptZll", sel_mme.c_str());
+    tree_mc->Project("mc_eem", "ptZll", sel_eem.c_str());
+    tree_mc->Project("mc_eee", "ptZll", sel_eee.c_str());
+
+    char hname[100];
+    sprintf( hname, "yields_mc_%d", iMC);
+    TH1D* h1_yields_mc = new TH1D(hname, "", 4, 0., 4.);
+    h1_yields_mc->SetBinContent( 1, lumi_fb*1000.*h1_mc_mmm->Integral() );
+    h1_yields_mc->SetBinContent( 2, lumi_fb*1000.*h1_mc_mme->Integral() );
+    h1_yields_mc->SetBinContent( 3, lumi_fb*1000.*h1_mc_eem->Integral() );
+    h1_yields_mc->SetBinContent( 4, lumi_fb*1000.*h1_mc_eee->Integral() );
+
+    h1_yields_mc->SetFillColor( db->get_mcFile(iMC).fillColor );
+
+    vh1_yields_mc.push_back( (TH1D*)h1_yields_mc );
+
+    stackMC->Add(h1_yields_mc, "HISTO");
+
+    delete h1_mc_mmm;
+    delete h1_mc_mme;
+    delete h1_mc_eem;
+    delete h1_mc_eee;
+    
+  }
+
+ 
+  for( unsigned i=0; i<db->get_mcFiles().size(); ++i) {
+
+    int inverseIndex = db->get_mcFiles().size()-i-1;
+    if( vh1_yields_mc[inverseIndex]->Integral()>0 )
+      legend->AddEntry( vh1_yields_mc[inverseIndex], db->get_mcFile(i).legendName.c_str(), "F" );
+
+  } 
+
+
+
+  float yMax = stackMC->GetMaximum();
+  yMax *= 2.2;
+
+  TH2D* h2_axes = new TH2D("axes", "", 4, 0., 4., 10, 0., yMax);
+  h2_axes->GetXaxis()->SetLabelSize(0.085);
+  h2_axes->GetXaxis()->SetBinLabel(1, "(#mu#mu)#mu");
+  h2_axes->GetXaxis()->SetBinLabel(2, "(#mu#mu)e");
+  h2_axes->GetXaxis()->SetBinLabel(3, "(ee)#mu");
+  h2_axes->GetXaxis()->SetBinLabel(4, "(ee)e");
+  h2_axes->SetYTitle("Events");
+
+
+  TPaveText* label_sqrt = db->get_labelSqrt();
+
+  TCanvas* c1 = new TCanvas("c1", "", 600, 600);
+  c1->cd();
+  h2_axes->Draw();
+  stackMC->Draw("histo same");
+  legend->Draw("same");
+  label_sqrt->Draw("same");
+
+  gPad->RedrawAxis();
+  
+  char canvasName[500];
+  if( saveName!="" )
+    sprintf( canvasName, "%s/channelYields_%s.eps", db->get_outputdir().c_str(), saveName.c_str() );
+  else
+    sprintf( canvasName, "%s/channelYields.eps", db->get_outputdir().c_str() );
+  c1->SaveAs(canvasName);
+
+  delete c1;
+  delete h2_axes;
+
+  for( unsigned i=0; i<vh1_yields_mc.size(); ++i ) 
+    delete vh1_yields_mc[vh1_yields_mc.size()-i-1];
+
+}
 
