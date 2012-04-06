@@ -89,6 +89,7 @@ void Ntp1Analyzer_TTZ::CreateOutputFile() {
   reducedTree_->Branch("etaLeptZ1",  &etaLeptZ1_,  "etaLeptZ1_/F");
   reducedTree_->Branch("phiLeptZ1",  &phiLeptZ1_,  "phiLeptZ1_/F");
   reducedTree_->Branch("chargeLeptZ1",  &chargeLeptZ1_,  "chargeLeptZ1_/I");
+  reducedTree_->Branch("combinedIsoRelLeptZ1",  &combinedIsoRelLeptZ1_,  "combinedIsoRelLeptZ1_/F");
 
   reducedTree_->Branch("eLeptZ1Gen",  &eLeptZ1Gen_,  "eLeptZ1Gen_/F");
   reducedTree_->Branch("ptLeptZ1Gen",  &ptLeptZ1Gen_,  "ptLeptZ1Gen_/F");
@@ -100,6 +101,7 @@ void Ntp1Analyzer_TTZ::CreateOutputFile() {
   reducedTree_->Branch("etaLeptZ2",  &etaLeptZ2_,  "etaLeptZ2_/F");
   reducedTree_->Branch("phiLeptZ2",  &phiLeptZ2_,  "phiLeptZ2_/F");
   reducedTree_->Branch("chargeLeptZ2",  &chargeLeptZ2_,  "chargeLeptZ2_/I");
+  reducedTree_->Branch("combinedIsoRelLeptZ2",  &combinedIsoRelLeptZ2_,  "combinedIsoRelLeptZ2_/F");
 
   reducedTree_->Branch("eLeptZ2Gen",  &eLeptZ2Gen_,  "eLeptZ2Gen_/F");
   reducedTree_->Branch("ptLeptZ2Gen",  &ptLeptZ2Gen_,  "ptLeptZ2Gen_/F");
@@ -108,12 +110,13 @@ void Ntp1Analyzer_TTZ::CreateOutputFile() {
 
   reducedTree_->Branch("nLept", &nLept_, "nLept_/I");
 
-  reducedTree_->Branch("leptTypeLept", leptTypeLept_, "leptTypeLept_[nLept_]/I");
+  reducedTree_->Branch("leptTypeLept", leptTypeLept_, "leptTypeLept_[nLept_]/F");
   reducedTree_->Branch("eLept",  eLept_,  "eLept_[nLept_]/F");
   reducedTree_->Branch( "ptLept",  ptLept_,  "ptLept_[nLept_]/F");
   reducedTree_->Branch("etaLept", etaLept_, "etaLept_[nLept_]/F");
   reducedTree_->Branch("phiLept", phiLept_, "phiLept_[nLept_]/F");
   reducedTree_->Branch("chargeLept", chargeLept_, "chargeLept_[nLept_]/I");
+  reducedTree_->Branch("combinedIsoRelLept", combinedIsoRelLept_, "combinedIsoRelLept_[nLept_]/F");
 
 
   reducedTree_->Branch("nJets", &nJets_, "nJets_/I");
@@ -549,6 +552,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        thisMuon.sumPt03 = sumPt03Muon[iMuon];
        thisMuon.emEt03  = emEt03Muon[iMuon];
        thisMuon.hadEt03 = hadEt03Muon[iMuon];
+       thisMuon.isolation = thisMuon.combinedIsoRel();
 
        if( event_==DEBUG_EVENTNUMBER ) {
          std::cout << "thisMuon.dxy: " << thisMuon.dxy << std::endl;
@@ -644,6 +648,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        thisEle.dr03TkSumPt = dr03TkSumPtEle[iEle];
        thisEle.dr03EcalRecHitSumEt = dr03EcalRecHitSumEtEle[iEle];
        thisEle.dr03HcalTowerSumEt = dr03HcalTowerSumEtEle[iEle];
+       thisEle.isolation = thisEle.combinedIsoRel();
 
        // electron ID
        thisEle.sigmaIetaIeta = (superClusterIndexEle[iEle]>=0) ? sqrt(covIEtaIEtaSC[superClusterIndexEle[iEle]]) : sqrt(covIEtaIEtaPFSC[PFsuperClusterIndexEle[iEle]]);
@@ -824,12 +829,14 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      etaLeptZ1_ = leptons[0].Eta();
      phiLeptZ1_ = leptons[0].Phi();
      chargeLeptZ1_ = leptons[0].charge;
+     combinedIsoRelLeptZ1_ = leptons[0].isolation;
      
      eLeptZ2_ = leptons[1].Energy();
      ptLeptZ2_ = leptons[1].Pt();
      etaLeptZ2_ = leptons[1].Eta();
      phiLeptZ2_ = leptons[1].Phi();
      chargeLeptZ2_ = leptons[1].charge;
+     combinedIsoRelLeptZ2_ = leptons[1].isolation;
 
 
      // save other leptons:
@@ -842,6 +849,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
          etaLept_[nLept_] = muonsPlus[iMuonPlus].Eta();
          phiLept_[nLept_] = muonsPlus[iMuonPlus].Phi();
          chargeLept_[nLept_] = muonsPlus[iMuonPlus].charge;
+         combinedIsoRelLept_[nLept_] = muonsPlus[iMuonPlus].isolation;
          nLept_++;
        }
      }
@@ -853,6 +861,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
          etaLept_[nLept_] = muonsMinus[iMuonMinus].Eta();
          phiLept_[nLept_] = muonsMinus[iMuonMinus].Phi();
          chargeLept_[nLept_] = muonsMinus[iMuonMinus].charge;
+         combinedIsoRelLept_[nLept_] = muonsMinus[iMuonMinus].isolation;
          nLept_++;
        }
      }
@@ -864,6 +873,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
          etaLept_[nLept_] = electronsPlus[iElectronPlus].Eta();
          phiLept_[nLept_] = electronsPlus[iElectronPlus].Phi();
          chargeLept_[nLept_] = electronsPlus[iElectronPlus].charge;
+         combinedIsoRelLept_[nLept_] = electronsPlus[iElectronPlus].isolation;
          nLept_++;
        }
      }
@@ -875,6 +885,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
          etaLept_[nLept_] = electronsMinus[iElectronMinus].Eta();
          phiLept_[nLept_] = electronsMinus[iElectronMinus].Phi();
          chargeLept_[nLept_] = electronsMinus[iElectronMinus].charge;
+         combinedIsoRelLept_[nLept_] = electronsMinus[iElectronMinus].isolation;
          nLept_++;
        }
      }
@@ -932,7 +943,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      // JETS
      // ------------------
 
-     float jetPt_thresh = 10.;
+     float jetPt_thresh = 20.;
 
      // first save leading jets in event:
      std::vector<AnalysisJet> leadJets;
