@@ -1,12 +1,13 @@
 #include <stdlib.h>
 #include <iostream>
+#include <fstream>
 #include <string>
 #include "CommonTools/DrawBase.h"
 #include "CommonTools/fitTools.h"
 
 
 
-void drawChannelYieldPlot( DrawBase* db, float lumi_fb, const std::string& saveName, std::string additionalCuts );
+void drawChannelYieldPlot( DrawBase* db, const std::string& selType, const std::string& bTaggerType, float lumi_fb, const std::string& saveName, std::string additionalCuts );
 
 
 int main(int argc, char* argv[]) {
@@ -165,8 +166,10 @@ int main(int argc, char* argv[]) {
 
   db->set_rebin(2);
   db->drawHisto( "ptZll", "Z p_{T}", "GeV" );
-  drawChannelYieldPlot( db, lumifb, "", "" );
-  drawChannelYieldPlot( db, lumifb, "ptZll80", "ptZll > 80." );
+  drawChannelYieldPlot( db, selType, bTaggerType, lumifb, "", "" );
+  drawChannelYieldPlot( db, selType, bTaggerType, lumifb, "ptZll80", "ptZll > 80." );
+
+
 
   std::vector<TH1D*> lastHistosMC;
   float signalYield;
@@ -226,7 +229,7 @@ int main(int argc, char* argv[]) {
 }  
 
 
-void drawChannelYieldPlot( DrawBase* db, float lumi_fb, const std::string& saveName, std::string additionalCuts ) {
+void drawChannelYieldPlot( DrawBase* db, const std::string& selType, const std::string& bTaggerType, float lumi_fb, const std::string& saveName, std::string additionalCuts ) {
 
 
   if( additionalCuts!="" ) additionalCuts += " && ";
@@ -247,6 +250,32 @@ void drawChannelYieldPlot( DrawBase* db, float lumi_fb, const std::string& saveN
   THStack* stackMC = new THStack();
   std::vector<TH1D*> vh1_yields_mc;
 
+  std::string yieldsFileName = "yields_"+selType;
+  if( saveName!= "" ) yieldsFileName = yieldsFileName + "_" + saveName;
+  yieldsFileName = yieldsFileName +"_"+bTaggerType+".txt";
+
+  ofstream yieldsFile(yieldsFileName.c_str());
+
+  yieldsFile << "------------------------" << std::endl;
+  yieldsFile << "Yields @ " << lumi_fb << " fb-1" << std::endl;
+  yieldsFile << "------------------------" << std::endl;
+
+  yieldsFile << std::endl;
+  yieldsFile << "                    (mm)m   \t(mm)e   \t(ee)m   \t(ee)e   \tTotal" << std::endl << std::endl;
+
+
+  float s_mmm = 0.;
+  float s_mme = 0.;
+  float s_eem = 0.;
+  float s_eee = 0.;
+  float s = 0.;
+
+  float b_mmm = 0.;
+  float b_mme = 0.;
+  float b_eem = 0.;
+  float b_eee = 0.;
+  float b  = 0.;
+
 
   for( unsigned i=0; i<db->get_mcFiles().size(); ++i) {
 
@@ -265,13 +294,19 @@ void drawChannelYieldPlot( DrawBase* db, float lumi_fb, const std::string& saveN
     tree_mc->Project("mc_eem", "ptZll", sel_eem.c_str());
     tree_mc->Project("mc_eee", "ptZll", sel_eee.c_str());
 
+    float mmm = lumi_fb*1000.*h1_mc_mmm->Integral();
+    float mme = lumi_fb*1000.*h1_mc_mme->Integral();
+    float eem = lumi_fb*1000.*h1_mc_eem->Integral();
+    float eee = lumi_fb*1000.*h1_mc_eee->Integral();
+    float total = mmm + mme + eem + eee;
+
     char hname[100];
     sprintf( hname, "yields_mc_%d", iMC);
     TH1D* h1_yields_mc = new TH1D(hname, "", 4, 0., 4.);
-    h1_yields_mc->SetBinContent( 1, lumi_fb*1000.*h1_mc_mmm->Integral() );
-    h1_yields_mc->SetBinContent( 2, lumi_fb*1000.*h1_mc_mme->Integral() );
-    h1_yields_mc->SetBinContent( 3, lumi_fb*1000.*h1_mc_eem->Integral() );
-    h1_yields_mc->SetBinContent( 4, lumi_fb*1000.*h1_mc_eee->Integral() );
+    h1_yields_mc->SetBinContent( 1, mmm );
+    h1_yields_mc->SetBinContent( 2, mme );
+    h1_yields_mc->SetBinContent( 3, eem );
+    h1_yields_mc->SetBinContent( 4, eee );
 
     h1_yields_mc->SetFillColor( db->get_mcFile(iMC).fillColor );
 
@@ -279,12 +314,45 @@ void drawChannelYieldPlot( DrawBase* db, float lumi_fb, const std::string& saveN
 
     stackMC->Add(h1_yields_mc, "HISTO");
 
+
+
+    if(  db->get_mcFiles()[iMC].legendName=="t#bar{t} + Z" ) {
+
+      s_mmm += mmm;
+      s_mme += mme;
+      s_eem += eem;
+      s_eee += eee;
+      s += total;
+
+    } else {
+
+      yieldsFile << db->get_mcFiles()[iMC].legendName;
+      for( unsigned ichar=0; ichar<20-db->get_mcFiles()[iMC].legendName.size(); ++ichar ) yieldsFile << " ";
+      yieldsFile << Form("%.4f \t %.4f \t %.4f \t %.4f \t %.4f", mmm, mme, eem, eee, total) << std::endl;
+
+      b_mmm += mmm;
+      b_mme += mme;
+      b_eem += eem;
+      b_eee += eee;
+      b += total;
+
+    }
+
     delete h1_mc_mmm;
     delete h1_mc_mme;
     delete h1_mc_eem;
     delete h1_mc_eee;
     
   }
+    
+
+  yieldsFile << "Total BG            " << Form("%.4f \t %.4f \t %.4f \t %.4f \t %.4f", b_mmm, b_mme, b_eem, b_eee, b) << std::endl;
+  yieldsFile << std::endl;
+  yieldsFile << "Signal              " << Form("%.4f \t %.4f \t %.4f \t %.4f \t %.4f", s_mmm, s_mme, s_eem, s_eee, s) << std::endl;
+  yieldsFile << "s / b               " << Form("%.4f \t %.4f \t %.4f \t %.4f \t %.4f", s_mmm/b_mmm, s_mme/b_mme, s_eem/b_eem, s_eee/b_eee, s/b) << std::endl;
+  yieldsFile << "s / sqrt(b)         " << Form("%.4f \t %.4f \t %.4f \t %.4f \t %.4f", s_mmm/sqrt(b_mmm), s_mme/sqrt(b_mme), s_eem/sqrt(b_eem), s_eee/sqrt(b_eee), s/sqrt(b)) << std::endl;
+
+  yieldsFile.close();
 
  
   for( unsigned i=0; i<db->get_mcFiles().size(); ++i) {
@@ -294,6 +362,9 @@ void drawChannelYieldPlot( DrawBase* db, float lumi_fb, const std::string& saveN
       legend->AddEntry( vh1_yields_mc[inverseIndex], db->get_mcFile(i).legendName.c_str(), "F" );
 
   } 
+
+
+
 
 
 
