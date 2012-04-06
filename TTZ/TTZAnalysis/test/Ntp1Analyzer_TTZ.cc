@@ -1106,8 +1106,8 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      }
 
 
-     // at least 4 jets in the event
-     if( nJets_<4 ) continue;
+     // at least 3 jets in the event
+     if( nJets_<3 ) continue;
 
 
 
