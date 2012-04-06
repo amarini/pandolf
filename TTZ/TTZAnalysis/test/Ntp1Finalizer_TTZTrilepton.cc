@@ -94,6 +94,8 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   h1_metSignificance->Sumw2();
 
 
+  TH1D* h1_rhoPF_prepresel = new TH1D("rhoPF_prepresel", "", 50, 0., 20.);
+  h1_rhoPF_prepresel->Sumw2();
   TH1D* h1_rhoPF_presel = new TH1D("rhoPF_presel", "", 50, 0., 20.);
   h1_rhoPF_presel->Sumw2();
   TH1D* h1_rhoPF = new TH1D("rhoPF", "", 50, 0., 20.);
@@ -108,6 +110,19 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   h1_etaLeptZ1->Sumw2();
   TH1D* h1_etaLeptZ2 = new TH1D("etaLeptZ2", "", 50, -2.5, 2.5);
   h1_etaLeptZ2->Sumw2();
+  TH1D* h1_combinedIsoRelLeptZ1 = new TH1D("combinedIsoRelLeptZ1", "", 100, 0., 1.);
+  h1_combinedIsoRelLeptZ1->Sumw2();
+  TH1D* h1_combinedIsoRelLeptZ2 = new TH1D("combinedIsoRelLeptZ2", "", 100, 0., 1.);
+  h1_combinedIsoRelLeptZ2->Sumw2();
+
+  TH1D* h1_ptLept3_presel = new TH1D("ptLept3_presel", "", 200, 0., 200.);
+  h1_ptLept3_presel->Sumw2();
+  TH1D* h1_etaLept3_presel = new TH1D("etaLept3_presel", "", 50, -2.5, 2.5);
+  h1_etaLept3_presel->Sumw2();
+  TH1D* h1_leptTypeLept3_presel = new TH1D("leptTypeLept3_presel", "", 2, -0.5, 1.5);
+  h1_leptTypeLept3_presel->Sumw2();
+  TH1D* h1_combinedIsoRelLept3_presel = new TH1D("combinedIsoRelLept3_presel", "", 100, 0., 1.);
+  h1_combinedIsoRelLept3_presel->Sumw2();
 
   TH1D* h1_ptLept3 = new TH1D("ptLept3", "", 200, 20., 220.);
   h1_ptLept3->Sumw2();
@@ -121,6 +136,10 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   h1_ptZll->Sumw2();
   TH1D* h1_etaZll = new TH1D("etaZll", "", 200, -5., 5.);
   h1_etaZll->Sumw2();
+  TH1D* h1_mZll_prepresel = new TH1D("mZll_prepresel", "", 240, 40., 160.);
+  h1_mZll_prepresel->Sumw2();
+  TH1D* h1_mZll_presel = new TH1D("mZll_presel", "", 240, 40., 160.);
+  h1_mZll_presel->Sumw2();
   TH1D* h1_mZll = new TH1D("mZll", "", 240, 40., 160.);
   h1_mZll->Sumw2();
 
@@ -130,6 +149,10 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   TH1D* h1_mT_lZmet = new TH1D("mT_lZmet", "", 300, 0., 300.);
   h1_mT_lZmet->Sumw2();
 
+  TH1D* h1_nJets_prepresel = new TH1D("nJets_prepresel", "", 11, -0.5, 10.5);
+  h1_nJets_prepresel->Sumw2();
+  TH1D* h1_nJets_pt10 = new TH1D("nJets_pt10", "", 7, 3.5, 10.5);
+  h1_nJets_pt10->Sumw2();
   TH1D* h1_nJets = new TH1D("nJets", "", 7, 3.5, 10.5);
   h1_nJets->Sumw2();
 
@@ -250,6 +273,8 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   tree_->SetBranchAddress("phiLeptZ1", &phiLeptZ1);
   Int_t chargeLeptZ1;
   tree_->SetBranchAddress("chargeLeptZ1", &chargeLeptZ1);
+  Float_t combinedIsoRelLeptZ1;
+  tree_->SetBranchAddress("combinedIsoRelLeptZ1", &combinedIsoRelLeptZ1);
 
   Float_t eLeptZ2;
   tree_->SetBranchAddress("eLeptZ2", &eLeptZ2);
@@ -261,6 +286,8 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   tree_->SetBranchAddress("phiLeptZ2", &phiLeptZ2);
   Int_t chargeLeptZ2;
   tree_->SetBranchAddress("chargeLeptZ2", &chargeLeptZ2);
+  Float_t combinedIsoRelLeptZ2;
+  tree_->SetBranchAddress("combinedIsoRelLeptZ2", &combinedIsoRelLeptZ2);
 
 
   Int_t nLept;
@@ -277,6 +304,8 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   tree_->SetBranchAddress("phiLept", phiLept);
   Int_t chargeLept[10];
   tree_->SetBranchAddress("chargeLept", chargeLept);
+  Float_t combinedIsoRelLept[10];
+  tree_->SetBranchAddress("combinedIsoRelLept", combinedIsoRelLept);
 
 
   Int_t nJets;
@@ -380,9 +409,8 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   float tmass = 172.9;
 
 
-  //std::string puType = "Spring11_Flat10";
-  //std::string puType_ave = "Spring11_Flat10";
-  //TString dataset_tstr(dataset_);
+  std::string puType = "Summer11_S4";
+  TString dataset_tstr(dataset_);
   //if( dataset_tstr.Contains("Summer11") && dataset_tstr.Contains("PU_S4") ) {
   //  puType = "Summer11_S4";
   //  puType_ave = "Summer11_S4_ave";
@@ -390,9 +418,12 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   //  puType = "Summer11_S4";
   //  //puType = "Fall11";
   //}
-  //PUWeight* fPUWeight = new PUWeight(-1, "2011A", puType);
+
+  PUWeight* fPUWeight = new PUWeight(-1, "2011A", puType);
   //PUWeight* fPUWeight_ave = new PUWeight(-1, "2011A", puType_ave);
-  //std::string puFileName;
+  std::string puFileName;
+  puFileName = "all2011AB.pileup_v2_73mb.root";
+
   //if( PUType_=="HR11" || PUType_=="HR11_v3")
   //  puFileName = "Pileup_DATA_up_to_178479_SiXie.root";
   //  //puFileName = "Pileup_DATA_up_to_178078.root";
@@ -413,6 +444,11 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   //}
 
 
+  std::cout << std::endl << "-> Using data pileup file: " << puFileName << std::endl;
+  TFile* filePU = TFile::Open(puFileName.c_str());
+  TH1F* h1_nPU_data = (TH1F*)filePU->Get("pileup");
+  fPUWeight->SetDataHistogram(h1_nPU_data);
+
   //if( PUType_!="HR11_v2" ) {
   //  std::cout << std::endl << "-> Using data pileup file: " << puFileName << std::endl;
   //  TFile* filePU = TFile::Open(puFileName.c_str());
@@ -431,26 +467,26 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   //  fPUWeight->SetDataHistogram(h1_PU_weightedAverage);
   //  fPUWeight_ave->SetDataHistogram(h1_PU_weightedAverage);
   //}
-  //  
-  //   
+    
+     
 
 
-  //if( PUType_=="HR11_73pb_DY" ) {
-  //  TFile* filePUMC = TFile::Open("generatedpileup_Zjets_MADGRAPH_AOD423.root");
-  //  TH1F* h1_nPU_mc = (TH1F*)filePUMC->Get("GenLevelInfoModule/npileup");
-  //  std::cout << "-> Switching MC PU file to: generatedpileup_Zjets_MADGRAPH_AOD423.root" << std::endl;
-  //  fPUWeight->SetMCHistogram(h1_nPU_mc);
-  //} else if( dataset_tstr.Contains("Summer11") && dataset_tstr.Contains("PU_S4") && PUType_!="HR11_v3" ) {
-  //  TFile* filePUMC = TFile::Open("Pileup_MC_Summer11_S4.root");
-  //  TH1F* h1_nPU_mc = (TH1F*)filePUMC->Get("hNPU");
-  //  std::cout << "-> Switching MC PU file to: Pileup_MC_Summer11_S4.root" << std::endl;
-  //  fPUWeight->SetMCHistogram(h1_nPU_mc);
-////} else if( dataset_tstr.Contains("Fall11") ) {
-////  TFile* filePUMC = TFile::Open("s6MCPileUp.root");
-////  TH1F* h1_nPU_mc = (TH1F*)filePUMC->Get("pileup");
-////  std::cout << "-> Switching MC PU file to: s6MCPileUp.root" << std::endl;
-////  fPUWeight->SetMCHistogram(h1_nPU_mc);
-  //}
+  if( PUType_=="HR11_73pb_DY" ) {
+    TFile* filePUMC = TFile::Open("generatedpileup_Zjets_MADGRAPH_AOD423.root");
+    TH1F* h1_nPU_mc = (TH1F*)filePUMC->Get("GenLevelInfoModule/npileup");
+    std::cout << "-> Switching MC PU file to: generatedpileup_Zjets_MADGRAPH_AOD423.root" << std::endl;
+    fPUWeight->SetMCHistogram(h1_nPU_mc);
+  } else if( dataset_tstr.Contains("Summer11") && dataset_tstr.Contains("PU_S4") && PUType_!="HR11_v3" ) {
+    TFile* filePUMC = TFile::Open("Pileup_MC_Summer11_S4.root");
+    TH1F* h1_nPU_mc = (TH1F*)filePUMC->Get("hNPU");
+    std::cout << "-> Switching MC PU file to: Pileup_MC_Summer11_S4.root" << std::endl;
+    fPUWeight->SetMCHistogram(h1_nPU_mc);
+//} else if( dataset_tstr.Contains("Fall11") ) {
+//  TFile* filePUMC = TFile::Open("s6MCPileUp.root");
+//  TH1F* h1_nPU_mc = (TH1F*)filePUMC->Get("pileup");
+//  std::cout << "-> Switching MC PU file to: s6MCPileUp.root" << std::endl;
+//  fPUWeight->SetMCHistogram(h1_nPU_mc);
+  }
 
 
 
@@ -461,12 +497,14 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   float bTagJetB1_t, bTagJetB2_t;
   float ptJet3_t, ptJet4_t, etaJet3_t, etaJet4_t;
   float HLTSF;
+  int leptType3;
 
   tree_passedEvents->Branch( "run", &run, "run/I" );
   tree_passedEvents->Branch( "LS", &LS, "LS/I" );
   tree_passedEvents->Branch( "event", &event, "event/I" );
   tree_passedEvents->Branch( "pfMet", &pfMet, "pfMet/F" );
   tree_passedEvents->Branch( "leptType", &leptType, "leptType/I" );
+  tree_passedEvents->Branch( "leptType3", &leptType3, "leptType3/I" );
   tree_passedEvents->Branch( "ptLeptZ1", &ptLeptZ1_t, "ptLeptZ1_t/F" );
   tree_passedEvents->Branch( "ptLeptZ2", &ptLeptZ2_t, "ptLeptZ2_t/F" );
   tree_passedEvents->Branch( "ptLept3", &ptLept3_t, "ptLept3_t/F" );
@@ -509,7 +547,7 @@ ofstream ofs("run_event.txt");
 
   for(int iEntry=0; iEntry<nEntries; ++iEntry) {
 
-    if( (iEntry % 20000)==0 ) std::cout << "Entry: " << iEntry << " /" << nEntries << std::endl;
+    if( (iEntry % 100000)==0 ) std::cout << "Entry: " << iEntry << " /" << nEntries << std::endl;
 
     tree_->GetEntry(iEntry);
 
@@ -574,8 +612,8 @@ ofstream ofs("run_event.txt");
 
 //    }
 
-
-      //eventWeight *= fPUWeight->GetWeight(nPU);
+      if( dataset_ == "DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1" )
+        eventWeight *= fPUWeight->GetWeight(nPU);
 
     } // if is MC
 
@@ -639,57 +677,36 @@ ofstream ofs("run_event.txt");
 
 
 
-    // this is trilepton channel: require at least one other lepton:
+    TLorentzVector leptZ1, leptZ2;
+    leptZ1.SetPtEtaPhiE( ptLeptZ1, etaLeptZ1, phiLeptZ1, eLeptZ1 );
+    leptZ2.SetPtEtaPhiE( ptLeptZ2, etaLeptZ2, phiLeptZ2, eLeptZ2 );
+
+    TLorentzVector diLepton = leptZ1+leptZ2;
+
+
+
+
+    // fill some histos before requiring third lepton:
+    h1_rhoPF_prepresel->Fill( rhoPF, eventWeight);
+    h1_mZll_prepresel->Fill( diLepton.M(), eventWeight );
+    h1_nJets_prepresel->Fill( nJets, eventWeight );
+
+
+
+    // this is the trilepton channel: require at least one other lepton:
     if( nLept<1 ) continue;
 
 
     h1_rhoPF_presel->Fill( rhoPF, eventWeight);
 
 
-    h1_pfMet->Fill( pfMet, eventWeight );
-    h1_metSignificance->Fill( metSignificance, eventWeight );
-
-
-
-    TLorentzVector leptZ1, leptZ2;
-    leptZ1.SetPtEtaPhiE( ptLeptZ1, etaLeptZ1, phiLeptZ1, eLeptZ1 );
-    leptZ2.SetPtEtaPhiE( ptLeptZ2, etaLeptZ2, phiLeptZ2, eLeptZ2 );
-
     TLorentzVector lept3;
     lept3.SetPtEtaPhiE( ptLept[0], etaLept[0], phiLept[0], eLept[0] );
 
-    TLorentzVector diLepton = leptZ1+leptZ2;
-
-
-    h1_ptLeptZ1->Fill( leptZ1.Pt(), eventWeight );
-    h1_ptLeptZ2->Fill( leptZ2.Pt(), eventWeight );
-    h1_etaLeptZ1->Fill( leptZ1.Eta(), eventWeight );
-    h1_etaLeptZ2->Fill( leptZ2.Eta(), eventWeight );
-
-    h1_deltaRZll->Fill( leptZ2.DeltaR(leptZ2), eventWeight );
-
-    h1_ptZll->Fill( diLepton.Pt(), eventWeight );
-    h1_etaZll->Fill( diLepton.Eta(), eventWeight );
-    h1_mZll->Fill( diLepton.M(), eventWeight );
-
-
-
-    TLorentzVector met;
-    met.SetPtEtaPhiE( pfMet, 0., phiMet, pfMet );
-
-    TLorentzVector W = lept3 + met;
-
-    h1_mTW->Fill( W.Mt() , eventWeight );
-
-    TLorentzVector lZ = lept3 + diLepton;
-    TLorentzVector lZ_plusMet = lZ + met;
-
-    float mT_lZmet = ( sqrt( lZ.Pt()*lZ.Pt() + lZ.M()*lZ.M() ) + pfMet )*( sqrt( lZ.Pt()*lZ.Pt() + lZ.M()*lZ.M() ) + pfMet )  -  lZ_plusMet.Pt()*lZ_plusMet.Pt();
-    mT_lZmet = sqrt(mT_lZmet);
-
-    h1_mT_lZmet->Fill( mT_lZmet, eventWeight );
-
-
+    h1_ptLept3_presel->Fill( lept3.Pt(), eventWeight );
+    h1_etaLept3_presel->Fill( lept3.Pt(), eventWeight );
+    h1_leptTypeLept3_presel->Fill( leptTypeLept[0], eventWeight );
+    h1_combinedIsoRelLept3_presel->Fill( combinedIsoRelLept[0], eventWeight );
 
 
     if( event==DEBUG_EVENTNUMBER ) {
@@ -705,6 +722,8 @@ ofstream ofs("run_event.txt");
     // ----------------------------
     // KINEMATIC SELECTION: LEPTONS
     // ----------------------------
+
+    h1_mZll_presel->Fill( diLepton.M(), eventWeight );
 
     if( leptZ1.Pt() < ptLeptZ1_thresh_ ) continue;
     if( leptZ2.Pt() < ptLeptZ2_thresh_ ) continue;
@@ -723,10 +742,23 @@ ofstream ofs("run_event.txt");
     // AND NOW JETS
     // ------------
 
+    h1_nJets_pt10->Fill( nJets , eventWeight );
 
-    h1_nJets->Fill( nJets , eventWeight );
 
-    if( nJets<4 ) continue;
+    // first: count them
+    int njets=0;
+    for( unsigned iJet=0; iJet<nJets; ++iJet) {
+
+      if( ptJet[iJet] < 20. ) continue;
+      if( fabs(etaJet[iJet]) > etaJet_thresh_ ) continue;
+
+      njets++;
+
+    }
+    
+    h1_nJets->Fill( njets , eventWeight );
+    if( njets<4 ) continue;
+
 
     AnalysisJet jetB1, jetB2, jet3, jet4;
     int i_jetB1=-1;
@@ -744,8 +776,12 @@ ofstream ofs("run_event.txt");
     
     float bestBtag=-9999.;
     float bestBtag2=-9999.;
+  
 
     for( unsigned iJet=0; iJet<nJets; ++iJet) {
+
+      if( ptJet[iJet] < ptBJet_thresh_ ) continue;
+      if( fabs(etaJet[iJet]) > etaJet_thresh_ ) continue;
 
       AnalysisJet thisJet;
       thisJet.SetPtEtaPhiE( ptJet[iJet], etaJet[iJet], phiJet[iJet], eJet[iJet]);
@@ -814,6 +850,9 @@ ofstream ofs("run_event.txt");
     for( unsigned iJet=0; iJet<nJets; ++iJet) {
 
       if( iJet==i_jetB1 || iJet==i_jetB2 ) continue;
+ 
+      if( ptJet[iJet] < ptJet_thresh_ ) continue;
+      if( fabs(etaJet[iJet]) > etaJet_thresh_ ) continue;
 
       AnalysisJet thisJet;
       thisJet.SetPtEtaPhiE( ptJet[iJet], etaJet[iJet], phiJet[iJet], eJet[iJet]);
@@ -869,6 +908,43 @@ ofstream ofs("run_event.txt");
     //std::cout << jet3.Pt() << std::endl;
     //std::cout << jet4.Pt() << std::endl;
     //std::cout << std::endl << std::endl << std::endl;
+
+
+
+
+    h1_pfMet->Fill( pfMet, eventWeight );
+    h1_metSignificance->Fill( metSignificance, eventWeight );
+
+    TLorentzVector met;
+    met.SetPtEtaPhiE( pfMet, 0., phiMet, pfMet );
+
+    TLorentzVector W = lept3 + met;
+
+    h1_mTW->Fill( W.Mt() , eventWeight );
+
+    TLorentzVector lZ = lept3 + diLepton;
+    TLorentzVector lZ_plusMet = lZ + met;
+
+    float mT_lZmet = ( sqrt( lZ.Pt()*lZ.Pt() + lZ.M()*lZ.M() ) + pfMet )*( sqrt( lZ.Pt()*lZ.Pt() + lZ.M()*lZ.M() ) + pfMet )  -  lZ_plusMet.Pt()*lZ_plusMet.Pt();
+    mT_lZmet = sqrt(mT_lZmet);
+
+    h1_mT_lZmet->Fill( mT_lZmet, eventWeight );
+
+
+    h1_ptLeptZ1->Fill( leptZ1.Pt(), eventWeight );
+    h1_ptLeptZ2->Fill( leptZ2.Pt(), eventWeight );
+    h1_etaLeptZ1->Fill( leptZ1.Eta(), eventWeight );
+    h1_etaLeptZ2->Fill( leptZ2.Eta(), eventWeight );
+
+    if( nLept>0 ) 
+      h1_ptLept3->Fill( lept3.Pt(), eventWeight );
+
+    h1_deltaRZll->Fill( leptZ2.DeltaR(leptZ2), eventWeight );
+
+    h1_ptZll->Fill( diLepton.Pt(), eventWeight );
+    h1_etaZll->Fill( diLepton.Eta(), eventWeight );
+    h1_mZll->Fill( diLepton.M(), eventWeight );
+
 
     h1_ptJetB1->Fill( jetB1.Pt(), eventWeight );
     h1_ptJetB2->Fill( jetB2.Pt(), eventWeight );
@@ -973,6 +1049,7 @@ ofstream ofs("run_event.txt");
 
 
 
+    leptType3 = leptTypeLept[0];
 
     ptLeptZ1_t = leptZ1.Pt();
     ptLeptZ2_t = leptZ2.Pt();
@@ -1037,6 +1114,7 @@ ofstream ofs("run_event.txt");
   h1_metSignificance->Write();
 
 
+  h1_rhoPF_prepresel->Write();
   h1_rhoPF_presel->Write();
   h1_rhoPF->Write();
 
@@ -1046,6 +1124,11 @@ ofstream ofs("run_event.txt");
   h1_etaLeptZ1->Write();
   h1_etaLeptZ2->Write();
 
+  h1_ptLept3_presel->Write();
+  h1_etaLept3_presel->Write();
+  h1_leptTypeLept3_presel->Write();
+  h1_combinedIsoRelLept3_presel->Write();
+
   h1_ptLept3->Write();
   h1_etaLept3->Write();
 
@@ -1053,12 +1136,16 @@ ofstream ofs("run_event.txt");
 
   h1_ptZll->Write();
   h1_etaZll->Write();
+  h1_mZll_prepresel->Write();
+  h1_mZll_presel->Write();
   h1_mZll->Write();
 
 
   h1_mTW->Write();
   h1_mT_lZmet->Write();
 
+  h1_nJets_prepresel->Write();
+  h1_nJets_pt10->Write();
   h1_nJets->Write();
 
 
@@ -1120,6 +1207,11 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
     etaLeptZ1_thresh_ = 3.;
     etaLeptZ2_thresh_ = 3.;
     etaLept3_thresh_ = 3.;
+
+    ptBJet_thresh_ = 20.;
+    ptJet_thresh_ = 20.;
+    etaJet_thresh_ = 2.4;
+
     ptJetB1_thresh_ = 30.;
     ptJetB2_thresh_ = 30.;
     ptJet3_thresh_ = 30.;
