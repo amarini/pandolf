@@ -196,6 +196,7 @@ DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType
   legendTextSize_ = 0.038;
 
   poissonAsymmErrors_ = true;
+  drawZeros_ = true;
 
   pdf_aussi_ = false;
   root_aussi_ = false;
@@ -1494,9 +1495,9 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
     TGraphAsymmErrors* graph_data_poisson = new TGraphAsymmErrors(0);
     if( dataHistos.size()==1 && poissonAsymmErrors_ ) {
       if( noBinLabels )
-        graph_data_poisson = fitTools::getGraphPoissonErrors(dataHistos[0]);
+        graph_data_poisson = fitTools::getGraphPoissonErrors(dataHistos[0], drawZeros_);
       else 
-        graph_data_poisson = fitTools::getGraphPoissonErrors(dataHistos[0], "binWidth");
+        graph_data_poisson = fitTools::getGraphPoissonErrors(dataHistos[0], drawZeros_, "binWidth");
       if( dataFiles_[0].markerStyle!=-1 )
         graph_data_poisson->SetMarkerStyle(dataFiles_[0].markerStyle);
       else 
@@ -1508,7 +1509,7 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
 
     // axis titles:
 
-    std::string xAxis = axisName;
+    std::string xAxis = (axisName=="") ? name : axisName;
     if( units!="" ) xAxis += " [" + units + "]";
 
     std::string yAxis = instanceName;
@@ -1543,6 +1544,13 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
     h2_axes->SetYTitle(yAxis.c_str());
 
     if( !noBinLabels ) h2_axes->GetXaxis()->SetLabelSize(0.07);
+    if( getBinLabels_ ) {
+      for( unsigned iBinx=1; iBinx<nBinsx+1; ++iBinx ) {
+        if( refHisto->GetXaxis()->GetBinLabel(iBinx)!="" )
+          h2_axes->GetXaxis()->SetBinLabel(iBinx, refHisto->GetXaxis()->GetBinLabel(iBinx));
+      }
+    }
+
 
     TPaveText* label_cms = get_labelCMS(0);
     TPaveText* label_sqrt = get_labelSqrt(0);
@@ -2762,7 +2770,7 @@ LegendBox DrawBase::get_legendBox( int legendQuadrant, const std::vector<std::st
     }
 
     bool widen = false;
-    int wide_thresh = 10;
+    int wide_thresh = 12;
     if( legendTitle_.size()>wide_thresh ) widen=true;
     if( legendNames!=0 ) {
       for( unsigned i=0;i<legendNames->size(); ++i )
