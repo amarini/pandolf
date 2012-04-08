@@ -3082,7 +3082,10 @@ TPaveText* DrawBase::get_labelSqrt( int legendQuadrant ) const {
           cmsText = "CMS Preliminary";
       }
       std::string lumiText = this->get_lumiText();
-      label_sqrt->AddText(Form("%s, L = %s at  #sqrt{s} = 7 TeV", cmsText.c_str(), lumiText.c_str()));
+      if( scaleFactor_>=0. )
+        label_sqrt->AddText(Form("%s, L = %s at  #sqrt{s} = 7 TeV", cmsText.c_str(), lumiText.c_str()));
+      else
+        label_sqrt->AddText(Form("%s,  #sqrt{s} = 7 TeV", cmsText.c_str()) );
     } else { //if lumiOnRightSide
       label_sqrt->AddText("#sqrt{s} = 7 TeV");
     }
