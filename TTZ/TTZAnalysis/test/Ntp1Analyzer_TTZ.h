@@ -45,9 +45,8 @@ class Ntp1Analyzer_TTZ : public Ntp1Analyzer {
    Bool_t passed_HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_;
 
 
-   int leptType_; //0: muon; 1: electron
+   int leptType_; //0: muon; 1: electron; 2: e+m-; 3: e-m+
    int leptTypeMC_; //0: muon; 1: electron
-   int oppositeFlavour_; 
 
    Float_t eZllMC_;
    Float_t ptZllMC_;
