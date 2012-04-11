@@ -577,35 +577,6 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      } //for muons
 
 
-//   std::vector<AnalysisMuon> muons;
-//   float bestMZ_muons=999999999.;
-//   int iMuonPlus_found=-1;
-//   int iMuonMinus_found=-1;
-
-//   // pick best-mZ, oppositely charged muon pair:
-//   for( unsigned iMuonPlus=0; iMuonPlus<muonsPlus.size(); ++iMuonPlus ) {
-//     for( unsigned iMuonMinus=0; iMuonMinus<muonsMinus.size(); ++iMuonMinus ) {
-//       TLorentzVector m1( muonsPlus[iMuonPlus] );
-//       TLorentzVector m2( muonsMinus[iMuonMinus] );
-//       TLorentzVector dimuon = m1+m2;
-//       if( muons.size()==0 ) {
-//         muons.push_back(muonsPlus[iMuonPlus]);
-//         muons.push_back(muonsMinus[iMuonMinus]);
-//         iMuonPlus_found = iMuonPlus;
-//         iMuonMinus_found = iMuonMinus;
-//         bestMZ_muons = dimuon.M();
-//       } else if( fabs(dimuon.M()-mZ) < fabs(bestMZ_muons-mZ) ) { //already found a pair
-//         muons.clear();
-//         muons.push_back(muonsPlus[iMuonPlus]);
-//         muons.push_back(muonsMinus[iMuonMinus]);
-//         iMuonPlus_found = iMuonPlus;
-//         iMuonMinus_found = iMuonMinus;
-//         bestMZ_muons = dimuon.M();
-//       }
-//     }  //for muons minus
-//   }  //for muons plus
-
-
      std::vector<AnalysisLepton> muons = getBestZMassPair( muonsPlus, muonsMinus );
 
 
@@ -717,35 +688,6 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      } //for electrons
 
 
-
-//   std::vector<AnalysisElectron> electrons;
-//   float bestMZ_electrons=999999999.;
-//   int iElePlus_found = -1;
-//   int iEleMinus_found = -1;
-
-//   // pick best-mZ, oppositely charged electron pair:
-//   for( unsigned iElePlus=0; iElePlus<electronsPlus.size(); ++iElePlus ) {
-//     for( unsigned iEleMinus=0; iEleMinus<electronsMinus.size(); ++iEleMinus ) {
-//       TLorentzVector e1( electronsPlus[iElePlus] );
-//       TLorentzVector e2( electronsMinus[iEleMinus] );
-//       TLorentzVector dielectron = e1+e2;
-//       if( electrons.size()==0 ) {
-//         electrons.push_back(electronsPlus [iElePlus]);
-//         electrons.push_back(electronsMinus[iEleMinus]);
-//         iElePlus_found = iElePlus;
-//         iEleMinus_found = iEleMinus;
-//         bestMZ_electrons = dielectron.M();
-//       } else if( fabs(dielectron.M()-mZ) < fabs(bestMZ_electrons-mZ) ) { //already found a pair
-//         electrons.clear();
-//         electrons.push_back(electronsPlus [iElePlus]);
-//         electrons.push_back(electronsMinus[iEleMinus]);
-//         iElePlus_found = iElePlus;
-//         iEleMinus_found = iEleMinus;
-//         bestMZ_electrons = dielectron.M();
-//       }
-//     }  //for electrons minus
-//   }  //for electrons plus
-
      std::vector<AnalysisLepton> electrons = getBestZMassPair( electronsPlus, electronsMinus );
 
 
@@ -762,9 +704,6 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        // at least one opposite-sign pair:
        if( (electronsPlus.size()+muonsPlus.size())==0 || (electronsMinus.size()+muonsMinus.size())==0 ) continue;
 
-       oppositeFlavour_ = true;
-
-
 
        std::vector<AnalysisLepton> elePlus_muMinus = getBestZMassPair( electronsPlus, muonsMinus );
        std::vector<AnalysisLepton> eleMinus_muPlus = getBestZMassPair( electronsMinus, muonsPlus );
@@ -776,7 +715,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
          if( fabs(Zepmm.M()-mZ) < fabs(Zemmp.M()-mZ) ) {
 
-           leptType_=3;
+           leptType_=2;
            if( elePlus_muMinus[0].Pt() > elePlus_muMinus[1].Pt() ) {
              leptons.push_back( elePlus_muMinus[0] );
              leptons.push_back( elePlus_muMinus[1] );
@@ -787,7 +726,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
          } else { 
 
-           leptType_=4;
+           leptType_=3;
            if( eleMinus_muPlus[0].Pt() > eleMinus_muPlus[1].Pt() ) {
              leptons.push_back( eleMinus_muPlus[0] );
              leptons.push_back( eleMinus_muPlus[1] );
@@ -801,7 +740,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
        } else if( elePlus_muMinus.size() == 2 ) {
 
-         leptType_ = 3;
+         leptType_ = 2;
 
          if( elePlus_muMinus[0].Pt() > elePlus_muMinus[1].Pt() ) {
 
@@ -817,7 +756,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
        } else if( eleMinus_muPlus.size() == 2 ) {
 
-         leptType_ = 4;
+         leptType_ = 3;
 
          if( eleMinus_muPlus[0].Pt() > eleMinus_muPlus[1].Pt() ) {
 
@@ -840,8 +779,6 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
 
      } else {
-
-       oppositeFlavour_ = false;
 
        if( electrons.size() == 2 && muons.size() == 2 ) { 
 
