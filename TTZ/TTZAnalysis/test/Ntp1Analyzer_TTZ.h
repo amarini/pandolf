@@ -47,6 +47,7 @@ class Ntp1Analyzer_TTZ : public Ntp1Analyzer {
 
    int leptType_; //0: muon; 1: electron
    int leptTypeMC_; //0: muon; 1: electron
+   int oppositeFlavour_; 
 
    Float_t eZllMC_;
    Float_t ptZllMC_;
@@ -58,6 +59,7 @@ class Ntp1Analyzer_TTZ : public Ntp1Analyzer {
    Float_t etaLeptZ1_;
    Float_t phiLeptZ1_;
    Int_t   chargeLeptZ1_;
+   Float_t combinedIsoRelLeptZ1_;
 
    Float_t eLeptZ1Gen_;
    Float_t ptLeptZ1Gen_;
@@ -69,6 +71,7 @@ class Ntp1Analyzer_TTZ : public Ntp1Analyzer {
    Float_t etaLeptZ2_;
    Float_t phiLeptZ2_;
    Int_t   chargeLeptZ2_;
+   Float_t combinedIsoRelLeptZ2_;
 
    Float_t eLeptZ2Gen_;
    Float_t ptLeptZ2Gen_;
@@ -82,6 +85,7 @@ class Ntp1Analyzer_TTZ : public Ntp1Analyzer {
    Float_t etaLept_[10];
    Float_t phiLept_[10];
    Int_t   chargeLept_[10];
+   Float_t combinedIsoRelLept_[10];
 
    Float_t eLeptGen_[10];
    Float_t ptLeptGen_[10];
