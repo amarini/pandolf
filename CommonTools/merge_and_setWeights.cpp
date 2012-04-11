@@ -568,7 +568,7 @@ float getWeight( const std::string& dataset, int nEvents ) {
     xSection = 18.3;//## //MCFM NLO see http://ceballos.web.cern.ch/ceballos/hwwlnln/cross_sections_backgrounds.txt
   } else if( dataset_tstr.BeginsWith("WZTo3LNu") || dataset_tstr.BeginsWith("WZJetsTo3LNu") ) {
     xSection = 0.558; // measured in CMS PAS 11-259
-    //xSection = 18.3*0.108*2.*0.0337*2.; // this seems to be wrong by a factor 3
+    //xSection = 18.3*0.108*3.*0.0337*3.; 
   } else if( dataset_tstr.BeginsWith("TTZ") ) {
     xSection = 0.139; //taken from https://twiki.cern.ch/twiki/bin/viewauth/CMS/SameSignDilepton2011#MC_samples_for_the_2011_paper
   } else if( dataset_tstr.BeginsWith("TTW") ) {
