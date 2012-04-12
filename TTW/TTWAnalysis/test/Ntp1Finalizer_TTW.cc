@@ -8,6 +8,7 @@
 #include "TH2D.h"
 #include "TProfile.h"
 #include "TRegexp.h"
+#include "TGraphAsymmErrors.h"
 
 #include "QGLikelihood/QGLikelihoodCalculator.h"
 #include "HelicityLikelihoodDiscriminant/HelicityLikelihoodDiscriminant.h"
@@ -20,7 +21,7 @@
 
 bool USE_MC_MASS=false;
 
-int DEBUG_EVENTNUMBER = 696;
+int DEBUG_EVENTNUMBER = 675033372;
 
 
 
@@ -107,6 +108,13 @@ void Ntp1Finalizer_TTW::finalize() {
   h1_etaLept1->Sumw2();
   TH1D* h1_etaLept2 = new TH1D("etaLept2", "", 50, -2.5, 2.5);
   h1_etaLept2->Sumw2();
+  TH1D* h1_combinedIsoRelLept1 = new TH1D("combinedIsoRelLept1", "", 30, 0., 0.15);
+  h1_combinedIsoRelLept1->Sumw2();
+  TH1D* h1_combinedIsoRelLept2 = new TH1D("combinedIsoRelLept2", "", 30, 0., 0.15);
+  h1_combinedIsoRelLept2->Sumw2();
+
+  TH1D* h1_passedCombinedIsoRel015 = new TH1D("passedCombinedIsoRel015", "", 20, 0., 20.);
+  TH1D* h1_passedCombinedIsoRel005 = new TH1D("passedCombinedIsoRel005", "", 20, 0., 20.);
 
   TH1D* h1_etaMu = new TH1D("etaMu", "", 50, -2.5, 2.5);
   h1_etaMu->Sumw2();
@@ -117,6 +125,12 @@ void Ntp1Finalizer_TTW::finalize() {
   TH1D* h1_deltaRll = new TH1D("deltaRll", "", 500, 0., 5.);
   h1_deltaRll->Sumw2();
 
+  TH1D* h1_mT1 = new TH1D("mT1", "", 200, 0., 200.);
+  h1_mT1->Sumw2();
+  TH1D* h1_mT2 = new TH1D("mT2", "", 200, 0., 200.);
+  h1_mT2->Sumw2();
+  TH1D* h1_mTMax = new TH1D("mTMax", "", 400, 0., 400.);
+  h1_mTMax->Sumw2();
 
 
   TH1D* h1_nJets = new TH1D("nJets", "", 9, 3.5, 12.5);
@@ -127,6 +141,11 @@ void Ntp1Finalizer_TTW::finalize() {
   h1_bTagJet1->Sumw2();
   TH1D* h1_bTagJet2 = new TH1D("bTagJet2", "", 420, -1., 20.);
   h1_bTagJet2->Sumw2();
+
+  TH1D* h1_kinfit_chiSquare = new TH1D("kinfit_chiSquare", "", 60, 0., 10.);
+  h1_kinfit_chiSquare->Sumw2();
+  TH1D* h1_kinfit_chiSquareProb = new TH1D("kinfit_chiSquareProb", "", 60, 0., 1.0001);
+  h1_kinfit_chiSquareProb->Sumw2();
 
 
   TH1D* h1_ptJet1 = new TH1D("ptJet1", "", 400, 20., 420.);
@@ -227,6 +246,8 @@ void Ntp1Finalizer_TTW::finalize() {
   tree_->SetBranchAddress("chargeLept1", &chargeLept1);
   Int_t leptTypeLept1;
   tree_->SetBranchAddress("leptTypeLept1", &leptTypeLept1);
+  Float_t combinedIsoRelLept1;
+  tree_->SetBranchAddress("combinedIsoRelLept1", &combinedIsoRelLept1);
 
   Float_t eLept2;
   tree_->SetBranchAddress("eLept2", &eLept2);
@@ -240,6 +261,8 @@ void Ntp1Finalizer_TTW::finalize() {
   tree_->SetBranchAddress("chargeLept2", &chargeLept2);
   Int_t leptTypeLept2;
   tree_->SetBranchAddress("leptTypeLept2", &leptTypeLept2);
+  Float_t combinedIsoRelLept2;
+  tree_->SetBranchAddress("combinedIsoRelLept2", &combinedIsoRelLept2);
 
 
   //Int_t nLept;
@@ -310,16 +333,18 @@ void Ntp1Finalizer_TTW::finalize() {
 
   Int_t nPart;
   tree_->SetBranchAddress("nPart", &nPart);
-  Float_t ePart[20];
+  Float_t ePart[100];
   tree_->SetBranchAddress("ePart", ePart);
-  Float_t ptPart[20];
+  Float_t ptPart[100];
   tree_->SetBranchAddress("ptPart", ptPart);
-  Float_t etaPart[20];
+  Float_t etaPart[100];
   tree_->SetBranchAddress("etaPart", etaPart);
-  Float_t phiPart[20];
+  Float_t phiPart[100];
   tree_->SetBranchAddress("phiPart", phiPart);
-  Int_t pdgIdPart[20];
+  Int_t pdgIdPart[100];
   tree_->SetBranchAddress("pdgIdPart", pdgIdPart);
+  Int_t statusPart[100];
+  tree_->SetBranchAddress("statusPart", statusPart);
 
 
   // HLT:
@@ -358,6 +383,7 @@ void Ntp1Finalizer_TTW::finalize() {
 
   //QGLikelihoodCalculator *qglikeli = new QGLikelihoodCalculator("/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
   float tmass = 172.9;
+  float Wmass = 80.399;
 
 
 //std::string puType = "Spring11_Flat10";
@@ -429,6 +455,7 @@ void Ntp1Finalizer_TTW::finalize() {
 ofstream ofs("run_event.txt");
 
 
+  DiJetKinFitter* fitter_jets = new DiJetKinFitter( "fitter_jets", "fitter_jets", Wmass );
 
 
   std::cout << std::endl << std::endl;
@@ -606,6 +633,7 @@ ofstream ofs("run_event.txt");
       std::cout << "leptType: " << leptType << std::endl; 
       std::cout << "Lept1.Pt(): " << Lept1.Pt() << " Lept1.Eta(): " << Lept1.Eta() << std::endl;
       std::cout << "Lept2.Pt(): " << Lept2.Pt() << " Lept2.Eta(): " << Lept2.Eta() << std::endl;
+      std::cout << "combinedIsoRelLept1: " << combinedIsoRelLept1 << " combinedIsoRelLept2: " << combinedIsoRelLept2 << std::endl;
       std::cout << "diLepton.M(): " << diLepton.M() << std::endl;
     }
 
@@ -620,6 +648,8 @@ ofstream ofs("run_event.txt");
     if( Lept2.Pt() < ptLept2_thresh_ ) continue;
     if( fabs(Lept1.Eta()) > etaLept1_thresh_ ) continue;
     if( fabs(Lept2.Eta()) > etaLept2_thresh_ ) continue;
+    if( combinedIsoRelLept1 > combRelIsoLept1_thresh_ ) continue;
+    if( combinedIsoRelLept2 > combRelIsoLept2_thresh_ ) continue;
     if( mll < mll_thresh_ ) continue;
 
 
@@ -663,6 +693,8 @@ ofstream ofs("run_event.txt");
     int i_bestBtag=-1;
     int i_bestBtag2=-1;
 
+    float ht = 0.;
+
     for( unsigned iJet=0; iJet<nJets; ++iJet) {
 
       AnalysisJet thisJet;
@@ -681,12 +713,14 @@ ofstream ofs("run_event.txt");
         continue;
       }
 
+      ht += thisJet.Pt();
+
       thisJet.rmsCand = rmsCandJet[iJet];
       thisJet.ptD = ptDJet[iJet];
       thisJet.nCharged = nChargedJet[iJet];
       thisJet.nNeutral = nNeutralJet[iJet];
-      thisJet.muonEnergyFraction = eMuonsJet[iJet]/thisJet.Energy();
-      thisJet.electronEnergyFraction = eElectronsJet[iJet]/thisJet.Energy();
+      thisJet.eMuons= eMuonsJet[iJet]/thisJet.Energy();
+      thisJet.eElectrons = eElectronsJet[iJet]/thisJet.Energy();
 
       thisJet.trackCountingHighEffBJetTag = trackCountingHighEffBJetTagJet[iJet];
       thisJet.trackCountingHighPurBJetTag = trackCountingHighPurBJetTagJet[iJet];
@@ -702,19 +736,20 @@ ofstream ofs("run_event.txt");
       thisJet.phiGen = phiGenJet[iJet];
       thisJet.eGen = eGenJet[iJet];
 
-      //match to parton:
-      int partFlavor=0;
-      float deltaRmin=999.;
-      for(unsigned iPart=0; iPart<nPart; ++iPart ) {
-        TLorentzVector thisPart;
-        thisPart.SetPtEtaPhiE( ptPart[iPart], etaPart[iPart], phiPart[iPart], ePart[iPart] );
-        float thisDeltaR = thisJet.DeltaR(thisPart);
-        if( thisDeltaR<deltaRmin ) {
-          partFlavor = pdgIdPart[iPart];
-          deltaRmin = thisDeltaR;
-        }
-      }
-      thisJet.pdgIdPart = partFlavor;
+      ////match to parton:
+      //int partFlavor=0;
+      //float deltaRmin=999.;
+      //for(unsigned iPart=0; iPart<nPart; ++iPart ) {
+      //  TLorentzVector thisPart;
+      //  if( !( fabs(pdgIdPart[iPart])<7 || pdgIdPart[iPart]==21) ) continue;
+      //  thisPart.SetPtEtaPhiE( ptPart[iPart], etaPart[iPart], phiPart[iPart], ePart[iPart] );
+      //  float thisDeltaR = thisJet.DeltaR(thisPart);
+      //  if( thisDeltaR<deltaRmin ) {
+      //    partFlavor = pdgIdPart[iPart];
+      //    deltaRmin = thisDeltaR;
+      //  }
+      //}
+      //thisJet.pdgIdPart = partFlavor;
 
 
       float thisBtag;
@@ -774,6 +809,11 @@ ofstream ofs("run_event.txt");
     } // for jets
 
     
+    if( event==DEBUG_EVENTNUMBER ) 
+      std::cout << std::endl << std::endl << std::endl << "-> Event HT: " << ht << "   (thresh is " << ht_thresh_ << ")" << std::endl;
+
+    
+    if( ht < ht_thresh_ ) continue;
 
     if( event==DEBUG_EVENTNUMBER ) {
       std::cout << std::endl << std::endl << std::endl << "-> So here are two best-btag jets: " << std::endl;
@@ -799,8 +839,8 @@ ofstream ofs("run_event.txt");
       thisJet.ptD = ptDJet[iJet];
       thisJet.nCharged = nChargedJet[iJet];
       thisJet.nNeutral = nNeutralJet[iJet];
-      thisJet.muonEnergyFraction = eMuonsJet[iJet]/thisJet.Energy();
-      thisJet.electronEnergyFraction = eElectronsJet[iJet]/thisJet.Energy();
+      thisJet.eMuons = eMuonsJet[iJet]/thisJet.Energy();
+      thisJet.eElectrons = eElectronsJet[iJet]/thisJet.Energy();
 
       thisJet.trackCountingHighEffBJetTag = trackCountingHighEffBJetTagJet[iJet];
       thisJet.trackCountingHighPurBJetTag = trackCountingHighPurBJetTagJet[iJet];
@@ -820,6 +860,8 @@ ofstream ofs("run_event.txt");
       int partFlavor=0;
       float deltaRmin=999.;
       for(unsigned iPart=0; iPart<nPart; ++iPart ) {
+        if( !( fabs(pdgIdPart[iPart])<6 || pdgIdPart[iPart]==21) ) continue;
+        if( statusPart[iPart]!=2 ) continue;
         TLorentzVector thisPart;
         thisPart.SetPtEtaPhiE( ptPart[iPart], etaPart[iPart], phiPart[iPart], ePart[iPart] );
         float thisDeltaR = thisJet.DeltaR(thisPart);
@@ -863,6 +905,21 @@ ofstream ofs("run_event.txt");
     //if( event==DEBUG_EVENTNUMBER ) std::cout << "first jet eta OK" << std::endl;
     //if( fabs(jet2.Eta()) > etaJet2_thresh_ ) continue;
     //if( event==DEBUG_EVENTNUMBER ) std::cout << "second jet eta OK" << std::endl;
+
+
+
+
+    // -------------
+    // KINEMATIC FIT
+    // -------------
+  
+    std::pair<TLorentzVector,TLorentzVector> jets_kinfit = fitter_jets->fit(jets[2], jets[3]);
+
+    float chiSquareProb = TMath::Prob(fitter_jets->getS(), fitter_jets->getNDF());
+    h1_kinfit_chiSquare->Fill( fitter_jets->getS()/fitter_jets->getNDF(), eventWeight ); 
+    h1_kinfit_chiSquareProb->Fill( chiSquareProb, eventWeight );
+
+
     
     float bTaggerJet1, bTaggerJet2;
     if( bTaggerType_=="TCHE" ) {
@@ -905,7 +962,13 @@ ofstream ofs("run_event.txt");
     } else {
       h1_etaEle->Fill( Lept2.Eta(), eventWeight );
     }
+    h1_combinedIsoRelLept1->Fill( combinedIsoRelLept1, eventWeight );
+    h1_combinedIsoRelLept2->Fill( combinedIsoRelLept2, eventWeight );
 
+    // these ones with no weight (for eff vs. PU):
+    h1_passedCombinedIsoRel015->Fill( rhoPF );
+    if( combinedIsoRelLept1<0.05 && combinedIsoRelLept2<0.05 ) 
+      h1_passedCombinedIsoRel005->Fill( rhoPF );
 
     deltaRll = Lept1.DeltaR(Lept2);
     h1_deltaRll->Fill( deltaRll, eventWeight );
@@ -914,6 +977,19 @@ ofstream ofs("run_event.txt");
     h1_nJets->Fill( jets.size(), eventWeight );
     h1_pfMet->Fill( pfMet, eventWeight );
     h1_metSignificance->Fill( metSignificance, eventWeight );
+
+    TLorentzVector v_met;
+    v_met.SetPtEtaPhiE( pfMet, 0., phiMet, pfMet );
+
+    float deltaPhiLept1_met = Lept1.DeltaPhi(v_met);
+    float deltaPhiLept2_met = Lept2.DeltaPhi(v_met);
+
+    float mT1 = sqrt( Lept1.Pt()*pfMet*(1.-cos(deltaPhiLept1_met)) );
+    float mT2 = sqrt( Lept2.Pt()*pfMet*(1.-cos(deltaPhiLept2_met)) );
+
+    h1_mT1->Fill( mT1, eventWeight );
+    h1_mT2->Fill( mT2, eventWeight );
+    h1_mTMax->Fill( TMath::Max(mT1, mT2), eventWeight );
 
     h1_ptJet1->Fill( jets[0].Pt(), eventWeight );
     h1_ptJet2->Fill( jets[1].Pt(), eventWeight );
@@ -1014,6 +1090,11 @@ ofstream ofs("run_event.txt");
 
 
 
+  TGraphAsymmErrors* gr_eff_combinedIsoRel_vs_rho = new TGraphAsymmErrors(0);
+  gr_eff_combinedIsoRel_vs_rho->SetName("eff_combinedIsoRel_vs_rho");
+  gr_eff_combinedIsoRel_vs_rho->BayesDivide( h1_passedCombinedIsoRel005, h1_passedCombinedIsoRel015 );
+
+
   h1_nCounter->SetBinContent(1, nCounter_);
   h1_nCounterW->SetBinContent(1, nCounterW_);
   h1_nCounterPU->SetBinContent(1, nCounterPU_);
@@ -1026,6 +1107,8 @@ ofstream ofs("run_event.txt");
   outFile_->cd();
 
   tree_passedEvents->Write();
+
+  gr_eff_combinedIsoRel_vs_rho->Write();
 
   h1_nCounter->Write();
   h1_nCounterW->Write();
@@ -1041,17 +1124,27 @@ ofstream ofs("run_event.txt");
 
   h1_pfMet->Write();
 
+  h1_mT1->Write();
+  h1_mT2->Write();
+  h1_mTMax->Write();
+
   h1_metSignificance->Write();
 
 
   h1_rhoPF_presel->Write();
   h1_rhoPF->Write();
 
+  
 
   h1_ptLept1->Write();
   h1_ptLept2->Write();
   h1_etaLept1->Write();
   h1_etaLept2->Write();
+  h1_combinedIsoRelLept1->Write();
+  h1_combinedIsoRelLept2->Write();
+
+  h1_passedCombinedIsoRel015->Write();
+  h1_passedCombinedIsoRel005->Write();
 
   h1_etaMu->Write();
   h1_etaEle->Write();
@@ -1067,6 +1160,8 @@ ofstream ofs("run_event.txt");
   h1_bTagJet1->Write();
   h1_bTagJet2->Write();
 
+  h1_kinfit_chiSquare->Write();
+  h1_kinfit_chiSquareProb->Write();
 
   h1_ptJet1->Write();
   h1_ptJet2->Write();
@@ -1119,10 +1214,13 @@ void Ntp1Finalizer_TTW::setSelectionType( const std::string& selectionType ) {
     ptLept2_thresh_ = 20.;
     etaLept1_thresh_ = 3.;
     etaLept2_thresh_ = 3.;
+    combRelIsoLept1_thresh_ = 1.;
+    combRelIsoLept2_thresh_ = 1.;
 
     mll_thresh_ = 8.;
 
     pfMet_thresh_ = 0.;
+    ht_thresh_ = 0.;
 
     btagSelectionType_ = "looseloose";
 
@@ -1144,10 +1242,13 @@ void Ntp1Finalizer_TTW::setSelectionType( const std::string& selectionType ) {
     ptLept2_thresh_ = 20.;
     etaLept1_thresh_ = 3.;
     etaLept2_thresh_ = 3.;
+    combRelIsoLept1_thresh_ = 1.;
+    combRelIsoLept2_thresh_ = 1.;
 
     mll_thresh_ = 8.;
 
     pfMet_thresh_ = 40.;
+    ht_thresh_ = 0.;
 
     btagSelectionType_ = "loosemed";
 
@@ -1169,10 +1270,13 @@ void Ntp1Finalizer_TTW::setSelectionType( const std::string& selectionType ) {
     ptLept2_thresh_ = 20.;
     etaLept1_thresh_ = 3.;
     etaLept2_thresh_ = 3.;
+    combRelIsoLept1_thresh_ = 1.;
+    combRelIsoLept2_thresh_ = 1.;
 
     mll_thresh_ = 8.;
 
     pfMet_thresh_ = 0.;
+    ht_thresh_ = 0.;
 
     btagSelectionType_ = "loosemed";
 
@@ -1194,12 +1298,71 @@ void Ntp1Finalizer_TTW::setSelectionType( const std::string& selectionType ) {
     ptLept2_thresh_ = 40.;
     etaLept1_thresh_ = 3.;
     etaLept2_thresh_ = 3.;
+    combRelIsoLept1_thresh_ = 1.;
+    combRelIsoLept2_thresh_ = 1.;
 
     mll_thresh_ = 8.;
 
     pfMet_thresh_ = 0.;
+    ht_thresh_ = 0.;
 
     btagSelectionType_ = "looseloose";
+
+    ptJet_thresh_ = 20.;
+    etaJet_thresh_ = 2.4;
+
+    ptJet1_thresh_ = 20.;
+    ptJet2_thresh_ = 20.;
+    ptJet3_thresh_ = 20.;
+    ptJet4_thresh_ = 20.;
+    etaJet1_thresh_ = 5.;
+    etaJet2_thresh_ = 5.;
+    etaJet3_thresh_ = 5.;
+    etaJet4_thresh_ = 5.;
+
+  } else if( selectionType_=="sel4" ) {
+
+    ptLept1_thresh_ = 75.;
+    ptLept2_thresh_ = 24.;
+    etaLept1_thresh_ = 3.;
+    etaLept2_thresh_ = 3.;
+    combRelIsoLept1_thresh_ = 0.05;
+    combRelIsoLept2_thresh_ = 0.05;
+
+    mll_thresh_ = 8.;
+
+    pfMet_thresh_ = 40.;
+    ht_thresh_ = 0.;
+
+    btagSelectionType_ = "loosenone";
+
+    ptJet_thresh_ = 20.;
+    etaJet_thresh_ = 2.4;
+
+    ptJet1_thresh_ = 20.;
+    ptJet2_thresh_ = 20.;
+    ptJet3_thresh_ = 20.;
+    ptJet4_thresh_ = 20.;
+    etaJet1_thresh_ = 5.;
+    etaJet2_thresh_ = 5.;
+    etaJet3_thresh_ = 5.;
+    etaJet4_thresh_ = 5.;
+
+  } else if( selectionType_=="sel5" ) {
+
+    ptLept1_thresh_ = 54.;
+    ptLept2_thresh_ = 23.;
+    etaLept1_thresh_ = 3.;
+    etaLept2_thresh_ = 3.;
+    combRelIsoLept1_thresh_ = 0.05;
+    combRelIsoLept2_thresh_ = 0.05;
+
+    mll_thresh_ = 8.;
+
+    pfMet_thresh_ = 30.;
+    ht_thresh_ = 56.;
+
+    btagSelectionType_ = "loosenone";
 
     ptJet_thresh_ = 20.;
     etaJet_thresh_ = 2.4;
@@ -1252,6 +1415,10 @@ bool Ntp1Finalizer_TTW::passedBTag( float btag1, float btag2, const std::string&
   } else if( btagSelectionType_=="medmed" ) {
 
     returnBool = ( btag1>med_thresh && btag2>med_thresh );  
+ 
+  } else if( btagSelectionType_=="loosenone" ) {
+
+    returnBool = ( btag1>loose_thresh || btag2>loose_thresh );  
  
   }
 
