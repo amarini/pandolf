@@ -124,6 +124,8 @@ class DrawBase {
   void add_label( const std::string& text, float xmin=0.23, float ymin=0.87, float xmax=0.36, float ymax=0.9, float textSize=0.035 );
   void delete_label();
 
+  void resetStyle() const { style_->cd(); };
+
   LegendBox get_legendBox( int legendQuadrant=1, const std::vector<std::string>* legendNames=0 ) const;
   TPaveText* get_labelCMS( int legendQuadrant=0 ) const;
   TPaveText* get_labelCMStop( bool wide=false ) const;
