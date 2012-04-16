@@ -23,7 +23,7 @@ class Ntp1Finalizer_TTZTrilepton : public Ntp1Finalizer {
   virtual void finalize();
   void setSelectionType( const std::string& selectionType );
 
-  float get_helicityLD_thresh(float mass, int nBTags);
+  float get_btagThresh( const std::string& btag_OP_ );
 
 
  private:
@@ -33,20 +33,26 @@ class Ntp1Finalizer_TTZTrilepton : public Ntp1Finalizer {
    std::string selectionType_;
    std::string bTaggerType_;
 
+   float  ptJet_thresh_;
+   float  ptBJet_thresh_;
+   float  etaJet_thresh_;
+
+   std::string btagJetB1_OP_;
+   std::string btagJetB2_OP_;
+
    float  ptLeptZ1_thresh_;
    float  ptLeptZ2_thresh_;
    float  ptLept3_thresh_;
    float  etaLeptZ1_thresh_;
    float  etaLeptZ2_thresh_;
    float  etaLept3_thresh_;
-   float  ptJetB1_thresh_;
-   float  ptJetB2_thresh_;
-   float  ptJet3_thresh_;
-   float  ptJet4_thresh_;
-   float  etaJetB1_thresh_;
-   float  etaJetB2_thresh_;
-   float  etaJet3_thresh_;
-   float  etaJet4_thresh_;
+
+   float  combinedIsoRelLept3_thresh_;
+
+   float  met_thresh_;
+
+   int    njets_thresh_;
+
    float  mZll_threshLo_;
    float  mZll_threshHi_;
 
