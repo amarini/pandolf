@@ -50,11 +50,14 @@ class Ntp1Finalizer_TTZTrilepton : public Ntp1Finalizer {
    float  combinedIsoRelLept3_thresh_;
 
    float  met_thresh_;
+   float  ht_thresh_;
 
    int    njets_thresh_;
 
    float  mZll_threshLo_;
    float  mZll_threshHi_;
+
+   float  ptZll_thresh_;
 
 };
 
