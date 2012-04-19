@@ -13,7 +13,7 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selType, const std::
 int main(int argc, char* argv[]) {
 
   if(  argc != 2 && argc != 3 ) {
-    std::cout << "USAGE: ./drawTTZTrilepton [(string)selType] [bTaggerType=\"TCHE\"]" << std::endl;
+    std::cout << "USAGE: ./drawTTZTrilepton [(string)selType] [bTaggerType=\"SSVHE\"]" << std::endl;
     exit(23);
   }
 
@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
 
   std::string PUType = "PUHR11_73pb";
 
-  std::string bTaggerType = "TCHE";
+  std::string bTaggerType = "SSVHE";
   if( argc>=3 ) {
     std::string bTaggerType_str(argv[2]);
     bTaggerType = bTaggerType_str;
@@ -94,12 +94,16 @@ int main(int argc, char* argv[]) {
   //db->set_legendTitle("Trilepton channel");
 
   db->drawHisto("nJets", "Jet Multiplicity (p_{T} > 10 GeV)", "", "Events", log);
+  db->drawHisto("mZll_prepresel", "Dilepton mass", "GeV", "Events");
   db->drawHisto("mZll", "Dilepton mass", "GeV", "Events");
 
 
+  db->set_rebin(10); 
+  db->set_xAxisMax(200.); 
+  db->drawHisto("pfMet", "pfME_{T}", "GeV", "Events", log);
+  db->drawHisto("pfMet_presel", "pfME_{T}", "GeV", "Events", log);
   db->set_rebin(4); 
   db->set_xAxisMax(250.); 
-  db->drawHisto("pfMet", "pfME_{T}", "GeV", "Events", log);
   db->set_xAxisMax();
   db->drawHisto("ptLept3_presel", "Third Lepton p_{T}", "GeV", "Events");
   db->set_xAxisMax(0.15);
@@ -107,13 +111,24 @@ int main(int argc, char* argv[]) {
   db->drawHisto("combinedIsoRelLept3_presel", "Third Lepton Isolation", "", "Events");
 
 
+  db->set_xAxisMax();
+  db->set_rebin(10);
+  db->drawHisto_fromTree("tree_passedEvents", "TMath::Max( TMath::Max(ptJetB1, ptJetB2), TMath::Max(ptJet3, ptJet4) )", "eventWeight", 100, 20., 420., "ptJetMax", "Leading Jet p_{T}", "GeV");
+  db->set_xAxisMax(250.);
+  db->drawHisto("ptLeptZ1", "Lead Z Lepton p_{T}", "GeV", "Events");
+  db->drawHisto("ptJetB1", "Leading b-Tagged Jet p_{T}", "GeV");
+  db->set_xAxisMax(150.);
+  db->drawHisto("ptLeptZ2", "Sublead Z Lepton p_{T}", "GeV", "Events");
   
   db->set_xAxisMax(5.);
-  db->drawHisto("bTagJetB1");
-  db->drawHisto("bTagJetB2");
+  db->set_rebin(5);
+  std::string axisName = "Leading b-Tag (" + bTaggerType + ")";
+  db->drawHisto("bTagJetB1", axisName );
+  axisName = "Subleading b-Tag (" + bTaggerType + ")";
+  db->drawHisto("bTagJetB2", "Subleading b-Tag");
 
   db->set_xAxisMax();
-  db->set_rebin(5);
+  db->set_rebin(20);
   db->drawHisto("mTW", "", "GeV", "Events");
   db->drawHisto("mT_lZmet", "", "GeV", "Events");
 
@@ -235,10 +250,10 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selType, const std::
   if( additionalCuts!="" ) additionalCuts += " && ";
 
   // and now lepton channel definitions:
-  std::string sel_mmm = "eventWeight*( " + additionalCuts + " leptType==0 && leptType3==0)";
-  std::string sel_mme = "eventWeight*( " + additionalCuts + " leptType==0 && leptType3==1)";
-  std::string sel_eem = "eventWeight*( " + additionalCuts + " leptType==1 && leptType3==0)";
-  std::string sel_eee = "eventWeight*( " + additionalCuts + " leptType==1 && leptType3==1)";
+  std::string sel_mmm = "eventWeight*( " + additionalCuts + " isMZllSignalRegion && leptType==0 && leptType3==0)";
+  std::string sel_mme = "eventWeight*( " + additionalCuts + " isMZllSignalRegion && leptType==0 && leptType3==1)";
+  std::string sel_eem = "eventWeight*( " + additionalCuts + " isMZllSignalRegion && leptType==1 && leptType3==0)";
+  std::string sel_eee = "eventWeight*( " + additionalCuts + " isMZllSignalRegion && leptType==1 && leptType3==1)";
 
 
 
