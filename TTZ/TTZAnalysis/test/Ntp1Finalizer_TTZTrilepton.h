@@ -17,7 +17,7 @@ class Ntp1Finalizer_TTZTrilepton : public Ntp1Finalizer {
 
  public:
 
-  Ntp1Finalizer_TTZTrilepton( const std::string& dataset, const std::string& selectionType, const std::string& bTaggerType="TCHE", const std::string& PUType="HR11", const std::string& leptType="ALL");
+  Ntp1Finalizer_TTZTrilepton( const std::string& dataset, const std::string& selectionType, const std::string& bTaggerType="SSVHE", const std::string& PUType="HR11", const std::string& leptType="ALL");
   virtual ~Ntp1Finalizer_TTZTrilepton() {};
 
   virtual void finalize();
