@@ -51,8 +51,10 @@ int main( int argc, char* argv[] ) {
     nf->addFile("DoubleMu_Run2011B_v2"); //first muons! important!
     nf->addFile("DoubleElectron_Run2011A_FULL");
     nf->addFile("DoubleElectron_Run2011B_v2");
+    nf->addFile("MuEG_Run2011A_FULL");
+    nf->addFile("MuEG_Run2011B");
 
-  } else if( "VV_Summer11" ) {
+  } else if( dataset=="VV_Summer11" ) {
 
     nf->addFile("WZJetsTo3LNu_TuneZ2_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1");
     nf->addFile("ZZ_TuneZ2_7TeV_pythia6_tauola_Summer11-PU_S4_START42_V11-v1");
