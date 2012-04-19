@@ -750,7 +750,7 @@ ofstream ofs("run_event.txt");
     if( leptZ2.Pt() < ptLeptZ2_thresh_ ) continue;
     if( fabs(leptZ1.Eta()) > etaLeptZ1_thresh_ ) continue;
     if( fabs(leptZ2.Eta()) > etaLeptZ2_thresh_ ) continue;
-
+    if( diLepton.Pt() < ptZll_thresh_ ) continue;
     isMZllSignalRegion=true;
     if( diLepton.M() < mZll_threshLo_ || diLepton.M() > mZll_threshHi_ ) isMZllSignalRegion=false;
 
@@ -786,6 +786,7 @@ ofstream ofs("run_event.txt");
     h1_nJets->Fill( njets , eventWeight );
 
     if( njets<njets_thresh_ ) continue;
+    if( ht<ht_thresh_ ) continue;
 
 
     AnalysisJet jetB1, jetB2, jet3, jet4;
@@ -1272,7 +1273,10 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
     mZll_threshLo_ = 70.;
     mZll_threshHi_ = 110.;
 
+    ptZll_thresh_ = 0.;
+
     met_thresh_ = 0.;
+    ht_thresh_ = 0.;
  
     njets_thresh_ = 3;
 
@@ -1297,7 +1301,10 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
     mZll_threshLo_ = 81.;
     mZll_threshHi_ = 101.;
 
+    ptZll_thresh_ = 0.;
+
     met_thresh_ = 30.;
+    ht_thresh_ = 0.;
 
     njets_thresh_ = 4;
 
@@ -1322,7 +1329,10 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
     mZll_threshLo_ = 81.;
     mZll_threshHi_ = 101.;
 
+    ptZll_thresh_ = 0.;
+
     met_thresh_ = 0.;
+    ht_thresh_ = 0.;
 
     njets_thresh_ = 4;
 
@@ -1347,7 +1357,38 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
     mZll_threshLo_ = 81.;
     mZll_threshHi_ = 101.;
 
+    ptZll_thresh_ = 0.;
+
     met_thresh_ = 0.;
+    ht_thresh_ = 0.;
+
+    njets_thresh_ = 3;
+
+  } else if( selectionType_=="optsel1" ) {
+
+    ptLeptZ1_thresh_ = 20.;
+    ptLeptZ2_thresh_ = 20.;
+    ptLept3_thresh_ = 23.;
+    etaLeptZ1_thresh_ = 3.;
+    etaLeptZ2_thresh_ = 3.;
+    etaLept3_thresh_ = 3.;
+
+    combinedIsoRelLept3_thresh_ = 1.;
+
+    ptBJet_thresh_ = 20.;
+    ptJet_thresh_ = 20.;
+    etaJet_thresh_ = 2.4;
+
+    btagJetB1_OP_ = "medium";
+    btagJetB2_OP_ = "none";
+
+    mZll_threshLo_ = 81.;
+    mZll_threshHi_ = 101.;
+
+    ptZll_thresh_ = 28.;
+
+    met_thresh_ = 0.;
+    ht_thresh_ = 184.;
 
     njets_thresh_ = 3;
 
