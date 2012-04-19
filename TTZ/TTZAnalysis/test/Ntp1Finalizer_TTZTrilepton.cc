@@ -505,6 +505,7 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   float ptJet3_t, ptJet4_t, etaJet3_t, etaJet4_t;
   float HLTSF;
   int leptType3;
+  bool isMZllSignalRegion;
 
   tree_passedEvents->Branch( "run", &run, "run/I" );
   tree_passedEvents->Branch( "LS", &LS, "LS/I" );
@@ -533,6 +534,7 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   tree_passedEvents->Branch( "eventWeight", &eventWeight, "eventWeight/F" );
   tree_passedEvents->Branch( "HLTSF", &HLTSF, "HLTSF/F" );
   tree_passedEvents->Branch( "PUWeight", &eventWeightPU, "eventWeightPU/F" );
+  tree_passedEvents->Branch( "isMZllSignalRegion", &isMZllSignalRegion, "isMZllSignalRegion/O" );
 
 
 
@@ -743,7 +745,7 @@ ofstream ofs("run_event.txt");
     if( fabs(leptZ1.Eta()) > etaLeptZ1_thresh_ ) continue;
     if( fabs(leptZ2.Eta()) > etaLeptZ2_thresh_ ) continue;
 
-    bool isMZllSignalRegion=true;
+    isMZllSignalRegion=true;
     if( diLepton.M() < mZll_threshLo_ || diLepton.M() > mZll_threshHi_ ) isMZllSignalRegion=false;
 
 
