@@ -506,10 +506,16 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   float HLTSF;
   int leptType3;
   bool isMZllSignalRegion;
+  int nBjets_loose;
+  int nBjets_medium;
+  float ht;
 
   tree_passedEvents->Branch( "run", &run, "run/I" );
   tree_passedEvents->Branch( "LS", &LS, "LS/I" );
   tree_passedEvents->Branch( "event", &event, "event/I" );
+  tree_passedEvents->Branch( "eventWeight", &eventWeight, "eventWeight/F" );
+  tree_passedEvents->Branch( "HLTSF", &HLTSF, "HLTSF/F" );
+  tree_passedEvents->Branch( "PUWeight", &eventWeightPU, "eventWeightPU/F" );
   tree_passedEvents->Branch( "pfMet", &pfMet, "pfMet/F" );
   tree_passedEvents->Branch( "leptType", &leptType, "leptType/I" );
   tree_passedEvents->Branch( "leptType3", &leptType3, "leptType3/I" );
@@ -531,10 +537,10 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   tree_passedEvents->Branch( "etaJetB2", &etaJetB2_t, "etaJetB2_t/F" );
   tree_passedEvents->Branch( "etaJet3", &etaJet3_t, "etaJet3_t/F" );
   tree_passedEvents->Branch( "etaJet4", &etaJet4_t, "etaJet4_t/F" );
-  tree_passedEvents->Branch( "eventWeight", &eventWeight, "eventWeight/F" );
-  tree_passedEvents->Branch( "HLTSF", &HLTSF, "HLTSF/F" );
-  tree_passedEvents->Branch( "PUWeight", &eventWeightPU, "eventWeightPU/F" );
+  tree_passedEvents->Branch( "ht", &ht, "ht/F" );
   tree_passedEvents->Branch( "isMZllSignalRegion", &isMZllSignalRegion, "isMZllSignalRegion/O" );
+  tree_passedEvents->Branch( "nBjets_loose", &nBjets_loose, "nBjets_loose/I" );
+  tree_passedEvents->Branch( "nBjets_medium", &nBjets_medium, "nBjets_medium/I" );
 
 
 
@@ -762,12 +768,16 @@ ofstream ofs("run_event.txt");
     h1_nJets_pt10->Fill( nJets , eventWeight );
 
 
+   
     // first: count them
+    ht = 0.;
     int njets=0;
     for( unsigned iJet=0; iJet<nJets; ++iJet) {
 
       if( ptJet[iJet] < 20. ) continue;
       if( fabs(etaJet[iJet]) > etaJet_thresh_ ) continue;
+
+      ht += ptJet[iJet];
 
       njets++;
 
@@ -786,6 +796,7 @@ ofstream ofs("run_event.txt");
     jetB1.SetPtEtaPhiE( ptJet[0], etaJet[0], phiJet[0], eJet[0]);
     jetB2.SetPtEtaPhiE( ptJet[1], etaJet[1], phiJet[1], eJet[1]);
     jet3.SetPtEtaPhiE( ptJet[2], etaJet[2], phiJet[2], eJet[2]);
+    jet4.SetPtEtaPhiE( 0., 0., 0., 0. );
     if( nJets>2 )
       jet4.SetPtEtaPhiE( ptJet[3], etaJet[3], phiJet[3], eJet[3]);
 
@@ -795,6 +806,8 @@ ofstream ofs("run_event.txt");
     
     float bestBtag=-9999.;
     float bestBtag2=-9999.;
+    nBjets_loose = 0;
+    nBjets_medium  = 0;
   
 
     for( unsigned iJet=0; iJet<nJets; ++iJet) {
@@ -845,6 +858,11 @@ ofstream ofs("run_event.txt");
       else if( bTaggerType_=="SSVHE" ) 
         thisBtag = thisJet.simpleSecondaryVertexHighEffBJetTag;
 
+      bool isBtagged_loose = ( thisBtag > this->get_btagThresh("loose") );
+      bool isBtagged_medium = ( thisBtag > this->get_btagThresh("medium") );
+
+      if( isBtagged_loose ) nBjets_loose += 1;
+      if( isBtagged_medium ) nBjets_medium += 1;
 
       if( thisBtag > bestBtag ) {
         bestBtag2 = bestBtag;
@@ -1256,7 +1274,7 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
 
     met_thresh_ = 0.;
  
-    njets_thresh_ = 4;
+    njets_thresh_ = 3;
 
   } else if( selectionType_=="sel1" ) {
 
