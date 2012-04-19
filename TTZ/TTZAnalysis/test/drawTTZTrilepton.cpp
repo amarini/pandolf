@@ -119,6 +119,11 @@ int main(int argc, char* argv[]) {
   db->drawHisto("ptJetB1", "Leading b-Tagged Jet p_{T}", "GeV");
   db->set_xAxisMax(150.);
   db->drawHisto("ptLeptZ2", "Sublead Z Lepton p_{T}", "GeV", "Events");
+
+  db->set_xAxisMax();
+  db->set_rebin();
+  db->drawHisto_fromTree("tree_passedEvents", "nBjets_loose", "eventWeight", 9, -0.5, 8.5, "nBjets_loose", "Number of b-Jets (loose)");
+  db->drawHisto_fromTree("tree_passedEvents", "nBjets_medium", "eventWeight", 9, -0.5, 8.5, "nBjets_medium", "Number of b-Jets (medium)");
   
   db->set_xAxisMax(5.);
   db->set_rebin(5);
@@ -149,6 +154,10 @@ int main(int argc, char* argv[]) {
   db->drawHisto("mTb1WZ", "", "GeV", "Events");
   db->drawHisto("mTb2WZ", "", "GeV", "Events");
   db->drawHisto("mTbWZ_best", "", "GeV", "Events");
+
+  db->set_rebin();
+  db->drawHisto_fromTree("tree_passedEvents", "ht", "eventWeight", 50, 60., 560., "ht", "H_{T}", "GeV");
+  db->drawHisto_fromTree("tree_passedEvents", "ptZll", "eventWeight*(mZll>81. && mZll<101.)", 30, 0., 300., "ptZll", "p_{T} (Z)", "GeV");
 
 
 
