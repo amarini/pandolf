@@ -321,7 +321,7 @@ TH1F* PUWeight::IdealMCHistogram( const std::string& puType) {
 		     4.58337152809607E-05};
 */
 
-  float   idealpu[50];
+  float   idealpu[55];
 
   if( puType=="Spring11_Flat10" ) {
 
@@ -375,6 +375,11 @@ TH1F* PUWeight::IdealMCHistogram( const std::string& puType) {
       idealpu[47]   =   0.;
       idealpu[48]   =   0.;
       idealpu[49]   =   0.;
+      idealpu[50]   =   0.;
+      idealpu[51]   =   0.;
+      idealpu[52]   =   0.;
+      idealpu[53]   =   0.;
+      idealpu[54]   =   0.;
 
   } else if( puType=="Summer11_S4" ) {
 
@@ -428,6 +433,11 @@ TH1F* PUWeight::IdealMCHistogram( const std::string& puType) {
       idealpu[47]   =   0.;
       idealpu[48]   =   0.;
       idealpu[49]   =   0.;
+      idealpu[50]   =   0.;
+      idealpu[51]   =   0.;
+      idealpu[52]   =   0.;
+      idealpu[53]   =   0.;
+      idealpu[54]   =   0.;
 
       //idealpu[0] =  0.14551;
       //idealpu[1] =  0.0644453;
@@ -507,60 +517,128 @@ TH1F* PUWeight::IdealMCHistogram( const std::string& puType) {
       idealpu[47]   =   0.;
       idealpu[48]   =   0.;
       idealpu[49]   =   0.;
+      idealpu[50]   =   0.;
+      idealpu[51]   =   0.;
+      idealpu[52]   =   0.;
+      idealpu[53]   =   0.;
+      idealpu[54]   =   0.;
 
 
   } else if( puType=="Fall11" ) {
 
-      idealpu[0]   =   0.003388501;
-      idealpu[1]   =   0.010357558;
-      idealpu[2]   =   0.024724258;
-      idealpu[3]   =   0.042348605;
-      idealpu[4]   =   0.058279812;
-      idealpu[5]   =   0.068851751;
-      idealpu[6]   =   0.072914824;
-      idealpu[7]   =   0.071579609;
-      idealpu[8]   =   0.066811668;
-      idealpu[9]   =   0.060672356;
-      idealpu[10]   =   0.054528356;
-      idealpu[11]   =   0.04919354;
-      idealpu[12]   =   0.044886042;
-      idealpu[13]   =   0.041341896;
-      idealpu[14]   =   0.0384679;
-      idealpu[15]   =   0.035871463;
-      idealpu[16]   =   0.03341952;
-      idealpu[17]   =   0.030915649;
-      idealpu[18]   =   0.028395374;
-      idealpu[19]   =   0.025798107;
-      idealpu[20]   =   0.023237445;
-      idealpu[21]   =   0.020602754;
-      idealpu[22]   =   0.0180688;
-      idealpu[23]   =   0.015559693;
-      idealpu[24]   =   0.013211063;
-      idealpu[25]   =   0.010964293;
-      idealpu[26]   =   0.008920993;
-      idealpu[27]   =   0.007080504;
-      idealpu[28]   =   0.005499239;
-      idealpu[29]   =   0.004187022;
-      idealpu[30]   =   0.003096474;
-      idealpu[31]   =   0.002237361;
-      idealpu[32]   =   0.001566428;
-      idealpu[33]   =   0.001074149;
-      idealpu[34]   =   0.000721755;
-      idealpu[35]   =   0.000470838;
-      idealpu[36]   =   0.00030268;
-      idealpu[37]   =   0.000184665;
-      idealpu[38]   =   0.000112883;
-      idealpu[39]   =   6.74043E-05;
-      idealpu[40]   =   3.82178E-05;
-      idealpu[41]   =   2.22847E-05;
-      idealpu[42]   =   1.20933E-05;
-      idealpu[43]   =   6.96173E-06;
-      idealpu[44]   =   3.4689E-06;
-      idealpu[45]   =   1.96172E-06;
-      idealpu[46]   =   8.49283E-07;
-      idealpu[47]   =   5.02393E-07;
-      idealpu[48]   =   2.15311E-07;
-      idealpu[49]   =   9.56938E-08;
+     idealpu[0]   =   0.014583699;
+     idealpu[1]   =   0.025682975;
+     idealpu[2]   =   0.038460562;
+     idealpu[3]   =   0.049414536;
+     idealpu[4]   =   0.056931087;
+     idealpu[5]   =   0.061182816;
+     idealpu[6]   =   0.062534625;
+     idealpu[7]   =   0.061476918;
+     idealpu[8]   =   0.058677499;
+     idealpu[9]   =   0.055449877;
+     idealpu[10]   =   0.051549051;
+     idealpu[11]   =   0.047621024;
+     idealpu[12]   =   0.043923799;
+     idealpu[13]   =   0.040569076;
+     idealpu[14]   =   0.037414654;
+     idealpu[15]   =   0.034227033;
+     idealpu[16]   =   0.031437714;
+     idealpu[17]   =   0.028825596;
+     idealpu[18]   =   0.026218978;
+     idealpu[19]   =   0.023727061;
+     idealpu[20]   =   0.021365645;
+     idealpu[21]   =   0.01918743 ;
+     idealpu[22]   =   0.016972815;
+     idealpu[23]   =   0.014920601;
+     idealpu[24]   =   0.013038989;
+     idealpu[25]   =   0.011293777;
+     idealpu[26]   =   0.009612465;
+     idealpu[27]   =   0.008193556;
+     idealpu[28]   =   0.006888047;
+     idealpu[29]   =   0.005715239;
+     idealpu[30]   =   0.004711232;
+     idealpu[31]   =   0.003869926;
+     idealpu[32]   =   0.003154521;
+     idealpu[33]   =   0.002547417;
+     idealpu[34]   =   0.002024714;
+     idealpu[35]   =   0.001574411;
+     idealpu[36]   =   0.001245808;
+     idealpu[37]   =   0.000955206;
+     idealpu[38]   =   0.000735305;
+     idealpu[39]   =   0.000557304;
+     idealpu[40]   =   0.000412503;
+     idealpu[41]   =   0.000305502;
+     idealpu[42]   =   0.000231002;
+     idealpu[43]   =   0.000165701;
+     idealpu[44]   =   0.000121201;
+     idealpu[45]   =   9.30006E-05;
+     idealpu[46]   =   6.40004E-05;
+     idealpu[47]   =   4.22003E-05;
+     idealpu[48]   =   2.85002E-05;
+     idealpu[49]   =   1.96001E-05;
+     idealpu[50]   =   1.59001E-05;
+     idealpu[51]   =   1.01001E-05;
+     idealpu[52]   =   8.50006E-06;
+     idealpu[53]   =   6.60004E-06;
+     idealpu[54]   =   2.70002E-06;
+
+  } else if( puType=="Fall11Truth" ) {
+
+    idealpu[0]   =   0.003388501;
+    idealpu[1]   =   0.010357558;
+    idealpu[2]   =   0.024724258;
+    idealpu[3]   =   0.042348605;
+    idealpu[4]   =   0.058279812;
+    idealpu[5]   =   0.068851751;
+    idealpu[6]   =   0.072914824;
+    idealpu[7]   =   0.071579609;
+    idealpu[8]   =   0.066811668;
+    idealpu[9]   =   0.060672356;
+    idealpu[10]   =   0.054528356;
+    idealpu[11]   =   0.04919354;
+    idealpu[12]   =   0.044886042;
+    idealpu[13]   =   0.041341896;
+    idealpu[14]   =   0.0384679;
+    idealpu[15]   =   0.035871463;
+    idealpu[16]   =   0.03341952;
+    idealpu[17]   =   0.030915649;
+    idealpu[18]   =   0.028395374;
+    idealpu[19]   =   0.025798107;
+    idealpu[20]   =   0.023237445;
+    idealpu[21]   =   0.020602754;
+    idealpu[22]   =   0.0180688;
+    idealpu[23]   =   0.015559693;
+    idealpu[24]   =   0.013211063;
+    idealpu[25]   =   0.010964293;
+    idealpu[26]   =   0.008920993;
+    idealpu[27]   =   0.007080504;
+    idealpu[28]   =   0.005499239;
+    idealpu[29]   =   0.004187022;
+    idealpu[30]   =   0.003096474;
+    idealpu[31]   =   0.002237361;
+    idealpu[32]   =   0.001566428;
+    idealpu[33]   =   0.001074149;
+    idealpu[34]   =   0.000721755;
+    idealpu[35]   =   0.000470838;
+    idealpu[36]   =   0.00030268;
+    idealpu[37]   =   0.000184665;
+    idealpu[38]   =   0.000112883;
+    idealpu[39]   =   6.74043E-05;
+    idealpu[40]   =   3.82178E-05;
+    idealpu[41]   =   2.22847E-05;
+    idealpu[42]   =   1.20933E-05;
+    idealpu[43]   =   6.96173E-06;
+    idealpu[44]   =   3.4689E-06;
+    idealpu[45]   =   1.96172E-06;
+    idealpu[46]   =   8.49283E-07;
+    idealpu[47]   =   5.02393E-07;
+    idealpu[48]   =   2.15311E-07;
+    idealpu[49]   =   9.56938E-08;
+      idealpu[50]   =   0.;
+      idealpu[51]   =   0.;
+      idealpu[52]   =   0.;
+      idealpu[53]   =   0.;
+      idealpu[54]   =   0.;
 
   } else {
 
@@ -616,6 +694,11 @@ TH1F* PUWeight::IdealMCHistogram( const std::string& puType) {
       idealpu[47]   =   0.;
       idealpu[48]   =   0.;
       idealpu[49]   =   0.;
+      idealpu[50]   =   0.;
+      idealpu[51]   =   0.;
+      idealpu[52]   =   0.;
+      idealpu[53]   =   0.;
+      idealpu[54]   =   0.;
 
   }
 
