@@ -1372,12 +1372,16 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
       if( !noDATA && !noMC ) { //normalize mc to data shape
         // default: choose first data histo:
         Float_t dataIntegral = dataHistos[0]->Integral();
-        Float_t mcIntegral = mcHisto_sum->Integral();
+        Float_t mcStackIntegral = mcHisto_sum->Integral();
         //Float_t dataIntegral = dataHistos[0]->Integral(0, dataHistos[0]->GetNbinsX()+1);
         //Float_t mcIntegral = mcHisto_sum->Integral(0, mcHisto_sum->GetNbinsX()+1);
-        mcHisto_sum->Scale( dataIntegral/mcIntegral );
-        for( unsigned i=0; i<mcHistos.size(); ++i )
-          mcHistos[i]->Scale( dataIntegral/mcIntegral );
+        mcHisto_sum->Scale( dataIntegral/mcStackIntegral );
+        for( unsigned i=0; i<mcHistos.size(); ++i ) {
+          if( noStack_ )
+            mcHistos[i]->Scale( dataIntegral/mcHistos[i]->Integral() );
+          else
+            mcHistos[i]->Scale( dataIntegral/mcStackIntegral );
+        }
       //} else if( noDATA ) { //normalize each MC to its area
       } else { //normalize each histo to its area
         // first: MC
