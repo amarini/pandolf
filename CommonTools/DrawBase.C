@@ -235,6 +235,8 @@ DrawBase::~DrawBase() {
 
 void DrawBase::set_lumiNormalization( float givenLumi) {
 
+  std::cout << "-> Set lumi normalization (" << givenLumi << " pb-1)." << std::endl;
+
   if( givenLumi==-1. ) {
 
     if( dataFiles_.size()==0 ) {
@@ -255,6 +257,8 @@ void DrawBase::set_lumiNormalization( float givenLumi) {
 }
 
 void DrawBase::set_shapeNormalization() {
+
+  std::cout << "-> Set shape normalization." << std::endl;
 
   scaleFactor_ = -1.;
   if( dataFiles_.size()==0 )
