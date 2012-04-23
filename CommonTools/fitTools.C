@@ -1297,7 +1297,7 @@ TGraphErrors* fitTools::get_graphRatio( TGraphErrors* gr_data, TGraphErrors* gr_
 
 
 
-TGraphAsymmErrors* fitTools::getGraphPoissonErrors( TH1D* histo, const std::string xerrType, float nSigma ) {
+TGraphAsymmErrors* fitTools::getGraphPoissonErrors( TH1D* histo, bool drawZeros, const std::string xerrType, float nSigma ) {
 
   
   TGraphAsymmErrors* graph = new TGraphAsymmErrors(0);
@@ -1320,6 +1320,8 @@ TGraphAsymmErrors* fitTools::getGraphPoissonErrors( TH1D* histo, const std::stri
       xerr = histo->GetBinWidth(iBin);
     }
     y = (int)histo->GetBinContent(iBin);
+
+    if( y==0 && !drawZeros ) continue;
        
     double ym, yp;
     RooHistError::instance().getPoissonInterval(y,ym,yp,nSigma);
