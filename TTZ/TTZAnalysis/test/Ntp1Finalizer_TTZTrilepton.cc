@@ -152,8 +152,6 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
 
   TH1D* h1_nJets_prepresel = new TH1D("nJets_prepresel", "", 11, -0.5, 10.5);
   h1_nJets_prepresel->Sumw2();
-  TH1D* h1_nJets_pt10 = new TH1D("nJets_pt10", "", 7, 3.5, 10.5);
-  h1_nJets_pt10->Sumw2();
   TH1D* h1_nJets = new TH1D("nJets", "", 7, 3.5, 10.5);
   h1_nJets->Sumw2();
 
@@ -427,8 +425,8 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   PUWeight* fPUWeight = new PUWeight(-1, "2011A", puType);
   //PUWeight* fPUWeight_ave = new PUWeight(-1, "2011A", puType_ave);
   std::string puFileName;
-  puFileName = "all2011AB.pileup_v2_73mb.root";
-  //puFileName = "Pileup_DATA_up_to_178479_SiXie.root";
+  //puFileName = "all2011AB.pileup_v2_73mb.root";
+  puFileName = "Pileup_DATA_up_to_178479_SiXie.root";
   //puFileName = "PileupTruth_v2.root";
   //puFileName = "PileupObs_v2.root";
   //puFileName = "FullData_178078.root"; 
@@ -438,6 +436,11 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   TFile* filePU = TFile::Open(puFileName.c_str());
   TH1F* h1_nPU_data = (TH1F*)filePU->Get("pileup");
   fPUWeight->SetDataHistogram(h1_nPU_data);
+
+
+  if( dataset_tstr.Contains("spadhi") )
+    fPUWeight->SetMCHistogram(h1_nPU_gen_);
+  
 
   //if( dataset_tstr.BeginsWith("TTW") || dataset_tstr.BeginsWith("TTZ") ) {
   //  TFile* filePUMC = TFile::Open("RareSM_Sanjay-v1.root");
@@ -464,51 +467,6 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   //TH1F* h1_nPU_mc = (TH1F*)filePUMC->Get("pileup");
   //std::cout << "-> Switching MC PU file to: PUFile_DYJets_Summer11.root" << std::endl;
   //fPUWeight->SetMCHistogram(h1_nPU_mc);
-
-  //TFile* filePUMC = TFile::Open("Pileup_DYJets_Fall11.root");
-  //TH1F* h1_nPU_mc = (TH1F*)filePUMC->Get("nPU_gen");
-  //std::cout << "-> Switching MC PU file to: Pileup_DYJets_Fall11.root" << std::endl;
-  fPUWeight->SetMCHistogram(h1_nPU_gen_);
-
-  //if( PUType_!="HR11_v2" ) {
-  //  std::cout << std::endl << "-> Using data pileup file: " << puFileName << std::endl;
-  //  TFile* filePU = TFile::Open(puFileName.c_str());
-  //  TH1F* h1_nPU_data = (TH1F*)filePU->Get("pileup");
-  //  fPUWeight->SetDataHistogram(h1_nPU_data);
-  //  fPUWeight_ave->SetDataHistogram(h1_nPU_data);
-  //} else {  // HR11_v2: 4.6fb-1 = 2.1 (A) + 2.5 (B)
-  //  TFile* filePU_RunA = TFile::Open("all2011A.pileup_v2_73mb.root");
-  //  TFile* filePU_RunB = TFile::Open("all2011B.pileup_v2_73mb.root");
-  //  TH1F* h1_PURunA = (TH1F*)filePU_RunA->Get("pileup");
-  //  TH1F* h1_PURunB = (TH1F*)filePU_RunB->Get("pileup");
-  //  h1_PURunA->Scale(2.1/h1_PURunA->Integral());
-  //  h1_PURunB->Scale(2.5/h1_PURunB->Integral());
-  //  TH1F* h1_PU_weightedAverage = new TH1F(*h1_PURunA);
-  //  h1_PU_weightedAverage->Add(h1_PURunB);
-  //  fPUWeight->SetDataHistogram(h1_PU_weightedAverage);
-  //  fPUWeight_ave->SetDataHistogram(h1_PU_weightedAverage);
-  //}
-    
-     
-
-
-  //if( PUType_=="HR11_73pb_DY" ) {
-  //  TFile* filePUMC = TFile::Open("generatedpileup_Zjets_MADGRAPH_AOD423.root");
-  //  TH1F* h1_nPU_mc = (TH1F*)filePUMC->Get("GenLevelInfoModule/npileup");
-  //  std::cout << "-> Switching MC PU file to: generatedpileup_Zjets_MADGRAPH_AOD423.root" << std::endl;
-  //  fPUWeight->SetMCHistogram(h1_nPU_mc);
-  //} else if( dataset_tstr.Contains("Summer11") && dataset_tstr.Contains("PU_S4") && PUType_!="HR11_v3" ) {
-  //  TFile* filePUMC = TFile::Open("Pileup_MC_Summer11_S4.root");
-  //  TH1F* h1_nPU_mc = (TH1F*)filePUMC->Get("hNPU");
-  //  std::cout << "-> Switching MC PU file to: Pileup_MC_Summer11_S4.root" << std::endl;
-  //  fPUWeight->SetMCHistogram(h1_nPU_mc);
-//} else if( dataset_tstr.Contains("Fall11") ) {
-//  TFile* filePUMC = TFile::Open("s6MCPileUp.root");
-//  TH1F* h1_nPU_mc = (TH1F*)filePUMC->Get("pileup");
-//  std::cout << "-> Switching MC PU file to: s6MCPileUp.root" << std::endl;
-//  fPUWeight->SetMCHistogram(h1_nPU_mc);
-  //}
-
 
 
   float mZll_t, ptZll_t;
@@ -587,6 +545,60 @@ ofstream ofs("run_event.txt");
       if( leptType_=="ELE" && leptType==0 ) continue;
       if( leptType_=="MU" && leptType==1 ) continue;
     }
+
+
+    if( !isMC ) { 
+
+      // remove duplicate events:
+
+      std::map<int, std::map<int, std::vector<int> > >::iterator it;
+
+      it = run_lumi_ev_map.find(run);
+
+
+      if( it==run_lumi_ev_map.end() ) {
+
+        std::vector<int> events;
+        events.push_back(event);
+        std::map<int, std::vector<int> > lumi_ev_map;
+        lumi_ev_map.insert( std::pair<int,std::vector<int> >(LS, events));
+        run_lumi_ev_map.insert( std::pair<int, std::map<int, std::vector<int> > > (run, lumi_ev_map) );
+
+      } else { //run exists, look for LS
+
+
+        std::map<int, std::vector<int> >::iterator it_LS;
+        it_LS = it->second.find( LS );
+
+        if( it_LS==(it->second.end())  ) {
+
+          std::vector<int> events;
+          events.push_back(event);
+          it->second.insert( std::pair<int, std::vector<int> > (LS, events) );
+
+        } else { //LS exists, look for event
+
+          std::vector<int>::iterator ev;
+          for( ev=it_LS->second.begin(); ev!=it_LS->second.end(); ++ev )
+            if( *ev==event ) break;
+
+
+          if( ev==it_LS->second.end() ) {
+
+            it_LS->second.push_back(event);
+
+          } else {
+
+            std::cout << "DISCARDING DUPLICATE EVENT!! Run: " << run << " LS: " << LS << " event: " << event << std::endl;
+
+            continue;
+
+          }
+        }
+      }
+
+
+    } //if is not mc
 
    
 
@@ -674,64 +686,11 @@ if( njets<3 ) continue;
 
 
 
-    if( !isMC ) { 
-
-      // remove duplicate events:
-
-      std::map<int, std::map<int, std::vector<int> > >::iterator it;
-
-      it = run_lumi_ev_map.find(run);
-
-
-      if( it==run_lumi_ev_map.end() ) {
-
-        std::vector<int> events;
-        events.push_back(event);
-        std::map<int, std::vector<int> > lumi_ev_map;
-        lumi_ev_map.insert( std::pair<int,std::vector<int> >(LS, events));
-        run_lumi_ev_map.insert( std::pair<int, std::map<int, std::vector<int> > > (run, lumi_ev_map) );
-
-      } else { //run exists, look for LS
-
-
-        std::map<int, std::vector<int> >::iterator it_LS;
-        it_LS = it->second.find( LS );
-
-        if( it_LS==(it->second.end())  ) {
-
-          std::vector<int> events;
-          events.push_back(event);
-          it->second.insert( std::pair<int, std::vector<int> > (LS, events) );
-
-        } else { //LS exists, look for event
-
-          std::vector<int>::iterator ev;
-          for( ev=it_LS->second.begin(); ev!=it_LS->second.end(); ++ev )
-            if( *ev==event ) break;
-
-
-          if( ev==it_LS->second.end() ) {
-
-            it_LS->second.push_back(event);
-
-          } else {
-
-            std::cout << "DISCARDING DUPLICATE EVENT!! Run: " << run << " LS: " << LS << " event: " << event << std::endl;
-
-            continue;
-
-          }
-        }
-      }
-
-
-    } //if is not mc
-
     if( leptType>1 ) 
       h1_mZll_OF_prepresel->Fill( diLepton.M(), eventWeight );
 
     if( dataset_=="TTJ_Fall11_highstat" ) //TTJets SF computed with computeTTJetsSF
-      eventWeight *= 1.1754;
+      eventWeight *= 1.173;
 
     if( leptType<=1 ) {
       h1_mZll_prepresel->Fill( diLepton.M(), eventWeight );
@@ -746,7 +705,7 @@ if( njets<3 ) continue;
     h1_nvertex_PUW->Fill(nvertex, eventWeight);
 
     h1_rhoPF_prepresel->Fill( rhoPF, eventWeight);
-    h1_nJets_prepresel->Fill( nJets, eventWeight );
+    h1_nJets_prepresel->Fill( njets, eventWeight );
 
 
 
@@ -805,9 +764,6 @@ if( njets<3 ) continue;
     // ------------
     // AND NOW JETS
     // ------------
-
-    h1_nJets_pt10->Fill( nJets , eventWeight );
-
 
    
     h1_nJets->Fill( njets , eventWeight );
@@ -1227,7 +1183,6 @@ if( njets<3 ) continue;
   h1_mT_lZmet->Write();
 
   h1_nJets_prepresel->Write();
-  h1_nJets_pt10->Write();
   h1_nJets->Write();
 
 

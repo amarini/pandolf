@@ -75,7 +75,7 @@ int main(int argc, char* argv[]) {
   TTZFileName += "_" + leptType;
   TTZFileName += ".root";
   TFile* TTZFile = TFile::Open(TTZFileName.c_str());
-  //db->add_mcFile( TTZFile, "ttZ", "t#bar{t} + Z", signalFillColor, 0);
+  db->add_mcFile( TTZFile, "ttZ", "t#bar{t} + Z", signalFillColor, 0);
 
 
   //std::string mcZJetsFileName = "TTZTrilepton_DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1";
@@ -124,13 +124,14 @@ int main(int argc, char* argv[]) {
   mcTTWFileName += "_" + leptType;
   mcTTWFileName += ".root";
   TFile* mcTTWFile = TFile::Open(mcTTWFileName.c_str());
-  //db->add_mcFile( mcTTWFile, "ttW", "t#bar{t} + W", 33, 0);
+  db->add_mcFile( mcTTWFile, "ttW", "t#bar{t} + W", 33, 0);
 
 
   //db->set_shapeNormalization();
   //db->set_noStack(true);
   //db->drawHisto("nvertex_PUW", "Number of Reconstructed Vertexes", "", "Events", true);
   //db->set_noStack(false);
+  //exit(1);
 
 
   float lumi_fb = 4.98;
@@ -140,17 +141,15 @@ int main(int argc, char* argv[]) {
 
   db->set_drawZeros(false);
 
-  bool log = true;
-
 
   //db->set_legendTitle("Trilepton channel");
   db->drawHisto("nvertex", "Number of Reconstructed Vertexes", "", "Events", true);
   db->drawHisto("nvertex_PUW", "Number of Reconstructed Vertexes", "", "Events", true);
 
-  db->drawHisto("rhoPF_presel", "Particle Flow Energy Density", "GeV", "Events", log);
+  db->drawHisto("nJets_prepresel", "Jet Multiplicity (p_{T} > 10 GeV)", "", "Events", true);
+  db->drawHisto("rhoPF_prepresel", "Particle Flow Energy Density", "GeV", "Events", true);
+  db->drawHisto("rhoPF_presel", "Particle Flow Energy Density", "GeV", "Events", true);
 
-  //db->drawHisto("nJets_prepresel", "Jet Multiplicity (p_{T} > 10 GeV)", "", "Events");
-  //db->drawHisto("nJets_pt10", "Jet Multiplicity (p_{T} > 10 GeV)", "", "Events");
   db->drawHisto("nJets", "Jet Multiplicity (p_{T} > 20 GeV)", "", "Events");
 
   //db->drawHisto("ptLept3_prepresel", "Third Lepton p_{T}", "GeV", "Events");
@@ -160,11 +159,12 @@ int main(int argc, char* argv[]) {
 
   db->set_rebin(2);
   db->set_xAxisMax(130.);
-  db->drawHisto("mZll_prepresel", "Dilepton Invariant Mass", "GeV", "Events", log, 2);
+  db->drawHisto("mZll_prepresel", "Dilepton Invariant Mass", "GeV", "Events", true, 2);
   db->set_rebin(4);
   db->drawHisto("mZll_OF_prepresel", "Opposite Flavor Dilepton Mass", "GeV", "Events");
-  db->drawHisto("mZll_presel", "Dilepton Invariant Mass", "GeV", "Events", log, 2);
-  db->drawHisto("mZll", "Dilepton Invariant Mass", "GeV", "Events", log, 2);
+  db->drawHisto("mZll_OF_prepresel_scaled", "Opposite Flavor Dilepton Mass", "GeV", "Events");
+  db->drawHisto("mZll_presel", "Dilepton Invariant Mass", "GeV", "Events", true, 2);
+  db->drawHisto("mZll", "Dilepton Invariant Mass", "GeV", "Events", true, 2);
   db->set_xAxisMax();
 
 
