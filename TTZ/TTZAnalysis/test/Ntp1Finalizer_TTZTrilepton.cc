@@ -144,8 +144,6 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   h1_mZll_prepresel_0btag->Sumw2();
   TH1D* h1_mZll_OF_prepresel = new TH1D("mZll_OF_prepresel", "", 220, 50., 160.);
   h1_mZll_OF_prepresel->Sumw2();
-  TH1D* h1_mZll_OF_prepresel_scaled = new TH1D("mZll_OF_prepresel_scaled", "", 220, 50., 160.);
-  h1_mZll_OF_prepresel_scaled->Sumw2();
   TH1D* h1_mZll_presel = new TH1D("mZll_presel", "", 220, 50., 160.);
   h1_mZll_presel->Sumw2();
   TH1D* h1_mZll_presel_0btag = new TH1D("mZll_presel_0btag", "", 220, 50., 160.);
@@ -845,6 +843,14 @@ if( njets<3 ) continue;
 
     } //for additional jets
 
+
+    float btag_thresh1 = this->get_btagThresh( btagJetB1_OP_ );
+    float btag_thresh2 = this->get_btagThresh( btagJetB2_OP_ );
+
+    bool passed_btag = (bTaggerJetB1 >= btag_thresh1) && ( bTaggerJetB2 >= btag_thresh2 );
+
+
+
     
     TLorentzVector leptZ1, leptZ2;
     leptZ1.SetPtEtaPhiE( ptLeptZ1, etaLeptZ1, phiLeptZ1, eLeptZ1 );
@@ -856,26 +862,19 @@ if( njets<3 ) continue;
 
 
 
-    if( leptType>1 )  //opposite flavour laptons: ttbar control region
-      h1_mZll_OF_prepresel->Fill( diLepton.M(), eventWeight );
-
-    if( dataset_=="TTJ_Fall11_highstat" ) //TTJets SF computed with computeTTJetsSF
-      eventWeight *= 1.173;
 
     if( leptType<=1 ) {
       h1_mZll_prepresel->Fill( diLepton.M(), eventWeight );
-    } else {
-      h1_mZll_OF_prepresel_scaled->Fill( diLepton.M(), eventWeight );
+    } else {  //opposite flavour leptons: ttbar control region
+      h1_mZll_OF_prepresel->Fill( diLepton.M(), eventWeight );
       continue;
     }
 
 
-    float btag_thresh_loose = this->get_btagThresh( "loose" );
-
 
     // btag free region: Z+jets and WZ control region
     //if( nBjets_loose == 0 ) {
-    if( nBjets_medium == 0 ) {
+    if( !passed_btag ) {
       h1_mZll_prepresel_0btag->Fill( diLepton.M(), eventWeight );
       if( nLept>0 )
         h1_mZll_presel_0btag->Fill( diLepton.M(), eventWeight );
@@ -956,11 +955,7 @@ if( njets<3 ) continue;
     if( njets<njets_thresh_ ) continue;
     if( ht<ht_thresh_ ) continue;
 
-    float btag_thresh1 = this->get_btagThresh( btagJetB1_OP_ );
-    float btag_thresh2 = this->get_btagThresh( btagJetB2_OP_ );
-
-    if( bTaggerJetB1 < btag_thresh1 ) continue;
-    if( bTaggerJetB2 < btag_thresh2 ) continue;
+    if( !passed_btag ) continue;
 
     
 
@@ -1198,7 +1193,6 @@ if( njets<3 ) continue;
   h1_mZll_prepresel->Write();
   h1_mZll_prepresel_0btag->Write();
   h1_mZll_OF_prepresel->Write();
-  h1_mZll_OF_prepresel_scaled->Write();
   h1_mZll_presel->Write();
   h1_mZll_presel_0btag->Write();
   h1_mZll->Write();
