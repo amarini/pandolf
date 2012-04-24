@@ -18,12 +18,10 @@
 
 
 int DEBUG_EVENTNUMBER = 715236831;
-float mZ = 91.1876;
 
 
 double trackDxyPV(float PVx, float PVy, float PVz, float eleVx, float eleVy, float eleVz, float elePx, float elePy, float elePz);
 float getWeightPU(Int_t nPU);
-std::vector<AnalysisLepton> getBestZMassPair( const std::vector<AnalysisLepton>& leptPlus, const std::vector<AnalysisLepton>& leptMinus );
 
 
 
@@ -33,8 +31,6 @@ std::vector<AnalysisLepton> getBestZMassPair( const std::vector<AnalysisLepton>&
 Ntp1Analyzer_TTZ::Ntp1Analyzer_TTZ( const std::string& dataset, const std::string& flags, TTree* tree ) :
      Ntp1Analyzer( "TTZ", dataset, flags, tree ) {
 
-
-  h1_nPU_gen_ = new TH1D("nPU_gen", "", 55, -0.5, 54.5 );
 
   h1_nCounter_Zee_ = new TH1D("nCounter_Zee", "", 1, 0., 1.);
   h1_nCounter_Zmumu_ = new TH1D("nCounter_Zmumu", "", 1, 0., 1.);
@@ -53,7 +49,6 @@ void Ntp1Analyzer_TTZ::CreateOutputFile() {
   reducedTree_->Branch("LS",&LS_,"LS_/I");
   reducedTree_->Branch("event",&event_,"event_/I");
   reducedTree_->Branch("nPU",&nPU_,"nPU_/I");
-  reducedTree_->Branch("nPU_ave",&nPU_ave_,"nPU_ave_/I");
   reducedTree_->Branch("nvertex",&nvertex_,"nvertex_/I");
   reducedTree_->Branch("rhoPF",&rhoPF_,"rhoPF_/F");
   reducedTree_->Branch("genWeight",&genWeight_,"genWeight_/F");
@@ -94,7 +89,6 @@ void Ntp1Analyzer_TTZ::CreateOutputFile() {
   reducedTree_->Branch("etaLeptZ1",  &etaLeptZ1_,  "etaLeptZ1_/F");
   reducedTree_->Branch("phiLeptZ1",  &phiLeptZ1_,  "phiLeptZ1_/F");
   reducedTree_->Branch("chargeLeptZ1",  &chargeLeptZ1_,  "chargeLeptZ1_/I");
-  reducedTree_->Branch("combinedIsoRelLeptZ1",  &combinedIsoRelLeptZ1_,  "combinedIsoRelLeptZ1_/F");
 
   reducedTree_->Branch("eLeptZ1Gen",  &eLeptZ1Gen_,  "eLeptZ1Gen_/F");
   reducedTree_->Branch("ptLeptZ1Gen",  &ptLeptZ1Gen_,  "ptLeptZ1Gen_/F");
@@ -106,7 +100,6 @@ void Ntp1Analyzer_TTZ::CreateOutputFile() {
   reducedTree_->Branch("etaLeptZ2",  &etaLeptZ2_,  "etaLeptZ2_/F");
   reducedTree_->Branch("phiLeptZ2",  &phiLeptZ2_,  "phiLeptZ2_/F");
   reducedTree_->Branch("chargeLeptZ2",  &chargeLeptZ2_,  "chargeLeptZ2_/I");
-  reducedTree_->Branch("combinedIsoRelLeptZ2",  &combinedIsoRelLeptZ2_,  "combinedIsoRelLeptZ2_/F");
 
   reducedTree_->Branch("eLeptZ2Gen",  &eLeptZ2Gen_,  "eLeptZ2Gen_/F");
   reducedTree_->Branch("ptLeptZ2Gen",  &ptLeptZ2Gen_,  "ptLeptZ2Gen_/F");
@@ -115,13 +108,12 @@ void Ntp1Analyzer_TTZ::CreateOutputFile() {
 
   reducedTree_->Branch("nLept", &nLept_, "nLept_/I");
 
-  reducedTree_->Branch("leptTypeLept", leptTypeLept_, "leptTypeLept_[nLept_]/F");
+  reducedTree_->Branch("leptTypeLept", leptTypeLept_, "leptTypeLept_[nLept_]/I");
   reducedTree_->Branch("eLept",  eLept_,  "eLept_[nLept_]/F");
   reducedTree_->Branch( "ptLept",  ptLept_,  "ptLept_[nLept_]/F");
   reducedTree_->Branch("etaLept", etaLept_, "etaLept_[nLept_]/F");
   reducedTree_->Branch("phiLept", phiLept_, "phiLept_[nLept_]/F");
   reducedTree_->Branch("chargeLept", chargeLept_, "chargeLept_[nLept_]/I");
-  reducedTree_->Branch("combinedIsoRelLept", combinedIsoRelLept_, "combinedIsoRelLept_[nLept_]/F");
 
 
   reducedTree_->Branch("nJets", &nJets_, "nJets_/I");
@@ -195,7 +187,6 @@ void Ntp1Analyzer_TTZ::CreateOutputFile() {
 Ntp1Analyzer_TTZ::~Ntp1Analyzer_TTZ() {
 
   outfile_->cd();
-  h1_nPU_gen_->Write();
   h1_nCounter_Zee_->Write();
   h1_nCounter_Zmumu_->Write();
 
@@ -267,13 +258,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      eventWeight_ = -1.; //default
      leptTypeMC_ = -1;
 
-     if( dataset_tstr.Contains("spadhi") )
-       nPU_ = nPU[0]; //generated only with one nPU
-     else
-       nPU_ = nPU[1]; //in time PU only
 
-
-     h1_nPU_gen_->Fill( nPU_ );
 
 
      if( !isGoodEvent(jentry) ) continue; //this takes care also of trigger
@@ -283,6 +268,8 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      bool goodVertex = (ndofPV[0] >= 4.0 && sqrt(PVxPV[0]*PVxPV[0]+PVyPV[0]*PVyPV[0]) < 2. && fabs(PVzPV[0]) < 24. );
      if( !goodVertex ) continue;
   
+     nPU_ = nPU[1]; //in time PU only
+
      nPU_ave_ = 0.;
      for( unsigned iBX=0; iBX<nBX; ++iBX ) {
        nPU_ave_ += nPU[iBX]; 
@@ -475,6 +462,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      //      FROM NOW ON RECO
      // -----------------------------
 
+     float mZ = 91.1876;
 
      epfMet_ = energyPFMet[0];
      sumEtpfMet_ = sumEtPFMet[0];
@@ -493,8 +481,8 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      // MUONS
      // ------------------
 
-     std::vector<AnalysisLepton> muonsPlus;
-     std::vector<AnalysisLepton> muonsMinus;
+     std::vector<AnalysisMuon> muonsPlus;
+     std::vector<AnalysisMuon> muonsMinus;
      int chargeFirstMuon;
 
 
@@ -561,7 +549,6 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        thisMuon.sumPt03 = sumPt03Muon[iMuon];
        thisMuon.emEt03  = emEt03Muon[iMuon];
        thisMuon.hadEt03 = hadEt03Muon[iMuon];
-       thisMuon.isolation = thisMuon.combinedIsoRel();
 
        if( event_==DEBUG_EVENTNUMBER ) {
          std::cout << "thisMuon.dxy: " << thisMuon.dxy << std::endl;
@@ -585,7 +572,35 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      } //for muons
 
 
-     std::vector<AnalysisLepton> muons = getBestZMassPair( muonsPlus, muonsMinus );
+     std::vector<AnalysisMuon> muons;
+     float bestMZ_muons=999999999.;
+     int iMuonPlus_found=-1;
+     int iMuonMinus_found=-1;
+
+     // pick best-mZ, oppositely charged muon pair:
+     for( unsigned iMuonPlus=0; iMuonPlus<muonsPlus.size(); ++iMuonPlus ) {
+       for( unsigned iMuonMinus=0; iMuonMinus<muonsMinus.size(); ++iMuonMinus ) {
+         TLorentzVector m1( muonsPlus[iMuonPlus] );
+         TLorentzVector m2( muonsMinus[iMuonMinus] );
+         TLorentzVector dimuon = m1+m2;
+         if( muons.size()==0 ) {
+           muons.push_back(muonsPlus[iMuonPlus]);
+           muons.push_back(muonsMinus[iMuonMinus]);
+           iMuonPlus_found = iMuonPlus;
+           iMuonMinus_found = iMuonMinus;
+           bestMZ_muons = dimuon.M();
+         } else if( fabs(dimuon.M()-mZ) < fabs(bestMZ_muons-mZ) ) { //already found a pair
+           muons.clear();
+           muons.push_back(muonsPlus[iMuonPlus]);
+           muons.push_back(muonsMinus[iMuonMinus]);
+           iMuonPlus_found = iMuonPlus;
+           iMuonMinus_found = iMuonMinus;
+           bestMZ_muons = dimuon.M();
+         }
+       }  //for muons minus
+     }  //for muons plus
+
+
 
 
 
@@ -593,8 +608,8 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      // ELECTRONS
      // ------------------
 
-     std::vector<AnalysisLepton> electronsPlus;
-     std::vector<AnalysisLepton> electronsMinus;
+     std::vector<AnalysisElectron> electronsPlus;
+     std::vector<AnalysisElectron> electronsMinus;
      int chargeFirstEle = 0;
      bool firstPassedVBTF80 = false;
 
@@ -629,7 +644,6 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        thisEle.dr03TkSumPt = dr03TkSumPtEle[iEle];
        thisEle.dr03EcalRecHitSumEt = dr03EcalRecHitSumEtEle[iEle];
        thisEle.dr03HcalTowerSumEt = dr03HcalTowerSumEtEle[iEle];
-       thisEle.isolation = thisEle.combinedIsoRel();
 
        // electron ID
        thisEle.sigmaIetaIeta = (superClusterIndexEle[iEle]>=0) ? sqrt(covIEtaIEtaSC[superClusterIndexEle[iEle]]) : sqrt(covIEtaIEtaPFSC[PFsuperClusterIndexEle[iEle]]);
@@ -678,7 +692,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
        // check that not matched to muon (clean electrons faked by muon MIP):
        bool matchedtomuon=false;
-       for( std::vector<AnalysisLepton>::iterator iMu=muons.begin(); iMu!=muons.end(); ++iMu )
+       for( std::vector<AnalysisMuon>::iterator iMu=muons.begin(); iMu!=muons.end(); ++iMu )
          if( iMu->DeltaR(thisEle)<0.1 ) matchedtomuon=true;
 
        if( matchedtomuon ) continue;
@@ -696,249 +710,171 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      } //for electrons
 
 
-     std::vector<AnalysisLepton> electrons = getBestZMassPair( electronsPlus, electronsMinus );
+
+     std::vector<AnalysisElectron> electrons;
+     float bestMZ_electrons=999999999.;
+     int iElePlus_found = -1;
+     int iEleMinus_found = -1;
+
+     // pick best-mZ, oppositely charged electron pair:
+     for( unsigned iElePlus=0; iElePlus<electronsPlus.size(); ++iElePlus ) {
+       for( unsigned iEleMinus=0; iEleMinus<electronsMinus.size(); ++iEleMinus ) {
+         TLorentzVector e1( electronsPlus[iElePlus] );
+         TLorentzVector e2( electronsMinus[iEleMinus] );
+         TLorentzVector dielectron = e1+e2;
+         if( electrons.size()==0 ) {
+           electrons.push_back(electronsPlus [iElePlus]);
+           electrons.push_back(electronsMinus[iEleMinus]);
+           iElePlus_found = iElePlus;
+           iEleMinus_found = iEleMinus;
+           bestMZ_electrons = dielectron.M();
+         } else if( fabs(dielectron.M()-mZ) < fabs(bestMZ_electrons-mZ) ) { //already found a pair
+           electrons.clear();
+           electrons.push_back(electronsPlus [iElePlus]);
+           electrons.push_back(electronsMinus[iEleMinus]);
+           iElePlus_found = iElePlus;
+           iEleMinus_found = iEleMinus;
+           bestMZ_electrons = dielectron.M();
+         }
+       }  //for electrons minus
+     }  //for electrons plus
 
 
      if( event_==DEBUG_EVENTNUMBER ) 
        std::cout << "Found: " << muons.size() << " muons and " << electrons.size() << " electrons." << std::endl;
 
+     if( electrons.size() < 2 && muons.size() < 2 ) continue;
+
+
 
 
      std::vector< AnalysisLepton > leptons;
 
+     if( electrons.size() == 2 && muons.size() == 2 ) { 
 
-     if( electrons.size() < 2 && muons.size() < 2 ) { //this is the ttbar opposite flavour control region:
+       TLorentzVector Zee = electrons[0] + electrons[1];
+       TLorentzVector Zmm = muons[0] + muons[1];
 
-       // at least one opposite-sign pair:
-       if( (electronsPlus.size()+muonsPlus.size())==0 || (electronsMinus.size()+muonsMinus.size())==0 ) continue;
+       if( fabs(Zee.M()-mZ) < fabs(Zmm.M()-mZ) ) {
 
-
-       std::vector<AnalysisLepton> elePlus_muMinus = getBestZMassPair( electronsPlus, muonsMinus );
-       std::vector<AnalysisLepton> eleMinus_muPlus = getBestZMassPair( electronsMinus, muonsPlus );
-
-       if( elePlus_muMinus.size() == 2 && eleMinus_muPlus.size() == 2 ) { 
-
-         TLorentzVector Zepmm = elePlus_muMinus[0] + elePlus_muMinus[1];
-         TLorentzVector Zemmp = eleMinus_muPlus[0] + eleMinus_muPlus[1];
-
-         if( fabs(Zepmm.M()-mZ) < fabs(Zemmp.M()-mZ) ) {
-
-           leptType_=2;
-           if( elePlus_muMinus[0].Pt() > elePlus_muMinus[1].Pt() ) {
-             leptons.push_back( elePlus_muMinus[0] );
-             leptons.push_back( elePlus_muMinus[1] );
-           } else {
-             leptons.push_back( elePlus_muMinus[1] );
-             leptons.push_back( elePlus_muMinus[0] );
-           }
-
-         } else { 
-
-           leptType_=3;
-           if( eleMinus_muPlus[0].Pt() > eleMinus_muPlus[1].Pt() ) {
-             leptons.push_back( eleMinus_muPlus[0] );
-             leptons.push_back( eleMinus_muPlus[1] );
-           } else {
-             leptons.push_back( eleMinus_muPlus[1] );
-             leptons.push_back( eleMinus_muPlus[0] );
-           }
-
-         }
-
-
-       } else if( elePlus_muMinus.size() == 2 ) {
-
-         leptType_ = 2;
-
-         if( elePlus_muMinus[0].Pt() > elePlus_muMinus[1].Pt() ) {
-
-           leptons.push_back( elePlus_muMinus[0] );
-           leptons.push_back( elePlus_muMinus[1] );
-
+         leptType_=1;
+         if( electrons[0].Pt() > electrons[1].Pt() ) {
+           leptons.push_back( electrons[0] );
+           leptons.push_back( electrons[1] );
          } else {
-
-           leptons.push_back( elePlus_muMinus[1] );
-           leptons.push_back( elePlus_muMinus[0] );
-
+           leptons.push_back( electrons[1] );
+           leptons.push_back( electrons[0] );
          }
 
-       } else if( eleMinus_muPlus.size() == 2 ) {
+       } else { 
 
-         leptType_ = 3;
-
-         if( eleMinus_muPlus[0].Pt() > eleMinus_muPlus[1].Pt() ) {
-
-           leptons.push_back( eleMinus_muPlus[0] );
-           leptons.push_back( eleMinus_muPlus[1] );
-
+         leptType_=0;
+         if( muons[0].Pt() > muons[1].Pt() ) {
+           leptons.push_back( muons[0] );
+           leptons.push_back( muons[1] );
          } else {
-
-           leptons.push_back( eleMinus_muPlus[1] );
-           leptons.push_back( eleMinus_muPlus[0] );
-
+           leptons.push_back( muons[1] );
+           leptons.push_back( muons[0] );
          }
-
-       } else {
-
-         std::cout << "There must be an error this is not possible." << std::endl;
-         exit(9101);
 
        }
 
+
+     } else if( electrons.size() == 2 ) {
+
+       leptType_ = 1;
+
+       if( electrons[0].Pt() > electrons[1].Pt() ) {
+
+         leptons.push_back( electrons[0] );
+         leptons.push_back( electrons[1] );
+
+       } else {
+
+         leptons.push_back( electrons[1] );
+         leptons.push_back( electrons[0] );
+
+       }
+
+     } else if( muons.size() == 2 ) {
+
+       leptType_ = 0;
+
+       if( muons[0].Pt() > muons[1].Pt() ) {
+
+         leptons.push_back( muons[0] );
+         leptons.push_back( muons[1] );
+
+       } else {
+
+         leptons.push_back( muons[1] );
+         leptons.push_back( muons[0] );
+
+       }
 
      } else {
 
-       if( electrons.size() == 2 && muons.size() == 2 ) { 
+       std::cout << "There must be an error this is not possible." << std::endl;
+       exit(9101);
 
-         TLorentzVector Zee = electrons[0] + electrons[1];
-         TLorentzVector Zmm = muons[0] + muons[1];
-
-         if( fabs(Zee.M()-mZ) < fabs(Zmm.M()-mZ) ) {
-
-           leptType_=1;
-           if( electrons[0].Pt() > electrons[1].Pt() ) {
-             leptons.push_back( electrons[0] );
-             leptons.push_back( electrons[1] );
-           } else {
-             leptons.push_back( electrons[1] );
-             leptons.push_back( electrons[0] );
-           }
-
-         } else { 
-
-           leptType_=0;
-           if( muons[0].Pt() > muons[1].Pt() ) {
-             leptons.push_back( muons[0] );
-             leptons.push_back( muons[1] );
-           } else {
-             leptons.push_back( muons[1] );
-             leptons.push_back( muons[0] );
-           }
-
-         }
-
-
-       } else if( electrons.size() == 2 ) {
-
-         leptType_ = 1;
-
-         if( electrons[0].Pt() > electrons[1].Pt() ) {
-
-           leptons.push_back( electrons[0] );
-           leptons.push_back( electrons[1] );
-
-         } else {
-
-           leptons.push_back( electrons[1] );
-           leptons.push_back( electrons[0] );
-
-         }
-
-       } else if( muons.size() == 2 ) {
-
-         leptType_ = 0;
-
-         if( muons[0].Pt() > muons[1].Pt() ) {
-
-           leptons.push_back( muons[0] );
-           leptons.push_back( muons[1] );
-
-         } else {
-
-           leptons.push_back( muons[1] );
-           leptons.push_back( muons[0] );
-
-         }
-
-       } else {
-
-         std::cout << "There must be an error this is not possible." << std::endl;
-         exit(9101);
-
-       }
-
-     } // if opposite flavour control region
-
-     if( leptons.size()<2 ) continue;
+     }
 
      eLeptZ1_ = leptons[0].Energy();
      ptLeptZ1_ = leptons[0].Pt();
      etaLeptZ1_ = leptons[0].Eta();
      phiLeptZ1_ = leptons[0].Phi();
      chargeLeptZ1_ = leptons[0].charge;
-     combinedIsoRelLeptZ1_ = leptons[0].isolation;
      
      eLeptZ2_ = leptons[1].Energy();
      ptLeptZ2_ = leptons[1].Pt();
      etaLeptZ2_ = leptons[1].Eta();
      phiLeptZ2_ = leptons[1].Phi();
      chargeLeptZ2_ = leptons[1].charge;
-     combinedIsoRelLeptZ2_ = leptons[1].isolation;
 
 
      // save other leptons:
      nLept_=0;
      for( unsigned iMuonPlus=0; iMuonPlus<muonsPlus.size() && nLept_<10; ++iMuonPlus ) {
-       bool notSelected = true;
-       if( muons.size()>0 ) {
-         notSelected = muonsPlus[iMuonPlus]!=muons[0]; // 0 is positive
-       }
-       if( notSelected ) {
+       if( iMuonPlus!=iMuonPlus_found ) {
          leptTypeLept_[nLept_] = 0;
          eLept_[nLept_] = muonsPlus[iMuonPlus].Energy();
          ptLept_[nLept_] = muonsPlus[iMuonPlus].Pt();
          etaLept_[nLept_] = muonsPlus[iMuonPlus].Eta();
          phiLept_[nLept_] = muonsPlus[iMuonPlus].Phi();
          chargeLept_[nLept_] = muonsPlus[iMuonPlus].charge;
-         combinedIsoRelLept_[nLept_] = muonsPlus[iMuonPlus].isolation;
          nLept_++;
        }
      }
      for( unsigned iMuonMinus=0; iMuonMinus<muonsMinus.size() && nLept_<10; ++iMuonMinus ) {
-       bool notSelected = true;
-       if( muons.size()>1 ) {
-         notSelected = muonsMinus[iMuonMinus]!=muons[1]; // 1 is negative
-       }
-       if( notSelected ) {
+       if( iMuonMinus!=iMuonMinus_found ) {
          leptTypeLept_[nLept_] = 0;
          eLept_[nLept_] = muonsMinus[iMuonMinus].Energy();
          ptLept_[nLept_] = muonsMinus[iMuonMinus].Pt();
          etaLept_[nLept_] = muonsMinus[iMuonMinus].Eta();
          phiLept_[nLept_] = muonsMinus[iMuonMinus].Phi();
          chargeLept_[nLept_] = muonsMinus[iMuonMinus].charge;
-         combinedIsoRelLept_[nLept_] = muonsMinus[iMuonMinus].isolation;
          nLept_++;
        }
      }
      for( unsigned iElectronPlus=0; iElectronPlus<electronsPlus.size() && nLept_<10; ++iElectronPlus ) {
-       bool notSelected = true;
-       if( electrons.size()>0 ) {
-         notSelected = electronsPlus[iElectronPlus]!=electrons[0]; // 0 is positive
-       }
-       if( notSelected ) {
+       if( iElectronPlus!=iElePlus_found ) {
          leptTypeLept_[nLept_] = 1;
          eLept_[nLept_] = electronsPlus[iElectronPlus].Energy();
          ptLept_[nLept_] = electronsPlus[iElectronPlus].Pt();
          etaLept_[nLept_] = electronsPlus[iElectronPlus].Eta();
          phiLept_[nLept_] = electronsPlus[iElectronPlus].Phi();
          chargeLept_[nLept_] = electronsPlus[iElectronPlus].charge;
-         combinedIsoRelLept_[nLept_] = electronsPlus[iElectronPlus].isolation;
          nLept_++;
        }
      }
      for( unsigned iElectronMinus=0; iElectronMinus<electronsMinus.size() && nLept_<10; ++iElectronMinus ) {
-       bool notSelected = true;
-       if( electrons.size()>1 ) {
-         notSelected = electronsMinus[iElectronMinus]!=electrons[1]; // 1 is negative
-       }
-       if( notSelected ) {
+       if( iElectronMinus!=iEleMinus_found ) {
          leptTypeLept_[nLept_] = 1;
          eLept_[nLept_] = electronsMinus[iElectronMinus].Energy();
          ptLept_[nLept_] = electronsMinus[iElectronMinus].Pt();
          etaLept_[nLept_] = electronsMinus[iElectronMinus].Eta();
          phiLept_[nLept_] = electronsMinus[iElectronMinus].Phi();
          chargeLept_[nLept_] = electronsMinus[iElectronMinus].charge;
-         combinedIsoRelLept_[nLept_] = electronsMinus[iElectronMinus].isolation;
          nLept_++;
        }
      }
@@ -996,8 +932,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      // JETS
      // ------------------
 
-     float jetPt_thresh = 20.;
-     float jetEta_thresh = 2.5;
+     float jetPt_thresh = 10.;
 
      // first save leading jets in event:
      std::vector<AnalysisJet> leadJets;
@@ -1115,7 +1050,6 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      for( unsigned iJet=0; iJet<leadJets.size() && nJets_<50; ++iJet ) {
 
        if( leadJets[iJet].Pt()<jetPt_thresh ) continue;
-       if( fabs(leadJets[iJet].Eta())>jetEta_thresh ) continue;
 
        eJet_[nJets_] = leadJets[iJet].Energy();
        ptJet_[nJets_] = leadJets[iJet].Pt();
@@ -1161,8 +1095,8 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      }
 
 
-     // at least 3 jets in the event
-     if( nJets_<3 ) continue;
+     // at least 4 jets in the event
+     if( nJets_<4 ) continue;
 
 
 
@@ -1221,39 +1155,3 @@ double trackDxyPV(float PVx, float PVy, float PVz, float eleVx, float eleVy, flo
   return ( - (eleVx-PVx)*elePy + (eleVy-PVy)*elePx ) / elePt;
 }
 
-
-
-
-std::vector<AnalysisLepton> getBestZMassPair( const std::vector<AnalysisLepton>& leptPlus, const std::vector<AnalysisLepton>& leptMinus ) {
-
-  std::vector<AnalysisLepton> returnLeptons;
-
-  float bestMZ=999999999.;
-  int iPlus_found = -1;
-  int iMinus_found = -1;
-
-  for( unsigned iPlus=0; iPlus<leptPlus.size(); ++iPlus ) {
-    for( unsigned iMinus=0; iMinus<leptMinus.size(); ++iMinus ) {
-      TLorentzVector l1( leptPlus[iPlus] );
-      TLorentzVector l2( leptMinus[iMinus] );
-      TLorentzVector dilepton = l1+l2;
-      if( returnLeptons.size()==0 ) {
-        returnLeptons.push_back(leptPlus [iPlus]);
-        returnLeptons.push_back(leptMinus[iMinus]);
-        iPlus_found = iPlus;
-        iMinus_found = iMinus;
-        bestMZ= dilepton.M();
-      } else if( fabs(dilepton.M()-mZ) < fabs(bestMZ-mZ) ) { //already found a pair
-        returnLeptons.clear();
-        returnLeptons.push_back(leptPlus [iPlus]);
-        returnLeptons.push_back(leptMinus[iMinus]);
-        iPlus_found = iPlus;
-        iMinus_found = iMinus;
-        bestMZ= dilepton.M();
-      }
-    }  // for minus
-  }  // for plus
-
-  return returnLeptons;
-
-}

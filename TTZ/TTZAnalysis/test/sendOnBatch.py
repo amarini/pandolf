@@ -40,14 +40,10 @@ afsdir = "/afs/cern.ch/user/p/pandolf/scratch0/NTUPLES/"+dataset
 diskoutputdir = "/cmsrm/pc22_2/pandolf/MC/Summer11/"+dataset
 match_Spring11 = re.search( r'Spring11', dataset, re.M|re.I)
 match_Fall11 = re.search( r'Fall11', dataset, re.M|re.I)
-isData = re.search( r'Run2011', dataset, re.M|re.I)
-if isData:
-    diskoutputdir = "/cmsrm/pc22_2/pandolf/DATA/"+dataset
-else:
-  if match_Spring11:
-      diskoutputdir = "/cmsrm/pc22_2/pandolf/MC/Spring11_v2/"+dataset
-  if match_Fall11:
-      diskoutputdir = "/cmsrm/pc22_2/pandolf/MC/Fall11/"+dataset
+if match_Spring11:
+    diskoutputdir = "/cmsrm/pc22_2/pandolf/MC/Spring11_v2/"+dataset
+if match_Fall11:
+    diskoutputdir = "/cmsrm/pc22_2/pandolf/MC/Fall11/"+dataset
 #diskoutputdir = "/cmsrm/pc22_2/pandolf/MC/Summer11/"+dataset
 #diskoutputmain2 = castordir
 #diskoutputmain2 = pnfsdir
