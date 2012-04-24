@@ -142,6 +142,8 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   h1_mZll_prepresel->Sumw2();
   TH1D* h1_mZll_OF_prepresel = new TH1D("mZll_OF_prepresel", "", 220, 50., 160.);
   h1_mZll_OF_prepresel->Sumw2();
+  TH1D* h1_mZll_OF_prepresel_scaled = new TH1D("mZll_OF_prepresel_scaled", "", 220, 50., 160.);
+  h1_mZll_OF_prepresel_scaled->Sumw2();
   TH1D* h1_mZll_presel = new TH1D("mZll_presel", "", 220, 50., 160.);
   h1_mZll_presel->Sumw2();
   TH1D* h1_mZll = new TH1D("mZll", "", 220, 50., 160.);
@@ -642,7 +644,10 @@ ofstream ofs("run_event.txt");
 
       eventWeight *= fPUWeight->GetWeight(nPU);
 
+
     } // if is MC
+
+
 
     // first: count them
     ht = 0.;
@@ -724,8 +729,18 @@ if( njets<3 ) continue;
 
     } //if is not mc
 
+    if( leptType>1 ) 
+      h1_mZll_OF_prepresel->Fill( diLepton.M(), eventWeight );
 
+    if( dataset_=="TTJ_Fall11_highstat" ) //TTJets SF computed with computeTTJetsSF
+      eventWeight *= 1.1754;
 
+    if( leptType<=1 ) {
+      h1_mZll_prepresel->Fill( diLepton.M(), eventWeight );
+    } else {
+      h1_mZll_OF_prepresel_scaled->Fill( diLepton.M(), eventWeight );
+      continue;
+    }
 
 
 
@@ -733,12 +748,6 @@ if( njets<3 ) continue;
     h1_rhoPF_prepresel->Fill( rhoPF, eventWeight);
     h1_nJets_prepresel->Fill( nJets, eventWeight );
 
-    if( leptType<=1 ) {
-      h1_mZll_prepresel->Fill( diLepton.M(), eventWeight );
-    } else {
-      h1_mZll_OF_prepresel->Fill( diLepton.M(), eventWeight );
-      continue;
-    }
 
 
     // this is the trilepton channel: require at least one other lepton:
@@ -1209,6 +1218,7 @@ if( njets<3 ) continue;
   h1_etaZll->Write();
   h1_mZll_prepresel->Write();
   h1_mZll_OF_prepresel->Write();
+  h1_mZll_OF_prepresel_scaled->Write();
   h1_mZll_presel->Write();
   h1_mZll->Write();
 
