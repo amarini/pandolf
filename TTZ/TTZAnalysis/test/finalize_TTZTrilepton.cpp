@@ -13,7 +13,7 @@
 int main( int argc, char* argv[] ) {
 
   if( argc!=3 && argc!=4 && argc!=5 && argc!=6 ) {
-    std::cout << "USAGE: ./finalize_TTZTrilepton [dataset] [selectionType] [bTaggerType=\"SSVHE\"] [PUType=\"HR11_73pb\"] [leptType=\"ALL\"]" <<std::endl;
+    std::cout << "USAGE: ./finalize_TTZTrilepton [dataset] [selectionType] [bTaggerType=\"TCHE\"] [PUType=\"HR11_73pb\"] [leptType=\"ALL\"]" <<std::endl;
     return 13;
   }
 
@@ -21,7 +21,7 @@ int main( int argc, char* argv[] ) {
   std::string dataset(argv[1]);
   std::string selectionType(argv[2]);
 
-  std::string bTaggerType="SSVHE";
+  std::string bTaggerType="TCHE";
   if( argc==4 ) {
     std::string bTaggerType_str(argv[3]);
     bTaggerType = bTaggerType_str;

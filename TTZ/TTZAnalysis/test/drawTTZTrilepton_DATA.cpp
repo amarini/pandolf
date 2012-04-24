@@ -13,7 +13,7 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
 int main(int argc, char* argv[]) {
 
   if(  argc != 2 && argc != 3 ) {
-    std::cout << "USAGE: ./drawTTZTrilepton [(string)selType] [bTaggerType=\"SSVHE\"]" << std::endl;
+    std::cout << "USAGE: ./drawTTZTrilepton [(string)selType] [bTaggerType=\"TCHE\"]" << std::endl;
     exit(23);
   }
 
@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
 
   std::string PUType = "PUHR11_73pb";
 
-  std::string bTaggerType = "SSVHE";
+  std::string bTaggerType = "TCHE";
   if( argc>=3 ) {
     std::string bTaggerType_str(argv[2]);
     bTaggerType = bTaggerType_str;
@@ -161,7 +161,8 @@ int main(int argc, char* argv[]) {
   db->set_rebin(2);
   db->set_xAxisMax(130.);
   db->drawHisto("mZll_prepresel", "Dilepton Invariant Mass", "GeV", "Events", log, 2);
-  db->drawHisto("mZll_OF_prepresel", "Opposite Flavor Dilepton Mass", "GeV", "Events", log, 2);
+  db->set_rebin(4);
+  db->drawHisto("mZll_OF_prepresel", "Opposite Flavor Dilepton Mass", "GeV", "Events");
   db->drawHisto("mZll_presel", "Dilepton Invariant Mass", "GeV", "Events", log, 2);
   db->drawHisto("mZll", "Dilepton Invariant Mass", "GeV", "Events", log, 2);
   db->set_xAxisMax();
