@@ -7,6 +7,9 @@
 
 
 
+float get_ttbarSF( DrawBase* db );
+float computeChiSquare( TH1D* h1_DATA, TH1D* h1_MC );
+
 void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char selection[], float lumi_fb );
 
 
@@ -146,8 +149,23 @@ int main(int argc, char* argv[]) {
   db->drawHisto("nvertex", "Number of Reconstructed Vertexes", "", "Events", true);
   db->drawHisto("nvertex_PUW", "Number of Reconstructed Vertexes", "", "Events", true);
 
-  db->drawHisto("nJets_prepresel", "Jet Multiplicity (p_{T} > 10 GeV)", "", "Events", true);
+  // prepresel (basically only dilepton + 3 jets):
+  db->drawHisto("nJets_prepresel", "Jet Multiplicity", "", "Events", true);
   db->drawHisto("rhoPF_prepresel", "Particle Flow Energy Density", "GeV", "Events", true);
+  db->set_rebin(2);
+  db->set_xAxisMax(130.);
+  db->drawHisto("mZll_prepresel", "Dilepton Invariant Mass", "GeV", "Events", true, 2);
+  // opposite flavor leptons: control region for ttbar:
+  db->set_rebin(4);
+  db->drawHisto("mZll_OF_prepresel", "Opposite Flavor Dilepton Mass", "GeV", "Events");
+  // scale ttbar MC to match data:
+  float ttbar_SF = get_ttbarSF( db );
+std::cout << "1" << std::endl;
+  db->set_mcWeight( "TTtW", ttbar_SF );
+std::cout << "2" << std::endl;
+  db->drawHisto("mZll_OF_prepresel", "Opposite Flavor Dilepton Mass", "GeV", "Events", false, 1, "scaled");
+std::cout << "3" << std::endl;
+
   db->drawHisto("rhoPF_presel", "Particle Flow Energy Density", "GeV", "Events", true);
 
   db->drawHisto("nJets", "Jet Multiplicity (p_{T} > 20 GeV)", "", "Events");
@@ -157,13 +175,10 @@ int main(int argc, char* argv[]) {
   //db->drawHisto("leptTypeLept3_prepresel", "Third Lepton Flavor", "", "Events");
   //db->drawHisto("combinedIsoRelLept3_prepresel", "Third Lepton Isolation", "", "Events");
 
-  db->set_rebin(2);
-  db->set_xAxisMax(130.);
-  db->drawHisto("mZll_prepresel", "Dilepton Invariant Mass", "GeV", "Events", true, 2);
+  db->drawHisto("mZll_prepresel_0btag", "Dilepton Invariant Mass", "GeV", "Events", true, 2);
   db->set_rebin(4);
-  db->drawHisto("mZll_OF_prepresel", "Opposite Flavor Dilepton Mass", "GeV", "Events");
-  db->drawHisto("mZll_OF_prepresel_scaled", "Opposite Flavor Dilepton Mass", "GeV", "Events");
   db->drawHisto("mZll_presel", "Dilepton Invariant Mass", "GeV", "Events", true, 2);
+  db->drawHisto("mZll_presel_0btag", "Dilepton Invariant Mass", "GeV", "Events", true, 2);
   db->drawHisto("mZll", "Dilepton Invariant Mass", "GeV", "Events", true, 2);
   db->set_xAxisMax();
 
@@ -481,3 +496,124 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
     delete vh1_yields_mc[vh1_yields_mc.size()-i-1];
 
 }
+
+
+
+
+float get_ttbarSF( DrawBase* db ) {
+
+
+  TH1D* h1_DATA = db->get_lastHistos_data()[0];
+
+  std::vector< TH1D* > lastHistosMC = db->get_lastHistos_mc();
+  TH1D* h1_TTJets;
+
+  for( unsigned iHisto=0; iHisto<lastHistosMC.size(); ++iHisto ) {
+
+    if( db->get_mcFiles()[iHisto].datasetName=="TTtW" ) {
+
+      h1_TTJets = new TH1D(*(lastHistosMC[iHisto]));
+      lastHistosMC.erase(lastHistosMC.begin()+iHisto);
+
+    }
+
+  }
+
+
+  float minSF = 0.9;
+  float maxSF = 1.5;
+
+  int nSteps = 1000;
+  float step = (maxSF-minSF)/(float)nSteps;
+
+  TH1D* h1_chiSquare = new TH1D("chiSquare", "", nSteps, minSF, maxSF );
+
+
+  float minChiSquare = 9999.;
+  float foundSF = -1.;
+
+  for( unsigned i=0; i<nSteps; ++i ) {
+
+    float thisSF = minSF + i*step;
+
+    TH1D* h1_TTJets_sf = new TH1D(*h1_TTJets);
+    h1_TTJets_sf->Scale( thisSF );
+
+    for( unsigned ihisto=0; ihisto<lastHistosMC.size(); ++ihisto )
+      h1_TTJets_sf->Add( lastHistosMC[ihisto] );
+
+    float thisChiSquare = computeChiSquare( h1_DATA, h1_TTJets_sf );
+
+    h1_chiSquare->SetBinContent( i+1, thisChiSquare ); 
+
+    if( thisChiSquare < minChiSquare ) {
+      minChiSquare = thisChiSquare;
+      foundSF = thisSF;
+    }
+
+    delete h1_TTJets_sf;
+
+  }
+
+  h1_chiSquare->SetXTitle( "t#bar{t} Scale Factor" );
+  h1_chiSquare->SetYTitle( "#chi^{2}" );
+  h1_chiSquare->SetMarkerStyle( 20 );
+  h1_chiSquare->SetMarkerSize( 1.6 );
+  h1_chiSquare->SetMarkerColor( 46 );
+  h1_chiSquare->GetYaxis()->SetRangeUser(0., h1_chiSquare->GetMaximum());
+
+  std::cout << std::endl << "-> TTbar Scaling" << std::endl;
+  std::cout << "Min Chi Square: " << minChiSquare << std::endl;
+  std::cout << "Best SF: " << foundSF << std::endl;
+
+  TPaveText* label_sqrt = db->get_labelSqrt();
+
+  TCanvas* c1 = new TCanvas("c1", "", 600, 600);
+  c1->cd();
+  
+  h1_chiSquare->Draw( "P" );
+  label_sqrt->Draw( "P" );
+
+  
+  char canvasName[500];
+  sprintf( canvasName, "%s/ttbarChiSquareScan.eps", db->get_outputdir().c_str() );
+  c1->SaveAs(canvasName);
+
+  delete c1;
+  delete h1_chiSquare;
+  delete h1_TTJets;
+
+
+  return foundSF;
+
+}
+
+
+
+
+float computeChiSquare( TH1D* h1_DATA, TH1D* h1_MC ) {
+
+  float chiSquare=0.;
+  int nbins = h1_DATA->GetNbinsX();
+
+  for( unsigned ibin=1; ibin<nbins+1; ++ibin ) {
+
+    float data = h1_DATA->GetBinContent(ibin);
+    float mc = h1_MC->GetBinContent(ibin);
+
+    float binDifference = fabs(data - mc);
+    float err = sqrt(data); // fairly high stat in every bin anyways
+
+    float addendum = binDifference / err;
+
+    chiSquare += (addendum*addendum);
+   
+  } //for bins
+
+  chiSquare /= (nbins-1);
+
+  return chiSquare;
+
+}
+
+
