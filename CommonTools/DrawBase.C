@@ -3258,3 +3258,32 @@ void DrawBase::delete_label() {
 
 
 
+void DrawBase::set_mcWeight( int iFile, float weight ) {
+
+  if( iFile<0 || iFile>=mcFiles_.size() ) {
+    std::cout << "[DrawBase::set_mcWeight] WARNING! Index out of range." << std::endl;
+  } else {
+    mcFiles_[iFile].weight = weight;
+  }
+
+}
+
+
+void DrawBase::set_mcWeight( const std::string& datasetName, float weight ) {
+
+  bool found = false;
+
+  for( unsigned iFile=0; iFile<mcFiles_.size(); ++iFile ) {
+    if( mcFiles_[iFile].datasetName == datasetName ) {
+      mcFiles_[iFile].weight = weight;
+      found = true;
+      break;
+    }
+  }
+
+  if( !found ) {
+    std::cout << "[DrawBase::set_mcWeight] WARNING! Didn't find datasetName '" << datasetName << "'." << std::endl;
+  }
+
+}
+
