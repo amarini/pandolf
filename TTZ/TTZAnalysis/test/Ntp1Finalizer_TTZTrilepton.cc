@@ -96,11 +96,11 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   h1_metSignificance->Sumw2();
 
 
-  TH1D* h1_rhoPF_prepresel = new TH1D("rhoPF_prepresel", "", 50, 0., 20.);
+  TH1D* h1_rhoPF_prepresel = new TH1D("rhoPF_prepresel", "", 50, 0., 30.);
   h1_rhoPF_prepresel->Sumw2();
-  TH1D* h1_rhoPF_presel = new TH1D("rhoPF_presel", "", 50, 0., 20.);
+  TH1D* h1_rhoPF_presel = new TH1D("rhoPF_presel", "", 50, 0., 30.);
   h1_rhoPF_presel->Sumw2();
-  TH1D* h1_rhoPF = new TH1D("rhoPF", "", 50, 0., 20.);
+  TH1D* h1_rhoPF = new TH1D("rhoPF", "", 50, 0., 30.);
   h1_rhoPF->Sumw2();
 
 
@@ -140,12 +140,16 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   h1_etaZll->Sumw2();
   TH1D* h1_mZll_prepresel = new TH1D("mZll_prepresel", "", 220, 50., 160.);
   h1_mZll_prepresel->Sumw2();
+  TH1D* h1_mZll_prepresel_0btag = new TH1D("mZll_prepresel_0btag", "", 220, 50., 160.);
+  h1_mZll_prepresel_0btag->Sumw2();
   TH1D* h1_mZll_OF_prepresel = new TH1D("mZll_OF_prepresel", "", 220, 50., 160.);
   h1_mZll_OF_prepresel->Sumw2();
   TH1D* h1_mZll_OF_prepresel_scaled = new TH1D("mZll_OF_prepresel_scaled", "", 220, 50., 160.);
   h1_mZll_OF_prepresel_scaled->Sumw2();
   TH1D* h1_mZll_presel = new TH1D("mZll_presel", "", 220, 50., 160.);
   h1_mZll_presel->Sumw2();
+  TH1D* h1_mZll_presel_0btag = new TH1D("mZll_presel_0btag", "", 220, 50., 160.);
+  h1_mZll_presel_0btag->Sumw2();
   TH1D* h1_mZll = new TH1D("mZll", "", 220, 50., 160.);
   h1_mZll->Sumw2();
 
@@ -675,103 +679,10 @@ ofstream ofs("run_event.txt");
 
     }
 if( njets<3 ) continue;
+
+
+    // define jets:
     
-    TLorentzVector leptZ1, leptZ2;
-    leptZ1.SetPtEtaPhiE( ptLeptZ1, etaLeptZ1, phiLeptZ1, eLeptZ1 );
-    leptZ2.SetPtEtaPhiE( ptLeptZ2, etaLeptZ2, phiLeptZ2, eLeptZ2 );
-
-    TLorentzVector diLepton = leptZ1+leptZ2;
-
-    if( diLepton.M()<50. ) continue; // gen cut in DY sample
-
-
-
-    if( leptType>1 ) 
-      h1_mZll_OF_prepresel->Fill( diLepton.M(), eventWeight );
-
-    if( dataset_=="TTJ_Fall11_highstat" ) //TTJets SF computed with computeTTJetsSF
-      eventWeight *= 1.173;
-
-    if( leptType<=1 ) {
-      h1_mZll_prepresel->Fill( diLepton.M(), eventWeight );
-    } else {
-      h1_mZll_OF_prepresel_scaled->Fill( diLepton.M(), eventWeight );
-      continue;
-    }
-
-
-
-    // fill some histos before requiring third lepton:
-    h1_nvertex_PUW->Fill(nvertex, eventWeight);
-
-    h1_rhoPF_prepresel->Fill( rhoPF, eventWeight);
-    h1_nJets_prepresel->Fill( njets, eventWeight );
-
-
-
-    // this is the trilepton channel: require at least one other lepton:
-    if( nLept<1 ) continue;
-
-
-    h1_pfMet_presel->Fill( pfMet, eventWeight);
-    h1_rhoPF_presel->Fill( rhoPF, eventWeight);
-
-
-    TLorentzVector lept3;
-    lept3.SetPtEtaPhiE( ptLept[0], etaLept[0], phiLept[0], eLept[0] );
-
-    h1_ptLept3_presel->Fill( lept3.Pt(), eventWeight );
-    h1_etaLept3_presel->Fill( lept3.Pt(), eventWeight );
-    h1_leptTypeLept3_presel->Fill( leptTypeLept[0], eventWeight );
-    h1_combinedIsoRelLept3_presel->Fill( combinedIsoRelLept[0], eventWeight );
-
-    if( lept3.Pt() < ptLept3_thresh_ ) continue;
-    if( combinedIsoRelLept[0] > combinedIsoRelLept3_thresh_ ) continue;
-
- 
-
-    if( event==DEBUG_EVENTNUMBER ) {
-      std::cout << std::endl << std::endl << "----------------------------------" << std::endl;
-      std::cout << "** LOG FOR RUN: " << run << "   EVENT: " << DEBUG_EVENTNUMBER << std::endl << std::endl;
-      std::cout << "leptType: " << leptType << std::endl; 
-      std::cout << "leptZ1.Pt(): " << leptZ1.Pt() << " leptZ1.Eta(): " << leptZ1.Eta() << std::endl;
-      std::cout << "leptZ2.Pt(): " << leptZ2.Pt() << " leptZ2.Eta(): " << leptZ2.Eta() << std::endl;
-      std::cout << "diLepton.M(): " << diLepton.M() << std::endl;
-    }
-
-
-    // ----------------------------
-    // KINEMATIC SELECTION: LEPTONS
-    // ----------------------------
-
-    h1_mZll_presel->Fill( diLepton.M(), eventWeight );
-
-    if( leptZ1.Pt() < ptLeptZ1_thresh_ ) continue;
-    if( leptZ2.Pt() < ptLeptZ2_thresh_ ) continue;
-    if( fabs(leptZ1.Eta()) > etaLeptZ1_thresh_ ) continue;
-    if( fabs(leptZ2.Eta()) > etaLeptZ2_thresh_ ) continue;
-    if( diLepton.Pt() < ptZll_thresh_ ) continue;
-    isMZllSignalRegion=true;
-    if( diLepton.M() < mZll_threshLo_ || diLepton.M() > mZll_threshHi_ ) isMZllSignalRegion=false;
-
-
-      
-    if( pfMet < met_thresh_ ) continue;  
-      
-      
-      
-      
-    // ------------
-    // AND NOW JETS
-    // ------------
-
-   
-    h1_nJets->Fill( njets , eventWeight );
-
-    if( njets<njets_thresh_ ) continue;
-    if( ht<ht_thresh_ ) continue;
-
-
     AnalysisJet jetB1, jetB2, jet3, jet4;
     int i_jetB1=-1;
     int i_jetB2=-1;
@@ -875,13 +786,6 @@ if( njets<3 ) continue;
       bTaggerJetB2 = jetB2.simpleSecondaryVertexHighEffBJetTag;
     }
 
-    float btag_thresh1 = this->get_btagThresh( btagJetB1_OP_ );
-    float btag_thresh2 = this->get_btagThresh( btagJetB2_OP_ );
-
-    if( bTaggerJetB1 < btag_thresh1 ) continue;
-    if( bTaggerJetB2 < btag_thresh2 ) continue;
-
-    
     
     // now add other jets ordered in pt:
     int istep=0;
@@ -940,6 +844,125 @@ if( njets<3 ) continue;
       }
 
     } //for additional jets
+
+    
+    TLorentzVector leptZ1, leptZ2;
+    leptZ1.SetPtEtaPhiE( ptLeptZ1, etaLeptZ1, phiLeptZ1, eLeptZ1 );
+    leptZ2.SetPtEtaPhiE( ptLeptZ2, etaLeptZ2, phiLeptZ2, eLeptZ2 );
+
+    TLorentzVector diLepton = leptZ1+leptZ2;
+
+    if( diLepton.M()<50. ) continue; // gen cut in DY sample
+
+
+
+    if( leptType>1 )  //opposite flavour laptons: ttbar control region
+      h1_mZll_OF_prepresel->Fill( diLepton.M(), eventWeight );
+
+    if( dataset_=="TTJ_Fall11_highstat" ) //TTJets SF computed with computeTTJetsSF
+      eventWeight *= 1.173;
+
+    if( leptType<=1 ) {
+      h1_mZll_prepresel->Fill( diLepton.M(), eventWeight );
+    } else {
+      h1_mZll_OF_prepresel_scaled->Fill( diLepton.M(), eventWeight );
+      continue;
+    }
+
+
+    float btag_thresh_loose = this->get_btagThresh( "loose" );
+
+
+    // btag free region: Z+jets and WZ control region
+    //if( nBjets_loose == 0 ) {
+    if( nBjets_medium == 0 ) {
+      h1_mZll_prepresel_0btag->Fill( diLepton.M(), eventWeight );
+      if( nLept>0 )
+        h1_mZll_presel_0btag->Fill( diLepton.M(), eventWeight );
+    }
+
+    
+
+
+
+
+    // fill some histos before requiring third lepton:
+    h1_nvertex_PUW->Fill(nvertex, eventWeight);
+
+    h1_rhoPF_prepresel->Fill( rhoPF, eventWeight);
+    h1_nJets_prepresel->Fill( njets, eventWeight );
+
+
+
+    // this is the trilepton channel: require at least one other lepton:
+    if( nLept<1 ) continue;
+
+
+    h1_pfMet_presel->Fill( pfMet, eventWeight);
+    h1_rhoPF_presel->Fill( rhoPF, eventWeight);
+
+
+    TLorentzVector lept3;
+    lept3.SetPtEtaPhiE( ptLept[0], etaLept[0], phiLept[0], eLept[0] );
+
+    h1_ptLept3_presel->Fill( lept3.Pt(), eventWeight );
+    h1_etaLept3_presel->Fill( lept3.Pt(), eventWeight );
+    h1_leptTypeLept3_presel->Fill( leptTypeLept[0], eventWeight );
+    h1_combinedIsoRelLept3_presel->Fill( combinedIsoRelLept[0], eventWeight );
+
+    if( lept3.Pt() < ptLept3_thresh_ ) continue;
+    if( combinedIsoRelLept[0] > combinedIsoRelLept3_thresh_ ) continue;
+
+ 
+
+    if( event==DEBUG_EVENTNUMBER ) {
+      std::cout << std::endl << std::endl << "----------------------------------" << std::endl;
+      std::cout << "** LOG FOR RUN: " << run << "   EVENT: " << DEBUG_EVENTNUMBER << std::endl << std::endl;
+      std::cout << "leptType: " << leptType << std::endl; 
+      std::cout << "leptZ1.Pt(): " << leptZ1.Pt() << " leptZ1.Eta(): " << leptZ1.Eta() << std::endl;
+      std::cout << "leptZ2.Pt(): " << leptZ2.Pt() << " leptZ2.Eta(): " << leptZ2.Eta() << std::endl;
+      std::cout << "diLepton.M(): " << diLepton.M() << std::endl;
+    }
+
+
+    // ----------------------------
+    // KINEMATIC SELECTION: LEPTONS
+    // ----------------------------
+
+    h1_mZll_presel->Fill( diLepton.M(), eventWeight );
+
+    if( leptZ1.Pt() < ptLeptZ1_thresh_ ) continue;
+    if( leptZ2.Pt() < ptLeptZ2_thresh_ ) continue;
+    if( fabs(leptZ1.Eta()) > etaLeptZ1_thresh_ ) continue;
+    if( fabs(leptZ2.Eta()) > etaLeptZ2_thresh_ ) continue;
+    if( diLepton.Pt() < ptZll_thresh_ ) continue;
+    isMZllSignalRegion=true;
+    if( diLepton.M() < mZll_threshLo_ || diLepton.M() > mZll_threshHi_ ) isMZllSignalRegion=false;
+
+
+      
+    if( pfMet < met_thresh_ ) continue;  
+      
+      
+      
+      
+    // ------------
+    // AND NOW JETS
+    // ------------
+
+   
+    h1_nJets->Fill( njets , eventWeight );
+
+    if( njets<njets_thresh_ ) continue;
+    if( ht<ht_thresh_ ) continue;
+
+    float btag_thresh1 = this->get_btagThresh( btagJetB1_OP_ );
+    float btag_thresh2 = this->get_btagThresh( btagJetB2_OP_ );
+
+    if( bTaggerJetB1 < btag_thresh1 ) continue;
+    if( bTaggerJetB2 < btag_thresh2 ) continue;
+
+    
 
     //std::cout <<  jetB1.Pt() << std::endl;
     //std::cout <<  jetB2.Pt() << std::endl;
@@ -1173,9 +1196,11 @@ if( njets<3 ) continue;
   h1_ptZll->Write();
   h1_etaZll->Write();
   h1_mZll_prepresel->Write();
+  h1_mZll_prepresel_0btag->Write();
   h1_mZll_OF_prepresel->Write();
   h1_mZll_OF_prepresel_scaled->Write();
   h1_mZll_presel->Write();
+  h1_mZll_presel_0btag->Write();
   h1_mZll->Write();
 
 
