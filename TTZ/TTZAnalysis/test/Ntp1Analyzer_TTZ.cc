@@ -34,6 +34,8 @@ Ntp1Analyzer_TTZ::Ntp1Analyzer_TTZ( const std::string& dataset, const std::strin
      Ntp1Analyzer( "TTZ", dataset, flags, tree ) {
 
 
+  h1_nPU_gen_ = new TH1D("nPU_gen", "", 55, -0.5, 54.5 );
+
   h1_nCounter_Zee_ = new TH1D("nCounter_Zee", "", 1, 0., 1.);
   h1_nCounter_Zmumu_ = new TH1D("nCounter_Zmumu", "", 1, 0., 1.);
 
@@ -51,6 +53,7 @@ void Ntp1Analyzer_TTZ::CreateOutputFile() {
   reducedTree_->Branch("LS",&LS_,"LS_/I");
   reducedTree_->Branch("event",&event_,"event_/I");
   reducedTree_->Branch("nPU",&nPU_,"nPU_/I");
+  reducedTree_->Branch("nPU_ave",&nPU_ave_,"nPU_ave_/I");
   reducedTree_->Branch("nvertex",&nvertex_,"nvertex_/I");
   reducedTree_->Branch("rhoPF",&rhoPF_,"rhoPF_/F");
   reducedTree_->Branch("genWeight",&genWeight_,"genWeight_/F");
@@ -192,6 +195,7 @@ void Ntp1Analyzer_TTZ::CreateOutputFile() {
 Ntp1Analyzer_TTZ::~Ntp1Analyzer_TTZ() {
 
   outfile_->cd();
+  h1_nPU_gen_->Write();
   h1_nCounter_Zee_->Write();
   h1_nCounter_Zmumu_->Write();
 
@@ -263,7 +267,13 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      eventWeight_ = -1.; //default
      leptTypeMC_ = -1;
 
+     if( dataset_tstr.Contains("spadhi") )
+       nPU_ = nPU[0]; //generated only with one nPU
+     else
+       nPU_ = nPU[1]; //in time PU only
 
+
+     h1_nPU_gen_->Fill( nPU_ );
 
 
      if( !isGoodEvent(jentry) ) continue; //this takes care also of trigger
@@ -273,8 +283,6 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      bool goodVertex = (ndofPV[0] >= 4.0 && sqrt(PVxPV[0]*PVxPV[0]+PVyPV[0]*PVyPV[0]) < 2. && fabs(PVzPV[0]) < 24. );
      if( !goodVertex ) continue;
   
-     nPU_ = nPU[1]; //in time PU only
-
      nPU_ave_ = 0.;
      for( unsigned iBX=0; iBX<nBX; ++iBX ) {
        nPU_ave_ += nPU[iBX]; 
@@ -989,6 +997,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      // ------------------
 
      float jetPt_thresh = 20.;
+     float jetEta_thresh = 2.5;
 
      // first save leading jets in event:
      std::vector<AnalysisJet> leadJets;
@@ -1106,6 +1115,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      for( unsigned iJet=0; iJet<leadJets.size() && nJets_<50; ++iJet ) {
 
        if( leadJets[iJet].Pt()<jetPt_thresh ) continue;
+       if( fabs(leadJets[iJet].Eta())>jetEta_thresh ) continue;
 
        eJet_[nJets_] = leadJets[iJet].Energy();
        ptJet_[nJets_] = leadJets[iJet].Pt();
