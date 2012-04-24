@@ -75,17 +75,18 @@ int main(int argc, char* argv[]) {
   TTZFileName += "_" + leptType;
   TTZFileName += ".root";
   TFile* TTZFile = TFile::Open(TTZFileName.c_str());
-  db->add_mcFile( TTZFile, "ttZ", "t#bar{t} + Z", signalFillColor, 3005);
+  //db->add_mcFile( TTZFile, "ttZ", "t#bar{t} + Z", signalFillColor, 0);
 
 
-  std::string mcZJetsFileName = "TTZTrilepton_DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1";
+  //std::string mcZJetsFileName = "TTZTrilepton_DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1";
+  std::string mcZJetsFileName = "TTZTrilepton_DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Fall11";
   mcZJetsFileName += "_" + selType;
   mcZJetsFileName += "_" + bTaggerType;
   //mcZJetsFileName += "_" + PUType;
   mcZJetsFileName += "_" + leptType;
   mcZJetsFileName += ".root";
   TFile* mcZJetsFile = TFile::Open(mcZJetsFileName.c_str());
-  db->add_mcFile( mcZJetsFile, "ZJets", "Z + jets", 46, 3001);
+  db->add_mcFile( mcZJetsFile, "ZJets", "Z + jets", 46, 0);
 
   //std::string mcTTbarFileName = "TTZTrilepton_TTJets_TuneZ2_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1";
   std::string mcTTbarFileName = "TTZTrilepton_TTJ_Fall11_highstat";
@@ -95,7 +96,7 @@ int main(int argc, char* argv[]) {
   mcTTbarFileName += "_" + leptType;
   mcTTbarFileName += ".root";
   TFile* mcTTbarFile = TFile::Open(mcTTbarFileName.c_str());
-  db->add_mcFile( mcTTbarFile, "TTtW", "t#bar{t}", 39, 3003);
+  db->add_mcFile( mcTTbarFile, "TTtW", "t#bar{t}", 39, 0);
 
   //std::string mcWZFileName = "TTZTrilepton_WZJetsTo3LNu_TuneZ2_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1";
   std::string mcVVFileName = "TTZTrilepton_VV_Summer11";
@@ -105,7 +106,7 @@ int main(int argc, char* argv[]) {
   mcVVFileName += "_" + leptType;
   mcVVFileName += ".root";
   TFile* mcVVFile = TFile::Open(mcVVFileName.c_str());
-  db->add_mcFile( mcVVFile, "VV_Summer11", "Diboson", 38, 3004);
+  db->add_mcFile( mcVVFile, "VV_Summer11", "Diboson", 38, 0);
 
 //std::string mcZZFileName = "TTZTrilepton_ZZ_TuneZ2_7TeV_pythia6_tauola_Summer11-PU_S4_START42_V11-v1";
 //mcZZFileName += "_" + selType;
@@ -123,9 +124,13 @@ int main(int argc, char* argv[]) {
   mcTTWFileName += "_" + leptType;
   mcTTWFileName += ".root";
   TFile* mcTTWFile = TFile::Open(mcTTWFileName.c_str());
-  db->add_mcFile( mcTTWFile, "ttW", "t#bar{t} + W", 33, 3002);
+  //db->add_mcFile( mcTTWFile, "ttW", "t#bar{t} + W", 33, 0);
 
 
+  //db->set_shapeNormalization();
+  //db->set_noStack(true);
+  //db->drawHisto("nvertex_PUW", "Number of Reconstructed Vertexes", "", "Events", true);
+  //db->set_noStack(false);
 
 
   float lumi_fb = 4.98;
@@ -139,9 +144,9 @@ int main(int argc, char* argv[]) {
 
 
   //db->set_legendTitle("Trilepton channel");
+  db->drawHisto("nvertex", "Number of Reconstructed Vertexes", "", "Events", true);
+  db->drawHisto("nvertex_PUW", "Number of Reconstructed Vertexes", "", "Events", true);
 
-  db->drawHisto("nvertex", "Number of Reconstructed Vertexes", "", "Events", log);
-  db->drawHisto("nvertex_PUW", "Number of Reconstructed Vertexes", "", "Events", log);
   db->drawHisto("rhoPF_presel", "Particle Flow Energy Density", "GeV", "Events", log);
 
   //db->drawHisto("nJets_prepresel", "Jet Multiplicity (p_{T} > 10 GeV)", "", "Events");
@@ -153,9 +158,10 @@ int main(int argc, char* argv[]) {
   //db->drawHisto("leptTypeLept3_prepresel", "Third Lepton Flavor", "", "Events");
   //db->drawHisto("combinedIsoRelLept3_prepresel", "Third Lepton Isolation", "", "Events");
 
-  db->set_rebin(4);
+  db->set_rebin(2);
   db->set_xAxisMax(130.);
   db->drawHisto("mZll_prepresel", "Dilepton Invariant Mass", "GeV", "Events", log, 2);
+  db->drawHisto("mZll_OF_prepresel", "Opposite Flavor Dilepton Mass", "GeV", "Events", log, 2);
   db->drawHisto("mZll_presel", "Dilepton Invariant Mass", "GeV", "Events", log, 2);
   db->drawHisto("mZll", "Dilepton Invariant Mass", "GeV", "Events", log, 2);
   db->set_xAxisMax();
@@ -338,11 +344,18 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
   tree_data->Project("data_eem", "ptZll", sel_eem.c_str());
   tree_data->Project("data_eee", "ptZll", sel_eee.c_str());
 
-  TH1D* h1_yields_data = new TH1D("yields_data", "", 4, 0., 4.);
-  h1_yields_data->SetBinContent( 1, h1_data_mmm->Integral() );
-  h1_yields_data->SetBinContent( 2, h1_data_mme->Integral() );
-  h1_yields_data->SetBinContent( 3, h1_data_eem->Integral() );
-  h1_yields_data->SetBinContent( 4, h1_data_eee->Integral() );
+  float mmm_data = h1_data_mmm->Integral();
+  float mme_data = h1_data_mme->Integral();
+  float eem_data = h1_data_eem->Integral();
+  float eee_data = h1_data_eee->Integral();
+  float tot_data = mmm_data + mme_data + eem_data + eee_data;
+
+  TH1D* h1_yields_data = new TH1D("yields_data", "", 5, 0., 5.);
+  h1_yields_data->SetBinContent( 1, eee_data );
+  h1_yields_data->SetBinContent( 2, eem_data );
+  h1_yields_data->SetBinContent( 3, mme_data );
+  h1_yields_data->SetBinContent( 4, mmm_data );
+  h1_yields_data->SetBinContent( 5, tot_data );
   
 
   TGraphAsymmErrors* gr_data = fitTools::getGraphPoissonErrors(h1_yields_data);
@@ -350,7 +363,8 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
   gr_data->SetMarkerSize(1.4);
 
 
-  TLegend* legend = new TLegend( 0.6, 0.57, 0.92, 0.9 );
+  //TLegend* legend = new TLegend( 0.6, 0.57, 0.92, 0.9 );
+  TLegend* legend = new TLegend( 0.2, 0.57, 0.52, 0.9 );
   legend->SetFillColor(0);
   legend->SetTextSize(0.042);
   legend->AddEntry( gr_data, "Data", "P" );
@@ -377,13 +391,22 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
     tree_mc->Project("mc_eem", "ptZll", sel_eem.c_str());
     tree_mc->Project("mc_eee", "ptZll", sel_eee.c_str());
 
+    float mmm_mc = h1_mc_mmm->Integral();
+    float mme_mc = h1_mc_mme->Integral();
+    float eem_mc = h1_mc_eem->Integral();
+    float eee_mc = h1_mc_eee->Integral();
+    float tot_mc = mmm_mc + mme_mc + eem_mc + eee_mc;
+
+
     char hname[100];
     sprintf( hname, "yields_mc_%d", iMC);
-    TH1D* h1_yields_mc = new TH1D(hname, "", 4, 0., 4.);
-    h1_yields_mc->SetBinContent( 1, lumi_fb*1000.*h1_mc_mmm->Integral() );
-    h1_yields_mc->SetBinContent( 2, lumi_fb*1000.*h1_mc_mme->Integral() );
-    h1_yields_mc->SetBinContent( 3, lumi_fb*1000.*h1_mc_eem->Integral() );
-    h1_yields_mc->SetBinContent( 4, lumi_fb*1000.*h1_mc_eee->Integral() );
+    TH1D* h1_yields_mc = new TH1D(hname, "", 5, 0., 5.);
+    h1_yields_mc->SetBinContent( 1, lumi_fb*1000.*eee_mc );
+    h1_yields_mc->SetBinContent( 2, lumi_fb*1000.*eem_mc );
+    h1_yields_mc->SetBinContent( 3, lumi_fb*1000.*mme_mc );
+    h1_yields_mc->SetBinContent( 4, lumi_fb*1000.*mmm_mc );
+    h1_yields_mc->SetBinContent( 5, lumi_fb*1000.*tot_mc );
+  
 
     h1_yields_mc->SetFillColor( db->get_mcFile(iMC).fillColor );
 
@@ -412,14 +435,15 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
   float yMaxData = h1_yields_data->GetMaximum();
   float yMaxMC = stackMC->GetMaximum();
   float yMax = TMath::Max(yMaxData, yMaxMC);
-  yMax *= 2.2;
+  yMax *= 1.4;
 
-  TH2D* h2_axes = new TH2D("axes", "", 4, 0., 4., 10, 0., yMax);
+  TH2D* h2_axes = new TH2D("axes", "", 5, 0., 5., 10, 0., yMax);
   h2_axes->GetXaxis()->SetLabelSize(0.085);
-  h2_axes->GetXaxis()->SetBinLabel(1, "(#mu#mu)#mu");
-  h2_axes->GetXaxis()->SetBinLabel(2, "(#mu#mu)e");
-  h2_axes->GetXaxis()->SetBinLabel(3, "(ee)#mu");
-  h2_axes->GetXaxis()->SetBinLabel(4, "(ee)e");
+  h2_axes->GetXaxis()->SetBinLabel(1, "(ee)e");
+  h2_axes->GetXaxis()->SetBinLabel(2, "(ee)#mu");
+  h2_axes->GetXaxis()->SetBinLabel(3, "(#mu#mu)e");
+  h2_axes->GetXaxis()->SetBinLabel(4, "(#mu#mu)#mu");
+  h2_axes->GetXaxis()->SetBinLabel(5, "Total" );
   h2_axes->SetYTitle("Events");
 
 

@@ -138,11 +138,13 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   h1_ptZll->Sumw2();
   TH1D* h1_etaZll = new TH1D("etaZll", "", 200, -5., 5.);
   h1_etaZll->Sumw2();
-  TH1D* h1_mZll_prepresel = new TH1D("mZll_prepresel", "", 240, 40., 160.);
+  TH1D* h1_mZll_prepresel = new TH1D("mZll_prepresel", "", 220, 50., 160.);
   h1_mZll_prepresel->Sumw2();
-  TH1D* h1_mZll_presel = new TH1D("mZll_presel", "", 240, 40., 160.);
+  TH1D* h1_mZll_OF_prepresel = new TH1D("mZll_OF_prepresel", "", 220, 50., 160.);
+  h1_mZll_OF_prepresel->Sumw2();
+  TH1D* h1_mZll_presel = new TH1D("mZll_presel", "", 220, 50., 160.);
   h1_mZll_presel->Sumw2();
-  TH1D* h1_mZll = new TH1D("mZll", "", 240, 40., 160.);
+  TH1D* h1_mZll = new TH1D("mZll", "", 220, 50., 160.);
   h1_mZll->Sumw2();
 
 
@@ -416,6 +418,7 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   TString dataset_tstr(dataset_);
   if( dataset_tstr.Contains("Fall11") ) {
     puType = "Fall11";
+    //puType = "Fall11Truth";
   }
 
 
@@ -423,25 +426,10 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   //PUWeight* fPUWeight_ave = new PUWeight(-1, "2011A", puType_ave);
   std::string puFileName;
   puFileName = "all2011AB.pileup_v2_73mb.root";
-
-  //if( PUType_=="HR11" || PUType_=="HR11_v3")
-  //  puFileName = "Pileup_DATA_up_to_178479_SiXie.root";
-  //  //puFileName = "Pileup_DATA_up_to_178078.root";
-  //else if( PUType_=="Run2011A" )
-  //  puFileName = "Pileup_DATA_up_to_173692.root";
-  //else if( PUType_=="Run2011A_73pb" )
-  //  puFileName = "all2011A.pileup_v2_73mb.root";
-  //else if( PUType_=="Run2011B" )
-  //  puFileName = "Pileup_DATA_Run2011B.root";
-  //  //puFileName = "Pileup_DATA_173692_to_178078.root";
-  //else if( PUType_=="Run2011B_73pb" )
-  //  puFileName = "all2011B.pileup_v2_73mb.root";
-  //else if( PUType_=="HR11_73pb" || PUType_=="HR11_73pb_DY" )
-  //  puFileName = "all2011AB.pileup_v2_73mb.root";
-  //else if( PUType_!="HR11_v2" ) {
-  //  std::cout << "-> Unknown PU Type: '" << PUType_ << "'. Will use HR11 default." << std::endl;
-  //  puFileName = "Pileup_DATA_up_to_178078.root";
-  //}
+  //puFileName = "Pileup_DATA_up_to_178479_SiXie.root";
+  //puFileName = "PileupTruth_v2.root";
+  //puFileName = "PileupObs_v2.root";
+  //puFileName = "FullData_178078.root"; 
 
 
   std::cout << std::endl << "-> Using data pileup file: " << puFileName << std::endl;
@@ -449,12 +437,36 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   TH1F* h1_nPU_data = (TH1F*)filePU->Get("pileup");
   fPUWeight->SetDataHistogram(h1_nPU_data);
 
-//if( dataset_tstr.BeginsWith("TTW") || dataset_tstr.BeginsWith("TTZ") ) {
-//  TFile* filePUMC = TFile::Open("RareSM_Sanjay-v1.root");
-//  TH1F* h1_nPU_mc = (TH1F*)filePUMC->Get("pileup");
-//  std::cout << "-> Switching MC PU file to: RareSM_Sanjay-v1.root" << std::endl;
-//  fPUWeight->SetMCHistogram(h1_nPU_mc);
-//}
+  //if( dataset_tstr.BeginsWith("TTW") || dataset_tstr.BeginsWith("TTZ") ) {
+  //  TFile* filePUMC = TFile::Open("RareSM_Sanjay-v1.root");
+  //  TH1F* h1_nPU_mc = (TH1F*)filePUMC->Get("pileup");
+  //  std::cout << "-> Switching MC PU file to: RareSM_Sanjay-v1.root" << std::endl;
+  //  fPUWeight->SetMCHistogram(h1_nPU_mc);
+  //}
+
+  //if( dataset_tstr.BeginsWith("TTJ") && dataset_tstr.Contains("Fall11") ) {
+  //  TFile* filePUMC = TFile::Open("TTJets_Fall11-S6.root");
+  //  TH1F* h1_nPU_mc = (TH1F*)filePUMC->Get("pileup");
+  //  std::cout << "-> Switching MC PU file to: TTJets_Fall11-S6.root" << std::endl;
+  //  fPUWeight->SetMCHistogram(h1_nPU_mc);
+  //}
+
+  //if( dataset_ == "DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1" ) {
+  //  TFile* filePUMC = TFile::Open("generatedpileup_Zjets_MADGRAPH_AOD423.root");
+  //  TH1F* h1_nPU_mc = (TH1F*)filePUMC->Get("GenLevelInfoModule/npileup");
+  //  std::cout << "-> Switching MC PU file to: generatedpileup_Zjets_MADGRAPH_AOD423.root" << std::endl;
+  //  fPUWeight->SetMCHistogram(h1_nPU_mc);
+  //}
+  
+  //TFile* filePUMC = TFile::Open("PUFile_DYJets_Summer11.root");
+  //TH1F* h1_nPU_mc = (TH1F*)filePUMC->Get("pileup");
+  //std::cout << "-> Switching MC PU file to: PUFile_DYJets_Summer11.root" << std::endl;
+  //fPUWeight->SetMCHistogram(h1_nPU_mc);
+
+  //TFile* filePUMC = TFile::Open("Pileup_DYJets_Fall11.root");
+  //TH1F* h1_nPU_mc = (TH1F*)filePUMC->Get("nPU_gen");
+  //std::cout << "-> Switching MC PU file to: Pileup_DYJets_Fall11.root" << std::endl;
+  fPUWeight->SetMCHistogram(h1_nPU_gen_);
 
   //if( PUType_!="HR11_v2" ) {
   //  std::cout << std::endl << "-> Using data pileup file: " << puFileName << std::endl;
@@ -574,9 +586,9 @@ ofstream ofs("run_event.txt");
       if( leptType_=="MU" && leptType==1 ) continue;
     }
 
+   
 
-    if( leptType>1 ) continue;
-
+    
 
     h1_nvertex->Fill(nvertex, eventWeight);
 
@@ -628,11 +640,32 @@ ofstream ofs("run_event.txt");
 
 //    }
 
-      if( dataset_ == "DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1" )
-        eventWeight *= fPUWeight->GetWeight(nPU);
+      eventWeight *= fPUWeight->GetWeight(nPU);
 
     } // if is MC
 
+    // first: count them
+    ht = 0.;
+    int njets=0;
+    for( unsigned iJet=0; iJet<nJets; ++iJet) {
+
+      if( ptJet[iJet] < 20. ) continue;
+      if( fabs(etaJet[iJet]) > etaJet_thresh_ ) continue;
+
+      ht += ptJet[iJet];
+
+      njets++;
+
+    }
+if( njets<3 ) continue;
+    
+    TLorentzVector leptZ1, leptZ2;
+    leptZ1.SetPtEtaPhiE( ptLeptZ1, etaLeptZ1, phiLeptZ1, eLeptZ1 );
+    leptZ2.SetPtEtaPhiE( ptLeptZ2, etaLeptZ2, phiLeptZ2, eLeptZ2 );
+
+    TLorentzVector diLepton = leptZ1+leptZ2;
+
+    if( diLepton.M()<50. ) continue; // gen cut in DY sample
 
 
     h1_nvertex_PUW->Fill(nvertex, eventWeight);
@@ -693,20 +726,19 @@ ofstream ofs("run_event.txt");
 
 
 
-    TLorentzVector leptZ1, leptZ2;
-    leptZ1.SetPtEtaPhiE( ptLeptZ1, etaLeptZ1, phiLeptZ1, eLeptZ1 );
-    leptZ2.SetPtEtaPhiE( ptLeptZ2, etaLeptZ2, phiLeptZ2, eLeptZ2 );
-
-    TLorentzVector diLepton = leptZ1+leptZ2;
-
 
 
 
     // fill some histos before requiring third lepton:
     h1_rhoPF_prepresel->Fill( rhoPF, eventWeight);
-    h1_mZll_prepresel->Fill( diLepton.M(), eventWeight );
     h1_nJets_prepresel->Fill( nJets, eventWeight );
 
+    if( leptType<=1 ) {
+      h1_mZll_prepresel->Fill( diLepton.M(), eventWeight );
+    } else {
+      h1_mZll_OF_prepresel->Fill( diLepton.M(), eventWeight );
+      continue;
+    }
 
 
     // this is the trilepton channel: require at least one other lepton:
@@ -769,20 +801,6 @@ ofstream ofs("run_event.txt");
 
 
    
-    // first: count them
-    ht = 0.;
-    int njets=0;
-    for( unsigned iJet=0; iJet<nJets; ++iJet) {
-
-      if( ptJet[iJet] < 20. ) continue;
-      if( fabs(etaJet[iJet]) > etaJet_thresh_ ) continue;
-
-      ht += ptJet[iJet];
-
-      njets++;
-
-    }
-    
     h1_nJets->Fill( njets , eventWeight );
 
     if( njets<njets_thresh_ ) continue;
@@ -1190,6 +1208,7 @@ ofstream ofs("run_event.txt");
   h1_ptZll->Write();
   h1_etaZll->Write();
   h1_mZll_prepresel->Write();
+  h1_mZll_OF_prepresel->Write();
   h1_mZll_presel->Write();
   h1_mZll->Write();
 
