@@ -87,13 +87,15 @@ class DrawBase {
                    const std::string& yAxisName, float yMin, float yMax, 
                    bool logx=false, bool logy=false);
 
-  void set_analysisType( const std::string analysisType ) { analysisType_ = analysisType; };
+
   void add_dataFile( TFile* dataFile, const std::string& datasetName, const std::string& legendName="Data", int markerColor=-1, int markerStyle=-1, int fillStyle=-1 );
   void add_dataFile( TFile* dataFile, float weight, const std::string& datasetName, const std::string& legendName="Data", int markerColor=-1, int markerStyle=-1, int fillStyle=-1 );
   void add_mcFile( TFile* mcFile, const std::string& datasetName, const std::string& legendName, int fillColor=-1, int fillStyle=-1, int markerStyle=-1, int lineColor=-1, int lineWidth=-1 );
   void add_mcFile_superimp( TFile* mcFile, const std::string& datasetName, const std::string& legendName, float multFactor=1., int lineColor=-1, int lineWidth=-1 );
   // in the following function weight must be cross_section(in pb) / Nevents:
   void add_mcFile( TFile* mcFile, float weight, const std::string& datasetName, const std::string& legendName, int fillColor=-1, int fillStyle=-1, int markerStyle=-1, int lineColor=-1, int lineWidth=-1 );
+
+  void set_analysisType( const std::string analysisType ) { analysisType_ = analysisType; };
   void set_lumi( float lumi ) { lumi_ = lumi; };
   void set_outputdir( const std::string& outputdir="" ); //if "" is passed, default outputdir is set
   void set_flags( const std::string& flags ) { flags_ = flags; };
@@ -121,6 +123,9 @@ class DrawBase {
   void set_markerSize( float markerSize ) { markerSize_ = markerSize; };
   void set_getBinLabels( bool getBinL=true ) { getBinLabels_ = getBinL; };
   void set_legendTitle( const std::string& title ) { legendTitle_ = title; };
+  void set_mcWeight( int iFile, float weight );
+  void set_mcWeight( const std::string& datasetName, float weight );
+
   void add_label( const std::string& text, float xmin=0.23, float ymin=0.87, float xmax=0.36, float ymax=0.9, float textSize=0.035 );
   void delete_label();
 
