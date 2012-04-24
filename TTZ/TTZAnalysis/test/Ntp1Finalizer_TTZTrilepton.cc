@@ -673,8 +673,6 @@ if( njets<3 ) continue;
     if( diLepton.M()<50. ) continue; // gen cut in DY sample
 
 
-    h1_nvertex_PUW->Fill(nvertex, eventWeight);
-
 
     if( !isMC ) { 
 
@@ -745,6 +743,8 @@ if( njets<3 ) continue;
 
 
     // fill some histos before requiring third lepton:
+    h1_nvertex_PUW->Fill(nvertex, eventWeight);
+
     h1_rhoPF_prepresel->Fill( rhoPF, eventWeight);
     h1_nJets_prepresel->Fill( nJets, eventWeight );
 
