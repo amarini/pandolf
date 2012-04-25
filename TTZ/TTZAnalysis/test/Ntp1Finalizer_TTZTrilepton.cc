@@ -487,7 +487,7 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   bool passed_btag;
   int nBjets_loose;
   int nBjets_medium;
-  float ht;
+  float ht, mt;
 
   tree_passedEvents->Branch( "run", &run, "run/I" );
   tree_passedEvents->Branch( "LS", &LS, "LS/I" );
@@ -517,6 +517,7 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   tree_passedEvents->Branch( "etaJet3", &etaJet3_t, "etaJet3_t/F" );
   tree_passedEvents->Branch( "etaJet4", &etaJet4_t, "etaJet4_t/F" );
   tree_passedEvents->Branch( "ht", &ht, "ht/F" );
+  tree_passedEvents->Branch( "mt", &mt, "mt/F" );
   tree_passedEvents->Branch( "isMZllSignalRegion", &isMZllSignalRegion, "isMZllSignalRegion/O" );
   tree_passedEvents->Branch( "passed_btag", &passed_btag, "passed_btag/O" );
   tree_passedEvents->Branch( "nBjets_loose", &nBjets_loose, "nBjets_loose/I" );
@@ -988,6 +989,9 @@ if( njets<3 ) continue;
         met.SetPtEtaPhiE( pfMet, 0., phiMet, pfMet );
 
         TLorentzVector W = lept3 + met;
+        // this is for tree_passedEvents:
+        mt = W.Mt();
+
 
         h1_mTW->Fill( W.Mt() , eventWeight );
 
