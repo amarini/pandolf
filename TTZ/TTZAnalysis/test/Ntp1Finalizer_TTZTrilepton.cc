@@ -489,6 +489,19 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   int nBjets_loose;
   int nBjets_medium;
   float ht, mt;
+  float mT_lZmet;
+  float mb1jj;
+  float mb2jj;
+  float mbjj_best;
+  float mb1jjZ;
+  float mb2jjZ;
+  float mbjjZ_best;
+  float mTb1W;
+  float mTb2W;
+  float mTbW_best;
+  float mTb1WZ;
+  float mTb2WZ;
+  float mTbWZ_best;
 
   tree_passedEvents->Branch( "run", &run, "run/I" );
   tree_passedEvents->Branch( "LS", &LS, "LS/I" );
@@ -524,7 +537,20 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   tree_passedEvents->Branch( "njets", &njets, "njets/I" );
   tree_passedEvents->Branch( "nBjets_loose", &nBjets_loose, "nBjets_loose/I" );
   tree_passedEvents->Branch( "nBjets_medium", &nBjets_medium, "nBjets_medium/I" );
-
+  tree_passedEvents->Branch("mT_lZmet"  , &mT_lZmet  , "mT_lZmet/F");
+  tree_passedEvents->Branch("mb1jj"     , &mb1jj     , "mb1jj/F");
+  tree_passedEvents->Branch("mb2jj"     , &mb2jj     , "mb2jj/F");
+  tree_passedEvents->Branch("mbjj_best" , &mbjj_best , "mbjj_best/F");
+  tree_passedEvents->Branch("mb1jjZ"    , &mb1jjZ    , "mb1jjZ/F");
+  tree_passedEvents->Branch("mb2jjZ"    , &mb2jjZ    , "mb2jjZ/F");
+  tree_passedEvents->Branch("mbjjZ_best", &mbjjZ_best, "mbjjZ_best/F");
+  tree_passedEvents->Branch("mTb1W"     , &mTb1W     , "mTb1W/F");
+  tree_passedEvents->Branch("mTb2W"     , &mTb2W     , "mTb2W/F");
+  tree_passedEvents->Branch("mTbW_best" , &mTbW_best , "mTbW_best/F");
+  tree_passedEvents->Branch("mTb1WZ"    , &mTb1WZ    , "mTb1WZ/F");
+  tree_passedEvents->Branch("mTb2WZ"    , &mTb2WZ    , "mTb2WZ/F");
+  tree_passedEvents->Branch("mTbWZ_best", &mTbWZ_best, "mTbWZ_best/F");
+      
 
 
 
@@ -1000,7 +1026,7 @@ if( njets<3 ) continue;
         TLorentzVector lZ = lept3 + diLepton;
         TLorentzVector lZ_plusMet = lZ + met;
 
-        float mT_lZmet = ( sqrt( lZ.Pt()*lZ.Pt() + lZ.M()*lZ.M() ) + pfMet )*( sqrt( lZ.Pt()*lZ.Pt() + lZ.M()*lZ.M() ) + pfMet )  -  lZ_plusMet.Pt()*lZ_plusMet.Pt();
+        mT_lZmet = ( sqrt( lZ.Pt()*lZ.Pt() + lZ.M()*lZ.M() ) + pfMet )*( sqrt( lZ.Pt()*lZ.Pt() + lZ.M()*lZ.M() ) + pfMet )  -  lZ_plusMet.Pt()*lZ_plusMet.Pt();
         mT_lZmet = sqrt(mT_lZmet);
 
         h1_mT_lZmet->Fill( mT_lZmet, eventWeight );
@@ -1052,22 +1078,32 @@ if( njets<3 ) continue;
         TLorentzVector b1jjZ = jetB1 + jet3 + jet4 + diLepton;
         TLorentzVector b2jjZ = jetB2 + jet3 + jet4 + diLepton;
 
-        h1_mb1jj->Fill( b1jj.M(), eventWeight );
-        h1_mb2jj->Fill( b2jj.M(), eventWeight );
+        mb1jj = b1jj.M();
+        mb2jj = b2jj.M();
 
-        if( fabs(b1jj.M()-tmass) < fabs(b2jj.M()-tmass) )
-          h1_mbjj_best->Fill( b1jj.M(), eventWeight );
+        h1_mb1jj->Fill( mb1jj, eventWeight );
+        h1_mb2jj->Fill( mb2jj, eventWeight );
+
+        if( fabs(mb1jj-tmass) < fabs(mb2jj-tmass) )
+          mbjj_best = mb1jj;
         else
-          h1_mbjj_best->Fill( b2jj.M(), eventWeight );
+          mbjj_best = mb2jj;
+
+        h1_mbjj_best->Fill( mbjj_best, eventWeight );
 
 
-        h1_mb1jjZ->Fill( b1jjZ.M(), eventWeight );
-        h1_mb2jjZ->Fill( b2jjZ.M(), eventWeight );
+        mb1jjZ = b1jjZ.M();
+        mb2jjZ = b2jjZ.M();
 
-        if( fabs(b1jjZ.M()-tmass) < fabs(b2jjZ.M()-tmass) )
-          h1_mbjjZ_best->Fill( b1jjZ.M(), eventWeight );
+        h1_mb1jjZ->Fill( mb1jjZ, eventWeight );
+        h1_mb2jjZ->Fill( mb2jjZ, eventWeight );
+
+        if( fabs(mb1jjZ-tmass) < fabs(mb2jjZ-tmass) )
+          mbjjZ_best = mb1jjZ;
         else
-          h1_mbjjZ_best->Fill( b2jjZ.M(), eventWeight );
+          mbjjZ_best = mb2jjZ;
+
+        h1_mbjjZ_best->Fill( mbjjZ_best, eventWeight );
 
 
 
@@ -1077,22 +1113,32 @@ if( njets<3 ) continue;
         TLorentzVector b1WZ = jetB1 + diLepton + lept3 + met;
         TLorentzVector b2WZ = jetB2 + diLepton + lept3 + met;
 
-        h1_mTb1W->Fill( b1W.Mt(), eventWeight );
-        h1_mTb2W->Fill( b2W.Mt(), eventWeight );
+        mTb1W = b1W.Mt();
+        mTb2W = b2W.Mt();
 
-        if( fabs(b1W.Mt()-tmass) < fabs(b2W.Mt()-tmass) )
-          h1_mTbW_best->Fill( b1W.Mt(), eventWeight );
+        h1_mTb1W->Fill( mTb1W, eventWeight );
+        h1_mTb2W->Fill( mTb2W, eventWeight );
+
+        if( fabs(mTb1W-tmass) < fabs(mTb2W-tmass) )
+          mTbW_best = mTb1W;
         else
-          h1_mTbW_best->Fill( b2W.Mt(), eventWeight );
+          mTbW_best = mTb2W;
+
+        h1_mTbW_best->Fill( mTb2W, eventWeight );
 
         
-        h1_mTb1WZ->Fill( b1WZ.Mt(), eventWeight );
-        h1_mTb2WZ->Fill( b2WZ.Mt(), eventWeight );
+        mTb1WZ = b1WZ.Mt();
+        mTb2WZ = b2WZ.Mt();
 
-        if( fabs(b1WZ.Mt()-tmass) < fabs(b2WZ.Mt()-tmass) )
-          h1_mTbWZ_best->Fill( b1WZ.Mt(), eventWeight );
+        h1_mTb1WZ->Fill( mTb1WZ, eventWeight );
+        h1_mTb2WZ->Fill( mTb2WZ, eventWeight );
+
+        if( fabs(mTb1WZ-tmass) < fabs(mTb2WZ-tmass) )
+          mTbWZ_best = mTb1WZ;
         else
-          h1_mTbWZ_best->Fill( b2WZ.Mt(), eventWeight );
+          mTbWZ_best = mTb2WZ;
+
+        h1_mTbWZ_best->Fill( mTbWZ_best, eventWeight );
       
       } // is mzll signal region
 
