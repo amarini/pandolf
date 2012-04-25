@@ -7,7 +7,8 @@
 
 
 
-float get_ttbarSF( DrawBase* db );
+float get_ttbarSF( const DrawBase& db );
+float get_DYWZSF( const DrawBase& db );
 float computeChiSquare( TH1D* h1_DATA, TH1D* h1_MC );
 
 void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char selection[], float lumi_fb );
@@ -155,30 +156,50 @@ int main(int argc, char* argv[]) {
   db->set_rebin(2);
   db->set_xAxisMax(130.);
   db->drawHisto("mZll_prepresel", "Dilepton Invariant Mass", "GeV", "Events", true, 2);
+
+
   // opposite flavor leptons: control region for ttbar:
   db->set_rebin(4);
   db->drawHisto("mZll_OF_prepresel", "Opposite Flavor Dilepton Mass", "GeV", "Events");
   // scale ttbar MC to match data:
-  float ttbar_SF = get_ttbarSF( db );
-std::cout << "1" << std::endl;
+  float ttbar_SF = get_ttbarSF( *db );
   db->set_mcWeight( "TTtW", ttbar_SF );
-std::cout << "2" << std::endl;
   db->drawHisto("mZll_OF_prepresel", "Opposite Flavor Dilepton Mass", "GeV", "Events", false, 1, "scaled");
-std::cout << "3" << std::endl;
 
+
+  // now add one lepton (prepresel -> presel)
+  // anti-btag: control region for Z+Jets and WZ:
+  db->drawHisto("mZll_presel_antibtag", "Dilepton Invariant Mass", "GeV", "Events", true, 2);
+  db->set_rebin();
+  db->set_xAxisMax();
+  db->drawHisto("nJets_presel", "Jet Multiplicity", "", "Events", true);
+  float DYWZ_SF = get_DYWZSF( *db );
+  db->set_mcWeight( "ZJets", DYWZ_SF );
+  db->set_mcWeight( "VV_Summer11", DYWZ_SF );
+
+  db->set_rebin(4);
+  db->set_xAxisMax(130.);
+  db->drawHisto("mZll_presel_antibtag", "Dilepton Invariant Mass", "GeV", "Events", true, 2, "scaled");
+  db->set_rebin();
+  db->set_xAxisMax();
+  db->drawHisto("nJets_presel", "Jet Multiplicity", "", "Events", true, 1, "scaled");
+
+
+  db->set_rebin(2);
   db->drawHisto("rhoPF_presel", "Particle Flow Energy Density", "GeV", "Events", true);
 
+
+  db->set_rebin();
   db->drawHisto("nJets", "Jet Multiplicity (p_{T} > 20 GeV)", "", "Events");
 
-  //db->drawHisto("ptLept3_prepresel", "Third Lepton p_{T}", "GeV", "Events");
-  //db->drawHisto("etaLept3_prepresel", "Third Lepton #eta", "", "Events");
-  //db->drawHisto("leptTypeLept3_prepresel", "Third Lepton Flavor", "", "Events");
-  //db->drawHisto("combinedIsoRelLept3_prepresel", "Third Lepton Isolation", "", "Events");
+  db->set_rebin(5);
+  db->drawHisto("ptLept3_presel", "Third Lepton p_{T}", "GeV", "Events");
+  db->drawHisto("etaLept3_presel", "Third Lepton #eta", "", "Events");
+  db->drawHisto("leptTypeLept3_presel", "Third Lepton Flavor", "", "Events");
+  db->drawHisto("combinedIsoRelLept3_presel", "Third Lepton Isolation", "", "Events");
 
-  db->drawHisto("mZll_prepresel_0btag", "Dilepton Invariant Mass", "GeV", "Events", true, 2);
   db->set_rebin(4);
   db->drawHisto("mZll_presel", "Dilepton Invariant Mass", "GeV", "Events", true, 2);
-  db->drawHisto("mZll_presel_0btag", "Dilepton Invariant Mass", "GeV", "Events", true, 2);
   db->drawHisto("mZll", "Dilepton Invariant Mass", "GeV", "Events", true, 2);
   db->set_xAxisMax();
 
@@ -500,20 +521,27 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
 
 
 
-float get_ttbarSF( DrawBase* db ) {
+float get_ttbarSF( const DrawBase& db ) {
 
 
-  TH1D* h1_DATA = db->get_lastHistos_data()[0];
+  //TH1D* h1_DATA = new TH1D(*(db->get_lastHistos_data()[0]));
+  TH1D* h1_DATA = new TH1D(*(db.get_lastHistos_data()[0]));
 
-  std::vector< TH1D* > lastHistosMC = db->get_lastHistos_mc();
+  std::vector< TH1D* > lastHistosMC = db.get_lastHistos_mc();
   TH1D* h1_TTJets;
 
+  std::vector< TH1D* > otherHistosMC;
+  // create short list of histos withous ttbar:
   for( unsigned iHisto=0; iHisto<lastHistosMC.size(); ++iHisto ) {
 
-    if( db->get_mcFiles()[iHisto].datasetName=="TTtW" ) {
+    if( db.get_mcFiles()[iHisto].datasetName!="TTtW" ) {
+
+      TH1D* h1_newHisto = new TH1D(*(lastHistosMC[iHisto]));
+      otherHistosMC.push_back( h1_newHisto );
+
+    } else {
 
       h1_TTJets = new TH1D(*(lastHistosMC[iHisto]));
-      lastHistosMC.erase(lastHistosMC.begin()+iHisto);
 
     }
 
@@ -539,8 +567,8 @@ float get_ttbarSF( DrawBase* db ) {
     TH1D* h1_TTJets_sf = new TH1D(*h1_TTJets);
     h1_TTJets_sf->Scale( thisSF );
 
-    for( unsigned ihisto=0; ihisto<lastHistosMC.size(); ++ihisto )
-      h1_TTJets_sf->Add( lastHistosMC[ihisto] );
+    for( unsigned ihisto=0; ihisto<otherHistosMC.size(); ++ihisto )
+      h1_TTJets_sf->Add( otherHistosMC[ihisto] );
 
     float thisChiSquare = computeChiSquare( h1_DATA, h1_TTJets_sf );
 
@@ -566,7 +594,7 @@ float get_ttbarSF( DrawBase* db ) {
   std::cout << "Min Chi Square: " << minChiSquare << std::endl;
   std::cout << "Best SF: " << foundSF << std::endl;
 
-  TPaveText* label_sqrt = db->get_labelSqrt();
+  TPaveText* label_sqrt = db.get_labelSqrt();
 
   TCanvas* c1 = new TCanvas("c1", "", 600, 600);
   c1->cd();
@@ -576,12 +604,13 @@ float get_ttbarSF( DrawBase* db ) {
 
   
   char canvasName[500];
-  sprintf( canvasName, "%s/ttbarChiSquareScan.eps", db->get_outputdir().c_str() );
+  sprintf( canvasName, "%s/ttbarChiSquareScan.eps", db.get_outputdir().c_str() );
   c1->SaveAs(canvasName);
 
   delete c1;
   delete h1_chiSquare;
   delete h1_TTJets;
+  delete h1_DATA;
 
 
   return foundSF;
@@ -610,10 +639,32 @@ float computeChiSquare( TH1D* h1_DATA, TH1D* h1_MC ) {
    
   } //for bins
 
-  chiSquare /= (nbins-1);
+  chiSquare /= (nbins-1.);
 
   return chiSquare;
 
 }
 
 
+
+
+float get_DYWZSF( const DrawBase& db ) {
+
+
+  TH1D* h1_DATA = new TH1D(*(db.get_lastHistos_data()[0]));
+  float dataIntegral = h1_DATA->Integral();
+
+  std::vector< TH1D* > lastHistosMC = db.get_lastHistos_mc();
+
+  float mcIntegral = 0.;
+  for( unsigned iHisto=0; iHisto<lastHistosMC.size(); ++iHisto )
+      mcIntegral += lastHistosMC[iHisto]->Integral();
+
+  float sf = dataIntegral/mcIntegral;
+
+  std::cout << std::endl << "-> DY/WZ Scaling" << std::endl;
+  std::cout << "SF: " << sf << std::endl;
+
+  return sf;
+
+}
