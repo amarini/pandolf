@@ -96,6 +96,8 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   h1_metSignificance->Sumw2();
 
 
+  TH1D* h1_rhoPF_noPUW = new TH1D("rhoPF_noPUW", "", 50, 0., 30.);
+  h1_rhoPF_noPUW->Sumw2();
   TH1D* h1_rhoPF_prepresel = new TH1D("rhoPF_prepresel", "", 50, 0., 30.);
   h1_rhoPF_prepresel->Sumw2();
   TH1D* h1_rhoPF_presel = new TH1D("rhoPF_presel", "", 50, 0., 30.);
@@ -154,6 +156,8 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
 
   TH1D* h1_nJets_prepresel = new TH1D("nJets_prepresel", "", 11, -0.5, 10.5);
   h1_nJets_prepresel->Sumw2();
+  TH1D* h1_nJets_presel = new TH1D("nJets_presel", "", 11, -0.5, 10.5);
+  h1_nJets_presel->Sumw2();
   TH1D* h1_nJets = new TH1D("nJets", "", 7, 3.5, 10.5);
   h1_nJets->Sumw2();
 
@@ -480,6 +484,7 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   float HLTSF;
   int leptType3;
   bool isMZllSignalRegion;
+  bool passed_btag;
   int nBjets_loose;
   int nBjets_medium;
   float ht;
@@ -513,6 +518,7 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   tree_passedEvents->Branch( "etaJet4", &etaJet4_t, "etaJet4_t/F" );
   tree_passedEvents->Branch( "ht", &ht, "ht/F" );
   tree_passedEvents->Branch( "isMZllSignalRegion", &isMZllSignalRegion, "isMZllSignalRegion/O" );
+  tree_passedEvents->Branch( "passed_btag", &passed_btag, "passed_btag/O" );
   tree_passedEvents->Branch( "nBjets_loose", &nBjets_loose, "nBjets_loose/I" );
   tree_passedEvents->Branch( "nBjets_medium", &nBjets_medium, "nBjets_medium/I" );
 
@@ -607,6 +613,7 @@ ofstream ofs("run_event.txt");
     
 
     h1_nvertex->Fill(nvertex, eventWeight);
+    h1_rhoPF_noPUW->Fill( rhoPF, eventWeight);
 
     if( isMC ) {
 
@@ -847,7 +854,7 @@ if( njets<3 ) continue;
     float btag_thresh1 = this->get_btagThresh( btagJetB1_OP_ );
     float btag_thresh2 = this->get_btagThresh( btagJetB2_OP_ );
 
-    bool passed_btag = (bTaggerJetB1 >= btag_thresh1) && ( bTaggerJetB2 >= btag_thresh2 );
+    passed_btag = (bTaggerJetB1 >= btag_thresh1) && ( bTaggerJetB2 >= btag_thresh2 );
 
 
 
@@ -874,7 +881,8 @@ if( njets<3 ) continue;
 
     // btag free region: Z+jets and WZ control region
     //if( nBjets_loose == 0 ) {
-    if( !passed_btag ) {
+    if( nBjets_medium == 0 ) {
+    //if( !passed_btag ) {
       h1_mZll_prepresel_antibtag->Fill( diLepton.M(), eventWeight );
       if( nLept>0 )
         h1_mZll_presel_antibtag->Fill( diLepton.M(), eventWeight );
@@ -897,6 +905,7 @@ if( njets<3 ) continue;
     if( nLept<1 ) continue;
 
 
+    h1_nJets_presel->Fill( njets, eventWeight );
     h1_pfMet_presel->Fill( pfMet, eventWeight);
     h1_rhoPF_presel->Fill( rhoPF, eventWeight);
 
@@ -949,140 +958,139 @@ if( njets<3 ) continue;
     // AND NOW JETS
     // ------------
 
-   
-    h1_nJets->Fill( njets , eventWeight );
-
-    if( njets<njets_thresh_ ) continue;
-    if( ht<ht_thresh_ ) continue;
-
-    if( !passed_btag ) continue;
-
-    
-
     //std::cout <<  jetB1.Pt() << std::endl;
     //std::cout <<  jetB2.Pt() << std::endl;
     //std::cout << jet3.Pt() << std::endl;
     //std::cout << jet4.Pt() << std::endl;
     //std::cout << std::endl << std::endl << std::endl;
 
+   
+    h1_nJets->Fill( njets , eventWeight );
 
-
-    // fill histograms:
-    
-    h1_mZll->Fill( diLepton.M(), eventWeight );
-
-
-    if( isMZllSignalRegion ) {
-
-      h1_pfMet->Fill( pfMet, eventWeight );
-      h1_metSignificance->Fill( metSignificance, eventWeight );
-
-      TLorentzVector met;
-      met.SetPtEtaPhiE( pfMet, 0., phiMet, pfMet );
-
-      TLorentzVector W = lept3 + met;
-
-      h1_mTW->Fill( W.Mt() , eventWeight );
-
-      TLorentzVector lZ = lept3 + diLepton;
-      TLorentzVector lZ_plusMet = lZ + met;
-
-      float mT_lZmet = ( sqrt( lZ.Pt()*lZ.Pt() + lZ.M()*lZ.M() ) + pfMet )*( sqrt( lZ.Pt()*lZ.Pt() + lZ.M()*lZ.M() ) + pfMet )  -  lZ_plusMet.Pt()*lZ_plusMet.Pt();
-      mT_lZmet = sqrt(mT_lZmet);
-
-      h1_mT_lZmet->Fill( mT_lZmet, eventWeight );
-
-
-      h1_ptLeptZ1->Fill( leptZ1.Pt(), eventWeight );
-      h1_ptLeptZ2->Fill( leptZ2.Pt(), eventWeight );
-      h1_etaLeptZ1->Fill( leptZ1.Eta(), eventWeight );
-      h1_etaLeptZ2->Fill( leptZ2.Eta(), eventWeight );
-
-      if( nLept>0 ) 
-        h1_ptLept3->Fill( lept3.Pt(), eventWeight );
-
-      h1_deltaRZll->Fill( leptZ2.DeltaR(leptZ2), eventWeight );
-
-      h1_ptZll->Fill( diLepton.Pt(), eventWeight );
-      h1_etaZll->Fill( diLepton.Eta(), eventWeight );
-
-
-      h1_ptJetB1->Fill( jetB1.Pt(), eventWeight );
-      h1_ptJetB2->Fill( jetB2.Pt(), eventWeight );
-      h1_ptJet3->Fill( jet3.Pt(), eventWeight );
-      h1_ptJet4->Fill( jet4.Pt(), eventWeight );
-
-      h1_etaJetB1->Fill( jetB1.Eta(), eventWeight );
-      h1_etaJetB2->Fill( jetB2.Eta(), eventWeight );
-      h1_etaJet3->Fill( jet3.Eta(), eventWeight );
-      if( jet4.Pt()>0. )
-        h1_etaJet4->Fill( jet4.Eta(), eventWeight );
-
-
-      h1_partFlavorJetB1->Fill( jetB1.pdgIdPart, eventWeight );
-      h1_partFlavorJetB2->Fill( jetB2.pdgIdPart, eventWeight );
-      h1_partFlavorJet3->Fill( jet3.pdgIdPart, eventWeight );
-      h1_partFlavorJet4->Fill( jet4.pdgIdPart, eventWeight );
+    if( njets<njets_thresh_ ) continue;
+    if( ht<ht_thresh_ ) continue;
 
 
 
-      h1_bTagJetB1->Fill( bTaggerJetB1, eventWeight );
-      h1_bTagJetB2->Fill( bTaggerJetB2, eventWeight );
+    if( passed_btag ) {
 
-
-
-      h1_deltaRbb->Fill( jetB1.DeltaR(jetB2), eventWeight );
-
-      TLorentzVector b1jj = jetB1 + jet3 + jet4;
-      TLorentzVector b2jj = jetB2 + jet3 + jet4;
-
-      TLorentzVector b1jjZ = jetB1 + jet3 + jet4 + diLepton;
-      TLorentzVector b2jjZ = jetB2 + jet3 + jet4 + diLepton;
-
-      h1_mb1jj->Fill( b1jj.M(), eventWeight );
-      h1_mb2jj->Fill( b2jj.M(), eventWeight );
-
-      if( fabs(b1jj.M()-tmass) < fabs(b2jj.M()-tmass) )
-        h1_mbjj_best->Fill( b1jj.M(), eventWeight );
-      else
-        h1_mbjj_best->Fill( b2jj.M(), eventWeight );
-
-
-      h1_mb1jjZ->Fill( b1jjZ.M(), eventWeight );
-      h1_mb2jjZ->Fill( b2jjZ.M(), eventWeight );
-
-      if( fabs(b1jjZ.M()-tmass) < fabs(b2jjZ.M()-tmass) )
-        h1_mbjjZ_best->Fill( b1jjZ.M(), eventWeight );
-      else
-        h1_mbjjZ_best->Fill( b2jjZ.M(), eventWeight );
-
-
-
-      TLorentzVector b1W = jetB1 + lept3 + met;
-      TLorentzVector b2W = jetB2 + lept3 + met;
-
-      TLorentzVector b1WZ = jetB1 + diLepton + lept3 + met;
-      TLorentzVector b2WZ = jetB2 + diLepton + lept3 + met;
-
-      h1_mTb1W->Fill( b1W.Mt(), eventWeight );
-      h1_mTb2W->Fill( b2W.Mt(), eventWeight );
-
-      if( fabs(b1W.Mt()-tmass) < fabs(b2W.Mt()-tmass) )
-        h1_mTbW_best->Fill( b1W.Mt(), eventWeight );
-      else
-        h1_mTbW_best->Fill( b2W.Mt(), eventWeight );
-
+      // fill histograms:
       
-      h1_mTb1WZ->Fill( b1WZ.Mt(), eventWeight );
-      h1_mTb2WZ->Fill( b2WZ.Mt(), eventWeight );
+      h1_mZll->Fill( diLepton.M(), eventWeight );
 
-      if( fabs(b1WZ.Mt()-tmass) < fabs(b2WZ.Mt()-tmass) )
-        h1_mTbWZ_best->Fill( b1WZ.Mt(), eventWeight );
-      else
-        h1_mTbWZ_best->Fill( b2WZ.Mt(), eventWeight );
-    
-    } // is mzll signal region
 
+      if( isMZllSignalRegion ) {
+
+        h1_pfMet->Fill( pfMet, eventWeight );
+        h1_metSignificance->Fill( metSignificance, eventWeight );
+
+        TLorentzVector met;
+        met.SetPtEtaPhiE( pfMet, 0., phiMet, pfMet );
+
+        TLorentzVector W = lept3 + met;
+
+        h1_mTW->Fill( W.Mt() , eventWeight );
+
+        TLorentzVector lZ = lept3 + diLepton;
+        TLorentzVector lZ_plusMet = lZ + met;
+
+        float mT_lZmet = ( sqrt( lZ.Pt()*lZ.Pt() + lZ.M()*lZ.M() ) + pfMet )*( sqrt( lZ.Pt()*lZ.Pt() + lZ.M()*lZ.M() ) + pfMet )  -  lZ_plusMet.Pt()*lZ_plusMet.Pt();
+        mT_lZmet = sqrt(mT_lZmet);
+
+        h1_mT_lZmet->Fill( mT_lZmet, eventWeight );
+
+
+        h1_ptLeptZ1->Fill( leptZ1.Pt(), eventWeight );
+        h1_ptLeptZ2->Fill( leptZ2.Pt(), eventWeight );
+        h1_etaLeptZ1->Fill( leptZ1.Eta(), eventWeight );
+        h1_etaLeptZ2->Fill( leptZ2.Eta(), eventWeight );
+
+        if( nLept>0 ) 
+          h1_ptLept3->Fill( lept3.Pt(), eventWeight );
+
+        h1_deltaRZll->Fill( leptZ2.DeltaR(leptZ2), eventWeight );
+
+        h1_ptZll->Fill( diLepton.Pt(), eventWeight );
+        h1_etaZll->Fill( diLepton.Eta(), eventWeight );
+
+
+        h1_ptJetB1->Fill( jetB1.Pt(), eventWeight );
+        h1_ptJetB2->Fill( jetB2.Pt(), eventWeight );
+        h1_ptJet3->Fill( jet3.Pt(), eventWeight );
+        h1_ptJet4->Fill( jet4.Pt(), eventWeight );
+
+        h1_etaJetB1->Fill( jetB1.Eta(), eventWeight );
+        h1_etaJetB2->Fill( jetB2.Eta(), eventWeight );
+        h1_etaJet3->Fill( jet3.Eta(), eventWeight );
+        if( jet4.Pt()>0. )
+          h1_etaJet4->Fill( jet4.Eta(), eventWeight );
+
+
+        h1_partFlavorJetB1->Fill( jetB1.pdgIdPart, eventWeight );
+        h1_partFlavorJetB2->Fill( jetB2.pdgIdPart, eventWeight );
+        h1_partFlavorJet3->Fill( jet3.pdgIdPart, eventWeight );
+        h1_partFlavorJet4->Fill( jet4.pdgIdPart, eventWeight );
+
+
+
+        h1_bTagJetB1->Fill( bTaggerJetB1, eventWeight );
+        h1_bTagJetB2->Fill( bTaggerJetB2, eventWeight );
+
+
+
+        h1_deltaRbb->Fill( jetB1.DeltaR(jetB2), eventWeight );
+
+        TLorentzVector b1jj = jetB1 + jet3 + jet4;
+        TLorentzVector b2jj = jetB2 + jet3 + jet4;
+
+        TLorentzVector b1jjZ = jetB1 + jet3 + jet4 + diLepton;
+        TLorentzVector b2jjZ = jetB2 + jet3 + jet4 + diLepton;
+
+        h1_mb1jj->Fill( b1jj.M(), eventWeight );
+        h1_mb2jj->Fill( b2jj.M(), eventWeight );
+
+        if( fabs(b1jj.M()-tmass) < fabs(b2jj.M()-tmass) )
+          h1_mbjj_best->Fill( b1jj.M(), eventWeight );
+        else
+          h1_mbjj_best->Fill( b2jj.M(), eventWeight );
+
+
+        h1_mb1jjZ->Fill( b1jjZ.M(), eventWeight );
+        h1_mb2jjZ->Fill( b2jjZ.M(), eventWeight );
+
+        if( fabs(b1jjZ.M()-tmass) < fabs(b2jjZ.M()-tmass) )
+          h1_mbjjZ_best->Fill( b1jjZ.M(), eventWeight );
+        else
+          h1_mbjjZ_best->Fill( b2jjZ.M(), eventWeight );
+
+
+
+        TLorentzVector b1W = jetB1 + lept3 + met;
+        TLorentzVector b2W = jetB2 + lept3 + met;
+
+        TLorentzVector b1WZ = jetB1 + diLepton + lept3 + met;
+        TLorentzVector b2WZ = jetB2 + diLepton + lept3 + met;
+
+        h1_mTb1W->Fill( b1W.Mt(), eventWeight );
+        h1_mTb2W->Fill( b2W.Mt(), eventWeight );
+
+        if( fabs(b1W.Mt()-tmass) < fabs(b2W.Mt()-tmass) )
+          h1_mTbW_best->Fill( b1W.Mt(), eventWeight );
+        else
+          h1_mTbW_best->Fill( b2W.Mt(), eventWeight );
+
+        
+        h1_mTb1WZ->Fill( b1WZ.Mt(), eventWeight );
+        h1_mTb2WZ->Fill( b2WZ.Mt(), eventWeight );
+
+        if( fabs(b1WZ.Mt()-tmass) < fabs(b2WZ.Mt()-tmass) )
+          h1_mTbWZ_best->Fill( b1WZ.Mt(), eventWeight );
+        else
+          h1_mTbWZ_best->Fill( b2WZ.Mt(), eventWeight );
+      
+      } // is mzll signal region
+
+    }
 
 
 //  // -------------------------
@@ -1168,6 +1176,7 @@ if( njets<3 ) continue;
   h1_metSignificance->Write();
 
 
+  h1_rhoPF_noPUW->Write();
   h1_rhoPF_prepresel->Write();
   h1_rhoPF_presel->Write();
   h1_rhoPF->Write();
@@ -1202,6 +1211,7 @@ if( njets<3 ) continue;
   h1_mT_lZmet->Write();
 
   h1_nJets_prepresel->Write();
+  h1_nJets_presel->Write();
   h1_nJets->Write();
 
 
