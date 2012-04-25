@@ -485,6 +485,7 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   int leptType3;
   bool isMZllSignalRegion;
   bool passed_btag;
+  int njets;
   int nBjets_loose;
   int nBjets_medium;
   float ht, mt;
@@ -520,6 +521,7 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   tree_passedEvents->Branch( "mt", &mt, "mt/F" );
   tree_passedEvents->Branch( "isMZllSignalRegion", &isMZllSignalRegion, "isMZllSignalRegion/O" );
   tree_passedEvents->Branch( "passed_btag", &passed_btag, "passed_btag/O" );
+  tree_passedEvents->Branch( "njets", &njets, "njets/I" );
   tree_passedEvents->Branch( "nBjets_loose", &nBjets_loose, "nBjets_loose/I" );
   tree_passedEvents->Branch( "nBjets_medium", &nBjets_medium, "nBjets_medium/I" );
 
@@ -673,7 +675,7 @@ ofstream ofs("run_event.txt");
 
     // first: count them
     ht = 0.;
-    int njets=0;
+    njets=0;
     for( unsigned iJet=0; iJet<nJets; ++iJet) {
 
       if( ptJet[iJet] < 20. ) continue;
