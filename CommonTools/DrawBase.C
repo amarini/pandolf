@@ -1077,7 +1077,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
 
 
   std::string histoName = name;
-  if( flags!="" ) histoName = histoName + "_" + flags;
+  //if( flags!="" ) histoName = histoName + "_" + flags;
 
   std::vector<TH1D*> dataHistos;
   for( unsigned int iData=0; iData<dataFiles_.size(); iData++ )
@@ -1228,6 +1228,11 @@ void DrawBase::drawHisto_fromTree( const std::string& treeName, const std::strin
 
 void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<TH1D*> mcHistos, std::vector<TH1D*> mcHistos_superimp, const std::string& name, const std::string& axisName, const std::string& units, const std::string& instanceName, bool log_aussi, int legendQuadrant, const std::string& flags, const std::string& labelText, bool add_jetAlgoText  ) {
 
+
+if( name=="mZll_OF_prepresel" ) {
+for(unsigned i=0; i<mcHistos.size(); ++i )
+std::cout << mcHistos[i]->GetEntries() << " " << mcHistos[i]->GetNbinsX() << " " << mcHistos[i]->Integral() << " " << std::endl;
+}
 
   // need this in order to avoid the same-histogram problem
   // (love ROOT)
@@ -1802,8 +1807,10 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
     if( mcHisto_sum!=0 ) delete mcHisto_sum;
 
 
-  // put it back as it was
-  TH1F::AddDirectory(kTRUE);
+  // FIX: NOT SURE IF IT'S OK TO KEEP IT LIKE THIS
+  // had to comment the following line in order to be able
+  // to draw the same histogram twice in the same program
+  //TH1F::AddDirectory(kTRUE);
 
 
 } //drawHisto
