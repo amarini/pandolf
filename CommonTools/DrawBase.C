@@ -1229,11 +1229,6 @@ void DrawBase::drawHisto_fromTree( const std::string& treeName, const std::strin
 void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<TH1D*> mcHistos, std::vector<TH1D*> mcHistos_superimp, const std::string& name, const std::string& axisName, const std::string& units, const std::string& instanceName, bool log_aussi, int legendQuadrant, const std::string& flags, const std::string& labelText, bool add_jetAlgoText  ) {
 
 
-if( name=="mZll_OF_prepresel" ) {
-for(unsigned i=0; i<mcHistos.size(); ++i )
-std::cout << mcHistos[i]->GetEntries() << " " << mcHistos[i]->GetNbinsX() << " " << mcHistos[i]->Integral() << " " << std::endl;
-}
-
   // need this in order to avoid the same-histogram problem
   // (love ROOT)
   TH1F::AddDirectory(kFALSE);
