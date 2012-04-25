@@ -140,14 +140,14 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   h1_etaZll->Sumw2();
   TH1D* h1_mZll_prepresel = new TH1D("mZll_prepresel", "", 220, 50., 160.);
   h1_mZll_prepresel->Sumw2();
-  TH1D* h1_mZll_prepresel_0btag = new TH1D("mZll_prepresel_0btag", "", 220, 50., 160.);
-  h1_mZll_prepresel_0btag->Sumw2();
+  TH1D* h1_mZll_prepresel_antibtag = new TH1D("mZll_prepresel_antibtag", "", 220, 50., 160.);
+  h1_mZll_prepresel_antibtag->Sumw2();
   TH1D* h1_mZll_OF_prepresel = new TH1D("mZll_OF_prepresel", "", 220, 50., 160.);
   h1_mZll_OF_prepresel->Sumw2();
   TH1D* h1_mZll_presel = new TH1D("mZll_presel", "", 220, 50., 160.);
   h1_mZll_presel->Sumw2();
-  TH1D* h1_mZll_presel_0btag = new TH1D("mZll_presel_0btag", "", 220, 50., 160.);
-  h1_mZll_presel_0btag->Sumw2();
+  TH1D* h1_mZll_presel_antibtag = new TH1D("mZll_presel_antibtag", "", 220, 50., 160.);
+  h1_mZll_presel_antibtag->Sumw2();
   TH1D* h1_mZll = new TH1D("mZll", "", 220, 50., 160.);
   h1_mZll->Sumw2();
 
@@ -875,9 +875,9 @@ if( njets<3 ) continue;
     // btag free region: Z+jets and WZ control region
     //if( nBjets_loose == 0 ) {
     if( !passed_btag ) {
-      h1_mZll_prepresel_0btag->Fill( diLepton.M(), eventWeight );
+      h1_mZll_prepresel_antibtag->Fill( diLepton.M(), eventWeight );
       if( nLept>0 )
-        h1_mZll_presel_0btag->Fill( diLepton.M(), eventWeight );
+        h1_mZll_presel_antibtag->Fill( diLepton.M(), eventWeight );
     }
 
     
@@ -1191,10 +1191,10 @@ if( njets<3 ) continue;
   h1_ptZll->Write();
   h1_etaZll->Write();
   h1_mZll_prepresel->Write();
-  h1_mZll_prepresel_0btag->Write();
+  h1_mZll_prepresel_antibtag->Write();
   h1_mZll_OF_prepresel->Write();
   h1_mZll_presel->Write();
-  h1_mZll_presel_0btag->Write();
+  h1_mZll_presel_antibtag->Write();
   h1_mZll->Write();
 
 
