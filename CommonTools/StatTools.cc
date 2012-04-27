@@ -43,6 +43,13 @@ float StatTools::computeZPL( TF2* f2_likelihood ) {
 
 
 
+float StatTools::computeZPL( const std::vector< StatChannel >& channels ) {
+
+
+}
+
+
+
 TF2* StatTools::getLikelihoodFunction( const std::string& name, int obs, float b, float b_err ) {
 
   TString name_tstr(name);
@@ -125,7 +132,7 @@ float StatTools::findMaximum2D( TF2* f2, int nsteps, bool fix_x ) {
     exit(11111);
   }
 
-  //std::cout << f2->GetName() << " max: " << Lmax_found << " found in (" << xmax_found << "," << ymax_found << ")" << std::endl;
+  std::cout << f2->GetName() << " max: " << Lmax_found << " found in (" << xmax_found << "," << ymax_found << ")" << std::endl;
 
   return Lmax_found;
 
