@@ -372,10 +372,10 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
   }
 
   // and now lepton channel definitions:
-  std::string sel_mmm = selection_str + " isMZllSignalRegion && leptType==0 && leptType3==0)";
-  std::string sel_mme = selection_str + " isMZllSignalRegion && leptType==0 && leptType3==1)";
-  std::string sel_eem = selection_str + " isMZllSignalRegion && leptType==1 && leptType3==0)";
-  std::string sel_eee = selection_str + " isMZllSignalRegion && leptType==1 && leptType3==1)";
+  std::string sel_mmm = selection_str + " isMZllSignalRegion && passed_btag && leptType==0 && leptType3==0)";
+  std::string sel_mme = selection_str + " isMZllSignalRegion && passed_btag && leptType==0 && leptType3==1)";
+  std::string sel_eem = selection_str + " isMZllSignalRegion && passed_btag && leptType==1 && leptType3==0)";
+  std::string sel_eee = selection_str + " isMZllSignalRegion && passed_btag && leptType==1 && leptType3==1)";
 
 
   TTree* tree_data = (TTree*)(db->get_dataFile(0).file->Get("tree_passedEvents"));
