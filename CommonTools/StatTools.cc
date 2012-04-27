@@ -21,11 +21,21 @@ float StatTools::computeZPL( float obs, float b_pred, float b_pred_err ) {
 
   TF2* f2_likelihood = getLikelihoodFunction( "likelihood", obs, b_pred, b_pred_err );
 
+  float ZPL = computeZPL(f2_likelihood);
+
+  delete f2_likelihood;
+
+  return ZPL;
+
+}
+
+
+
+float StatTools::computeZPL( TF2* f2_likelihood ) {
+
   float llr  = getLogLikelihoodRatio( "llr", f2_likelihood );
 
   float ZPL = sqrt( -2.*log(llr ) );
-
-  delete f2_likelihood;
 
   return ZPL;
 

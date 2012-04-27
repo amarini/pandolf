@@ -13,6 +13,7 @@ class StatTools {
 
   static float computeZBi( float obs, float b_pred, float b_pred_err );
   static float computeZPL( float obs, float b_pred, float b_pred_err );
+  static float computeZPL( TF2* f2_likelihood );
 
   static TF2* getLikelihoodFunction( const std::string& name, int obs, float b, float b_err );
   static float getLogLikelihoodRatio( const std::string& name, TF2* f2 );
