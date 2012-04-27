@@ -11,7 +11,7 @@ float get_ttbarSF( const DrawBase& db );
 float get_DYWZSF( const DrawBase& db );
 float computeChiSquare( TH1D* h1_DATA, TH1D* h1_MC );
 
-void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char selection[], float lumi_fb );
+void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char selection[], float lumi_fb, float ttbarSF, float DYWZSF );
 
 
 int main(int argc, char* argv[]) {
@@ -152,6 +152,7 @@ int main(int argc, char* argv[]) {
 
   // prepresel (basically only dilepton + 3 jets):
   db->drawHisto("nJets_prepresel", "Jet Multiplicity", "", "Events", true);
+  db->drawHisto("rhoPF_noPUW", "Particle Flow Energy Density", "GeV", "Events", true);
   db->drawHisto("rhoPF_prepresel", "Particle Flow Energy Density", "GeV", "Events", true);
   db->set_rebin(2);
   db->set_xAxisMax(130.);
@@ -162,20 +163,22 @@ int main(int argc, char* argv[]) {
   db->set_rebin(4);
   db->drawHisto("mZll_OF_prepresel", "Opposite Flavor Dilepton Mass", "GeV", "Events");
   // scale ttbar MC to match data:
-  float ttbar_SF = get_ttbarSF( *db );
-  db->set_mcWeight( "TTtW", ttbar_SF );
+  float ttbarSF = get_ttbarSF( *db );
+  db->set_mcWeight( "TTtW", ttbarSF );
   db->drawHisto("mZll_OF_prepresel", "Opposite Flavor Dilepton Mass", "GeV", "Events", false, 1, "scaled");
 
 
   // now add one lepton (prepresel -> presel)
   // anti-btag: control region for Z+Jets and WZ:
   db->drawHisto("mZll_presel_antibtag", "Dilepton Invariant Mass", "GeV", "Events", true, 2);
+  float DYWZSF = get_DYWZSF( *db );
+  db->set_mcWeight( "ZJets", DYWZSF );
+  db->set_mcWeight( "VV_Summer11", DYWZSF );
+
+  db->drawHisto("mZll_presel", "Dilepton Invariant Mass", "GeV", "Events", true, 2 );
   db->set_rebin();
   db->set_xAxisMax();
   db->drawHisto("nJets_presel", "Jet Multiplicity", "", "Events", true);
-  float DYWZ_SF = get_DYWZSF( *db );
-  db->set_mcWeight( "ZJets", DYWZ_SF );
-  db->set_mcWeight( "VV_Summer11", DYWZ_SF );
 
   db->set_rebin(4);
   db->set_xAxisMax(130.);
@@ -199,13 +202,17 @@ int main(int argc, char* argv[]) {
   db->drawHisto("combinedIsoRelLept3_presel", "Third Lepton Isolation", "", "Events");
 
   db->set_rebin(4);
-  db->drawHisto("mZll_presel", "Dilepton Invariant Mass", "GeV", "Events", true, 2);
+  db->set_xAxisMax(130);
+  db->drawHisto("mZll_presel", "Dilepton Invariant Mass", "GeV", "Events", true, 2, "scaled");
   db->drawHisto("mZll", "Dilepton Invariant Mass", "GeV", "Events", true, 2);
+  //db->drawHisto_fromTree("tree_passedEvents", "mZll", "eventWeight*(nBjets_medium==0 && isMZllSignalRegion)", 100, 50., 130., "mZll_antibtag", "Dilepton Invariant Mass", "GeV");
+  //float DYWZSF2 = get_DYWZSF( *db );
   db->set_xAxisMax();
 
 
-  drawChannelYieldPlot( db, "", "", lumi_fb );
-  drawChannelYieldPlot( db, "ptZll80", "eventWeight*(ptZll>80.)", lumi_fb );
+  drawChannelYieldPlot( db, "noScaling", "", lumi_fb, 1., 1. );
+  drawChannelYieldPlot( db, "", "", lumi_fb, ttbarSF, DYWZSF );
+  drawChannelYieldPlot( db, "ptZll80", "eventWeight*(ptZll>80.)", lumi_fb, ttbarSF, DYWZSF );
 
   std::vector<TH1D*> lastHistosMC;
   float signalYield;
@@ -235,7 +242,7 @@ int main(int argc, char* argv[]) {
   std::cout << "Signal yield: " << signalYield << " (" << 100.*signalYield/channelYieldGen << "%)" << std::endl;
   sprintf(selection, "eventWeight*(mZll>81. && mZll<101. && pfMet>30. && bTagJetB1>%f && ptJetB1>20. && ptJetB2>20. && ptJet3>20. && ptJet4>20.)", btag_thresh);
   db->drawHisto_fromTree("tree_passedEvents", "ptZll", selection, 30, 0., 300., "ptZll_jetpt20_btag_met", "p_{T} (Z)", "GeV", "Events");
-  drawChannelYieldPlot( db, "jetpt20_btag_met", selection, lumi_fb );
+  drawChannelYieldPlot( db, "jetpt20_btag_met", selection, lumi_fb, ttbarSF, DYWZSF );
   lastHistosMC = db->get_lastHistos_mc();
   for( unsigned int iHisto=0; iHisto<lastHistosMC.size(); ++iHisto ) {
     if( lastHistosMC[iHisto]->GetFillColor()==signalFillColor ) {
@@ -286,7 +293,7 @@ int main(int argc, char* argv[]) {
 
   sprintf( selection, "eventWeight*(ptZll>100. && mZll>81. && mZll<101. && pfMet>30. && bTagJetB1>%f && ptJetB1>20. && ptJetB2>20. && ptJet3>20. && ptJet4>20.)", btag_thresh);
   db->drawHisto_fromTree("tree_passedEvents", "ptZll", selection, 30, 0., 300., "ptZll_jetpt20_btag_met_ptZll", "p_{T} (Z)", "GeV", "Events");
-  drawChannelYieldPlot( db, "jetpt20_btag_met_ptZll", selection, lumi_fb );
+  drawChannelYieldPlot( db, "jetpt20_btag_met_ptZll", selection, lumi_fb, ttbarSF, DYWZSF );
   lastHistosMC = db->get_lastHistos_mc();
   for( unsigned int iHisto=0; iHisto<lastHistosMC.size(); ++iHisto ) {
     if( lastHistosMC[iHisto]->GetFillColor()==signalFillColor ) {
@@ -346,7 +353,9 @@ int main(int argc, char* argv[]) {
 
 
 
-void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char selection[], float lumi_fb ) {
+void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char selection[], float lumi_fb, float ttbarSF, float DYWZSF ) {
+
+  TH1F::AddDirectory(kTRUE);
 
   std::string selection_str(selection);
 
@@ -387,6 +396,7 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
   float eee_data = h1_data_eee->Integral();
   float tot_data = mmm_data + mme_data + eem_data + eee_data;
 
+
   TH1D* h1_yields_data = new TH1D("yields_data", "", 5, 0., 5.);
   h1_yields_data->SetBinContent( 1, eee_data );
   h1_yields_data->SetBinContent( 2, eem_data );
@@ -409,6 +419,7 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
 
   THStack* stackMC = new THStack();
   std::vector<TH1D*> vh1_yields_mc;
+  TH1D* h1_yields_mc_tot = new TH1D("yields_mc_tot", "", 5, 0., 5.);
 
 
   for( unsigned i=0; i<db->get_mcFiles().size(); ++i) {
@@ -434,15 +445,18 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
     float eee_mc = h1_mc_eee->Integral();
     float tot_mc = mmm_mc + mme_mc + eem_mc + eee_mc;
 
+    float scaling = lumi_fb*1000.;
+    if( db->get_mcFile(iMC).datasetName=="TTtW" ) scaling *= ttbarSF;
+    if( db->get_mcFile(iMC).datasetName=="ZJets" || db->get_mcFile(iMC).datasetName=="VV_Summer11" ) scaling *= DYWZSF;
 
     char hname[100];
     sprintf( hname, "yields_mc_%d", iMC);
     TH1D* h1_yields_mc = new TH1D(hname, "", 5, 0., 5.);
-    h1_yields_mc->SetBinContent( 1, lumi_fb*1000.*eee_mc );
-    h1_yields_mc->SetBinContent( 2, lumi_fb*1000.*eem_mc );
-    h1_yields_mc->SetBinContent( 3, lumi_fb*1000.*mme_mc );
-    h1_yields_mc->SetBinContent( 4, lumi_fb*1000.*mmm_mc );
-    h1_yields_mc->SetBinContent( 5, lumi_fb*1000.*tot_mc );
+    h1_yields_mc->SetBinContent( 1, scaling*eee_mc );
+    h1_yields_mc->SetBinContent( 2, scaling*eem_mc );
+    h1_yields_mc->SetBinContent( 3, scaling*mme_mc );
+    h1_yields_mc->SetBinContent( 4, scaling*mmm_mc );
+    h1_yields_mc->SetBinContent( 5, scaling*tot_mc );
   
 
     h1_yields_mc->SetFillColor( db->get_mcFile(iMC).fillColor );
@@ -450,6 +464,7 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
     vh1_yields_mc.push_back( (TH1D*)h1_yields_mc );
 
     stackMC->Add(h1_yields_mc, "HISTO");
+    h1_yields_mc_tot->Add(h1_yields_mc);
 
     delete h1_mc_mmm;
     delete h1_mc_mme;
@@ -503,10 +518,28 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
     sprintf( canvasName, "%s/channelYields.eps", db->get_outputdir().c_str() );
   c1->SaveAs(canvasName);
 
+  
+  std::string yieldfilename = db->get_outputdir() + "/yields";
+  if( selName!="" ) yieldfilename = yieldfilename + "_" + selName;
+  yieldfilename = yieldfilename + ".txt";
+
+  ofstream ofs(yieldfilename.c_str());
+
+  ofs << "channel\tobserved\tbackground" << std::endl;
+  ofs << "(ee)e  \t" << h1_yields_data->GetBinContent(1) << "\t\t" << h1_yields_mc_tot->GetBinContent(1) << std::endl;
+  ofs << "(ee)m  \t" << h1_yields_data->GetBinContent(2) << "\t\t" << h1_yields_mc_tot->GetBinContent(2) << std::endl;
+  ofs << "(mm)e  \t" << h1_yields_data->GetBinContent(3) << "\t\t" << h1_yields_mc_tot->GetBinContent(3) << std::endl;
+  ofs << "(mm)m  \t" << h1_yields_data->GetBinContent(4) << "\t\t" << h1_yields_mc_tot->GetBinContent(4) << std::endl;
+  ofs << "Total  \t" << h1_yields_data->GetBinContent(5) << "\t\t" << h1_yields_mc_tot->GetBinContent(5) << std::endl;
+
+  ofs.close();
+
+
   delete c1;
   delete h2_axes;
   delete gr_data;
   delete h1_yields_data;
+  delete h1_yields_mc_tot;
 
   delete h1_data_mmm;
   delete h1_data_mme;
