@@ -45,6 +45,32 @@ float StatTools::computeZPL( TF2* f2_likelihood ) {
 
 float StatTools::computeZPL( const std::vector< StatChannel >& channels ) {
 
+  std::vector<TF2*> functions;
+  std::string combined_name;
+
+  float xmax, ymax;
+
+  for( unsigned ichan=0; ichan<channels.size(); ++ichan ) {
+
+    std::string f_name = "likelihood_" + channels[ichan].name;
+    TF2* f2_likelihood = getLikelihoodFunction( f_name, channels[ichan].obs, channels[ichan].b, channels[ichan].b_err );
+
+    functions.push_back(f2_likelihood);
+
+    if( ichan==0 )
+      combined_name = f_name;
+    else
+      combined_name = combined_name + "*" + f_name;
+
+    xmax += fabs(channels[ichan].obs-channels[ichan].b);
+    ymax += 2.*channels[ichan].b;
+
+  }
+
+  
+  TF2* combined_likelihood = new TF2( "combined_likelihood", combined_name.c_str(), 0., xmax, 0., ymax );
+  
+  return computeZPL( combined_likelihood );
 
 }
 
@@ -71,10 +97,8 @@ TF2* StatTools::getLikelihoodFunction( const std::string& name, int obs, float b
 
 
 
-float StatTools::getLogLikelihoodRatio( const std::string& name, TF2* f2 ) {
+float StatTools::getLogLikelihoodRatio( const std::string& name, TF2* f2, int nsteps ) {
 
-
-  int nsteps = 1000;
   float L_max2d = findMaximum2D( f2, nsteps );
   float L_max1d_x0 = findMaximum2D( f2, nsteps, true );
 
