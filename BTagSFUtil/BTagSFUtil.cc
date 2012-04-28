@@ -1,9 +1,74 @@
 #include <iostream>
 #include <fstream>
-#include "BTagSFUtil.h"
+#include "HiggsAnalysis/Higgs2l2b/interface/BTagSFUtil.h"
 #include "TMath.h"
+//#include "HiggsAnalysis/Higgs2l2b/src/SFlightFuncs.C"
 
 
+/***********************************/
+/*           NEW FUNCTION          */
+/***********************************/
+
+void BTagSFUtil::SF(const std::string& btagAlgo, const std::string& wp, float pt, float eta){
+  int NL = 4; 
+  int NM = 3;
+
+  //binning in eta is the same for SFl and mistag, but it changes with the wp
+
+  float etamin_L[4] = {0.0, 0.5, 1.0, 1.5} ;
+  float etamax_L[4] = {0.5, 1.0, 1.5, 2.4} ;
+  float etamin_M[3] = {0.0, 0.8, 1.6} ;
+  float etamax_M[3] = {0.8, 1.6, 2.4} ;
+  float etamin(0), etamax(0);
+  // SF for b's
+  //  float b_SF_Medium = h2_Medium_BTAGBEFFCORR_->GetBinContent( iBin_pt, iBin_eta );
+  //  float b_SF_Loose = h2_Loose_BTAGBEFFCORR_->GetBinContent( iBin_pt, iBin_eta );
+  //  float SFb_;
+  //  float SFlight_, Mistag_;
+  SFlightFuncs sfl_func;
+  MistagFuncs mt_func;   
+  float pt_sfb;
+  pt_sfb = pt;
+
+  if(pt>670){ 
+    std::cout<<"WARNING: Mistagging rate for pt greater than 670 are not defined, we are going to treat this case as a pt=670 case"<<std::endl;
+    pt = 670;}
+  if(pt<30) {
+    pt_sfb = 30;
+  }
+
+  if(wp == "L"){ 
+    if(btagAlgo == "CSV")   SFb_ = 1.02658*((1.+(0.0195388*pt_sfb))/(1.+(0.0209145*pt_sfb)));
+    if(btagAlgo == "TCHE") SFb_ = 0.603913*((1.+(0.286361*pt_sfb))/(1.+(0.170474*pt_sfb)));
+    if(btagAlgo == "JP") SFb_ = 0.969851*((1.+(-6.06362e-05*pt_sfb))/(1.+(-0.000156638*pt_sfb)));
+    for(int i=0;i<NL;++i){
+      if ((TMath::Abs(eta) >etamin_L[i] || TMath::Abs(eta) == etamin_L[i]) && TMath::Abs(eta) <etamax_L[i]){
+	etamin = etamin_L[i];
+	etamax = etamax_L[i];
+      }
+    }
+  }// end L 
+
+ if(wp == "M"){ 
+   if(btagAlgo == "TCHE") SFb_ = 0.932251*((1.+(0.00335634*pt_sfb))/(1.+(0.00305994*pt_sfb)));
+   if(btagAlgo == "CSV")  SFb_ = 0.6981*((1.+(0.414063*pt_sfb))/(1.+(0.300155*pt_sfb)));
+   if(btagAlgo == "JP") SFb_ = 0.90806*((1.+(0.000236997*pt_sfb))/(1.+(5.49455e-05*pt_sfb)));
+    for(int i=0;i<NM;++i){
+      if (( TMath::Abs(eta) >etamin_M[i] || TMath::Abs(eta) == etamin_L[i]) && TMath::Abs(eta) <etamax_M[i]){
+	etamin = etamin_M[i];
+	etamax = etamax_M[i];
+      }
+    }
+  }// end M 
+
+ // uncomment for debugging
+ //  std::cout<<"ETA: "<<eta<<std::endl;
+ //  std::cout<<"ETAMIN AND ETAMAX ARE: "<<etamin<<" ,"<<etamax<<std::endl;
+  TF1* SFlight_func = sfl_func.GetSFlmean(TString(btagAlgo),TString(wp),etamin, etamax);
+  SFlight_ = SFlight_func->Eval(pt);
+  TF1* Mistag_func = mt_func.GetMistagmean(TString(btagAlgo),TString(wp),etamin, etamax);
+  Mistag_ =  Mistag_func->Eval(pt);
+}
 
 
 BTagSFUtil::BTagSFUtil( int seed ) {
@@ -13,7 +78,9 @@ BTagSFUtil::BTagSFUtil( int seed ) {
 
 }
 
-
+/***********************************/
+/* THIS FUNCTION IS NOT UP TO DATE */
+/***********************************/
 
 void BTagSFUtil::set_fileMedium( TFile* file ) {
 
@@ -41,7 +108,9 @@ void BTagSFUtil::set_fileMedium( TFile* file ) {
 }
 
 
-
+/***********************************/
+/* THIS FUNCTION IS NOT UP TO DATE */
+/***********************************/
 
 void BTagSFUtil::set_fileLoose( TFile* file ) {
 
@@ -68,7 +137,9 @@ void BTagSFUtil::set_fileLoose( TFile* file ) {
 
 }
 
-  
+/***********************************/
+/* THIS FUNCTION IS NOT UP TO DATE */
+/***********************************/
 
 void BTagSFUtil::modifyBTagsWithSF( bool& isBTagged_loose, bool& isBTagged_medium, int pdgIdPart, float Btageff_SF_l, float Btageff_SF_m, float Btagmistag_SF_l,float Btagmistag_SF_m, float Btagmistag_eff_l, float Btagmistag_eff_m) {
   
@@ -127,17 +198,19 @@ void BTagSFUtil::modifyBTagsWithSF( bool& isBTagged_loose, bool& isBTagged_mediu
 
 
 
-
-
-
-
-
-
-void BTagSFUtil::modifyBTagsWithSF( bool& isBTagged_loose, bool& isBTagged_medium, float jetpt, float jeteta, int pdgIdPart, float sysSF) {
+void BTagSFUtil::modifyBTagsWithSF( const std::string& btagAlgo, bool& isBTagged_loose, bool& isBTagged_medium, float jetpt, float jeteta, int pdgIdPart, float sysSF) {
   
 
 
-
+  SF(btagAlgo, "M", jetpt, jeteta);
+  float  b_SF_Medium = SFb_;
+  float light_SF_Medium = SFlight_;
+  float light_eff_Medium = Mistag_;
+  SF(btagAlgo, "L", jetpt, jeteta);
+  float  b_SF_Loose = SFb_;
+  float light_SF_Loose = SFlight_;
+  float light_eff_Loose = Mistag_;
+    
   // b quarks and c quarks:
   if( abs( pdgIdPart ) == 5 ||  abs( pdgIdPart ) == 4) { 
 
@@ -148,8 +221,12 @@ void BTagSFUtil::modifyBTagsWithSF( bool& isBTagged_loose, bool& isBTagged_mediu
     int iBin_eta = h2_Medium_BTAGBEFFCORR_->GetYaxis()->FindBin(jeteta);
 
     // SF for b's
-    float b_SF_Medium = h2_Medium_BTAGBEFFCORR_->GetBinContent( iBin_pt, iBin_eta );
-    float b_SF_Loose = h2_Loose_BTAGBEFFCORR_->GetBinContent( iBin_pt, iBin_eta );
+
+    /* old recipe */
+    // float b_SF_Medium = h2_Medium_BTAGBEFFCORR_->GetBinContent( iBin_pt, iBin_eta );
+    // float b_SF_Loose = h2_Loose_BTAGBEFFCORR_->GetBinContent( iBin_pt, iBin_eta );
+
+
 
     float coin = rand_->Uniform(1.);
     
@@ -171,11 +248,13 @@ void BTagSFUtil::modifyBTagsWithSF( bool& isBTagged_loose, bool& isBTagged_mediu
     int iBin_eta = h2_Medium_BTAGBEFFCORR_->GetYaxis()->FindBin(jeteta);
 
     // SF for light quarks
-    float light_SF_Medium = h2_Medium_BTAGLEFFCORR_->GetBinContent( iBin_pt, iBin_eta );
-    float light_SF_Loose = h2_Loose_BTAGLEFFCORR_->GetBinContent( iBin_pt, iBin_eta );
+    //    float light_SF_Medium = h2_Medium_BTAGLEFFCORR_->GetBinContent( iBin_pt, iBin_eta );
+    //    float light_SF_Loose = h2_Loose_BTAGLEFFCORR_->GetBinContent( iBin_pt, iBin_eta );
 
-    float light_eff_Medium = h2_Medium_BTAGLEFF_->GetBinContent( iBin_pt, iBin_eta );
-    float light_eff_Loose = h2_Loose_BTAGLEFF_->GetBinContent( iBin_pt, iBin_eta );
+
+
+    //float light_eff_Medium = h2_Medium_BTAGLEFF_->GetBinContent( iBin_pt, iBin_eta );
+    //float light_eff_Loose = h2_Loose_BTAGLEFF_->GetBinContent( iBin_pt, iBin_eta );
 
 
     float mistagPercent_Loose = ( light_SF_Loose*light_eff_Loose - light_eff_Loose ) / ( 1. - light_eff_Loose );
@@ -198,6 +277,9 @@ void BTagSFUtil::modifyBTagsWithSF( bool& isBTagged_loose, bool& isBTagged_mediu
 
 
 
+/***********************************/
+/* THIS FUNCTION IS NOT UP TO DATE */
+/***********************************/
 
 //This method of getSF uses the functional form of the mistag SF based on 2011 data. We do not need an eta information becasuse the dependence is flat in eta. 
 BTagScaleFactor BTagSFUtil::getSF( const std::string& type, float jetpt ) {
@@ -229,7 +311,9 @@ BTagScaleFactor BTagSFUtil::getSF( const std::string& type, float jetpt ) {
 }
 
 
-
+/***********************************/
+/* THIS FUNCTION IS NOT UP TO DATE */
+/***********************************/
 
 BTagScaleFactor BTagSFUtil::getSF( const std::string& fileName, float jetpt, float jeteta ) {
 
