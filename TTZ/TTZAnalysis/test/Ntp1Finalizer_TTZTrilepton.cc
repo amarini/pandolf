@@ -419,7 +419,7 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   std::map< int, std::map<int, std::vector<int> > > run_lumi_ev_map;
 
 
-//  BTagSFUtil* btsfutil = new BTagSFUtil(13);
+  BTagSFUtil* btsfutil = new BTagSFUtil(13);
   
   //QGLikelihoodCalculator *qglikeli = new QGLikelihoodCalculator("/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
  
@@ -791,7 +791,8 @@ if( njets<3 ) continue;
       bool isBtagged_medium = ( thisBtag > this->get_btagThresh("medium") );
 
       // take into account btag scale factors
-      //btsfutil->modifyBTagsWithSF(bTaggerType_, isBtagged_loose, isBtagged_medium, thisJet.Pt(), thisJet.Eta(), thisJet.pdgIdPart );
+      std::cout << bTaggerType_ << " " <<  isBtagged_loose << " " <<  isBtagged_medium << " " <<  thisJet.Pt() << " " <<  thisJet.Eta() << " " <<  thisJet.pdgIdPart  << std::endl;
+      btsfutil->modifyBTagsWithSF(bTaggerType_, isBtagged_loose, isBtagged_medium, thisJet.Pt(), thisJet.Eta(), thisJet.pdgIdPart );
 
       if( isBtagged_loose ) nBjets_loose += 1;
       if( isBtagged_medium ) nBjets_medium += 1;
