@@ -12,6 +12,7 @@
 #include "QGLikelihood/QGLikelihoodCalculator.h"
 #include "HelicityLikelihoodDiscriminant/HelicityLikelihoodDiscriminant.h"
 #include "KinematicFit/DiJetKinFitter.h"
+#include "BTagSFUtil/BTagSFUtil.h"
 
 #include "PUWeight.h"
 
@@ -25,6 +26,9 @@ int DEBUG_EVENTNUMBER = 98901397;
 
 
 
+float getMuonHLTSF_DoubleTrigger( float pt, float eta, const std::string& runPeriod );
+float getMuonHLTSF_SingleTrigger( float pt, float eta, const std::string& runPeriod );
+float getEventHLTSF( float effSingle1, float effSingle2, float effDouble1, float effDouble2 );
 
 
 // constructor:
@@ -415,7 +419,10 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   std::map< int, std::map<int, std::vector<int> > > run_lumi_ev_map;
 
 
+//  BTagSFUtil* btsfutil = new BTagSFUtil(13);
+  
   //QGLikelihoodCalculator *qglikeli = new QGLikelihoodCalculator("/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
+ 
   float Zmass = 91.1876;
   float tmass = 172.9;
 
@@ -646,51 +653,44 @@ ofstream ofs("run_event.txt");
 
     if( isMC ) {
 
-//    // scale factor for double mu triggers:
-//    if( leptType==0 ) {
+      // scale factor for double mu triggers:
+      if( leptType==0 ) {
 
-//      float effDouble1_Run2011A = getMuonHLTSF_DoubleTrigger( ptLept1, etaLept1, "Run2011A" );
-//      float effDouble2_Run2011A = getMuonHLTSF_DoubleTrigger( ptLept2, etaLept2, "Run2011A" );
+        float effDouble1_Run2011A = getMuonHLTSF_DoubleTrigger( ptLeptZ1, etaLeptZ1, "Run2011A" );
+        float effDouble2_Run2011A = getMuonHLTSF_DoubleTrigger( ptLeptZ2, etaLeptZ2, "Run2011A" );
 
-//      float effDouble1_Run2011B = getMuonHLTSF_DoubleTrigger( ptLept1, etaLept1, "Run2011B" );
-//      float effDouble2_Run2011B = getMuonHLTSF_DoubleTrigger( ptLept2, etaLept2, "Run2011B" );
+        float effDouble1_Run2011B = getMuonHLTSF_DoubleTrigger( ptLeptZ1, etaLeptZ1, "Run2011B" );
+        float effDouble2_Run2011B = getMuonHLTSF_DoubleTrigger( ptLeptZ2, etaLeptZ2, "Run2011B" );
 
-//      float effSingle1_Run2011A1 = getMuonHLTSF_SingleTrigger( ptLept1, etaLept1, "Run2011A1");
-//      float effSingle2_Run2011A1 = getMuonHLTSF_SingleTrigger( ptLept2, etaLept2, "Run2011A1");
+        float effSingle1_Run2011A1 = getMuonHLTSF_SingleTrigger( ptLeptZ1, etaLeptZ1, "Run2011A1");
+        float effSingle2_Run2011A1 = getMuonHLTSF_SingleTrigger( ptLeptZ2, etaLeptZ2, "Run2011A1");
 
-//      float effSingle1_Run2011A2 = getMuonHLTSF_SingleTrigger( ptLept1, etaLept1, "Run2011A2");
-//      float effSingle2_Run2011A2 = getMuonHLTSF_SingleTrigger( ptLept2, etaLept2, "Run2011A2");
+        float effSingle1_Run2011A2 = getMuonHLTSF_SingleTrigger( ptLeptZ1, etaLeptZ1, "Run2011A2");
+        float effSingle2_Run2011A2 = getMuonHLTSF_SingleTrigger( ptLeptZ2, etaLeptZ2, "Run2011A2");
 
-//      float effSingle1_Run2011A3 = getMuonHLTSF_SingleTrigger( ptLept1, etaLept1, "Run2011A3");
-//      float effSingle2_Run2011A3 = getMuonHLTSF_SingleTrigger( ptLept2, etaLept2, "Run2011A3");
+        float effSingle1_Run2011A3 = getMuonHLTSF_SingleTrigger( ptLeptZ1, etaLeptZ1, "Run2011A3");
+        float effSingle2_Run2011A3 = getMuonHLTSF_SingleTrigger( ptLeptZ2, etaLeptZ2, "Run2011A3");
 
-//      float effSingle1_Run2011B = getMuonHLTSF_SingleTrigger( ptLept1, etaLept1, "Run2011B");
-//      float effSingle2_Run2011B = getMuonHLTSF_SingleTrigger( ptLept2, etaLept2, "Run2011B");
-
-
-//      float HLTSF_Run2011A1 = getEventHLTSF( effSingle1_Run2011A1, effSingle2_Run2011A1, effDouble1_Run2011A, effDouble2_Run2011A );
-//      float HLTSF_Run2011A2 = getEventHLTSF( effSingle1_Run2011A2, effSingle2_Run2011A2, effDouble1_Run2011A, effDouble2_Run2011A );
-//      float HLTSF_Run2011A3 = getEventHLTSF( effSingle1_Run2011A3, effSingle2_Run2011A3, effDouble1_Run2011A, effDouble2_Run2011A );
-//      float HLTSF_Run2011B  = getEventHLTSF( effSingle1_Run2011B, effSingle2_Run2011B, effDouble1_Run2011B, effDouble2_Run2011B );
+        float effSingle1_Run2011B = getMuonHLTSF_SingleTrigger( ptLeptZ1, etaLeptZ1, "Run2011B");
+        float effSingle2_Run2011B = getMuonHLTSF_SingleTrigger( ptLeptZ2, etaLeptZ2, "Run2011B");
 
 
-//      // weighted average over full run (weighted with lumi):
-//      // LP11:
-//      //HLTSF = (217.*HLTSF_Run2011A1 + 920.*HLTSF_Run2011A2 + 478.*HLTSF_Run2011A3)/(217.+920.+478.);
-//      if( PUType_=="Run2011A" || PUType_=="Run2011A_73pb" )
-//        HLTSF = (217.*HLTSF_Run2011A1 + 920.*HLTSF_Run2011A2 + 1000.*HLTSF_Run2011A3)/(217.+920.+1000.);
-//      else if( PUType_=="HR11" ) 
-//        HLTSF = (217.*HLTSF_Run2011A1 + 920.*HLTSF_Run2011A2 + 1000.*HLTSF_Run2011A3 + 2100.*HLTSF_Run2011B)/(217.+920.+1000.+2100.);
-//      else if( PUType_=="HR11_v2" || PUType_=="HR11_73pb" )
-//        HLTSF = (217.*HLTSF_Run2011A1 + 920.*HLTSF_Run2011A2 + 1000.*HLTSF_Run2011A3 + 2500.*HLTSF_Run2011B)/(217.+920.+1000.+2500.);
+        float HLTSF_Run2011A1 = getEventHLTSF( effSingle1_Run2011A1, effSingle2_Run2011A1, effDouble1_Run2011A, effDouble2_Run2011A );
+        float HLTSF_Run2011A2 = getEventHLTSF( effSingle1_Run2011A2, effSingle2_Run2011A2, effDouble1_Run2011A, effDouble2_Run2011A );
+        float HLTSF_Run2011A3 = getEventHLTSF( effSingle1_Run2011A3, effSingle2_Run2011A3, effDouble1_Run2011A, effDouble2_Run2011A );
+        float HLTSF_Run2011B  = getEventHLTSF( effSingle1_Run2011B, effSingle2_Run2011B, effDouble1_Run2011B, effDouble2_Run2011B );
 
-//      eventWeight *= HLTSF;
 
-//    } else { //electrons
+        // weighted average over full run (weighted with lumi):
+        HLTSF = (217.*HLTSF_Run2011A1 + 920.*HLTSF_Run2011A2 + 1000.*HLTSF_Run2011A3 + 2100.*HLTSF_Run2011B)/(217.+920.+1000.+2100.);
 
-//      HLTSF = 1.;
+        eventWeight *= HLTSF;
 
-//    }
+      } else { //electrons
+
+        HLTSF = 1.;
+
+      }
 
       eventWeight *= fPUWeight->GetWeight(nPU);
 
@@ -789,6 +789,9 @@ if( njets<3 ) continue;
 
       bool isBtagged_loose = ( thisBtag > this->get_btagThresh("loose") );
       bool isBtagged_medium = ( thisBtag > this->get_btagThresh("medium") );
+
+      // take into account btag scale factors
+      //btsfutil->modifyBTagsWithSF(bTaggerType_, isBtagged_loose, isBtagged_medium, thisJet.Pt(), thisJet.Eta(), thisJet.pdgIdPart );
 
       if( isBtagged_loose ) nBjets_loose += 1;
       if( isBtagged_medium ) nBjets_medium += 1;
@@ -1494,4 +1497,116 @@ float Ntp1Finalizer_TTZTrilepton::get_btagThresh( const std::string& btag_OP_ ) 
   return -9999.;
 
 }
+
+
+
+
+float getMuonHLTSF_DoubleTrigger( float pt, float eta, const std::string& runPeriod ) {
+
+  float hltsf = 0.;
+
+  if( runPeriod=="Run2011A" ) {
+
+    if( fabs(eta)<0.8 ) 
+      hltsf = 0.975;
+    else if( fabs(eta)<2.1 )
+      hltsf = 0.955;
+    else 
+      hltsf = 0.910;
+
+  } else if( runPeriod=="Run2011B" ) {
+
+    if( fabs(eta)<0.8 ) 
+      hltsf = 0.972;
+    else if( fabs(eta)<2.1 )
+      hltsf = 0.945;
+    else { // eta 2.1 -> 2.4
+      if( pt<40. ) {
+        hltsf = 0.85;
+      } else {
+        hltsf = 0.87;
+      }
+    }
+
+  } else {
+
+    std::cout << "WARNING! Unknown run period: " << runPeriod << "! Returning HLTSF=0." << std::endl;
+
+  }
+
+  return hltsf;
+
+}
+
+
+
+
+float getMuonHLTSF_SingleTrigger( float pt, float eta, const std::string& runPeriod ) {
+
+  if( pt<25. ) return 0.;
+
+  float hltsf = 0.;
+
+  if( runPeriod=="Run2011A1" ) { //up to may10 technical stop
+
+    if( fabs(eta)<0.8 ) 
+      hltsf = 0.896;
+    else if( fabs(eta)<2.1 )
+      hltsf = 0.807;
+    else 
+      hltsf = 0.608;
+
+  } else if( runPeriod=="Run2011A2" ) { //from may10 to EPS
+
+    if( fabs(eta)<0.8 ) 
+      hltsf = 0.895;
+    else if( fabs(eta)<2.1 )
+      hltsf = 0.838;
+    else 
+      hltsf = 0.738;
+
+  } else if( runPeriod=="Run2011A3" ) { //from EPS to end of Run2011A
+
+    if( fabs(eta)<0.8 ) 
+      hltsf = 0.890;
+    else if( fabs(eta)<2.1 )
+      hltsf = 0.809;
+    else 
+      hltsf = 0.493;
+
+  } else if( runPeriod=="Run2011B" ) {
+
+    if( fabs(eta)<0.8 ) 
+      hltsf = 0.87;
+    else if( fabs(eta)<2.1 )
+      hltsf = 0.79;
+    else  //using HLT_IsoMu24_eta2p1
+      hltsf = 0.;
+
+  } else {
+
+    std::cout << "WARNING! Unknown run period: " << runPeriod << "! Returning HLTSF=0." << std::endl;
+
+  }
+
+  return hltsf;
+
+}
+
+
+float getEventHLTSF( float effSingle1, float effSingle2, float effDouble1, float effDouble2 ) {
+
+  float HLTSF = effDouble1 * effDouble2 +
+                effSingle2 * (1. - effDouble2 ) +
+                effSingle1 * (1. - effDouble1 );
+
+//float HLTSF = effDouble1 * effDouble2 +
+//                effSingle2 * (1. - effDouble1*effDouble2 ) +
+//                effSingle1 * (1. - effDouble1*effDouble2 ) * (1. - effSingle2);
+
+  return HLTSF;
+
+  }
+
+
 
