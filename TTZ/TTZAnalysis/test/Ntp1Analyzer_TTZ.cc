@@ -1078,7 +1078,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        int pdgIdPart=0;
        for( unsigned iPart=0; iPart<nMc; ++iPart ) {
          if( statusMc[iPart]!=3 ) continue; //partons
-         if( idMc[iPart]!=21 && abs(idMc[iPart])>6 ) continue; //quarks or gluons
+         if( idMc[iPart]!=21 && abs(idMc[iPart])>5 ) continue; //quarks or gluons
          if( pMc[iPart]*sin(thetaMc[iPart])<0.1 ) continue; 
          TLorentzVector thisPart;
          thisPart.SetPtEtaPhiE(pMc[iPart]*sin(thetaMc[iPart]), etaMc[iPart], phiMc[iPart], energyMc[iPart]);
