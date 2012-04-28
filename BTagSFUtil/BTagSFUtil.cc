@@ -1,8 +1,7 @@
 #include <iostream>
 #include <fstream>
-#include "HiggsAnalysis/Higgs2l2b/interface/BTagSFUtil.h"
+#include "BTagSFUtil.h"
 #include "TMath.h"
-//#include "HiggsAnalysis/Higgs2l2b/src/SFlightFuncs.C"
 
 
 /***********************************/

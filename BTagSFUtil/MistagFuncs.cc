@@ -1,5 +1,5 @@
 
-#include "HiggsAnalysis/Higgs2l2b/interface/MistagFuncs.h"
+#include "MistagFuncs.h"
 
 
 MistagFuncs::MistagFuncs(){}

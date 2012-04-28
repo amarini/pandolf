@@ -8,7 +8,6 @@
 <use name="rootcore"/>                                                         
 <use name="rootrflx"/>
 <use name="roofit"/>
-<use name="AnalysisDataFormats/HiggsAna"/>
 
 
 <export>
