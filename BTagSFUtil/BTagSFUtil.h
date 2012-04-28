@@ -6,8 +6,8 @@
 #include "TFile.h"
 #include "TH2D.h"
 #include <iostream>
-#include "HiggsAnalysis/Higgs2l2b/interface/SFlightFuncs.h"
-#include "HiggsAnalysis/Higgs2l2b/interface/MistagFuncs.h"
+#include "SFlightFuncs.h"
+#include "MistagFuncs.h"
 
 
 

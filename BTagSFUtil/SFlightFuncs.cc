@@ -1,5 +1,5 @@
 
-#include "HiggsAnalysis/Higgs2l2b/interface/SFlightFuncs.h"
+#include "SFlightFuncs.h"
 
 
 SFlightFuncs::SFlightFuncs(){}
