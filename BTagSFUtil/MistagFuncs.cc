@@ -308,8 +308,8 @@ TF1* MistagFuncs::GetMistag(TString meanminmax, TString tagger, TString TaggerSt
   TString Atagger = tagger+TaggerStrength;
   TString sEtamin = Form("%1.1f",Etamin);
   TString sEtamax = Form("%1.1f",Etamax);
-  std::cout << sEtamin << std::endl;
-  std::cout << sEtamax << std::endl;
+  //std::cout << sEtamin << std::endl;
+  //std::cout << sEtamax << std::endl;
 
 // Definition of functions from plot33New.C ----------------------
 
