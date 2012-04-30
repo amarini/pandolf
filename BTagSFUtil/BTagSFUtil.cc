@@ -30,7 +30,7 @@ void BTagSFUtil::SF(const std::string& btagAlgo, const std::string& wp, float pt
   pt_sfb = pt;
 
   if(pt>670){ 
-    std::cout<<"WARNING: Mistagging rate for pt greater than 670 are not defined, we are going to treat this case as a pt=670 case"<<std::endl;
+    //std::cout<<"WARNING: Mistagging rate for pt greater than 670 are not defined, we are going to treat this case as a pt=670 case"<<std::endl;
     pt = 670;}
   if(pt<30) {
     pt_sfb = 30;
@@ -67,6 +67,10 @@ void BTagSFUtil::SF(const std::string& btagAlgo, const std::string& wp, float pt
   SFlight_ = SFlight_func->Eval(pt);
   TF1* Mistag_func = mt_func.GetMistagmean(TString(btagAlgo),TString(wp),etamin, etamax);
   Mistag_ =  Mistag_func->Eval(pt);
+
+  delete SFlight_func;
+  delete Mistag_func;
+
 }
 
 
