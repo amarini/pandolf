@@ -4,6 +4,17 @@
 #include "TMath.h"
 
 
+
+
+BTagSFUtil::BTagSFUtil( int seed ) {
+
+  rand_ = new TRandom3(seed);
+  setSFFileName("");
+
+}
+
+
+
 /***********************************/
 /*           NEW FUNCTION          */
 /***********************************/
@@ -36,50 +47,46 @@ void BTagSFUtil::SF(const std::string& btagAlgo, const std::string& wp, float pt
     pt_sfb = 30;
   }
 
+  SFlight_ = sfl_func.GetSFLight_fast( TString(btagAlgo),TString(wp), pt, eta );
+  Mistag_ =  mt_func.GetMistag_fast( TString(btagAlgo),TString(wp), pt, eta );
+
   if(wp == "L"){ 
     if(btagAlgo == "CSV")   SFb_ = 1.02658*((1.+(0.0195388*pt_sfb))/(1.+(0.0209145*pt_sfb)));
     if(btagAlgo == "TCHE") SFb_ = 0.603913*((1.+(0.286361*pt_sfb))/(1.+(0.170474*pt_sfb)));
     if(btagAlgo == "JP") SFb_ = 0.969851*((1.+(-6.06362e-05*pt_sfb))/(1.+(-0.000156638*pt_sfb)));
-    for(int i=0;i<NL;++i){
-      if ((TMath::Abs(eta) >etamin_L[i] || TMath::Abs(eta) == etamin_L[i]) && TMath::Abs(eta) <etamax_L[i]){
-	etamin = etamin_L[i];
-	etamax = etamax_L[i];
-      }
-    }
+//    for(int i=0;i<NL;++i){
+//      if ((TMath::Abs(eta) >etamin_L[i] || TMath::Abs(eta) == etamin_L[i]) && TMath::Abs(eta) <etamax_L[i]){
+//	etamin = etamin_L[i];
+//	etamax = etamax_L[i];
+//      }
+//    }
   }// end L 
 
  if(wp == "M"){ 
    if(btagAlgo == "TCHE") SFb_ = 0.932251*((1.+(0.00335634*pt_sfb))/(1.+(0.00305994*pt_sfb)));
    if(btagAlgo == "CSV")  SFb_ = 0.6981*((1.+(0.414063*pt_sfb))/(1.+(0.300155*pt_sfb)));
    if(btagAlgo == "JP") SFb_ = 0.90806*((1.+(0.000236997*pt_sfb))/(1.+(5.49455e-05*pt_sfb)));
-    for(int i=0;i<NM;++i){
-      if (( TMath::Abs(eta) >etamin_M[i] || TMath::Abs(eta) == etamin_L[i]) && TMath::Abs(eta) <etamax_M[i]){
-	etamin = etamin_M[i];
-	etamax = etamax_M[i];
-      }
-    }
+//    for(int i=0;i<NM;++i){
+//      if (( TMath::Abs(eta) >etamin_M[i] || TMath::Abs(eta) == etamin_L[i]) && TMath::Abs(eta) <etamax_M[i]){
+//	etamin = etamin_M[i];
+//	etamax = etamax_M[i];
+//      }
+//    }
   }// end M 
 
  // uncomment for debugging
  //  std::cout<<"ETA: "<<eta<<std::endl;
  //  std::cout<<"ETAMIN AND ETAMAX ARE: "<<etamin<<" ,"<<etamax<<std::endl;
-  TF1* SFlight_func = sfl_func.GetSFlmean(TString(btagAlgo),TString(wp),etamin, etamax);
-  SFlight_ = SFlight_func->Eval(pt);
-  TF1* Mistag_func = mt_func.GetMistagmean(TString(btagAlgo),TString(wp),etamin, etamax);
-  Mistag_ =  Mistag_func->Eval(pt);
-
-  delete SFlight_func;
-  delete Mistag_func;
-
-}
-
-
-BTagSFUtil::BTagSFUtil( int seed ) {
-
-  rand_ = new TRandom3(seed);
-  setSFFileName("");
+//  TF1* SFlight_func = sfl_func.GetSFlmean(TString(btagAlgo),TString(wp),etamin, etamax);
+//  SFlight_ = SFlight_func->Eval(pt);
+//  TF1* Mistag_func = mt_func.GetMistagmean(TString(btagAlgo),TString(wp),etamin, etamax);
+//  Mistag_ =  Mistag_func->Eval(pt);
+//
+//  delete SFlight_func;
+//  delete Mistag_func;
 
 }
+
 
 /***********************************/
 /* THIS FUNCTION IS NOT UP TO DATE */

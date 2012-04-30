@@ -14,6 +14,8 @@ public:
 
   TF1* GetMistag(TString meanminmax, TString tagger, TString TaggerStrength, Float_t Etamin, Float_t Etamax);
   
+  float GetMistag_fast(const TString& tagger, const TString& TaggerStrength, float pt, float eta );
+  
   TF1* GetMistagmean(TString tagger, TString TaggerStrength, float Etamin, float Etamax);
   
   TF1* GetMistagmin(TString tagger, TString TaggerStrength, float Etamin, float Etamax);

@@ -36,6 +36,8 @@ class SFlightFuncs{
   
   
   TF1* GetSFLight(TString meanminmax, TString tagger, TString TaggerStrength, Float_t Etamin, Float_t Etamax);
+  float GetSFLight_fast(const TString& tagger, const TString& TaggerStrength, float pt, float eta, const TString& meanminmax="mean" );
+
   
   
 };

@@ -1,5 +1,6 @@
 
 #include "MistagFuncs.h"
+#include <cmath>
 
 
 MistagFuncs::MistagFuncs(){}
@@ -512,6 +513,231 @@ if( meanminmax == "mean" ) tmpMistag = new TF1("Mistag","(-0.00101+(4.70405e-05*
 
 // End of definition of functions from plot33New.C ---------------
   if( tmpMistag == NULL ) std::cout << "NULL pointer returned... Function seems not to exist" << std::endl;
+
+  return tmpMistag;
+}
+
+
+
+
+
+float MistagFuncs::GetMistag_fast(const TString& tagger, const TString& TaggerStrength, Float_t pt, Float_t eta ) {
+
+  float x = pt;
+  if( x < 20. ) x = 20.;
+  if( x > 670. ) x = 670.;
+
+  float tmpMistag = 0.;
+
+  TString Atagger = tagger+TaggerStrength;
+
+// Definition of functions from plot33New.C ----------------------
+
+if( Atagger == "CVSL" ) {
+  if( fabs(eta) >= 0.0 && fabs(eta) < 0.5)
+  {
+   tmpMistag = 242534*(((1+(0.0182863*x))+(4.50105e-05*(x*x)))/(1+(108569*x)));
+  }
+  else if( fabs(eta) >= 0.5 && fabs(eta) < 1.0)
+  {
+   tmpMistag = 129.938*(((1+(0.0197657*x))+(4.73472e-05*(x*x)))/(1+(55.2415*x)));
+  }
+  else if( fabs(eta) >= 1.0 && fabs(eta) < 1.5)
+  {
+   tmpMistag = 592.214*(((1+(0.00671207*x))+(6.46109e-05*(x*x)))/(1+(134.318*x)));
+  }
+  else if( fabs(eta) >= 1.5 && fabs(eta) < 2.4)
+  {
+   tmpMistag = 93329*(((1+(0.0219705*x))+(3.76566e-05*(x*x)))/(1+(18245.1*x)));
+  }
+} 
+
+
+else if( Atagger == "CSVM" ) {
+  if( fabs(eta) >= 0.0 && fabs(eta) < 0.8)
+  {
+   tmpMistag = (0.00967751+(2.54564e-05*x))+(-6.92256e-10*(x*x));
+  }
+  else if( fabs(eta) >= 0.8 && fabs(eta) < 1.6)
+  {
+   tmpMistag = (0.00974141+(5.09503e-05*x))+(2.0641e-08*(x*x));
+  }
+  else if( fabs(eta) >= 1.6 && fabs(eta) < 2.4)
+  {
+   tmpMistag = (0.013595+(0.000104538*x))+(-1.36087e-08*(x*x));
+  }
+}
+
+
+else if( Atagger == "CSVT" ) {
+ tmpMistag = 0.00315116*(((1+(-0.00769281*x))+(2.58066e-05*(x*x)))+(-2.02149e-08*(x*(x*x))));
+}
+
+
+else if( Atagger == "TCHEL" ) {
+  if( fabs(eta) >= 0.0 && fabs(eta) < 0.5)
+  {
+   tmpMistag = (((-0.0235318+(0.00268868*x))+(-6.47688e-06*(x*x)))+(7.92087e-09*(x*(x*x))))+(-4.06519e-12*(x*(x*(x*x))));
+  }
+  else if( fabs(eta) >= 0.5 && fabs(eta) < 1.0)
+  {
+   tmpMistag = (((-0.0257274+(0.00289337*x))+(-7.48879e-06*(x*x)))+(9.84928e-09*(x*(x*x))))+(-5.40844e-12*(x*(x*(x*x))));
+  }
+  else if( fabs(eta) >= 1.0 && fabs(eta) < 1.5)
+  {
+   tmpMistag = (((-0.0310046+(0.00307803*x))+(-7.94145e-06*(x*x)))+(1.06889e-08*(x*(x*x))))+(-6.08971e-12*(x*(x*(x*x))));
+  }
+  else if( fabs(eta) >= 1.5 && fabs(eta) < 2.4)
+  {
+   tmpMistag = (((-0.0274561+(0.00301096*x))+(-8.89588e-06*(x*x)))+(1.40142e-08*(x*(x*x))))+(-8.95723e-12*(x*(x*(x*x))));
+  }
+}
+
+
+else if( Atagger == "TCHEM" ) {
+  if( fabs(eta) >= 0.0 && fabs(eta) < 0.8)
+  {
+   tmpMistag = (0.000919586+(0.00026266*x))+(-1.75723e-07*(x*x));
+  }
+  else if( fabs(eta) >= 0.8 && fabs(eta) < 1.6)
+  {
+   tmpMistag = (-0.00364137+(0.000350371*x))+(-1.89967e-07*(x*x));
+  }
+  else if( fabs(eta) >= 1.6 && fabs(eta) < 2.4)
+  {
+   tmpMistag = (-0.00483904+(0.000367751*x))+(-1.36152e-07*(x*x));
+  }
+}
+
+
+else if( Atagger == "JBPL" ) {
+  if( fabs(eta) >= 0.0 && fabs(eta) < 0.5 ) 
+  {
+   tmpMistag = (0.0277261+(0.000808207*x))+(-6.44146e-07*(x*x));
+  }
+  else if( fabs(eta) >= 0.5 && fabs(eta) < 1.0)
+  {
+   tmpMistag = (0.0278926+(0.000827697*x))+(-7.01497e-07*(x*x));
+  }
+  else if( fabs(eta) >= 1.0 && fabs(eta) < 1.5)
+  {
+   tmpMistag = (0.0221411+(0.000900444*x))+(-6.52873e-07*(x*x));
+  }
+  else if( fabs(eta) >= 1.5 && fabs(eta) < 2.4)
+  {
+   tmpMistag = (0.0227045+(0.000808122*x))+(-5.67134e-07*(x*x));
+  }
+
+}
+
+
+else if( Atagger == "JBPM" )
+{
+  if( fabs(eta) >= 0.0 && fabs(eta) < 0.8)
+  {
+   tmpMistag = (((0.00206106+(0.000105851*x))+(2.691e-08*(x*x)))+(-4.34651e-11*(x*(x*x))))+(-6.73107e-14*(x*(x*(x*x))));
+  }
+  else if( fabs(eta) >= 0.8 && fabs(eta) < 1.6)
+  {
+   tmpMistag = (((0.00318438+(4.40327e-05*x))+(3.46922e-07*(x*x)))+(-3.93396e-10*(x*(x*x))))+(3.94283e-14*(x*(x*(x*x))));
+  }
+  else if( fabs(eta) >= 1.6 && fabs(eta) < 2.4)
+  {
+   tmpMistag = (((0.00209833+(4.27753e-05*x))+(1.96076e-07*(x*x)))+(6.19275e-11*(x*(x*x))))+(-2.63318e-13*(x*(x*(x*x))));
+  }
+}
+
+
+else if( Atagger == "JBPT" ) {
+ tmpMistag = (-3.36681e-05+(1.37292e-05*x))+(1.78479e-08*(x*x));
+}
+
+
+else if( Atagger == "JPL" ) {
+  if( fabs(eta) >= 0.0 && fabs(eta) < 0.5)
+  {
+   tmpMistag = (0.060001+(0.000332202*x))+(-2.36709e-07*(x*x));
+  }
+  else if( fabs(eta) >= 0.5 && fabs(eta) < 1.0)
+  {
+   tmpMistag = (0.0597675+(0.000370979*x))+(-2.94673e-07*(x*x));
+  }
+  else if( fabs(eta) >= 1.0 && fabs(eta) < 1.5)
+  {
+   tmpMistag = (0.0483728+(0.000528418*x))+(-3.17825e-07*(x*x));
+  }
+  else if( fabs(eta) >= 1.5 && fabs(eta) < 2.4)
+  {
+   tmpMistag = (0.0463159+(0.000546644*x))+(-3.40486e-07*(x*x));
+  }
+}
+
+
+else if( Atagger == "JPM" ) {
+  if( fabs(eta) >= 0.0 && fabs(eta) < 0.8)
+  {
+   tmpMistag = (0.00727084+(4.48901e-05*x))+(-4.42894e-09*(x*x));
+  }
+  else if( fabs(eta) >= 0.8 && fabs(eta) < 1.6)
+  {
+   tmpMistag = (0.00389156+(6.35508e-05*x))+(1.54183e-08*(x*x));
+  }
+  else if( fabs(eta) >= 1.6 && fabs(eta) < 2.4)
+  {
+   tmpMistag = (0.0032816+(4.18867e-05*x))+(7.44912e-08*(x*x));
+  }
+}
+
+
+else if( Atagger == "JPT" ) {
+ tmpMistag = (0.000379966+(8.30969e-06*x))+(1.10364e-08*(x*x));
+}
+
+
+else if( Atagger == "SSVHEM" ) {
+  if( fabs(eta) >= 0.0 && fabs(eta) < 0.8)
+  {
+   tmpMistag = (((0.000547883+(0.00023023*x))+(-7.31792e-07*(x*x)))+(1.15659e-09*(x*(x*x))))+(-7.00641e-13*(x*(x*(x*x))));
+  }
+  else if( fabs(eta) >= 0.8 && fabs(eta) < 1.6)
+  {
+   tmpMistag = (((0.000615562+(0.000240254*x))+(-7.00237e-07*(x*x)))+(1.2566e-09*(x*(x*x))))+(-8.59011e-13*(x*(x*(x*x))));
+  }
+  else if( fabs(eta) >= 1.6 && fabs(eta) < 2.4)
+  {
+   tmpMistag = (((0.000372388+(0.000309735*x))+(-4.35952e-07*(x*x)))+(3.63763e-10*(x*(x*x))))+(-2.11993e-13*(x*(x*(x*x))));
+  }
+}
+
+
+else if( Atagger == "SSVHPT" ) {
+ tmpMistag = (-2.9605e-05+(2.35624e-05*x))+(-1.77552e-08*(x*x));
+}
+
+
+
+else if( Atagger == "TCHPM" ) {
+  if( fabs(eta) >= 0.0 && fabs(eta) < 0.8)
+  {
+   tmpMistag = (((-0.00464673+(0.000247485*x))+(9.13236e-07*(x*x)))+(-2.49994e-09*(x*(x*x))))+(1.65678e-12*(x*(x*(x*x))));
+  }
+  else if( fabs(eta) >= 0.8 && fabs(eta) < 1.6)
+  {
+   tmpMistag = (((-0.0060878+(0.000297422*x))+(1.13369e-06*(x*x)))+(-2.84945e-09*(x*(x*x))))+(1.64721e-12*(x*(x*(x*x))));
+  }
+  else if( fabs(eta) >= 1.6 && fabs(eta) < 2.4)
+  {
+   tmpMistag = (((-0.00836219+(0.000391889*x))+(2.78156e-07*(x*x)))+(-6.14017e-10*(x*(x*x))))+(-1.30592e-13*(x*(x*(x*x))));
+  }
+}
+
+
+else if( Atagger == "TCHPT" ) {
+ tmpMistag = (-0.00101+(4.70405e-05*x))+(8.3338e-09*(x*x));
+}
+
+
+// End of definition of functions from plot33New.C ---------------
 
   return tmpMistag;
 }

@@ -45,6 +45,7 @@ class BTagSFUtil {
  public:
 
   BTagSFUtil( int seed=0 );
+  //BTagSFUtil( const std::string& btagAlgo, const std::string& wp, int seed=0 );
 
 /***********************************/
 /* FUNCTIONS NOT UP TO DATE */
