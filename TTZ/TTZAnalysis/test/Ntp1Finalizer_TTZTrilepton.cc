@@ -146,6 +146,10 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   h1_etaZll->Sumw2();
   TH1D* h1_mZll_prepresel = new TH1D("mZll_prepresel", "", 220, 50., 160.);
   h1_mZll_prepresel->Sumw2();
+  TH1D* h1_mZll_prepresel_ELE = new TH1D("mZll_prepresel_ELE", "", 220, 50., 160.);
+  h1_mZll_prepresel_ELE->Sumw2();
+  TH1D* h1_mZll_prepresel_MU = new TH1D("mZll_prepresel_MU", "", 220, 50., 160.);
+  h1_mZll_prepresel_MU->Sumw2();
   TH1D* h1_mZll_prepresel_antibtag = new TH1D("mZll_prepresel_antibtag", "", 220, 50., 160.);
   h1_mZll_prepresel_antibtag->Sumw2();
   TH1D* h1_mZll_OF_prepresel = new TH1D("mZll_OF_prepresel", "", 220, 50., 160.);
@@ -791,8 +795,8 @@ if( njets<3 ) continue;
       bool isBtagged_medium = ( thisBtag > this->get_btagThresh("medium") );
 
       // take into account btag scale factors
-      std::cout << bTaggerType_ << " " <<  isBtagged_loose << " " <<  isBtagged_medium << " " <<  thisJet.Pt() << " " <<  thisJet.Eta() << " " <<  thisJet.pdgIdPart  << std::endl;
-      btsfutil->modifyBTagsWithSF(bTaggerType_, isBtagged_loose, isBtagged_medium, thisJet.Pt(), thisJet.Eta(), thisJet.pdgIdPart );
+      //std::cout << bTaggerType_ << " " <<  isBtagged_loose << " " <<  isBtagged_medium << " " <<  thisJet.Pt() << " " <<  thisJet.Eta() << " " <<  thisJet.pdgIdPart  << std::endl;
+      //btsfutil->modifyBTagsWithSF(bTaggerType_, isBtagged_loose, isBtagged_medium, thisJet.Pt(), thisJet.Eta(), thisJet.pdgIdPart );
 
       if( isBtagged_loose ) nBjets_loose += 1;
       if( isBtagged_medium ) nBjets_medium += 1;
@@ -905,6 +909,10 @@ if( njets<3 ) continue;
 
     if( leptType<=1 ) {
       h1_mZll_prepresel->Fill( diLepton.M(), eventWeight );
+      if( leptType==0 )
+        h1_mZll_prepresel_MU->Fill( diLepton.M(), eventWeight );
+      else
+        h1_mZll_prepresel_ELE->Fill( diLepton.M(), eventWeight );
     } else {  //opposite flavour leptons: ttbar control region
       h1_mZll_OF_prepresel->Fill( diLepton.M(), eventWeight );
       continue;
@@ -1256,6 +1264,8 @@ if( njets<3 ) continue;
   h1_ptZll->Write();
   h1_etaZll->Write();
   h1_mZll_prepresel->Write();
+  h1_mZll_prepresel_MU->Write();
+  h1_mZll_prepresel_ELE->Write();
   h1_mZll_prepresel_antibtag->Write();
   h1_mZll_OF_prepresel->Write();
   h1_mZll_presel->Write();
