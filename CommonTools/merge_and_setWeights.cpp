@@ -19,6 +19,7 @@ struct EventStruct {
   float totalEvents;
   float totalEventsPU;
   float totalEventsPU_ave;
+  TH1F* h1_nPU_gen;
 
 };
 
@@ -56,6 +57,7 @@ int main( int argc, char* argv[] ) {
   float nTotalEvents = totalEvents.totalEvents;
   float nTotalEventsPU = totalEvents.totalEventsPU;
   float nTotalEventsPU_ave = totalEvents.totalEventsPU_ave;
+  TH1F* h1_nPU_gen = totalEvents.h1_nPU_gen;
 
   std::cout << std::endl << "-> Finished adding. Total entries: " << tree->GetEntries() << std::endl;
 
@@ -72,11 +74,14 @@ int main( int argc, char* argv[] ) {
   Bool_t passed_HLT_IsoMu24;
   tree->SetBranchAddress("passed_HLT_IsoMu24", &passed_HLT_IsoMu24);
   Bool_t passed_HLT_Mu17_Ele8_CaloIdL;
-  tree->SetBranchAddress("passed_HLT_Mu17_Ele8_CaloIdL", &passed_HLT_Mu17_Ele8_CaloIdL);
+  if( analysisType_=="TTW" )
+    tree->SetBranchAddress("passed_HLT_Mu17_Ele8_CaloIdL", &passed_HLT_Mu17_Ele8_CaloIdL);
   Bool_t passed_HLT_Mu8_Ele17_CaloIdL;
-  tree->SetBranchAddress("passed_HLT_Mu8_Ele17_CaloIdL", &passed_HLT_Mu8_Ele17_CaloIdL);
+  if( analysisType_=="TTW" )
+    tree->SetBranchAddress("passed_HLT_Mu8_Ele17_CaloIdL", &passed_HLT_Mu8_Ele17_CaloIdL);
   Bool_t passed_HLT_Mu8_Ele17_CaloIdT_CaloIsoVL;
-  tree->SetBranchAddress("passed_HLT_Mu8_Ele17_CaloIdT_CaloIsoVL", &passed_HLT_Mu8_Ele17_CaloIdT_CaloIsoVL);
+  if( analysisType_=="TTW" )
+    tree->SetBranchAddress("passed_HLT_Mu8_Ele17_CaloIdT_CaloIsoVL", &passed_HLT_Mu8_Ele17_CaloIdT_CaloIsoVL);
   Bool_t passed_HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL;
   tree->SetBranchAddress("passed_HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL", &passed_HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL);
   Bool_t passed_HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL;
@@ -118,6 +123,9 @@ int main( int argc, char* argv[] ) {
                     && !passed_HLT_DoubleMu7 && !passed_HLT_Mu13_Mu8
                     && !passed_HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL && !passed_HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL;
 
+      if( analysisType_ == "TTZ" )
+        passedHLT = passedHLT && !passed_HLT_Mu17_Ele8_CaloIdL && !passed_HLT_Mu8_Ele17_CaloIdL && !passed_HLT_Mu8_Ele17_CaloIdT_CaloIsoVL;
+
       if( !passedHLT ) continue;
 
     } else if( dataset_tstr.BeginsWith("DoubleMu") ) {
@@ -131,7 +139,7 @@ int main( int argc, char* argv[] ) {
       bool passedHLT = (passed_HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL || passed_HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL)
                        && !passed_HLT_DoubleMu7 && !passed_HLT_Mu13_Mu8;
 
-      if( analysisType_ == "TTW" )
+      if( analysisType_ == "TTW" || analysisType_ == "TTZ" )
         passedHLT = passedHLT && !passed_HLT_Mu17_Ele8_CaloIdL && !passed_HLT_Mu8_Ele17_CaloIdL && !passed_HLT_Mu8_Ele17_CaloIdT_CaloIsoVL;
 
       if( !passedHLT ) continue;
@@ -152,6 +160,7 @@ int main( int argc, char* argv[] ) {
   h1_nCounterW->Write();
   h1_nCounterPU->Write();
   h1_nCounterPU_ave->Write();
+  h1_nPU_gen->Write();
   newTree->Write();
   outfile->Write();
   outfile->Close();
@@ -171,6 +180,7 @@ EventStruct addInput( const std::string& dataset ) {
   TH1F* h1_nCounterPU_ave;
   TH1F* h1_nCounter_Zee;
   TH1F* h1_nCounter_Zmumu;
+  TH1F* h1_nPU_gen = new TH1F("nPU_gen", "", 55, -0.5, 54.5);
 
   float totalEvents = 0;
   float totalEventsPU = 0;
@@ -226,6 +236,13 @@ EventStruct addInput( const std::string& dataset ) {
     if( h1_nCounter_Zmumu!=0 ) {
       totalEvents_Zmumu += h1_nCounter_Zmumu->GetBinContent(1);
     }
+
+    // nPU_gen:
+    TH1F* h1_nPU_gen_tmp = (TH1F*)infile->Get("nPU_gen");
+    if( h1_nPU_gen_tmp!=0 ) {
+      h1_nPU_gen->Add(h1_nPU_gen_tmp);
+    }
+
     std::cout << std::endl;
     infile->Close();
 
@@ -278,6 +295,13 @@ EventStruct addInput( const std::string& dataset ) {
         totalEvents_Zmumu += h1_nCounter_Zmumu->GetBinContent(1);
       }
       std::cout << std::endl;
+
+      // nPU_gen:
+      TH1F* h1_nPU_gen_tmp = (TH1F*)infile->Get("nPU_gen");
+      if( h1_nPU_gen_tmp!=0 ) {
+        h1_nPU_gen->Add(h1_nPU_gen_tmp);
+      }
+
       infile->Close();
 
     }
@@ -305,6 +329,7 @@ EventStruct addInput( const std::string& dataset ) {
   events.totalEvents = totalEvents;
   events.totalEventsPU = totalEventsPU;
   events.totalEventsPU_ave = totalEventsPU_ave;
+  events.h1_nPU_gen = h1_nPU_gen;
 
   return events;
 
@@ -573,6 +598,8 @@ float getWeight( const std::string& dataset, int nEvents ) {
     xSection = 0.139; //taken from https://twiki.cern.ch/twiki/bin/viewauth/CMS/SameSignDilepton2011#MC_samples_for_the_2011_paper
   } else if( dataset_tstr.BeginsWith("TTW") ) {
     xSection = 0.1633; //taken from https://twiki.cern.ch/twiki/bin/viewauth/CMS/SameSignDilepton2011#MC_samples_for_the_2011_paper
+  } else if( dataset_tstr.BeginsWith("TTPhoton") ) {
+    xSection = 0.6545; //taken from https://twiki.cern.ch/twiki/bin/viewauth/CMS/SameSignDilepton2011#MC_samples_for_the_2011_paper
   } else if( dataset=="Zmumu_Pythia" ) {
     xSection = 3048./3.; //NNLO see https://twiki.cern.ch/twiki/pub/CMS/GeneratorMain/ShortXsec.pdf
   } else if( dataset=="PhotonJet_Summer1036X_Pt5to15_pfakt5" ) {
