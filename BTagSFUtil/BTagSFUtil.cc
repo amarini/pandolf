@@ -200,7 +200,6 @@ void BTagSFUtil::modifyBTagsWithSF( bool& isBTagged_loose, bool& isBTagged_mediu
 void BTagSFUtil::modifyBTagsWithSF( const std::string& btagAlgo, bool& isBTagged_loose, bool& isBTagged_medium, float jetpt, float jeteta, int pdgIdPart, float sysSF) {
   
 
-
   SF(btagAlgo, "M", jetpt, jeteta);
   float  b_SF_Medium = SFb_;
   float light_SF_Medium = SFlight_;
@@ -216,8 +215,8 @@ void BTagSFUtil::modifyBTagsWithSF( const std::string& btagAlgo, bool& isBTagged
     // no need to downgrade if is a b and not tagged
     if( !isBTagged_loose ) return;
 
-    int iBin_pt = (jetpt<240.) ? h2_Medium_BTAGBEFFCORR_->GetXaxis()->FindBin(jetpt) : h2_Medium_BTAGBEFFCORR_->GetXaxis()->FindBin(239.);
-    int iBin_eta = h2_Medium_BTAGBEFFCORR_->GetYaxis()->FindBin(jeteta);
+    //int iBin_pt = (jetpt<240.) ? h2_Medium_BTAGBEFFCORR_->GetXaxis()->FindBin(jetpt) : h2_Medium_BTAGBEFFCORR_->GetXaxis()->FindBin(239.);
+    //int iBin_eta = h2_Medium_BTAGBEFFCORR_->GetYaxis()->FindBin(jeteta);
 
     // SF for b's
 
@@ -243,8 +242,8 @@ void BTagSFUtil::modifyBTagsWithSF( const std::string& btagAlgo, bool& isBTagged
     // no need to upgrade if is light and medium tagged
     if( isBTagged_medium ) return;
 
-    int iBin_pt = (jetpt<500.) ? h2_Medium_BTAGBEFFCORR_->GetXaxis()->FindBin(jetpt) : h2_Medium_BTAGBEFFCORR_->GetXaxis()->FindBin(499.);
-    int iBin_eta = h2_Medium_BTAGBEFFCORR_->GetYaxis()->FindBin(jeteta);
+    //int iBin_pt = (jetpt<500.) ? h2_Medium_BTAGBEFFCORR_->GetXaxis()->FindBin(jetpt) : h2_Medium_BTAGBEFFCORR_->GetXaxis()->FindBin(499.);
+    //int iBin_eta = h2_Medium_BTAGBEFFCORR_->GetYaxis()->FindBin(jeteta);
 
     // SF for light quarks
     //    float light_SF_Medium = h2_Medium_BTAGLEFFCORR_->GetBinContent( iBin_pt, iBin_eta );
