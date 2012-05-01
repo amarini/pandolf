@@ -14,6 +14,9 @@
 
 #include "PUWeight.h"
 
+#include "JetCorrectionUncertainty.h"
+
+
 //#include "fitTools.h"
 
 
@@ -78,6 +81,10 @@ void Ntp1Analyzer_TTZ::CreateOutputFile() {
   reducedTree_->Branch("passed_HLT_TripleMu5",   &passed_HLT_TripleMu5_,  "passed_HLT_TripleMu5_/O)");
   reducedTree_->Branch("passed_HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL", &passed_HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_, "passed_HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_/O");
   reducedTree_->Branch("passed_HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL", &passed_HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_, "passed_HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_/O");
+  reducedTree_->Branch("passed_HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL", &passed_HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_, "passed_HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_/O");
+  reducedTree_->Branch("passed_HLT_Mu17_Ele8_CaloIdL", &passed_HLT_Mu17_Ele8_CaloIdL_, "passed_HLT_Mu17_Ele8_CaloIdL_/O");
+  reducedTree_->Branch("passed_HLT_Mu8_Ele17_CaloIdL", &passed_HLT_Mu8_Ele17_CaloIdL_, "passed_HLT_Mu8_Ele17_CaloIdL_/O");
+  reducedTree_->Branch("passed_HLT_Mu8_Ele17_CaloIdT_CaloIsoVL", &passed_HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_, "passed_HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_/O");
 
 
   reducedTree_->Branch("ptHat",&ptHat_,"ptHat_/F");
@@ -130,6 +137,7 @@ void Ntp1Analyzer_TTZ::CreateOutputFile() {
   reducedTree_->Branch( "ptJet",  ptJet_,  "ptJet_[nJets_]/F");
   reducedTree_->Branch("etaJet", etaJet_, "etaJet_[nJets_]/F");
   reducedTree_->Branch("phiJet", phiJet_, "phiJet_[nJets_]/F");
+  reducedTree_->Branch( "ptUncertJet",  ptUncertJet_,  "ptUncertJet_[nJets_]/F");
 
   reducedTree_->Branch("ptDJet", ptDJet_, "ptDJet_[nJets_]/F");
   reducedTree_->Branch("rmsCandJet", rmsCandJet_, "rmsCandJet_[nJets_]/F");
@@ -245,6 +253,11 @@ void Ntp1Analyzer_TTZ::Loop()
    fPUWeight->SetDataHistogram(h1_nPU_data);
    fPUWeight_ave->SetDataHistogram(h1_nPU_data);
 
+
+   JetCorrectionUncertainty *fJetCorrUnc = new JetCorrectionUncertainty("AK5PF_Uncertainty_GR_R_42_V19.txt");
+
+
+
    float nCounterPU=0.;
    float nCounterPU_ave=0.;
 
@@ -307,6 +320,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
 
      // save trigger info:
+     // double muon:
      passed_HLT_DoubleMu6_ = this->PassedHLT( jentry, "HLT_DoubleMu6");
      passed_HLT_DoubleMu7_ = this->PassedHLT( jentry, "HLT_DoubleMu7");
      passed_HLT_Mu13_Mu8_ = this->PassedHLT( jentry, "HLT_Mu13_Mu8");
@@ -318,9 +332,16 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      passed_HLT_L2DoubleMu23_NoVertex_ = this->PassedHLT( jentry, "HLT_L2DoubleMu23_NoVertex");
      passed_HLT_L2DoubleMu30_NoVertex_ = this->PassedHLT( jentry, "HLT_L2DoubleMu30_NoVertex");
      passed_HLT_TripleMu5_ = this->PassedHLT( jentry, "HLT_TripleMu5");
+
+     // double electron:
      passed_HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_ = this->PassedHLT( jentry, "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL");
      passed_HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_ = this->PassedHLT( jentry, "HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL");
+     passed_HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_ = this->PassedHLT( jentry, "HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL");
   
+     // muEG:
+     passed_HLT_Mu17_Ele8_CaloIdL_ = this->PassedHLT( jentry, "HLT_Mu17_Ele8_CaloIdL" );
+     passed_HLT_Mu8_Ele17_CaloIdL_ = this->PassedHLT( jentry, "HLT_Mu8_Ele17_CaloIdL" );
+     passed_HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_ = this->PassedHLT( jentry, "HLT_Mu8_Ele17_CaloIdT_CaloIsoVL" );
 
 
      //bool isMC = ( runNumber < 5 );
@@ -1122,6 +1143,11 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        ptJet_[nJets_] = leadJets[iJet].Pt();
        etaJet_[nJets_] = leadJets[iJet].Eta();
        phiJet_[nJets_] = leadJets[iJet].Phi();
+
+       fJetCorrUnc->setJetPt(leadJets[iJet].Pt());   
+       fJetCorrUnc->setJetEta(leadJets[iJet].Eta()); 
+       ptUncertJet_[nJets_] = fJetCorrUnc->getUncertainty(true);
+
        eChargedHadronsJet_[nJets_] = leadJets[iJet].eChargedHadrons;
        ePhotonsJet_[nJets_]        = leadJets[iJet].ePhotons;
        eNeutralHadronsJet_[nJets_] = leadJets[iJet].eNeutralHadrons;
