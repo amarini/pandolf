@@ -100,6 +100,8 @@ while (len(inputfiles) > 0):
     outputfile.write('#!/bin/bash\n')
     outputfile.write('export STAGE_HOST=castorcms\n')
     outputfile.write('export SCRAM_ARCH=slc5_amd64_gcc434\n')
+    outputfile.write('export LANGUAGE=C\n')
+    outputfile.write('export LC_ALL=C\n')
     outputfile.write('cd /afs/cern.ch/user/p/pandolf/scratch1/CMSSW_4_2_3_patch5/ ; eval `scramv1 runtime -sh` ; cd -\n')
     outputfile.write('cp '+pwd+'/QG_QCD_Pt_15to3000_TuneZ2_Flat*.root $WORKDIR\n')
     outputfile.write('cp '+pwd+'/Pileup*.root $WORKDIR\n')
