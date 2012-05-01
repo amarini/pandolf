@@ -668,9 +668,10 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        // additional ID to be as tight as trigger (HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL):
        if( fabs(scEta)<1.4442 ) { //barrel
          if( fabs(thisEle.deltaPhiAtVtx) > 0.15 ) continue;
+         if( thisEle.hOverE > 0.12 ) continue; //conforming to SSDL analysis
        } else { //endcaps
          if( fabs(thisEle.deltaPhiAtVtx) > 0.1 ) continue;
-         if( thisEle.hOverE > 0.1 ) continue;
+         if( thisEle.hOverE > 0.15 ) continue; // looks like (from ntuples) there's a cut at 0.15 at hlt, not 0.075 as CaloIdT says
        }
 
        if( event_==DEBUG_EVENTNUMBER ) std::cout << "Passed additional eleID cuts (HLT)." << std::endl;
@@ -1078,7 +1079,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        int pdgIdPart=0;
        for( unsigned iPart=0; iPart<nMc; ++iPart ) {
          if( statusMc[iPart]!=3 ) continue; //partons
-         if( idMc[iPart]!=21 && abs(idMc[iPart])>5 ) continue; //quarks or gluons
+         if( idMc[iPart]!=21 && abs(idMc[iPart])>5 ) continue; //quarks or gluons (excluding top)
          if( pMc[iPart]*sin(thetaMc[iPart])<0.1 ) continue; 
          TLorentzVector thisPart;
          thisPart.SetPtEtaPhiE(pMc[iPart]*sin(thetaMc[iPart]), etaMc[iPart], phiMc[iPart], energyMc[iPart]);
