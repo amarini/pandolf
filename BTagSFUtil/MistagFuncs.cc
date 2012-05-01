@@ -533,7 +533,7 @@ float MistagFuncs::GetMistag_fast(const TString& tagger, const TString& TaggerSt
 
 // Definition of functions from plot33New.C ----------------------
 
-if( Atagger == "CVSL" ) {
+if( Atagger == "CSVL" ) {
   if( fabs(eta) >= 0.0 && fabs(eta) < 0.5)
   {
    tmpMistag = 242534*(((1+(0.0182863*x))+(4.50105e-05*(x*x)))/(1+(108569*x)));
