@@ -727,18 +727,8 @@ if( njets<3 ) continue;
 
     // define jets:
     
-    AnalysisJet jetB1, jetB2, jet3, jet4;
     int i_jetB1=-1;
     int i_jetB2=-1;
-
-    // default: order by pt
-    jetB1.SetPtEtaPhiE( ptJet[0], etaJet[0], phiJet[0], eJet[0]);
-    jetB2.SetPtEtaPhiE( ptJet[1], etaJet[1], phiJet[1], eJet[1]);
-    jet3.SetPtEtaPhiE( ptJet[2], etaJet[2], phiJet[2], eJet[2]);
-    jet4.SetPtEtaPhiE( 0., 0., 0., 0. );
-    if( nJets>2 )
-      jet4.SetPtEtaPhiE( ptJet[3], etaJet[3], phiJet[3], eJet[3]);
-
 
 
     // first look for best Btags:
@@ -788,7 +778,10 @@ if( njets<3 ) continue;
       //    deltaRmin = thisDeltaR;
       //  }
       //}
-      thisJet.pdgIdPart = pdgIdPartJet[iJet];
+      TLorentzVector parton;
+      parton.SetPtEtaPhiE( thisJet.Pt(), etaPartJet[iJet], phiPartJet[iJet], thisJet->Energy() );
+      float deltaR = parton.DeltaR( thisJet );
+      thisJet.pdgIdPart = (deltaR<0.5) ? pdgIdPartJet[iJet] : 21; //needed only for btag SF's
 
 
       float thisBtag;
@@ -803,35 +796,42 @@ if( njets<3 ) continue;
       // take into account btag scale factors
       btsfutil->modifyBTagsWithSF_fast(isBtagged_loose, isBtagged_medium, thisJet.Pt(), thisJet.Eta(), thisJet.pdgIdPart );
 
+      njets += 1;
       if( isBtagged_loose ) nBjets_loose += 1;
       if( isBtagged_medium ) nBjets_medium += 1;
 
       if( thisBtag > bestBtag ) {
         bestBtag2 = bestBtag;
         bestBtag = thisBtag;
-        jetB2 = jetB1;
-        jetB1 = thisJet;
+        //jetB2 = jetB1;
+        //jetB1 = thisJet;
         i_jetB2 = i_jetB1;
         i_jetB1 = iJet;
       } else if( thisBtag > bestBtag2 ) {
         bestBtag2 = thisBtag;
         i_jetB2 = iJet;
-        jetB2 = thisJet;
+        //jetB2 = thisJet;
       }
 
 
     } // for jets
 
 
+    if( njets < nJets_thresh_ ) continue;
+    //if( nBjets_loose < nBJets_loose_thresh_ ) continue;
+    //if( nBjets_medium < nBJets_medium_thresh_ ) continue;
 
-    float bTaggerJetB1, bTaggerJetB2;
-    if( bTaggerType_=="TCHE" ) {
-      bTaggerJetB1 = jetB1.trackCountingHighEffBJetTag;
-      bTaggerJetB2 = jetB2.trackCountingHighEffBJetTag;
-    } else if( bTaggerType_=="SSVHE" ) {
-      bTaggerJetB1 = jetB1.simpleSecondaryVertexHighEffBJetTag;
-      bTaggerJetB2 = jetB2.simpleSecondaryVertexHighEffBJetTag;
-    }
+    passed_btag = (nBjets_loose >= nBJets_loose_thresh_) && ( nBjets_medium >= nBJets_medium_thresh_ );
+
+
+    AnalysisJet jetB1, jetB2, jet3, jet4;
+    jetB1.SetPtEtaPhiE( ptJet[i_jetB1], etaJet[i_jetB1], phiJet[i_jetB1], eJet[i_jetB1]);
+    jetB2.SetPtEtaPhiE( ptJet[i_jetB2], etaJet[i_jetB2], phiJet[i_jetB2], eJet[i_jetB2]);
+    jet3.SetPtEtaPhiE( 0., 0., 0., 0. );
+    jet4.SetPtEtaPhiE( 0., 0., 0., 0. );
+
+
+
 
     
     // now add other jets ordered in pt:
@@ -893,10 +893,10 @@ if( njets<3 ) continue;
     } //for additional jets
 
 
-    float btag_thresh1 = this->get_btagThresh( btagJetB1_OP_ );
-    float btag_thresh2 = this->get_btagThresh( btagJetB2_OP_ );
+    //float btag_thresh1 = this->get_btagThresh( btagJetB1_OP_ );
+    //float btag_thresh2 = this->get_btagThresh( btagJetB2_OP_ );
 
-    passed_btag = (bTaggerJetB1 >= btag_thresh1) && ( bTaggerJetB2 >= btag_thresh2 );
+    //passed_btag = (bTaggerJetB1 >= btag_thresh1) && ( bTaggerJetB2 >= btag_thresh2 );
 
 
 
@@ -1080,6 +1080,15 @@ if( njets<3 ) continue;
         h1_partFlavorJet3->Fill( jet3.pdgIdPart, eventWeight );
         h1_partFlavorJet4->Fill( jet4.pdgIdPart, eventWeight );
 
+
+        float bTaggerJetB1, bTaggerJetB2;
+        if( bTaggerType_=="TCHE" ) {
+          bTaggerJetB1 = jetB1.trackCountingHighEffBJetTag;
+          bTaggerJetB2 = jetB2.trackCountingHighEffBJetTag;
+        } else if( bTaggerType_=="SSVHE" ) {
+          bTaggerJetB1 = jetB1.simpleSecondaryVertexHighEffBJetTag;
+          bTaggerJetB2 = jetB2.simpleSecondaryVertexHighEffBJetTag;
+        }
 
 
         h1_bTagJetB1->Fill( bTaggerJetB1, eventWeight );
@@ -1350,8 +1359,9 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
     ptJet_thresh_ = 20.;
     etaJet_thresh_ = 2.4;
 
-    btagJetB1_OP_ = "none";
-    btagJetB2_OP_ = "none";
+    njets_thresh_ = 3;
+    nBjets_loose_thresh_ = 0;
+    nBjets_medium_medium_ = 0;
 
     mZll_threshLo_ = 70.;
     mZll_threshHi_ = 110.;
@@ -1378,8 +1388,9 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
     ptJet_thresh_ = 20.;
     etaJet_thresh_ = 2.4;
 
-    btagJetB1_OP_ = "medium";
-    btagJetB2_OP_ = "none";
+    njets_thresh_ = 3;
+    nBjets_loose_thresh_ = 0;
+    nBjets_medium_medium_ = 1;
 
     mZll_threshLo_ = 81.;
     mZll_threshHi_ = 101.;
@@ -1406,8 +1417,9 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
     ptJet_thresh_ = 20.;
     etaJet_thresh_ = 2.4;
 
-    btagJetB1_OP_ = "medium";
-    btagJetB2_OP_ = "none";
+    njets_thresh_ = 3;
+    nBjets_loose_thresh_ = 0;
+    nBjets_medium_medium_ = 1;
 
     mZll_threshLo_ = 81.;
     mZll_threshHi_ = 101.;
@@ -1434,8 +1446,9 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
     ptJet_thresh_ = 20.;
     etaJet_thresh_ = 2.4;
 
-    btagJetB1_OP_ = "medium";
-    btagJetB2_OP_ = "none";
+    njets_thresh_ = 3;
+    nBjets_loose_thresh_ = 0;
+    nBjets_medium_medium_ = 1;
 
     mZll_threshLo_ = 81.;
     mZll_threshHi_ = 101.;
@@ -1462,8 +1475,9 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
     ptJet_thresh_ = 20.;
     etaJet_thresh_ = 2.4;
 
-    btagJetB1_OP_ = "medium";
-    btagJetB2_OP_ = "none";
+    njets_thresh_ = 3;
+    nBjets_loose_thresh_ = 0;
+    nBjets_medium_medium_ = 1;
 
     mZll_threshLo_ = 81.;
     mZll_threshHi_ = 101.;
@@ -1489,6 +1503,7 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
 
 
 
+/*
 float Ntp1Finalizer_TTZTrilepton::get_btagThresh( const std::string& btag_OP_ ) {
 
   if( btag_OP_ == "none" ) return -9999.;
@@ -1512,7 +1527,7 @@ float Ntp1Finalizer_TTZTrilepton::get_btagThresh( const std::string& btag_OP_ ) 
   return -9999.;
 
 }
-
+*/
 
 
 
