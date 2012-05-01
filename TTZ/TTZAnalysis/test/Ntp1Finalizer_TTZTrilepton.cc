@@ -372,21 +372,27 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   tree_->SetBranchAddress("jetBProbabilityBJetTagJet", jetBProbabilityBJetTagJet);
   Float_t jetProbabilityBJetTagJet[50];
   tree_->SetBranchAddress("jetProbabilityBJetTagJet", jetProbabilityBJetTagJet);
+  Int_t pdgIdPartJet[50];
+  tree_->SetBranchAddress("pdgIdPartJet", pdgIdPartJet);
+  Float_t etaPartJet[50];
+  tree_->SetBranchAddress("etaPartJet", etaPartJet);
+  Float_t phiPartJet[50];
+  tree_->SetBranchAddress("phiPartJet", phiPartJet);
 
 
 
-  Int_t nPart;
-  tree_->SetBranchAddress("nPart", &nPart);
-  Float_t ePart[20];
-  tree_->SetBranchAddress("ePart", ePart);
-  Float_t ptPart[20];
-  tree_->SetBranchAddress("ptPart", ptPart);
-  Float_t etaPart[20];
-  tree_->SetBranchAddress("etaPart", etaPart);
-  Float_t phiPart[20];
-  tree_->SetBranchAddress("phiPart", phiPart);
-  Int_t pdgIdPart[20];
-  tree_->SetBranchAddress("pdgIdPart", pdgIdPart);
+  //Int_t nPart;
+  //tree_->SetBranchAddress("nPart", &nPart);
+  //Float_t ePart[20];
+  //tree_->SetBranchAddress("ePart", ePart);
+  //Float_t ptPart[20];
+  //tree_->SetBranchAddress("ptPart", ptPart);
+  //Float_t etaPart[20];
+  //tree_->SetBranchAddress("etaPart", etaPart);
+  //Float_t phiPart[20];
+  //tree_->SetBranchAddress("phiPart", phiPart);
+  //Int_t pdgIdPart[20];
+  //tree_->SetBranchAddress("pdgIdPart", pdgIdPart);
 
 
   // HLT:
@@ -423,7 +429,7 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   std::map< int, std::map<int, std::vector<int> > > run_lumi_ev_map;
 
 
-  BTagSFUtil* btsfutil = new BTagSFUtil(13);
+  BTagSFUtil* btsfutil = new BTagSFUtil(bTaggerType_, 13);
   
   //QGLikelihoodCalculator *qglikeli = new QGLikelihoodCalculator("/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
  
@@ -770,19 +776,19 @@ if( njets<3 ) continue;
       thisJet.phiGen = phiJetGen[iJet];
       thisJet.eGen = eJetGen[iJet];
 
-      //match to parton:
-      int partFlavor=0;
-      float deltaRmin=999.;
-      for(unsigned iPart=0; iPart<nPart; ++iPart ) {
-        TLorentzVector thisPart;
-        thisPart.SetPtEtaPhiE( ptPart[iPart], etaPart[iPart], phiPart[iPart], ePart[iPart] );
-        float thisDeltaR = thisJet.DeltaR(thisPart);
-        if( thisDeltaR<deltaRmin ) {
-          partFlavor = pdgIdPart[iPart];
-          deltaRmin = thisDeltaR;
-        }
-      }
-      thisJet.pdgIdPart = partFlavor;
+      ////match to parton:
+      //int partFlavor=0;
+      //float deltaRmin=999.;
+      //for(unsigned iPart=0; iPart<nPart; ++iPart ) {
+      //  TLorentzVector thisPart;
+      //  thisPart.SetPtEtaPhiE( ptPart[iPart], etaPart[iPart], phiPart[iPart], ePart[iPart] );
+      //  float thisDeltaR = thisJet.DeltaR(thisPart);
+      //  if( thisDeltaR<deltaRmin ) {
+      //    partFlavor = pdgIdPart[iPart];
+      //    deltaRmin = thisDeltaR;
+      //  }
+      //}
+      thisJet.pdgIdPart = pdgIdPartJet[iJet];
 
 
       float thisBtag;
@@ -795,8 +801,7 @@ if( njets<3 ) continue;
       bool isBtagged_medium = ( thisBtag > this->get_btagThresh("medium") );
 
       // take into account btag scale factors
-      //std::cout << bTaggerType_ << " " <<  isBtagged_loose << " " <<  isBtagged_medium << " " <<  thisJet.Pt() << " " <<  thisJet.Eta() << " " <<  thisJet.pdgIdPart  << std::endl;
-      //btsfutil->modifyBTagsWithSF(bTaggerType_, isBtagged_loose, isBtagged_medium, thisJet.Pt(), thisJet.Eta(), thisJet.pdgIdPart );
+      btsfutil->modifyBTagsWithSF_fast(isBtagged_loose, isBtagged_medium, thisJet.Pt(), thisJet.Eta(), thisJet.pdgIdPart );
 
       if( isBtagged_loose ) nBjets_loose += 1;
       if( isBtagged_medium ) nBjets_medium += 1;
@@ -860,19 +865,19 @@ if( njets<3 ) continue;
       thisJet.phiGen = phiJetGen[iJet];
       thisJet.eGen = eJetGen[iJet];
 
-      //match to parton:
-      int partFlavor=0;
-      float deltaRmin=999.;
-      for(unsigned iPart=0; iPart<nPart; ++iPart ) {
-        TLorentzVector thisPart;
-        thisPart.SetPtEtaPhiE( ptPart[iPart], etaPart[iPart], phiPart[iPart], ePart[iPart] );
-        float thisDeltaR = thisJet.DeltaR(thisPart);
-        if( thisDeltaR<deltaRmin ) {
-          partFlavor = pdgIdPart[iPart];
-          deltaRmin = thisDeltaR;
-        }
-      }
-      thisJet.pdgIdPart = partFlavor;
+      ////match to parton:
+      //int partFlavor=0;
+      //float deltaRmin=999.;
+      //for(unsigned iPart=0; iPart<nPart; ++iPart ) {
+      //  TLorentzVector thisPart;
+      //  thisPart.SetPtEtaPhiE( ptPart[iPart], etaPart[iPart], phiPart[iPart], ePart[iPart] );
+      //  float thisDeltaR = thisJet.DeltaR(thisPart);
+      //  if( thisDeltaR<deltaRmin ) {
+      //    partFlavor = pdgIdPart[iPart];
+      //    deltaRmin = thisDeltaR;
+      //  }
+      //}
+      thisJet.pdgIdPart = pdgIdPartJet[iJet];
 
 
       if( istep==0 ) {
@@ -1227,7 +1232,6 @@ if( njets<3 ) continue;
   h1_nCounter->Write();
   h1_nCounterW->Write();
   h1_nCounterPU->Write();
-
 
 
   h1_nvertex->Write();
