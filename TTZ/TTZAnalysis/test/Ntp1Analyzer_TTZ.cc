@@ -1018,7 +1018,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      // JETS
      // ------------------
 
-     float jetPt_thresh = 20.;
+     float jetPt_thresh = 19.; //19 gev so that we can vary the JES uncert down one sigma
      float jetEta_thresh = 2.5;
 
      // first save leading jets in event:

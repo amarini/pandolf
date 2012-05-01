@@ -43,6 +43,11 @@ class Ntp1Analyzer_TTZ : public Ntp1Analyzer {
 
    Bool_t passed_HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_;
    Bool_t passed_HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_;
+   Bool_t passed_HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_;
+
+   Bool_t passed_HLT_Mu17_Ele8_CaloIdL_;
+   Bool_t passed_HLT_Mu8_Ele17_CaloIdL_;
+   Bool_t passed_HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_;
 
 
    int leptType_; //0: muon; 1: electron; 2: e+m-; 3: e-m+
@@ -98,6 +103,7 @@ class Ntp1Analyzer_TTZ : public Ntp1Analyzer {
    Float_t   eJet_[50];
    Float_t phiJet_[50];
    Float_t etaJet_[50];
+   Float_t  ptUncertJet_[50];
 
    Float_t ptDJet_[50];
    Float_t rmsCandJet_[50];
@@ -159,6 +165,8 @@ class Ntp1Analyzer_TTZ : public Ntp1Analyzer {
    Float_t metSignificance_;
    Float_t mEtSig_;
    Float_t phipfMet_;
+
+   TH1D* h1_nPU_gen_;
 
    TH1D* h1_nCounter_Zee_;
    TH1D* h1_nCounter_Zmumu_;
