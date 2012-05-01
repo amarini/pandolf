@@ -104,6 +104,7 @@ while (len(inputfiles) > 0):
     outputfile.write('cp '+pwd+'/QG_QCD_Pt_15to3000_TuneZ2_Flat*.root $WORKDIR\n')
     outputfile.write('cp '+pwd+'/Pileup*.root $WORKDIR\n')
     outputfile.write('cp '+pwd+'/SF_*.txt $WORKDIR\n')
+    outputfile.write('cp '+pwd+'/AK5PF_Uncertainty*.txt $WORKDIR\n')
     outputfile.write('cd $WORKDIR\n')
     #outputfile.write(pwd+'/'+application+" "+dataset+" "+inputfilename+" _"+str(ijob)+"\n")
     outputfile.write(pwd+'/'+application+" "+dataset+" "+inputfilename+" "+str(ijob)+"\n")
