@@ -30,7 +30,7 @@ BTagSFUtil::BTagSFUtil( const std::string& btagAlgo, int seed ) {
 
 void BTagSFUtil::init( const std::string& wp ) {
 
-  std::cout << "[BTagSFUtil] :: Initializing working point: '" << wp << "'." << std::endl;
+  std::cout << "[BTagSFUtil::init] Initializing working point: '" << wp << "'." << std::endl;
 
   InitSFLight(wp);
   InitMistag(wp);
@@ -800,7 +800,7 @@ float BTagSFUtil::GetMistag( float pt, float eta, const std::string& wp, const s
 
 
 
-float BTagSFUtil::GetSFb( float pt, float eta, const std::string& wp ) {
+float BTagSFUtil::GetSFb( float pt, float eta, const std::string& wp, const std::string& meanMinMax ) {
 
   checkInit(wp);
 
@@ -816,10 +816,198 @@ float BTagSFUtil::GetSFb( float pt, float eta, const std::string& wp ) {
   if( pt<thisFunct->GetMinimumX() ) pt = thisFunct->GetMinimumX();
   if( pt>thisFunct->GetMaximumX() ) pt = thisFunct->GetMaximumX();
 
-  return thisFunct->Eval(pt);
+  float SFb_err = 0.;
+  if( meanMinMax!="mean" ) { 
+    SFb_err = getSFb_err( pt, wp );
+    if( meanMinMax=="min" ) SFb_err = -SFb_err;
+  }
 
+  float SFb = thisFunct->Eval(pt) + SFb_err;
+
+  return SFb;
 
 }
+
+
+float BTagSFUtil::getSFb_err( float pt, const std::string wp ) {
+
+  // uncertainties taken from https://twiki.cern.ch/twiki/pub/CMS/BtagPOG/SFb-mujet_payload.txt
+  
+  std::vector<float> ptBins_min;
+  ptBins_min.push_back(30.);
+  ptBins_min.push_back(40.);
+  ptBins_min.push_back(50.);
+  ptBins_min.push_back(60.);
+  ptBins_min.push_back(70.);
+  ptBins_min.push_back(80.);
+  ptBins_min.push_back(100.);
+  ptBins_min.push_back(120.);
+  ptBins_min.push_back(160.);
+  ptBins_min.push_back(210.);
+  ptBins_min.push_back(260.);
+  ptBins_min.push_back(320.);
+  ptBins_min.push_back(400.);
+  ptBins_min.push_back(500.);
+  ptBins_min.push_back(670.);
+
+
+  std::vector<float> SFb_err;
+
+  TString Atagger = btagAlgo_+wp;
+
+
+  if( Atagger=="TCHEL" ) {
+
+    SFb_err.push_back(0.0244956);
+    SFb_err.push_back(0.0237293);
+    SFb_err.push_back(0.0180131);
+    SFb_err.push_back(0.0182411);
+    SFb_err.push_back(0.0184592);
+    SFb_err.push_back(0.0106444);
+    SFb_err.push_back(0.011073);
+    SFb_err.push_back(0.0106296);
+    SFb_err.push_back(0.0175259);
+    SFb_err.push_back(0.0161566);
+    SFb_err.push_back(0.0158973);
+    SFb_err.push_back(0.0186782);
+    SFb_err.push_back(0.0371113);
+    SFb_err.push_back(0.0289788 );
+
+  } else if( Atagger=="TCHEM" ) {
+
+    SFb_err.push_back(0.0311456);
+    SFb_err.push_back(0.0303825);
+    SFb_err.push_back(0.0209488);
+    SFb_err.push_back(0.0216987);
+    SFb_err.push_back(0.0227149);
+    SFb_err.push_back(0.0260294);
+    SFb_err.push_back(0.0205766);
+    SFb_err.push_back(0.0227065);
+    SFb_err.push_back(0.0260481);
+    SFb_err.push_back(0.0278001);
+    SFb_err.push_back(0.0295361);
+    SFb_err.push_back(0.0306555);
+    SFb_err.push_back(0.0367805);
+    SFb_err.push_back(0.0527368 );
+
+  } else if( Atagger=="CSVL" ) {
+
+    SFb_err.push_back(0.0188743);
+    SFb_err.push_back(0.0161816);
+    SFb_err.push_back(0.0139824);
+    SFb_err.push_back(0.0152644);
+    SFb_err.push_back(0.0161226);
+    SFb_err.push_back(0.0157396);
+    SFb_err.push_back(0.0161619);
+    SFb_err.push_back(0.0168747);
+    SFb_err.push_back(0.0257175);
+    SFb_err.push_back(0.026424);
+    SFb_err.push_back(0.0264928);
+    SFb_err.push_back(0.0315127);
+    SFb_err.push_back(0.030734);
+    SFb_err.push_back(0.0438259);
+
+  } else if( Atagger=="CSVM" ) {
+
+    SFb_err.push_back(0.0295675);
+    SFb_err.push_back(0.0295095);
+    SFb_err.push_back(0.0210867);
+    SFb_err.push_back(0.0219349);
+    SFb_err.push_back(0.0227033);
+    SFb_err.push_back(0.0204062);
+    SFb_err.push_back(0.0185857);
+    SFb_err.push_back(0.0256242);
+    SFb_err.push_back(0.0383341);
+    SFb_err.push_back(0.0409675);
+    SFb_err.push_back(0.0420284);
+    SFb_err.push_back(0.0541299);
+    SFb_err.push_back(0.0578761);
+    SFb_err.push_back(0.0655432 );
+
+  } else if( Atagger=="CSVT" ) {
+
+    SFb_err.push_back(0.0364717);
+    SFb_err.push_back(0.0362281);
+    SFb_err.push_back(0.0232876);
+    SFb_err.push_back(0.0249618);
+    SFb_err.push_back(0.0261482);
+    SFb_err.push_back(0.0290466);
+    SFb_err.push_back(0.0300033);
+    SFb_err.push_back(0.0453252);
+    SFb_err.push_back(0.0685143);
+    SFb_err.push_back(0.0653621);
+    SFb_err.push_back(0.0712586);
+    SFb_err.push_back(0.094589);
+    SFb_err.push_back(0.0777011);
+    SFb_err.push_back(0.0866563 );
+
+  } else if( Atagger=="JPL" ) {
+
+    SFb_err.push_back(0.0250319);
+    SFb_err.push_back(0.0250197);
+    SFb_err.push_back(0.0212994);
+    SFb_err.push_back(0.0225867);
+    SFb_err.push_back(0.0239025);
+    SFb_err.push_back(0.026476);
+    SFb_err.push_back(0.0264219);
+    SFb_err.push_back(0.0156582);
+    SFb_err.push_back(0.0222798);
+    SFb_err.push_back(0.0223169);
+    SFb_err.push_back(0.0225454);
+    SFb_err.push_back(0.0405975);
+    SFb_err.push_back(0.0405668);
+    SFb_err.push_back(0.0415829 );
+
+  } else if( Atagger=="JPM" ) {
+
+    SFb_err.push_back(0.0352594);
+    SFb_err.push_back(0.0353008);
+    SFb_err.push_back(0.0299008);
+    SFb_err.push_back(0.0276606);
+    SFb_err.push_back(0.0292312);
+    SFb_err.push_back(0.0336607);
+    SFb_err.push_back(0.0284701);
+    SFb_err.push_back(0.029544);
+    SFb_err.push_back(0.0358872);
+    SFb_err.push_back(0.0367869);
+    SFb_err.push_back(0.0375048);
+    SFb_err.push_back(0.0597367);
+    SFb_err.push_back(0.0653152);
+    SFb_err.push_back(0.074242 );
+
+  } else if( Atagger=="JPT" ) {
+
+    SFb_err.push_back(0.0475813);
+    SFb_err.push_back(0.0472359);
+    SFb_err.push_back(0.0378328);
+    SFb_err.push_back(0.0334787);
+    SFb_err.push_back(0.034681);
+    SFb_err.push_back(0.0398312);
+    SFb_err.push_back(0.0481646);
+    SFb_err.push_back(0.0392262);
+    SFb_err.push_back(0.0463086);
+    SFb_err.push_back(0.0534565);
+    SFb_err.push_back(0.0545823);
+    SFb_err.push_back(0.102505);
+    SFb_err.push_back(0.113198);
+    SFb_err.push_back(0.138116 );
+
+  } // if atagger
+
+
+  // find pt bin:
+  int ptBin = -1;
+  for( unsigned ipt=0; ipt<ptBins_min.size()-1; ++ipt ) {
+    if( pt>=ptBins_min[ipt] && pt<=ptBins_min[ipt+1] ) { // <= so that 670 is ok
+      ptBin = ipt;
+      break;
+    }
+  }
+
+  return SFb_err[ptBin];
+
+}
+
 
 
 void BTagSFUtil::checkInit( const std::string& wp ) {
@@ -1029,12 +1217,17 @@ void BTagSFUtil::modifyBTagsWithSF( bool& isBTagged_loose, bool& isBTagged_mediu
 void BTagSFUtil::modifyBTagsWithSF_fast( bool& isBTagged_loose, bool& isBTagged_medium, float jetpt, float jeteta, int pdgIdPart, const std::string& meanMinMax ) {
   
 
-  float  b_SF_Medium = GetSFb(jetpt, jeteta, "M");
-  float light_SF_Medium = GetSFLight(jetpt, jeteta, "M");
-  float light_eff_Medium = GetMistag(jetpt, jeteta, "M");
-  float  b_SF_Loose = GetSFb(jetpt, jeteta, "L");
-  float light_SF_Loose = GetSFLight(jetpt, jeteta, "L");
-  float light_eff_Loose = GetMistag(jetpt, jeteta, "L");
+  if( meanMinMax!="mean" && meanMinMax!="min" && meanMinMax!="max" ) {
+    std::cout << "[BTagSFUtil::modifyBTagsWithSF_fast] ERROR! meanMinMax can only be equal to 'mean', 'min' or 'max'. Please fix your code." << std::endl;
+    exit(777);
+  }
+
+  float  b_SF_Medium = GetSFb(jetpt, jeteta, "M", meanMinMax);
+  float light_SF_Medium = GetSFLight(jetpt, jeteta, "M", meanMinMax);
+  float light_eff_Medium = GetMistag(jetpt, jeteta, "M", meanMinMax);
+  float  b_SF_Loose = GetSFb(jetpt, jeteta, "L", meanMinMax);
+  float light_SF_Loose = GetSFLight(jetpt, jeteta, "L", meanMinMax);
+  float light_eff_Loose = GetMistag(jetpt, jeteta, "L", meanMinMax);
 
 
     
