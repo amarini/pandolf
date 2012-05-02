@@ -55,7 +55,8 @@ class BTagSFUtil {
 
   float GetSFLight( float pt, float eta, const std::string& wp, const std::string& meanminmax="mean" );
   float GetMistag( float pt, float eta, const std::string& wp, const std::string& meanminmax="mean" );
-  float GetSFb( float pt, float eta, const std::string& wp );
+  float GetSFb( float pt, float eta, const std::string& wp, const std::string& meanminmax="mean" );
+  float getSFb_err( float pt, const std::string wp );
 
   TF1* GetFunctionEtaBins( float eta, const std::vector<float>& etaBins, const std::vector<TF1*>& functions ) const;
 
