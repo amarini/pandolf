@@ -33,7 +33,7 @@ float getEventHLTSF( float effSingle1, float effSingle2, float effDouble1, float
 
 // constructor:
 
-Ntp1Finalizer_TTZTrilepton::Ntp1Finalizer_TTZTrilepton( const std::string& dataset, const std::string& selectionType, const std::string& bTaggerType, const std::string& PUType, const std::string& leptType ) : Ntp1Finalizer( "TTZTrilepton", dataset, leptType ) {
+Ntp1Finalizer_TTZTrilepton::Ntp1Finalizer_TTZTrilepton( const std::string& dataset, const std::string& selectionType, const std::string& bTaggerType, const std::string& leptType ) : Ntp1Finalizer( "TTZTrilepton", dataset, leptType ) {
 
   if( leptType!="ALL" && leptType!="MU" && leptType!="ELE" ) {
     std::cout << "Lept type '" << leptType << "' currently not supported. Exiting." << std::endl;
@@ -47,7 +47,6 @@ Ntp1Finalizer_TTZTrilepton::Ntp1Finalizer_TTZTrilepton( const std::string& datas
 
   bTaggerType_ = bTaggerType;
   leptType_ = leptType;
-  PUType_ = PUType;
 
   setSelectionType(selectionType);
 
@@ -65,7 +64,6 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   tree_->GetEntry(0);
   bool isMC = (run < 160000);
   std::string fullFlags = selectionType_ + "_" + bTaggerType_;
-  //if( isMC ) fullFlags = fullFlags + "_PU" + PUType_;
   fullFlags = fullFlags + "_" + leptType_;
   if( jes_ == 1 ) fullFlags = fullFlags + "_JESUP";
   else if( jes_ == -1 ) fullFlags = fullFlags + "_JESDOWN";
@@ -594,7 +592,6 @@ ofstream ofs("run_event.txt");
   std::cout << "----> DATASET: " << dataset_ << std::endl;
   std::cout << "----> SELECTION: " << selectionType_ << std::endl;
   std::cout << "----> B-TAGGER: " << bTaggerType_ << std::endl;
-  if( isMC ) std::cout << "----> PU REWEIGHING: " << PUType_ << std::endl;
   std::cout << std::endl << std::endl;
 
 
@@ -884,6 +881,7 @@ ofstream ofs("run_event.txt");
     jet4.SetPtEtaPhiE( 0., 0., 0., 0. );
 
 
+std::cout << pfMet - pfMet_vector.Pt() << std::endl;
     
     // now add other jets ordered in pt:
     int istep=0;

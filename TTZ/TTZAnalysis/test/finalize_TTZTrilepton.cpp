@@ -12,8 +12,8 @@
 
 int main( int argc, char* argv[] ) {
 
-  if( argc!=3 && argc!=4 && argc!=5 && argc!=6 ) {
-    std::cout << "USAGE: ./finalize_TTZTrilepton [dataset] [selectionType] [bTaggerType=\"TCHE\"] [PUType=\"HR11_73pb\"] [leptType=\"ALL\"]" <<std::endl;
+  if( argc!=2 && argc!=3 && argc!=4 && argc!=5 ) {
+    std::cout << "USAGE: ./finalize_TTZTrilepton [dataset] [selectionType] [bTaggerType=\"TCHE\"] [leptType=\"ALL\"]" <<std::endl;
     return 13;
   }
 
@@ -27,21 +27,15 @@ int main( int argc, char* argv[] ) {
     bTaggerType = bTaggerType_str;
   }
 
-  std::string PUType="HR11_73pb";
-  if( argc==5 ) {
-    std::string PUType_str(argv[4]);
-    PUType = PUType_str;
-  }
-
   std::string leptType="ALL";
-  if( argc==6 ) {
-    std::string leptType_str(argv[5]);
+  if( argc==5 ) {
+    std::string leptType_str(argv[4]);
     leptType = leptType_str;
   }
 
 
 
-  Ntp1Finalizer_TTZTrilepton* nf = new Ntp1Finalizer_TTZTrilepton( dataset, selectionType, bTaggerType, PUType, leptType );
+  Ntp1Finalizer_TTZTrilepton* nf = new Ntp1Finalizer_TTZTrilepton( dataset, selectionType, bTaggerType, leptType );
   nf->set_inputAnalyzerType("TTZ");
 
 
