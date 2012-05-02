@@ -56,7 +56,7 @@ Ntp1Finalizer_TTZTrilepton::Ntp1Finalizer_TTZTrilepton( const std::string& datas
 
 
 
-void Ntp1Finalizer_TTZTrilepton::finalize() {
+void Ntp1Finalizer_TTZTrilepton::finalize( ) {
 
   //if( outFile_==0 ) this->createOutputFile();
   
@@ -67,6 +67,17 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   std::string fullFlags = selectionType_ + "_" + bTaggerType_;
   //if( isMC ) fullFlags = fullFlags + "_PU" + PUType_;
   fullFlags = fullFlags + "_" + leptType_;
+  if( jes_ == 1 ) fullFlags = fullFlags + "_JESUP";
+  else if( jes_ == -1 ) fullFlags = fullFlags + "_JESDOWN";
+  else if( jes_ != 0 ) {
+    char fullFlags_char[100];
+    if( jes_ < 0 )
+      sprintf( fullFlags_char, "%s_JESDOWN%d", fullFlags.c_str(), jes_ );
+    else
+      sprintf( fullFlags_char, "%s_JESUP%d", fullFlags.c_str(), jes_ );
+    std::string fullFlags_tmp(fullFlags_char);
+    fullFlags = fullFlags_tmp;
+  }
   this->set_flags(fullFlags); //this is for the outfile name
   this->createOutputFile();
 
@@ -334,6 +345,8 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   tree_->SetBranchAddress("eJet", eJet);
   Float_t ptJet[50];
   tree_->SetBranchAddress("ptJet", ptJet);
+  Float_t ptUncertJet[50];
+  tree_->SetBranchAddress("ptUncertJet", ptUncertJet);
   Float_t etaJet[50];
   tree_->SetBranchAddress("etaJet", etaJet);
   Float_t phiJet[50];
@@ -539,8 +552,8 @@ void Ntp1Finalizer_TTZTrilepton::finalize() {
   tree_passedEvents->Branch( "etaLept3", &etaLept3_t, "etaLept3_t/F" );
   tree_passedEvents->Branch( "ptJetB1", &ptJetB1_t, "ptJetB1_t/F" );
   tree_passedEvents->Branch( "ptJetB2", &ptJetB2_t, "ptJetB2_t/F" );
-  tree_passedEvents->Branch( "bTagJetB1", &bTagJetB1_t, "bTagJetB1_t/F" );
-  tree_passedEvents->Branch( "bTagJetB2", &bTagJetB2_t, "bTagJetB2_t/F" );
+  //tree_passedEvents->Branch( "bTagJetB1", &bTagJetB1_t, "bTagJetB1_t/F" );
+  //tree_passedEvents->Branch( "bTagJetB2", &bTagJetB2_t, "bTagJetB2_t/F" );
   tree_passedEvents->Branch( "ptJet3", &ptJet3_t, "ptJet3_t/F" );
   tree_passedEvents->Branch( "ptJet4", &ptJet4_t, "ptJet4_t/F" );
   tree_passedEvents->Branch( "etaJetB1", &etaJetB1_t, "etaJetB1_t/F" );
@@ -663,6 +676,8 @@ ofstream ofs("run_event.txt");
 
     if( isMC ) {
 
+      HLTSF = 1.;
+
       // scale factor for double mu triggers:
       if( leptType==0 ) {
 
@@ -696,9 +711,27 @@ ofstream ofs("run_event.txt");
 
         eventWeight *= HLTSF;
 
-      } else { //electrons
+      } else if( leptType==1 ) { //electrons
 
         HLTSF = 1.;
+
+      } else if( leptType==2 ) { // e+mu-
+
+        float effSingle_Run2011A1 = ( chargeLeptZ1<0 ) ? getMuonHLTSF_SingleTrigger( ptLeptZ1, etaLeptZ1, "Run2011A1") : getMuonHLTSF_SingleTrigger( ptLeptZ2, etaLeptZ2, "Run2011A1");
+        float effSingle_Run2011A2 = ( chargeLeptZ1<0 ) ? getMuonHLTSF_SingleTrigger( ptLeptZ1, etaLeptZ1, "Run2011A2") : getMuonHLTSF_SingleTrigger( ptLeptZ2, etaLeptZ2, "Run2011A2");
+        float effSingle_Run2011A3 = ( chargeLeptZ1<0 ) ? getMuonHLTSF_SingleTrigger( ptLeptZ1, etaLeptZ1, "Run2011A3") : getMuonHLTSF_SingleTrigger( ptLeptZ2, etaLeptZ2, "Run2011A3");
+        float effSingle_Run2011B  = ( chargeLeptZ1<0 ) ? getMuonHLTSF_SingleTrigger( ptLeptZ1, etaLeptZ1, "Run2011B") : getMuonHLTSF_SingleTrigger( ptLeptZ2, etaLeptZ2, "Run2011B");
+
+        HLTSF = (217.*effSingle_Run2011A1 + 920.*effSingle_Run2011A2 + 1000.*effSingle_Run2011A3 + 2100.*effSingle_Run2011B)/(217.+920.+1000.+2100.);
+
+      } else if( leptType==3 ) { // e-mu+
+
+        float effSingle_Run2011A1 = ( chargeLeptZ1>0 ) ? getMuonHLTSF_SingleTrigger( ptLeptZ1, etaLeptZ1, "Run2011A1") : getMuonHLTSF_SingleTrigger( ptLeptZ2, etaLeptZ2, "Run2011A1");
+        float effSingle_Run2011A2 = ( chargeLeptZ1>0 ) ? getMuonHLTSF_SingleTrigger( ptLeptZ1, etaLeptZ1, "Run2011A2") : getMuonHLTSF_SingleTrigger( ptLeptZ2, etaLeptZ2, "Run2011A2");
+        float effSingle_Run2011A3 = ( chargeLeptZ1>0 ) ? getMuonHLTSF_SingleTrigger( ptLeptZ1, etaLeptZ1, "Run2011A3") : getMuonHLTSF_SingleTrigger( ptLeptZ2, etaLeptZ2, "Run2011A3");
+        float effSingle_Run2011B  = ( chargeLeptZ1>0 ) ? getMuonHLTSF_SingleTrigger( ptLeptZ1, etaLeptZ1, "Run2011B") : getMuonHLTSF_SingleTrigger( ptLeptZ2, etaLeptZ2, "Run2011B");
+
+        HLTSF = (217.*effSingle_Run2011A1 + 920.*effSingle_Run2011A2 + 1000.*effSingle_Run2011A3 + 2100.*effSingle_Run2011B)/(217.+920.+1000.+2100.);
 
       }
 
@@ -709,20 +742,20 @@ ofstream ofs("run_event.txt");
 
 
 
-    // first: count them
-    ht = 0.;
-    njets=0;
-    for( unsigned iJet=0; iJet<nJets; ++iJet) {
-
-      if( ptJet[iJet] < 20. ) continue;
-      if( fabs(etaJet[iJet]) > etaJet_thresh_ ) continue;
-
-      ht += ptJet[iJet];
-
-      njets++;
-
-    }
-if( njets<3 ) continue;
+//    // first: count them
+//    ht = 0.;
+//    njets=0;
+//    for( unsigned iJet=0; iJet<nJets; ++iJet) {
+//
+//      if( ptJet[iJet] < 20. ) continue;
+//      if( fabs(etaJet[iJet]) > etaJet_thresh_ ) continue;
+//
+//      ht += ptJet[iJet];
+//
+//      njets++;
+//
+//    }
+//if( njets<3 ) continue;
 
 
     // define jets:
@@ -731,21 +764,30 @@ if( njets<3 ) continue;
     int i_jetB2=-1;
 
 
-    // first look for best Btags:
-    
     float bestBtag=-9999.;
     float bestBtag2=-9999.;
+    ht = 0.;
+    njets=0;
     nBjets_loose = 0;
     nBjets_medium  = 0;
+
+    AnalysisJet jetB1, jetB2;
+    jetB1.SetPtEtaPhiE( 0., 0., 0., 0. );
+    jetB2.SetPtEtaPhiE( 0., 0., 0., 0. );
   
 
     for( unsigned iJet=0; iJet<nJets; ++iJet) {
 
-      if( ptJet[iJet] < ptBJet_thresh_ ) continue;
+      // JES syst:
+      float ptJet_corr = ptJet[iJet] + (float)jes_*ptUncertJet[iJet];
+
+      if( ptJet_corr < ptJet_thresh_ ) continue;
       if( fabs(etaJet[iJet]) > etaJet_thresh_ ) continue;
 
+      ht += ptJet_corr;
+
       AnalysisJet thisJet;
-      thisJet.SetPtEtaPhiE( ptJet[iJet], etaJet[iJet], phiJet[iJet], eJet[iJet]);
+      thisJet.SetPtEtaPhiE( ptJet_corr, etaJet[iJet], phiJet[iJet], eJet[iJet]);
 
       thisJet.rmsCand = rmsCandJet[iJet];
       thisJet.ptD = ptDJet[iJet];
@@ -779,7 +821,7 @@ if( njets<3 ) continue;
       //  }
       //}
       TLorentzVector parton;
-      parton.SetPtEtaPhiE( thisJet.Pt(), etaPartJet[iJet], phiPartJet[iJet], thisJet->Energy() );
+      parton.SetPtEtaPhiE( thisJet.Pt(), etaPartJet[iJet], phiPartJet[iJet], thisJet.Energy() );
       float deltaR = parton.DeltaR( thisJet );
       thisJet.pdgIdPart = (deltaR<0.5) ? pdgIdPartJet[iJet] : 21; //needed only for btag SF's
 
@@ -803,34 +845,34 @@ if( njets<3 ) continue;
       if( thisBtag > bestBtag ) {
         bestBtag2 = bestBtag;
         bestBtag = thisBtag;
-        //jetB2 = jetB1;
-        //jetB1 = thisJet;
+        jetB2 = jetB1;
+        jetB1 = thisJet;
         i_jetB2 = i_jetB1;
         i_jetB1 = iJet;
       } else if( thisBtag > bestBtag2 ) {
         bestBtag2 = thisBtag;
         i_jetB2 = iJet;
-        //jetB2 = thisJet;
+        jetB2 = thisJet;
       }
 
 
     } // for jets
 
 
-    if( njets < nJets_thresh_ ) continue;
-    //if( nBjets_loose < nBJets_loose_thresh_ ) continue;
-    //if( nBjets_medium < nBJets_medium_thresh_ ) continue;
+    if( njets < njets_thresh_ ) continue;
+    //if( nBjets_loose < nBjets_loose_thresh_ ) continue;
+    //if( nBjets_medium < nBjets_medium_thresh_ ) continue;
 
-    passed_btag = (nBjets_loose >= nBJets_loose_thresh_) && ( nBjets_medium >= nBJets_medium_thresh_ );
+    passed_btag = (nBjets_loose >= nBjets_loose_thresh_) && ( nBjets_medium >= nBjets_medium_thresh_ );
 
+    if( jetB1.Pt()==0. || jetB2.Pt()==0. ) {
+      std::cout << "JetB1/B2 are not defined. There must be a problem." << std::endl;
+      exit(33);
+    }
 
-    AnalysisJet jetB1, jetB2, jet3, jet4;
-    jetB1.SetPtEtaPhiE( ptJet[i_jetB1], etaJet[i_jetB1], phiJet[i_jetB1], eJet[i_jetB1]);
-    jetB2.SetPtEtaPhiE( ptJet[i_jetB2], etaJet[i_jetB2], phiJet[i_jetB2], eJet[i_jetB2]);
+    AnalysisJet jet3, jet4;
     jet3.SetPtEtaPhiE( 0., 0., 0., 0. );
     jet4.SetPtEtaPhiE( 0., 0., 0., 0. );
-
-
 
 
     
@@ -838,13 +880,15 @@ if( njets<3 ) continue;
     int istep=0;
     for( unsigned iJet=0; iJet<nJets; ++iJet) {
 
+      float ptJet_corr = ptJet[iJet] + (float)jes_*ptUncertJet[iJet];
+
       if( iJet==i_jetB1 || iJet==i_jetB2 ) continue;
  
-      if( ptJet[iJet] < ptJet_thresh_ ) continue;
+      if( ptJet_corr < ptJet_thresh_ ) continue;
       if( fabs(etaJet[iJet]) > etaJet_thresh_ ) continue;
 
       AnalysisJet thisJet;
-      thisJet.SetPtEtaPhiE( ptJet[iJet], etaJet[iJet], phiJet[iJet], eJet[iJet]);
+      thisJet.SetPtEtaPhiE( ptJet_corr, etaJet[iJet], phiJet[iJet], eJet[iJet]);
 
       thisJet.rmsCand = rmsCandJet[iJet];
       thisJet.ptD = ptDJet[iJet];
@@ -892,11 +936,6 @@ if( njets<3 ) continue;
 
     } //for additional jets
 
-
-    //float btag_thresh1 = this->get_btagThresh( btagJetB1_OP_ );
-    //float btag_thresh2 = this->get_btagThresh( btagJetB2_OP_ );
-
-    //passed_btag = (bTaggerJetB1 >= btag_thresh1) && ( bTaggerJetB2 >= btag_thresh2 );
 
 
 
@@ -1013,7 +1052,6 @@ if( njets<3 ) continue;
    
     h1_nJets->Fill( njets , eventWeight );
 
-    if( njets<njets_thresh_ ) continue;
     if( ht<ht_thresh_ ) continue;
 
 
@@ -1205,8 +1243,8 @@ if( njets<3 ) continue;
     etaJetB1_t = jetB1.Eta();
     etaJetB2_t = jetB2.Eta();
 
-    bTagJetB1_t = bTaggerJetB1;
-    bTagJetB2_t = bTaggerJetB2;
+    //bTagJetB1_t = bTaggerJetB1;
+    //bTagJetB2_t = bTaggerJetB2;
 
     ptJet3_t = jet3.Pt();
     ptJet4_t = jet4.Pt();
@@ -1355,13 +1393,12 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
 
     combinedIsoRelLept3_thresh_ = 1.;
 
-    ptBJet_thresh_ = 20.;
     ptJet_thresh_ = 20.;
     etaJet_thresh_ = 2.4;
 
     njets_thresh_ = 3;
     nBjets_loose_thresh_ = 0;
-    nBjets_medium_medium_ = 0;
+    nBjets_medium_thresh_ = 0;
 
     mZll_threshLo_ = 70.;
     mZll_threshHi_ = 110.;
@@ -1371,8 +1408,6 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
     met_thresh_ = 0.;
     ht_thresh_ = 0.;
  
-    njets_thresh_ = 3;
-
   } else if( selectionType_=="sel1" ) {
 
     ptLeptZ1_thresh_ = 20.;
@@ -1384,13 +1419,12 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
 
     combinedIsoRelLept3_thresh_ = 1.;
 
-    ptBJet_thresh_ = 20.;
     ptJet_thresh_ = 20.;
     etaJet_thresh_ = 2.4;
 
-    njets_thresh_ = 3;
+    njets_thresh_ = 4;
     nBjets_loose_thresh_ = 0;
-    nBjets_medium_medium_ = 1;
+    nBjets_medium_thresh_ = 1;
 
     mZll_threshLo_ = 81.;
     mZll_threshHi_ = 101.;
@@ -1399,8 +1433,6 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
 
     met_thresh_ = 30.;
     ht_thresh_ = 0.;
-
-    njets_thresh_ = 4;
 
   } else if( selectionType_=="sel2" ) {
 
@@ -1413,13 +1445,12 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
 
     combinedIsoRelLept3_thresh_ = 1.;
 
-    ptBJet_thresh_ = 20.;
     ptJet_thresh_ = 20.;
     etaJet_thresh_ = 2.4;
 
-    njets_thresh_ = 3;
+    njets_thresh_ = 4;
     nBjets_loose_thresh_ = 0;
-    nBjets_medium_medium_ = 1;
+    nBjets_medium_thresh_ = 1;
 
     mZll_threshLo_ = 81.;
     mZll_threshHi_ = 101.;
@@ -1428,8 +1459,6 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
 
     met_thresh_ = 0.;
     ht_thresh_ = 0.;
-
-    njets_thresh_ = 4;
 
   } else if( selectionType_=="sel3" ) {
 
@@ -1442,13 +1471,12 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
 
     combinedIsoRelLept3_thresh_ = 1.;
 
-    ptBJet_thresh_ = 20.;
     ptJet_thresh_ = 20.;
     etaJet_thresh_ = 2.4;
 
     njets_thresh_ = 3;
     nBjets_loose_thresh_ = 0;
-    nBjets_medium_medium_ = 1;
+    nBjets_medium_thresh_ = 1;
 
     mZll_threshLo_ = 81.;
     mZll_threshHi_ = 101.;
@@ -1457,8 +1485,6 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
 
     met_thresh_ = 0.;
     ht_thresh_ = 0.;
-
-    njets_thresh_ = 3;
 
   } else if( selectionType_=="optsel1" ) {
 
@@ -1471,13 +1497,12 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
 
     combinedIsoRelLept3_thresh_ = 1.;
 
-    ptBJet_thresh_ = 20.;
     ptJet_thresh_ = 20.;
     etaJet_thresh_ = 2.4;
 
     njets_thresh_ = 3;
     nBjets_loose_thresh_ = 0;
-    nBjets_medium_medium_ = 1;
+    nBjets_medium_thresh_ = 1;
 
     mZll_threshLo_ = 81.;
     mZll_threshHi_ = 101.;
@@ -1486,8 +1511,6 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
 
     met_thresh_ = 0.;
     ht_thresh_ = 184.;
-
-    njets_thresh_ = 3;
 
 
   } else {
@@ -1503,7 +1526,7 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
 
 
 
-/*
+
 float Ntp1Finalizer_TTZTrilepton::get_btagThresh( const std::string& btag_OP_ ) {
 
   if( btag_OP_ == "none" ) return -9999.;
@@ -1527,7 +1550,7 @@ float Ntp1Finalizer_TTZTrilepton::get_btagThresh( const std::string& btag_OP_ ) 
   return -9999.;
 
 }
-*/
+
 
 
 
@@ -1636,7 +1659,7 @@ float getEventHLTSF( float effSingle1, float effSingle2, float effDouble1, float
 
   return HLTSF;
 
-  }
+}
 
 
 
