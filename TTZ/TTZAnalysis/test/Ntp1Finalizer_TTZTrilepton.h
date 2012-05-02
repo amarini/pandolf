@@ -34,11 +34,11 @@ class Ntp1Finalizer_TTZTrilepton : public Ntp1Finalizer {
    std::string bTaggerType_;
 
    float  ptJet_thresh_;
-   float  ptBJet_thresh_;
    float  etaJet_thresh_;
 
-   std::string btagJetB1_OP_;
-   std::string btagJetB2_OP_;
+   int njets_thresh_;
+   int nBjets_loose_thresh_;
+   int nBjets_medium_thresh_;
 
    float  ptLeptZ1_thresh_;
    float  ptLeptZ2_thresh_;
@@ -52,12 +52,13 @@ class Ntp1Finalizer_TTZTrilepton : public Ntp1Finalizer {
    float  met_thresh_;
    float  ht_thresh_;
 
-   int    njets_thresh_;
-
    float  mZll_threshLo_;
    float  mZll_threshHi_;
 
    float  ptZll_thresh_;
+
+   // syst flags:
+   int jes_; // number of sigmas
 
 };
 
