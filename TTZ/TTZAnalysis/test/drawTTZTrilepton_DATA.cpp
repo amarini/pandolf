@@ -216,6 +216,8 @@ int main(int argc, char* argv[]) {
   drawChannelYieldPlot( db, "", "", lumi_fb, ttbarSF, DYWZSF );
   drawChannelYieldPlot( db, "ptZll80", "eventWeight*(ptZll>80.)", lumi_fb, ttbarSF, DYWZSF );
 
+
+/*
   std::vector<TH1D*> lastHistosMC;
   float signalYield;
   float channelYieldGen = lumi_fb * 139 * 0.06 * 0.2 * 0.67;
@@ -341,6 +343,7 @@ int main(int argc, char* argv[]) {
   yieldsFile << "Observed:    \t& " << db->get_lastHistos_data()[0]->Integral() << std::endl;
   yieldsFile.close();
 
+*/
 
 
 
@@ -422,6 +425,9 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
   THStack* stackMC = new THStack();
   std::vector<TH1D*> vh1_yields_mc;
   TH1D* h1_yields_mc_totBG = new TH1D("yields_mc_totBG", "", 5, 0., 5.);
+  h1_yields_mc_totBG->Sumw2();
+  TH1D* h1_yields_mc_signal = new TH1D("yields_mc_signal", "", 5, 0., 5.);
+  h1_yields_mc_signal->Sumw2();
 
 
   for( unsigned i=0; i<db->get_mcFiles().size(); ++i) {
@@ -469,6 +475,8 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
 
     if( db->get_mcFile(iMC).datasetName!="ttZ" && db->get_mcFile(iMC).datasetName!="ttW" )
       h1_yields_mc_totBG->Add(h1_yields_mc);
+    else 
+      h1_yields_mc_signal->Add(h1_yields_mc);
 
     delete h1_mc_mmm;
     delete h1_mc_mme;
@@ -529,12 +537,12 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
 
   ofstream ofs(yieldfilename.c_str());
 
-  ofs << "channel\tobserved\tbackground" << std::endl;
-  ofs << "(ee)e  \t" << h1_yields_data->GetBinContent(1) << "\t\t" << h1_yields_mc_totBG->GetBinContent(1) << std::endl;
-  ofs << "(ee)m  \t" << h1_yields_data->GetBinContent(2) << "\t\t" << h1_yields_mc_totBG->GetBinContent(2) << std::endl;
-  ofs << "(mm)e  \t" << h1_yields_data->GetBinContent(3) << "\t\t" << h1_yields_mc_totBG->GetBinContent(3) << std::endl;
-  ofs << "(mm)m  \t" << h1_yields_data->GetBinContent(4) << "\t\t" << h1_yields_mc_totBG->GetBinContent(4) << std::endl;
-  ofs << "Total  \t" << h1_yields_data->GetBinContent(5) << "\t\t" << h1_yields_mc_totBG->GetBinContent(5) << std::endl;
+  ofs << "channel\tobserved\tsignal\tbackground" << std::endl;
+  ofs << "(ee)e  \t" << h1_yields_data->GetBinContent(1) << "\t\t" << h1_yields_mc_signal->GetBinContent(1) << "\t\t" << h1_yields_mc_totBG->GetBinContent(1) << std::endl;
+  ofs << "(ee)m  \t" << h1_yields_data->GetBinContent(2) << "\t\t" << h1_yields_mc_signal->GetBinContent(2) << "\t\t" << h1_yields_mc_totBG->GetBinContent(2) << std::endl;
+  ofs << "(mm)e  \t" << h1_yields_data->GetBinContent(3) << "\t\t" << h1_yields_mc_signal->GetBinContent(3) << "\t\t" << h1_yields_mc_totBG->GetBinContent(3) << std::endl;
+  ofs << "(mm)m  \t" << h1_yields_data->GetBinContent(4) << "\t\t" << h1_yields_mc_signal->GetBinContent(4) << "\t\t" << h1_yields_mc_totBG->GetBinContent(4) << std::endl;
+  ofs << "Total  \t" << h1_yields_data->GetBinContent(5) << "\t\t" << h1_yields_mc_signal->GetBinContent(5) << "\t\t" << h1_yields_mc_totBG->GetBinContent(5) << std::endl;
 
   ofs.close();
 
@@ -544,6 +552,7 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
   delete gr_data;
   delete h1_yields_data;
   delete h1_yields_mc_totBG;
+  delete h1_yields_mc_signal;
 
   delete h1_data_mmm;
   delete h1_data_mme;
