@@ -25,6 +25,9 @@ class Ntp1Finalizer_TTZTrilepton : public Ntp1Finalizer {
 
   float get_btagThresh( const std::string& btag_OP_ );
 
+  void set_jes( int jes ) { jes_ = jes; };
+  void set_btagSyst( int btagSyst ) { btagSyst_ = btagSyst; };
+
 
  private:
 
@@ -58,6 +61,7 @@ class Ntp1Finalizer_TTZTrilepton : public Ntp1Finalizer {
 
    // syst flags:
    int jes_; // number of sigmas
+   int btagSyst_; // number of sigmas
 
 };
 
