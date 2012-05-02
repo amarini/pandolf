@@ -508,9 +508,9 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   float mZll_t, ptZll_t;
   float ptLeptZ1_t, ptLeptZ2_t, etaLeptZ1_t, etaLeptZ2_t;
   float ptLept3_t, etaLept3_t;
-  float ptJetB1_t, ptJetB2_t, etaJetB1_t, etaJetB2_t;
-  float bTagJetB1_t, bTagJetB2_t;
-  float ptJet3_t, ptJet4_t, etaJet3_t, etaJet4_t;
+  //float ptJetB1_t, ptJetB2_t, etaJetB1_t, etaJetB2_t;
+  //float bTagJetB1_t, bTagJetB2_t;
+  //float ptJet3_t, ptJet4_t, etaJet3_t, etaJet4_t;
   float HLTSF;
   int leptType3;
   bool isMZllSignalRegion;
@@ -550,16 +550,16 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   tree_passedEvents->Branch( "ptZll", &ptZll_t, "ptZll_t/F" );
   tree_passedEvents->Branch( "mZll", &mZll_t, "mZll_t/F" );
   tree_passedEvents->Branch( "etaLept3", &etaLept3_t, "etaLept3_t/F" );
-  tree_passedEvents->Branch( "ptJetB1", &ptJetB1_t, "ptJetB1_t/F" );
-  tree_passedEvents->Branch( "ptJetB2", &ptJetB2_t, "ptJetB2_t/F" );
+  //tree_passedEvents->Branch( "ptJetB1", &ptJetB1_t, "ptJetB1_t/F" );
+  //tree_passedEvents->Branch( "ptJetB2", &ptJetB2_t, "ptJetB2_t/F" );
   //tree_passedEvents->Branch( "bTagJetB1", &bTagJetB1_t, "bTagJetB1_t/F" );
   //tree_passedEvents->Branch( "bTagJetB2", &bTagJetB2_t, "bTagJetB2_t/F" );
-  tree_passedEvents->Branch( "ptJet3", &ptJet3_t, "ptJet3_t/F" );
-  tree_passedEvents->Branch( "ptJet4", &ptJet4_t, "ptJet4_t/F" );
-  tree_passedEvents->Branch( "etaJetB1", &etaJetB1_t, "etaJetB1_t/F" );
-  tree_passedEvents->Branch( "etaJetB2", &etaJetB2_t, "etaJetB2_t/F" );
-  tree_passedEvents->Branch( "etaJet3", &etaJet3_t, "etaJet3_t/F" );
-  tree_passedEvents->Branch( "etaJet4", &etaJet4_t, "etaJet4_t/F" );
+  //tree_passedEvents->Branch( "ptJet3", &ptJet3_t, "ptJet3_t/F" );
+  //tree_passedEvents->Branch( "ptJet4", &ptJet4_t, "ptJet4_t/F" );
+  //tree_passedEvents->Branch( "etaJetB1", &etaJetB1_t, "etaJetB1_t/F" );
+  //tree_passedEvents->Branch( "etaJetB2", &etaJetB2_t, "etaJetB2_t/F" );
+  //tree_passedEvents->Branch( "etaJet3", &etaJet3_t, "etaJet3_t/F" );
+  //tree_passedEvents->Branch( "etaJet4", &etaJet4_t, "etaJet4_t/F" );
   tree_passedEvents->Branch( "ht", &ht, "ht/F" );
   tree_passedEvents->Branch( "mt", &mt, "mt/F" );
   tree_passedEvents->Branch( "isMZllSignalRegion", &isMZllSignalRegion, "isMZllSignalRegion/O" );
@@ -709,8 +709,6 @@ ofstream ofs("run_event.txt");
         // weighted average over full run (weighted with lumi):
         HLTSF = (217.*HLTSF_Run2011A1 + 920.*HLTSF_Run2011A2 + 1000.*HLTSF_Run2011A3 + 2100.*HLTSF_Run2011B)/(217.+920.+1000.+2100.);
 
-        eventWeight *= HLTSF;
-
       } else if( leptType==1 ) { //electrons
 
         HLTSF = 1.;
@@ -735,6 +733,7 @@ ofstream ofs("run_event.txt");
 
       }
 
+      eventWeight *= HLTSF;
       eventWeight *= fPUWeight->GetWeight(nPU);
 
 
@@ -775,6 +774,8 @@ ofstream ofs("run_event.txt");
     jetB1.SetPtEtaPhiE( 0., 0., 0., 0. );
     jetB2.SetPtEtaPhiE( 0., 0., 0., 0. );
   
+    TLorentzVector pfMet_vector;
+    pfMet_vector.SetPtEtaPhiE( pfMet, 0., phiMet, pfMet );
 
     for( unsigned iJet=0; iJet<nJets; ++iJet) {
 
@@ -788,6 +789,14 @@ ofstream ofs("run_event.txt");
 
       AnalysisJet thisJet;
       thisJet.SetPtEtaPhiE( ptJet_corr, etaJet[iJet], phiJet[iJet], eJet[iJet]);
+
+      // MET syst:
+      AnalysisJet thisJet_uncorr;
+      thisJet_uncorr.SetPtEtaPhiE( ptJet[iJet], etaJet[iJet], phiJet[iJet], eJet[iJet]);
+
+      pfMet_vector -= thisJet_uncorr;
+      pfMet_vector += thisJet_uncorr;
+      
 
       thisJet.rmsCand = rmsCandJet[iJet];
       thisJet.ptD = ptDJet[iJet];
@@ -921,7 +930,10 @@ ofstream ofs("run_event.txt");
       //    deltaRmin = thisDeltaR;
       //  }
       //}
-      thisJet.pdgIdPart = pdgIdPartJet[iJet];
+      TLorentzVector parton;
+      parton.SetPtEtaPhiE( thisJet.Pt(), etaPartJet[iJet], phiPartJet[iJet], thisJet.Energy() );
+      float deltaR = parton.DeltaR( thisJet );
+      thisJet.pdgIdPart = (deltaR<0.5) ? pdgIdPartJet[iJet] : 21; //needed only for btag SF's
 
 
       if( istep==0 ) {
@@ -1238,18 +1250,18 @@ ofstream ofs("run_event.txt");
     ptZll_t = diLepton.Pt();
     mZll_t = diLepton.M();
 
-    ptJetB1_t = jetB1.Pt();
-    ptJetB2_t = jetB2.Pt();
-    etaJetB1_t = jetB1.Eta();
-    etaJetB2_t = jetB2.Eta();
+//  ptJetB1_t = jetB1.Pt();
+//  ptJetB2_t = jetB2.Pt();
+//  etaJetB1_t = jetB1.Eta();
+//  etaJetB2_t = jetB2.Eta();
 
-    //bTagJetB1_t = bTaggerJetB1;
-    //bTagJetB2_t = bTaggerJetB2;
+//  //bTagJetB1_t = bTaggerJetB1;
+//  //bTagJetB2_t = bTaggerJetB2;
 
-    ptJet3_t = jet3.Pt();
-    ptJet4_t = jet4.Pt();
-    etaJet3_t = jet3.Eta();
-    etaJet4_t = jet4.Eta();
+//  ptJet3_t = jet3.Pt();
+//  ptJet4_t = jet4.Pt();
+//  etaJet3_t = jet3.Eta();
+//  etaJet4_t = jet4.Eta();
 
 
 
