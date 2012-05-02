@@ -122,7 +122,7 @@ void Ntp1Analyzer_TTZ::CreateOutputFile() {
 
   reducedTree_->Branch("nLept", &nLept_, "nLept_/I");
 
-  reducedTree_->Branch("leptTypeLept", leptTypeLept_, "leptTypeLept_[nLept_]/F");
+  reducedTree_->Branch("leptTypeLept", leptTypeLept_, "leptTypeLept_[nLept_]/I");
   reducedTree_->Branch("eLept",  eLept_,  "eLept_[nLept_]/F");
   reducedTree_->Branch( "ptLept",  ptLept_,  "ptLept_[nLept_]/F");
   reducedTree_->Branch("etaLept", etaLept_, "etaLept_[nLept_]/F");
@@ -728,6 +728,12 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
      std::vector< AnalysisLepton > leptons;
 
+     // definition of leptType:
+     // 0: mumu
+     // 1: ee
+     // 2: e+mu-
+     // 3: e-mu+
+
 
      if( electrons.size() < 2 && muons.size() < 2 ) { //this is the ttbar opposite flavour control region:
 
@@ -808,7 +814,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        }
 
 
-     } else {
+     } else { // this is the (same flavor) signal region
 
        if( electrons.size() == 2 && muons.size() == 2 ) { 
 
@@ -901,10 +907,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      // save other leptons:
      nLept_=0;
      for( unsigned iMuonPlus=0; iMuonPlus<muonsPlus.size() && nLept_<10; ++iMuonPlus ) {
-       bool notSelected = true;
-       if( muons.size()>0 ) {
-         notSelected = muonsPlus[iMuonPlus]!=muons[0]; // 0 is positive
-       }
+       bool notSelected = (muonsPlus[iMuonPlus]!=leptons[0] && muonsPlus[iMuonPlus]!=leptons[1]); 
        if( notSelected ) {
          leptTypeLept_[nLept_] = 0;
          eLept_[nLept_] = muonsPlus[iMuonPlus].Energy();
@@ -917,10 +920,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        }
      }
      for( unsigned iMuonMinus=0; iMuonMinus<muonsMinus.size() && nLept_<10; ++iMuonMinus ) {
-       bool notSelected = true;
-       if( muons.size()>1 ) {
-         notSelected = muonsMinus[iMuonMinus]!=muons[1]; // 1 is negative
-       }
+       bool notSelected = (muonsMinus[iMuonMinus]!=leptons[0] && muonsMinus[iMuonMinus]!=leptons[1]);
        if( notSelected ) {
          leptTypeLept_[nLept_] = 0;
          eLept_[nLept_] = muonsMinus[iMuonMinus].Energy();
@@ -933,10 +933,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        }
      }
      for( unsigned iElectronPlus=0; iElectronPlus<electronsPlus.size() && nLept_<10; ++iElectronPlus ) {
-       bool notSelected = true;
-       if( electrons.size()>0 ) {
-         notSelected = electronsPlus[iElectronPlus]!=electrons[0]; // 0 is positive
-       }
+       bool notSelected = ( electronsPlus[iElectronPlus]!=leptons[0] && electronsPlus[iElectronPlus]!=leptons[1] );
        if( notSelected ) {
          leptTypeLept_[nLept_] = 1;
          eLept_[nLept_] = electronsPlus[iElectronPlus].Energy();
@@ -949,10 +946,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        }
      }
      for( unsigned iElectronMinus=0; iElectronMinus<electronsMinus.size() && nLept_<10; ++iElectronMinus ) {
-       bool notSelected = true;
-       if( electrons.size()>1 ) {
-         notSelected = electronsMinus[iElectronMinus]!=electrons[1]; // 1 is negative
-       }
+       bool notSelected = ( electronsMinus[iElectronMinus]!=leptons[0] && electronsMinus[iElectronMinus]!=leptons[1] );
        if( notSelected ) {
          leptTypeLept_[nLept_] = 1;
          eLept_[nLept_] = electronsMinus[iElectronMinus].Energy();
@@ -1018,7 +1012,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      // JETS
      // ------------------
 
-     float jetPt_thresh = 19.; //19 gev so that we can vary the JES uncert down one sigma
+     float jetPt_thresh = 19.; //so that we can vary the JES uncert down one sigma (uncert is never > 5% in eta<2.5)
      float jetEta_thresh = 2.5;
 
      // first save leading jets in event:
