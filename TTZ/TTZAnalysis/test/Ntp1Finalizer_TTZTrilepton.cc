@@ -777,7 +777,7 @@ ofstream ofs("run_event.txt");
     for( unsigned iJet=0; iJet<nJets; ++iJet) {
 
       // JES syst:
-      float ptJet_corr = ptJet[iJet] + (float)jes_*ptUncertJet[iJet];
+      float ptJet_corr = ptJet[iJet] + (float)jes_*ptUncertJet[iJet]*ptJet[iJet];
 
       if( ptJet_corr < ptJet_thresh_ ) continue;
       if( fabs(etaJet[iJet]) > etaJet_thresh_ ) continue;
@@ -792,7 +792,7 @@ ofstream ofs("run_event.txt");
       thisJet_uncorr.SetPtEtaPhiE( ptJet[iJet], etaJet[iJet], phiJet[iJet], eJet[iJet]);
 
       pfMet_vector -= thisJet_uncorr;
-      pfMet_vector += thisJet_uncorr;
+      pfMet_vector += thisJet;
       
 
       thisJet.rmsCand = rmsCandJet[iJet];
@@ -881,13 +881,14 @@ ofstream ofs("run_event.txt");
     jet4.SetPtEtaPhiE( 0., 0., 0., 0. );
 
 
-std::cout << pfMet - pfMet_vector.Pt() << std::endl;
+    // takes care of JES syst:
+    pfMet = pfMet_vector.Pt();
     
     // now add other jets ordered in pt:
     int istep=0;
     for( unsigned iJet=0; iJet<nJets; ++iJet) {
 
-      float ptJet_corr = ptJet[iJet] + (float)jes_*ptUncertJet[iJet];
+      float ptJet_corr = ptJet[iJet] + (float)jes_*ptUncertJet[iJet]*ptJet[iJet];
 
       if( iJet==i_jetB1 || iJet==i_jetB2 ) continue;
  
