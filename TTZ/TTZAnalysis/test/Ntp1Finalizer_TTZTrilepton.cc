@@ -826,10 +826,15 @@ ofstream ofs("run_event.txt");
       //    deltaRmin = thisDeltaR;
       //  }
       //}
-      TLorentzVector parton;
-      parton.SetPtEtaPhiE( thisJet.Pt(), etaPartJet[iJet], phiPartJet[iJet], thisJet.Energy() );
-      float deltaR = parton.DeltaR( thisJet );
-      thisJet.pdgIdPart = (deltaR<0.5) ? pdgIdPartJet[iJet] : 21; //needed only for btag SF's
+
+      if( isMC ) {
+        TLorentzVector parton;
+        parton.SetPtEtaPhiE( thisJet.Pt(), etaPartJet[iJet], phiPartJet[iJet], thisJet.Energy() );
+        float deltaR = parton.DeltaR( thisJet );
+        thisJet.pdgIdPart = (deltaR<0.5) ? pdgIdPartJet[iJet] : 21; //needed only for btag SF's
+      } else {
+        thisJet.pdgIdPart = 0;
+      }
 
 
       float thisBtag;
@@ -929,10 +934,14 @@ ofstream ofs("run_event.txt");
       //    deltaRmin = thisDeltaR;
       //  }
       //}
-      TLorentzVector parton;
-      parton.SetPtEtaPhiE( thisJet.Pt(), etaPartJet[iJet], phiPartJet[iJet], thisJet.Energy() );
-      float deltaR = parton.DeltaR( thisJet );
-      thisJet.pdgIdPart = (deltaR<0.5) ? pdgIdPartJet[iJet] : 21; //needed only for btag SF's
+      if( isMC ) {
+        TLorentzVector parton;
+        parton.SetPtEtaPhiE( thisJet.Pt(), etaPartJet[iJet], phiPartJet[iJet], thisJet.Energy() );
+        float deltaR = parton.DeltaR( thisJet );
+        thisJet.pdgIdPart = (deltaR<0.5) ? pdgIdPartJet[iJet] : 21; //needed only for btag SF's
+      } else {
+        thisJet.pdgIdPart = 0;
+      }
 
 
       if( istep==0 ) {
