@@ -76,6 +76,17 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
     std::string fullFlags_tmp(fullFlags_char);
     fullFlags = fullFlags_tmp;
   }
+  if( btagSyst_ == 1 ) fullFlags = fullFlags + "_BTagUP";
+  else if( btagSyst_ == -1 ) fullFlags = fullFlags + "_BTagDOWN";
+  else if( btagSyst_ != 0 ) {
+    char fullFlags_char[100];
+    if( btagSyst_ < 0 )
+      sprintf( fullFlags_char, "%s_BTagDOWN%d", fullFlags.c_str(), btagSyst_ );
+    else
+      sprintf( fullFlags_char, "%s_BTagUP%d", fullFlags.c_str(), btagSyst_ );
+    std::string fullFlags_tmp(fullFlags_char);
+    fullFlags = fullFlags_tmp;
+  }
   this->set_flags(fullFlags); //this is for the outfile name
   this->createOutputFile();
 
@@ -91,7 +102,8 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   h1_nCounterPU->Sumw2();
 
 
-
+  TH1D* h1_prova_MU = new TH1D("prova_MU", "", 8, 0, 8);
+  TH1D* h1_prova_ELE = new TH1D("prova_ELE", "", 8, 0, 8);
 
   TH1D* h1_nvertex = new TH1D("nvertex", "", 36, -0.5, 35.5);
   h1_nvertex->Sumw2();
@@ -436,11 +448,21 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
 
 
 
-  int nEntries = tree_->GetEntries();
+  //int nEntries = tree_->GetEntries();
+  int nEntries = 10000;
   std::map< int, std::map<int, std::vector<int> > > run_lumi_ev_map;
 
 
   BTagSFUtil* btsfutil = new BTagSFUtil(bTaggerType_, 13);
+  std::string meanminmax;
+  if( btagSyst_==0 )       meanminmax = "mean";
+  else if( btagSyst_==1 )  meanminmax = "max";
+  else if( btagSyst_==-1 ) meanminmax = "min";
+  else {
+    std::cout << "Only allowed values for btagSyst are 0, 1, -1. Exiting." << std::endl;
+    exit(55);
+  }
+
   
   //QGLikelihoodCalculator *qglikeli = new QGLikelihoodCalculator("/cmsrm/pc18/pandolf/CMSSW_4_2_3_patch1/src/UserCode/pandolf/QGLikelihood/QG_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6_Summer11-PU_S3_START42_V11-v2.root");
  
@@ -592,6 +614,7 @@ ofstream ofs("run_event.txt");
   std::cout << "----> DATASET: " << dataset_ << std::endl;
   std::cout << "----> SELECTION: " << selectionType_ << std::endl;
   std::cout << "----> B-TAGGER: " << bTaggerType_ << std::endl;
+  std::cout << "----> LEPT TYPE: " << leptType_ << std::endl;
   std::cout << std::endl << std::endl;
 
 
@@ -602,6 +625,8 @@ ofstream ofs("run_event.txt");
 
     tree_->GetEntry(iEntry);
 
+if( leptType==0 ) h1_prova_MU->Fill(0);
+if( leptType==1 ) h1_prova_ELE->Fill(0);
 
     if( eventWeight <= 0. ) eventWeight = 1.;
 
@@ -609,7 +634,6 @@ ofstream ofs("run_event.txt");
       if( leptType_=="ELE" && leptType==0 ) continue;
       if( leptType_=="MU" && leptType==1 ) continue;
     }
-
 
     if( !isMC ) { 
 
@@ -847,7 +871,8 @@ ofstream ofs("run_event.txt");
       bool isBtagged_medium = ( thisBtag > this->get_btagThresh("medium") );
 
       // take into account btag scale factors
-      btsfutil->modifyBTagsWithSF_fast(isBtagged_loose, isBtagged_medium, thisJet.Pt(), thisJet.Eta(), thisJet.pdgIdPart );
+      btsfutil->modifyBTagsWithSF_fast(isBtagged_loose, isBtagged_medium, thisJet.Pt(), thisJet.Eta(), thisJet.pdgIdPart, meanminmax );
+//      btsfutil->modifyBTagsWithSF_fast(isBtagged_loose, isBtagged_medium, thisJet.Pt(), thisJet.Eta(), thisJet.pdgIdPart, "min" );
 
       njets += 1;
       if( isBtagged_loose ) nBjets_loose += 1;
@@ -995,6 +1020,8 @@ ofstream ofs("run_event.txt");
 
     
 
+if( leptType==0 ) h1_prova_MU->Fill(1);
+if( leptType==1 ) h1_prova_ELE->Fill(1);
 
 
 
@@ -1008,6 +1035,9 @@ ofstream ofs("run_event.txt");
 
     // this is the trilepton channel: require at least one other lepton:
     if( nLept<1 ) continue;
+if( leptType==0 ) h1_prova_MU->Fill(2);
+if( leptType==1 ) h1_prova_ELE->Fill(2);
+
 
 
     h1_nJets_presel->Fill( njets, eventWeight );
@@ -1023,8 +1053,14 @@ ofstream ofs("run_event.txt");
     h1_leptTypeLept3_presel->Fill( leptTypeLept[0], eventWeight );
     h1_combinedIsoRelLept3_presel->Fill( combinedIsoRelLept[0], eventWeight );
 
+if( leptType==0 ) h1_prova_MU->Fill(3);
+if( leptType==1 ) h1_prova_ELE->Fill(3);
+
     if( lept3.Pt() < ptLept3_thresh_ ) continue;
     if( combinedIsoRelLept[0] > combinedIsoRelLept3_thresh_ ) continue;
+
+if( leptType==0 ) h1_prova_MU->Fill(4);
+if( leptType==1 ) h1_prova_ELE->Fill(4);
 
  
 
@@ -1044,6 +1080,9 @@ ofstream ofs("run_event.txt");
 
     h1_mZll_presel->Fill( diLepton.M(), eventWeight );
 
+if( leptType==0 ) h1_prova_MU ->Fill(5);
+if( leptType==1 ) h1_prova_ELE->Fill(5);
+
     if( leptZ1.Pt() < ptLeptZ1_thresh_ ) continue;
     if( leptZ2.Pt() < ptLeptZ2_thresh_ ) continue;
     if( fabs(leptZ1.Eta()) > etaLeptZ1_thresh_ ) continue;
@@ -1052,11 +1091,17 @@ ofstream ofs("run_event.txt");
     isMZllSignalRegion=true;
     if( diLepton.M() < mZll_threshLo_ || diLepton.M() > mZll_threshHi_ ) isMZllSignalRegion=false;
 
+if( leptType==0 ) h1_prova_MU ->Fill(6);
+if( leptType==1 ) h1_prova_ELE->Fill(6);
+
 
       
     if( pfMet < met_thresh_ ) continue;  
       
       
+if( leptType==0 ) h1_prova_MU ->Fill(7);
+if( leptType==1 ) h1_prova_ELE->Fill(7);
+
       
       
     // ------------
@@ -1300,6 +1345,8 @@ ofstream ofs("run_event.txt");
   h1_nCounterW->Write();
   h1_nCounterPU->Write();
 
+h1_prova_MU->Write();
+h1_prova_ELE->Write();
 
   h1_nvertex->Write();
   h1_nvertex_PUW->Write();
