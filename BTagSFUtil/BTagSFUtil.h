@@ -14,16 +14,18 @@
 
 // ............................................................................................................
 /*
-Usage:  
+RECOMMENDED Usage:  
 
 In the analysis macro:
 
-BTagSFUtil* btsfutil = new BTagSFUtil(13);
+BTagSFUtil* btsfutil = new BTagSFUtil(btagger, 13);
+// btagger is a string and is the name of the btagger (supported btaggers: "TCHE", "CVS", "JP");
 // 13 is just the seed
 
-btsfutil->modifyBTagsWithSF(taggerName, jet1_tagged_loose, jet1_tagged_medium, Jet1pt_, Jet1eta_, jet1flav_ );
+btsfutil->modifyBTagsWithSF_fast(jet1_tagged_loose, jet1_tagged_medium, Jet1pt_, Jet1eta_, jet1flav_, meanminmax );
+where jet1flav_ is the pdg id of the jet parton
+and meanminmax is "mean" for the normal usage, "min"/"max" respectively for systematic uncertainties +/- 1 sigma
 
-// taggerName can be: "TCHE", "CSV", "JP"
 
 */
 // .............................................................................................................
