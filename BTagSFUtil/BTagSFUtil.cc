@@ -777,6 +777,8 @@ float BTagSFUtil::GetMistag( float pt, float eta, const std::string& wp, const s
 
   checkInit(wp);
 
+  // meanminmax not used for now
+
   TF1* thisFunct;
 
   if( wp=="L" ) {
@@ -1234,17 +1236,34 @@ void BTagSFUtil::modifyBTagsWithSF_fast( bool& isBTagged_loose, bool& isBTagged_
   // b quarks and c quarks:
   if( abs( pdgIdPart ) == 5 ||  abs( pdgIdPart ) == 4) { 
 
-    // no need to downgrade if is a b and not tagged
+    // no need to downgrade if is a b/c and not tagged
     if( !isBTagged_loose ) return;
 
-    float coin = rand_->Uniform(1.);
-    
-    if( isBTagged_medium ){ 
-      if( coin > b_SF_Medium ) {isBTagged_medium=false; isBTagged_loose=false;} //turn medium and loose off, 
+    float b_eff = 1.;
+    if(abs( pdgIdPart ) == 4) b_eff /= 5.; // c's have 20% eff wrt b's
+
+    if( isBTagged_medium ) { 
+      bool newBTag = this->applySF( isBTagged_medium, b_SF_Medium, b_eff );
+      if( !newBTag ) {
+        isBTagged_medium = newBTag;
+        isBTagged_loose = newBTag; //need to downgrade also loose
+      }
+    } else if( isBTagged_loose && !isBTagged_medium ) {
+      bool newBTag = this->applySF( isBTagged_loose, b_SF_Loose, b_eff );
+      isBTagged_loose = newBTag;
     }
-    else if( isBTagged_loose && !isBTagged_medium ){
-      if( coin > b_SF_Loose ) isBTagged_loose=false; //
-    }
+      
+
+
+//  float coin = rand_->Uniform(1.);
+
+//  if( isBTagged_medium ){ 
+//    if( coin > b_SF_Medium ) {isBTagged_medium=false; isBTagged_loose=false;} //turn medium and loose off, 
+
+//  }
+//  else if( isBTagged_loose && !isBTagged_medium ){
+//    if( coin > b_SF_Loose ) isBTagged_loose=false; //
+//  }
 
 
   // light quarks:
@@ -1253,23 +1272,66 @@ void BTagSFUtil::modifyBTagsWithSF_fast( bool& isBTagged_loose, bool& isBTagged_
     // no need to upgrade if is light and medium tagged
     if( isBTagged_medium ) return;
 
-    float mistagPercent_Loose = ( light_SF_Loose*light_eff_Loose - light_eff_Loose ) / ( 1. - light_eff_Loose );
-    float mistagPercent_Medium = ( light_SF_Medium*light_eff_Medium - light_eff_Medium ) / ( 1. - light_eff_Medium );
-
-
-    float coin = rand_->Uniform(1.);
-
     // for light quarks, the jet has to be upgraded:
     if( !isBTagged_loose ) {
-      if( coin < mistagPercent_Loose ) isBTagged_loose = true;
+      bool newBTag = this->applySF( isBTagged_loose, light_SF_Loose, light_eff_Loose );
+      isBTagged_loose = newBTag;
     } else if( !isBTagged_medium ) {
-      if( coin < mistagPercent_Medium ) isBTagged_medium = true; 
+      bool newBTag = this->applySF( isBTagged_medium, light_SF_Medium, light_eff_Medium );
+      isBTagged_medium = newBTag;
     }
+
+//  float mistagPercent_Loose = ( light_SF_Loose*light_eff_Loose - light_eff_Loose ) / ( 1. - light_eff_Loose );
+//  float mistagPercent_Medium = ( light_SF_Medium*light_eff_Medium - light_eff_Medium ) / ( 1. - light_eff_Medium );
+
+
+//  float coin = rand_->Uniform(1.);
+
+//  // for light quarks, the jet has to be upgraded:
+//  if( !isBTagged_loose ) {
+//    if( coin < mistagPercent_Loose ) isBTagged_loose = true;
+//  } else if( !isBTagged_medium ) {
+//    if( coin < mistagPercent_Medium ) isBTagged_medium = true; 
+//  }
 
     
   } //if light quark
 
 } //modifyBTagsWithSF_fast
+
+
+
+
+bool BTagSFUtil::applySF(bool isBTagged, float Btag_SF, float Btag_eff) const {
+  
+  bool newBTag = isBTagged;
+
+  if (Btag_SF == 1) return newBTag; //no correction needed 
+
+  //throw die
+  float coin = rand_->Uniform(1.);    
+  
+  if(Btag_SF > 1){  // use this if SF>1
+
+    if( !isBTagged ) {
+
+      //fraction of jets that need to be upgraded
+      float mistagPercent = (1.0 - Btag_SF) / (1.0 - (Btag_SF/Btag_eff) );
+
+      //upgrade to tagged
+      if( coin < mistagPercent ) {newBTag = true;}
+    }
+
+  }else{  // use this if SF<1
+      
+    //downgrade tagged to untagged
+    if( isBTagged && coin > Btag_SF ) {newBTag = false;}
+
+  }
+
+  return newBTag;
+}
+
 
 
 

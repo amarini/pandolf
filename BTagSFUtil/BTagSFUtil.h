@@ -69,6 +69,8 @@ class BTagSFUtil {
   void SF(const std::string& btagAlgo, const std::string& wp, float pt = 60., float eta = 1.6);
   void modifyBTagsWithSF_fast( bool& isBTagged_loose, bool& isBTagged_medium, float jetpt, float jeteta, int pdgIdPart, const std::string& meanMinMax="mean" );
   void modifyBTagsWithSF(const std::string& btagAlgo , bool& isBTagged_loose, bool& isBTagged_medium, float jetpt, float jeteta, int pdgIdPart, float sysSF=1.0);
+  bool applySF(bool isBTagged, float Btag_SF, float Btag_eff) const;
+
 
 
 /***********************************/
