@@ -21,7 +21,7 @@
 
 bool USE_MC_MASS=false;
 
-int DEBUG_EVENTNUMBER = 98901397;
+int DEBUG_EVENTNUMBER = 166986733;
 
 
 
@@ -102,9 +102,6 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   h1_nCounterPU->Sumw2();
 
 
-  TH1D* h1_prova_MU = new TH1D("prova_MU", "", 8, 0, 8);
-  TH1D* h1_prova_ELE = new TH1D("prova_ELE", "", 8, 0, 8);
-
   TH1D* h1_nvertex = new TH1D("nvertex", "", 36, -0.5, 35.5);
   h1_nvertex->Sumw2();
   TH1D* h1_nvertex_PUW = new TH1D("nvertex_PUW", "", 36, -0.5, 35.5);
@@ -175,6 +172,10 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   h1_mZll_prepresel_antibtag->Sumw2();
   TH1D* h1_mZll_OF_prepresel = new TH1D("mZll_OF_prepresel", "", 220, 50., 160.);
   h1_mZll_OF_prepresel->Sumw2();
+  TH1D* h1_mZll_OF2_prepresel = new TH1D("mZll_OF2_prepresel", "", 220, 50., 160.);
+  h1_mZll_OF2_prepresel->Sumw2();
+  TH1D* h1_mZll_OF3_prepresel = new TH1D("mZll_OF3_prepresel", "", 220, 50., 160.);
+  h1_mZll_OF3_prepresel->Sumw2();
   TH1D* h1_mZll_presel = new TH1D("mZll_presel", "", 220, 50., 160.);
   h1_mZll_presel->Sumw2();
   TH1D* h1_mZll_presel_antibtag = new TH1D("mZll_presel_antibtag", "", 220, 50., 160.);
@@ -448,8 +449,7 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
 
 
 
-  //int nEntries = tree_->GetEntries();
-  int nEntries = 10000;
+  int nEntries = tree_->GetEntries();
   std::map< int, std::map<int, std::vector<int> > > run_lumi_ev_map;
 
 
@@ -625,8 +625,6 @@ ofstream ofs("run_event.txt");
 
     tree_->GetEntry(iEntry);
 
-if( leptType==0 ) h1_prova_MU->Fill(0);
-if( leptType==1 ) h1_prova_ELE->Fill(0);
 
     if( eventWeight <= 0. ) eventWeight = 1.;
 
@@ -736,21 +734,19 @@ if( leptType==1 ) h1_prova_ELE->Fill(0);
 
       } else if( leptType==2 ) { // e+mu-
 
-        float effSingle_Run2011A1 = ( chargeLeptZ1<0 ) ? getMuonHLTSF_SingleTrigger( ptLeptZ1, etaLeptZ1, "Run2011A1") : getMuonHLTSF_SingleTrigger( ptLeptZ2, etaLeptZ2, "Run2011A1");
-        float effSingle_Run2011A2 = ( chargeLeptZ1<0 ) ? getMuonHLTSF_SingleTrigger( ptLeptZ1, etaLeptZ1, "Run2011A2") : getMuonHLTSF_SingleTrigger( ptLeptZ2, etaLeptZ2, "Run2011A2");
-        float effSingle_Run2011A3 = ( chargeLeptZ1<0 ) ? getMuonHLTSF_SingleTrigger( ptLeptZ1, etaLeptZ1, "Run2011A3") : getMuonHLTSF_SingleTrigger( ptLeptZ2, etaLeptZ2, "Run2011A3");
-        float effSingle_Run2011B  = ( chargeLeptZ1<0 ) ? getMuonHLTSF_SingleTrigger( ptLeptZ1, etaLeptZ1, "Run2011B") : getMuonHLTSF_SingleTrigger( ptLeptZ2, etaLeptZ2, "Run2011B");
+        //float effSingle_Run2011A  = ( chargeLeptZ1<0 ) ? getMuonHLTSF_DoubleTrigger( ptLeptZ1, etaLeptZ1, "Run2011A") : getMuonHLTSF_DoubleTrigger( ptLeptZ2, etaLeptZ2, "Run2011A");
+        //float effSingle_Run2011B  = ( chargeLeptZ1<0 ) ? getMuonHLTSF_DoubleTrigger( ptLeptZ1, etaLeptZ1, "Run2011B") : getMuonHLTSF_DoubleTrigger( ptLeptZ2, etaLeptZ2, "Run2011B");
 
-        HLTSF = (217.*effSingle_Run2011A1 + 920.*effSingle_Run2011A2 + 1000.*effSingle_Run2011A3 + 2100.*effSingle_Run2011B)/(217.+920.+1000.+2100.);
+        //HLTSF = ( (217.+920.+1000.)*effSingle_Run2011A + 2100.*effSingle_Run2011B)/(217.+920.+1000.+2100.);
+        HLTSF = 1.; // not needed as signal doesnt have OF leptons and ttbar is scaled
 
       } else if( leptType==3 ) { // e-mu+
 
-        float effSingle_Run2011A1 = ( chargeLeptZ1>0 ) ? getMuonHLTSF_SingleTrigger( ptLeptZ1, etaLeptZ1, "Run2011A1") : getMuonHLTSF_SingleTrigger( ptLeptZ2, etaLeptZ2, "Run2011A1");
-        float effSingle_Run2011A2 = ( chargeLeptZ1>0 ) ? getMuonHLTSF_SingleTrigger( ptLeptZ1, etaLeptZ1, "Run2011A2") : getMuonHLTSF_SingleTrigger( ptLeptZ2, etaLeptZ2, "Run2011A2");
-        float effSingle_Run2011A3 = ( chargeLeptZ1>0 ) ? getMuonHLTSF_SingleTrigger( ptLeptZ1, etaLeptZ1, "Run2011A3") : getMuonHLTSF_SingleTrigger( ptLeptZ2, etaLeptZ2, "Run2011A3");
-        float effSingle_Run2011B  = ( chargeLeptZ1>0 ) ? getMuonHLTSF_SingleTrigger( ptLeptZ1, etaLeptZ1, "Run2011B") : getMuonHLTSF_SingleTrigger( ptLeptZ2, etaLeptZ2, "Run2011B");
+        //float effSingle_Run2011A = ( chargeLeptZ1>0 ) ? getMuonHLTSF_DoubleTrigger( ptLeptZ1, etaLeptZ1, "Run2011A") : getMuonHLTSF_DoubleTrigger( ptLeptZ2, etaLeptZ2, "Run2011A");
+        //float effSingle_Run2011B = ( chargeLeptZ1>0 ) ? getMuonHLTSF_DoubleTrigger( ptLeptZ1, etaLeptZ1, "Run2011B") : getMuonHLTSF_DoubleTrigger( ptLeptZ2, etaLeptZ2, "Run2011B");
 
-        HLTSF = (217.*effSingle_Run2011A1 + 920.*effSingle_Run2011A2 + 1000.*effSingle_Run2011A3 + 2100.*effSingle_Run2011B)/(217.+920.+1000.+2100.);
+        //HLTSF = ( (217.+920.+1000.)*effSingle_Run2011A + 2100.*effSingle_Run2011B)/(217.+920.+1000.+2100.);
+        HLTSF = 1.; // not needed as signal doesnt have OF leptons and ttbar is scaled
 
       }
 
@@ -991,6 +987,17 @@ if( leptType==1 ) h1_prova_ELE->Fill(0);
 
     TLorentzVector diLepton = leptZ1+leptZ2;
 
+    if( event==DEBUG_EVENTNUMBER ) {
+      std::cout << std::endl << std::endl << "----------------------------------" << std::endl;
+      std::cout << "** LOG FOR RUN: " << run << "   EVENT: " << DEBUG_EVENTNUMBER << std::endl << std::endl;
+      std::cout << "eventWeight: " << eventWeight << std::endl;
+      std::cout << "leptType: " << leptType << std::endl; 
+      std::cout << "leptZ1.Pt(): " << leptZ1.Pt() << " leptZ1.Eta(): " << leptZ1.Eta() << std::endl;
+      std::cout << "leptZ2.Pt(): " << leptZ2.Pt() << " leptZ2.Eta(): " << leptZ2.Eta() << std::endl;
+      std::cout << "diLepton.M(): " << diLepton.M() << std::endl;
+    }
+
+
     if( diLepton.M()<50. ) continue; // gen cut in DY sample
 
 
@@ -1003,7 +1010,13 @@ if( leptType==1 ) h1_prova_ELE->Fill(0);
       else
         h1_mZll_prepresel_ELE->Fill( diLepton.M(), eventWeight );
     } else {  //opposite flavour leptons: ttbar control region
+
+      if( event==DEBUG_EVENTNUMBER ) std::cout << "Filling OF plot and continuing." << std::endl;
       h1_mZll_OF_prepresel->Fill( diLepton.M(), eventWeight );
+      if( leptType==2 )
+        h1_mZll_OF2_prepresel->Fill( diLepton.M(), eventWeight );
+      if( leptType==3 )
+        h1_mZll_OF3_prepresel->Fill( diLepton.M(), eventWeight );
       continue;
     }
 
@@ -1020,9 +1033,6 @@ if( leptType==1 ) h1_prova_ELE->Fill(0);
 
     
 
-if( leptType==0 ) h1_prova_MU->Fill(1);
-if( leptType==1 ) h1_prova_ELE->Fill(1);
-
 
 
     // fill some histos before requiring third lepton:
@@ -1035,8 +1045,6 @@ if( leptType==1 ) h1_prova_ELE->Fill(1);
 
     // this is the trilepton channel: require at least one other lepton:
     if( nLept<1 ) continue;
-if( leptType==0 ) h1_prova_MU->Fill(2);
-if( leptType==1 ) h1_prova_ELE->Fill(2);
 
 
 
@@ -1053,25 +1061,12 @@ if( leptType==1 ) h1_prova_ELE->Fill(2);
     h1_leptTypeLept3_presel->Fill( leptTypeLept[0], eventWeight );
     h1_combinedIsoRelLept3_presel->Fill( combinedIsoRelLept[0], eventWeight );
 
-if( leptType==0 ) h1_prova_MU->Fill(3);
-if( leptType==1 ) h1_prova_ELE->Fill(3);
 
     if( lept3.Pt() < ptLept3_thresh_ ) continue;
     if( combinedIsoRelLept[0] > combinedIsoRelLept3_thresh_ ) continue;
 
-if( leptType==0 ) h1_prova_MU->Fill(4);
-if( leptType==1 ) h1_prova_ELE->Fill(4);
 
  
-
-    if( event==DEBUG_EVENTNUMBER ) {
-      std::cout << std::endl << std::endl << "----------------------------------" << std::endl;
-      std::cout << "** LOG FOR RUN: " << run << "   EVENT: " << DEBUG_EVENTNUMBER << std::endl << std::endl;
-      std::cout << "leptType: " << leptType << std::endl; 
-      std::cout << "leptZ1.Pt(): " << leptZ1.Pt() << " leptZ1.Eta(): " << leptZ1.Eta() << std::endl;
-      std::cout << "leptZ2.Pt(): " << leptZ2.Pt() << " leptZ2.Eta(): " << leptZ2.Eta() << std::endl;
-      std::cout << "diLepton.M(): " << diLepton.M() << std::endl;
-    }
 
 
     // ----------------------------
@@ -1080,8 +1075,6 @@ if( leptType==1 ) h1_prova_ELE->Fill(4);
 
     h1_mZll_presel->Fill( diLepton.M(), eventWeight );
 
-if( leptType==0 ) h1_prova_MU ->Fill(5);
-if( leptType==1 ) h1_prova_ELE->Fill(5);
 
     if( leptZ1.Pt() < ptLeptZ1_thresh_ ) continue;
     if( leptZ2.Pt() < ptLeptZ2_thresh_ ) continue;
@@ -1091,16 +1084,12 @@ if( leptType==1 ) h1_prova_ELE->Fill(5);
     isMZllSignalRegion=true;
     if( diLepton.M() < mZll_threshLo_ || diLepton.M() > mZll_threshHi_ ) isMZllSignalRegion=false;
 
-if( leptType==0 ) h1_prova_MU ->Fill(6);
-if( leptType==1 ) h1_prova_ELE->Fill(6);
 
 
       
     if( pfMet < met_thresh_ ) continue;  
       
       
-if( leptType==0 ) h1_prova_MU ->Fill(7);
-if( leptType==1 ) h1_prova_ELE->Fill(7);
 
       
       
@@ -1345,9 +1334,6 @@ if( leptType==1 ) h1_prova_ELE->Fill(7);
   h1_nCounterW->Write();
   h1_nCounterPU->Write();
 
-h1_prova_MU->Write();
-h1_prova_ELE->Write();
-
   h1_nvertex->Write();
   h1_nvertex_PUW->Write();
   h1_nvertex_PUW_ave->Write();
@@ -1386,6 +1372,8 @@ h1_prova_ELE->Write();
   h1_mZll_prepresel_ELE->Write();
   h1_mZll_prepresel_antibtag->Write();
   h1_mZll_OF_prepresel->Write();
+  h1_mZll_OF2_prepresel->Write();
+  h1_mZll_OF3_prepresel->Write();
   h1_mZll_presel->Write();
   h1_mZll_presel_antibtag->Write();
   h1_mZll->Write();
