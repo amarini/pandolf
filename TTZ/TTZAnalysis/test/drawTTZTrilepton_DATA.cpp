@@ -164,6 +164,8 @@ int main(int argc, char* argv[]) {
   // opposite flavor leptons: control region for ttbar:
   db->set_rebin(4);
   db->drawHisto("mZll_OF_prepresel", "Opposite Flavor Dilepton Mass", "GeV", "Events");
+  //db->drawHisto("mZll_OF2_prepresel", "Opposite Flavor Dilepton Mass", "GeV", "Events");
+  //db->drawHisto("mZll_OF3_prepresel", "Opposite Flavor Dilepton Mass", "GeV", "Events");
   // scale ttbar MC to match data:
   float ttbarSF = get_ttbarSF( *db );
   db->set_mcWeight( "TTtW", ttbarSF );
@@ -537,12 +539,13 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
 
   ofstream ofs(yieldfilename.c_str());
 
-  ofs << "channel\tobserved\tsignal\tbackground" << std::endl;
-  ofs << "(ee)e  \t" << h1_yields_data->GetBinContent(1) << "\t\t" << h1_yields_mc_signal->GetBinContent(1) << "\t\t" << h1_yields_mc_totBG->GetBinContent(1) << std::endl;
-  ofs << "(ee)m  \t" << h1_yields_data->GetBinContent(2) << "\t\t" << h1_yields_mc_signal->GetBinContent(2) << "\t\t" << h1_yields_mc_totBG->GetBinContent(2) << std::endl;
-  ofs << "(mm)e  \t" << h1_yields_data->GetBinContent(3) << "\t\t" << h1_yields_mc_signal->GetBinContent(3) << "\t\t" << h1_yields_mc_totBG->GetBinContent(3) << std::endl;
-  ofs << "(mm)m  \t" << h1_yields_data->GetBinContent(4) << "\t\t" << h1_yields_mc_signal->GetBinContent(4) << "\t\t" << h1_yields_mc_totBG->GetBinContent(4) << std::endl;
-  ofs << "Total  \t" << h1_yields_data->GetBinContent(5) << "\t\t" << h1_yields_mc_signal->GetBinContent(5) << "\t\t" << h1_yields_mc_totBG->GetBinContent(5) << std::endl;
+  ofs << "channel\tobserved\tsignal\tb_pred\tb_pred_error" << std::endl;
+  ofs << "(ee)e  \t" << h1_yields_data->GetBinContent(1) << "\t\t" << h1_yields_mc_signal->GetBinContent(1) << "\t" << h1_yields_mc_totBG->GetBinContent(1) << "\t" << h1_yields_mc_totBG->GetBinError(1) << std::endl;
+  ofs << "(ee)m  \t" << h1_yields_data->GetBinContent(2) << "\t\t" << h1_yields_mc_signal->GetBinContent(2) << "\t" << h1_yields_mc_totBG->GetBinContent(2) << "\t" << h1_yields_mc_totBG->GetBinError(2) << std::endl;
+  ofs << "(mm)e  \t" << h1_yields_data->GetBinContent(3) << "\t\t" << h1_yields_mc_signal->GetBinContent(3) << "\t" << h1_yields_mc_totBG->GetBinContent(3) << "\t" << h1_yields_mc_totBG->GetBinError(3) << std::endl;
+  ofs << "(mm)m  \t" << h1_yields_data->GetBinContent(4) << "\t\t" << h1_yields_mc_signal->GetBinContent(4) << "\t" << h1_yields_mc_totBG->GetBinContent(4) << "\t" << h1_yields_mc_totBG->GetBinError(4) << std::endl;
+  ofs << "Total  \t" << h1_yields_data->GetBinContent(5) << "\t\t" << h1_yields_mc_signal->GetBinContent(5) << "\t" << h1_yields_mc_totBG->GetBinContent(5) << "\t" << h1_yields_mc_totBG->GetBinError(5) << std::endl;
+
 
   ofs.close();
 
