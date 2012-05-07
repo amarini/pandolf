@@ -1,4 +1,4 @@
-// @(#)root/tmva $Id: TMVAClassification.C,v 1.4 2012/04/16 13:14:08 pandolf Exp $
+// @(#)root/tmva $Id: TMVAClassification.C,v 1.1 2012/04/23 13:50:22 pandolf Exp $
 /**********************************************************************************
  * Project   : TMVA - a Root-integrated toolkit for multivariate data analysis    *
  * Package   : TMVA                                                               *
@@ -174,16 +174,32 @@ void TMVAClassification( std::string optName, TString myMethodList = "" )
    // Define the input variables that shall be used for the MVA training
    // note that you may also use variable expressions, such as: "3*var1/var2*abs(var3)"
    // [all types of expressions that can also be parsed by TTree::Draw( "expression" )]
-   factory->AddVariable( "ptLept3"       , "Third Lepton p_{T}", "GeV", 'F');
+   //factory->AddVariable( "ptLept3"       , "Third Lepton p_{T}", "GeV", 'F');
    factory->AddVariable( "ptZll"         , "p_{T} (Z)", "GeV", 'F');
    factory->AddVariable( "ht"            , "H_{T}", "GeV", 'F');
-   //factory->AddVariable( "mZll"          , "DiLepton Mass", "GeV", 'F');
-   //factory->AddVariable( "ptLeptZ1"      , "Lead Lepton p_{T}", "GeV", 'F');
+   factory->AddVariable("mT_lZmet"  , "mT_lZmet", "GeV", 'F');
+   factory->AddVariable("mb1jj"     , "mb1jj", "GeV", 'F');
+   //factory->AddVariable("mb2jj"     , "mb2jj", "GeV", 'F');
+   factory->AddVariable("mbjj_best" , "mbjj_best", "GeV", 'F');
+   factory->AddVariable("mb1jjZ"    , "mb1jjZ", "GeV", 'F');
+   //factory->AddVariable("mb2jjZ"    , "mb2jjZ", "GeV", 'F');
+   factory->AddVariable("mbjjZ_best", "mbjjZ_best", "GeV", 'F');
+   //factory->AddVariable("mTb1W"     , "mTb1W", "GeV", 'F');
+   //factory->AddVariable("mTb2W"     , "mTb2W", "GeV", 'F');
+   factory->AddVariable("mTbW_best" , "mTbW_best", "GeV", 'F');
+   //factory->AddVariable("mTb1WZ"    , "mTb1WZ", "GeV", 'F');
+   //factory->AddVariable("mTb2WZ"    , "mTb2WZ", "GeV", 'F');
+   factory->AddVariable("mTbWZ_best", "mTbWZ_best", "GeV", 'F');
+   //factory->AddVariable( "mt"            , "M_{T}", "GeV", 'F');
+   factory->AddVariable( "ptJetB1"      , "Lead b-Jet p_{T}", "GeV", 'F');
+   //factory->AddVariable( "ptJetB2"      , "Sublead Lepton p_{T}", "GeV", 'F');
+   factory->AddVariable( "ptLeptZ1"      , "Lead Lepton p_{T}", "GeV", 'F');
    //factory->AddVariable( "ptLeptZ2"      , "Sublead Lepton p_{T}", "GeV", 'F');
-   //factory->AddVariable( "pfMet"         , "ME_{T}", "GeV", 'F');
-   //factory->AddVariable( "NbJmed"   , "N B Jets (medium)", "", 'I');
-   //factory->AddVariable( "NbJ"      , "N B Jets", "", 'I');
-   //factory->AddVariable( "NJ"       , "N Jets", "", 'I');
+   factory->AddVariable( "pfMet"         , "ME_{T}", "GeV", 'F');
+   //factory->AddVariable( "nBjets_medium"   , "N B Jets (medium)", "", 'I');
+   //factory->AddVariable( "nBjets_loose"      , "N B Jets", "", 'I');
+   //factory->AddVariable( "njets"       , "N Jets", "", 'I');
+   //factory->AddVariable( "mZll"          , "DiLepton Mass", "GeV", 'F');
 
    // You can add so-called "Spectator variables", which are not used in the MVA training, 
    // but will appear in the final "TestTree" produced by TMVA. This TestTree will contain the 
@@ -228,15 +244,25 @@ void TMVAClassification( std::string optName, TString myMethodList = "" )
       TTree* opt_tree = (TTree*)input->Get("tree_opt");
 
       
-      std::string signalFileName = "TTZTrilepton_TTZ_TuneZ2_7TeV-madgraphCMSSW42xPUv3_spadhi_presel_TCHE_ALL.root";
+      std::string signalFileName = "../TTZTrilepton_TTZ_TuneZ2_7TeV-madgraphCMSSW42xPUv3_spadhi_presel_TCHE_ALL.root";
       TFile* signalFile = TFile::Open(signalFileName.c_str());
       TTree *signal     = (TTree*)signalFile->Get("tree_passedEvents");
 
       TChain* background = new TChain("tree_passedEvents");
-      std::string ttjFileName = "TTZTrilepton_TTJ_Fall11_highstat_presel_TCHE_ALL.root";
+      std::string ttjFileName = "../TTZTrilepton_TTJ_Fall11_highstat_presel_TCHE_ALL.root";
       background->Add(ttjFileName.c_str());
-      std::string dyFileName = "TTZTrilepton_DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1_presel_TCHE_ALL.root";
-      background->Add(dyFileName.c_str());
+      std::string vvFileName = "../TTZTrilepton_VV_Summer11_presel_TCHE_ALL.root";
+      background->Add(vvFileName.c_str());
+      std::string dyFileName = "../TTZTrilepton_DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Fall11_presel_TCHE_ALL.root";
+      //background->Add(dyFileName.c_str());
+
+      //TFile* file_TTJ = TFile::Open("../TTZTrilepton_TTJ_Fall11_highstat_presel_TCHE_ALL.root");
+      //TFile* file_VV = TFile::Open("../TTZTrilepton_VV_Summer11_presel_TCHE_ALL.root");
+      //TFile* file_DY = TFile::Open("../TTZTrilepton_DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Fall11_presel_TCHE_ALL.root");
+
+      //TTree* tree_TTJ = (TTree*)file_TTJ->Get("tree_passedEvents");
+      //TTree* tree_VV  = (TTree*)file_VV->Get("tree_passedEvents");
+      //TTree* tree_DY  = (TTree*)file_DY->Get("tree_passedEvents");
 
 
       // global event weights per tree (see below for setting event-wise weights)
@@ -249,6 +275,9 @@ void TMVAClassification( std::string optName, TString myMethodList = "" )
       // you can add an arbitrary number of signal or background trees
       factory->AddSignalTree    ( signal,     signalWeight     );
       factory->AddBackgroundTree( background, backgroundWeight );
+      //factory->AddBackgroundTree( tree_TTJ, 1.17 ); //weights taken from datadriven rescaling
+      //factory->AddBackgroundTree( tree_VV, 1.46 );
+      //factory->AddBackgroundTree( tree_DY, 1.46 );
 
       // To give different trees for training and testing, do as follows:
       //    factory->AddSignalTree( signalTrainingTree, signalTrainWeight, "Training" );
@@ -301,8 +330,11 @@ void TMVAClassification( std::string optName, TString myMethodList = "" )
    //char presel[500];
    //sprintf( presel, "NJ>=%d && NbJ>=%d && pT1>%f && pT2>%f", nJ_min_presel, nbJ_min_presel, ptLep1_min_presel, ptLep2_min_presel );
 
-   TCut mycuts = "nBjets_medium>0 && mZll > 81. && mZll < 101."; // for example: TCut mycuts = "abs(var1)<0.5 && abs(var2-0.5)<1";
-   TCut mycutb = "nBjets_medium>0 && mZll > 81. && mZll < 101."; // for example: TCut mycutb = "abs(var1)<0.5";
+   TCut mycuts = "nBjets_medium>0 && mZll > 81. && mZll < 101. && pfMet>30. && leptType<2"; // for example: TCut mycuts = "abs(var1)<0.5 && abs(var2-0.5)<1";
+   TCut mycutb = "nBjets_medium>0 && mZll > 81. && mZll < 101. && pfMet>30. && leptType<2"; // for example: TCut mycutb = "abs(var1)<0.5";
+
+   //TCut mycuts = ""; // for example: TCut mycuts = "abs(var1)<0.5 && abs(var2-0.5)<1";
+   //TCut mycutb = ""; // for example: TCut mycutb = "abs(var1)<0.5";
 
 
    // tell the factory to use all remaining events in the trees after training for testing:
@@ -328,16 +360,13 @@ void TMVAClassification( std::string optName, TString myMethodList = "" )
 
       std::string bookConditions;
       bookConditions = "H:!V:FitMethod=MC";
-      bookConditions += ":VarProp[0]=FMax"; //ptlept3
-      bookConditions += ":VarProp[1]=FMax"; //ptzll
-      bookConditions += ":VarProp[2]=FMax"; //HT
-      //bookConditions += ":VarProp[3]=NotEnforced"; //mzll
-// factory->AddVariable( "ptLept3"       , "Third Lepton p_{T}", "GeV", 'F');
-// factory->AddVariable( "ptZll"         , "p_{T} (Z)", "GeV", 'F');
-// factory->AddVariable( "mZll"          , "DiLepton Mass", "GeV", 'F');
-// factory->AddVariable( "ht"            , "H_{T}", "GeV", 'F');
-      bookConditions += ":EffSel:SampleSize=500000000";
-      //bookConditions += ":EffSel:SampleSize=500000";
+      bookConditions += ":VarProp[0]=FMax"; //ptZ
+      bookConditions += ":VarProp[1]=FMax"; //ht
+   //factory->AddVariable( "ptZll"         , "p_{T} (Z)", "GeV", 'F');
+   //factory->AddVariable( "ht"            , "H_{T}", "GeV", 'F');
+
+      //bookConditions += ":EffSel:SampleSize=50000000"; // this for the actual opt
+      bookConditions += ":EffSel:SampleSize=500000"; // this for the ranking
 
 
 
