@@ -49,6 +49,8 @@ class BTagSFUtil {
   BTagSFUtil( int seed=0 );
   BTagSFUtil( const std::string& btagAlgo, int seed=0 );
 
+  ~BTagSFUtil();
+
   void init( const std::string& wp );
   void InitSFLight( const std::string& wp );
   void InitMistag( const std::string& wp );

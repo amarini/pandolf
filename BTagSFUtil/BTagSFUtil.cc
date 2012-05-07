@@ -28,6 +28,14 @@ BTagSFUtil::BTagSFUtil( const std::string& btagAlgo, int seed ) {
 }
 
 
+BTagSFUtil::~BTagSFUtil() {
+
+  delete rand_;
+
+}
+
+
+
 void BTagSFUtil::init( const std::string& wp ) {
 
   std::cout << "[BTagSFUtil::init] Initializing working point: '" << wp << "'." << std::endl;
