@@ -228,39 +228,47 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
 
   TH1D* h1_mTW = new TH1D("mTW", "", 300, 0., 300.);
   h1_mTW->Sumw2();
-  TH1D* h1_mT_lZmet = new TH1D("mT_lZmet", "", 300, 0., 300.);
+  TH1D* h1_mT_lZmet = new TH1D("mT_lZmet", "", 1000, 0., 1000.);
   h1_mT_lZmet->Sumw2();
 
   TH1D* h1_deltaRbb = new TH1D("deltaRbb", "", 500, 0., 5.);
   h1_deltaRbb->Sumw2();
   
-  TH1D* h1_mb1jj = new TH1D("mb1jj", "", 500., 0., 500.);
+  TH1D* h1_mb1jj = new TH1D("mb1jj", "", 1000., 0., 1000.);
   h1_mb1jj->Sumw2();
-  TH1D* h1_mb2jj = new TH1D("mb2jj", "", 500., 0., 500.);
+  TH1D* h1_mb2jj = new TH1D("mb2jj", "", 1000., 0., 1000.);
   h1_mb2jj->Sumw2();
-  TH1D* h1_mbjj_best = new TH1D("mbjj_best", "", 500., 0., 500.);
+  TH1D* h1_mbjj_best = new TH1D("mbjj_best", "", 1000., 0., 1000.);
   h1_mbjj_best->Sumw2();
+  TH1D* h1_mbjj_max = new TH1D("mbjj_max", "", 1000., 0., 1000.);
+  h1_mbjj_max->Sumw2();
   
-  TH1D* h1_mb1jjZ = new TH1D("mb1jjZ", "", 500., 0., 500.);
+  TH1D* h1_mb1jjZ = new TH1D("mb1jjZ", "", 1000., 0., 1000.);
   h1_mb1jjZ->Sumw2();
-  TH1D* h1_mb2jjZ = new TH1D("mb2jjZ", "", 500., 0., 500.);
+  TH1D* h1_mb2jjZ = new TH1D("mb2jjZ", "", 1000., 0., 1000.);
   h1_mb2jjZ->Sumw2();
-  TH1D* h1_mbjjZ_best = new TH1D("mbjjZ_best", "", 500., 0., 500.);
+  TH1D* h1_mbjjZ_best = new TH1D("mbjjZ_best", "", 1000., 0., 1000.);
   h1_mbjjZ_best->Sumw2();
+  TH1D* h1_mbjjZ_max = new TH1D("mbjjZ_max", "", 1000., 0., 1000.);
+  h1_mbjjZ_max->Sumw2();
 
-  TH1D* h1_mTb1W = new TH1D("mTb1W", "", 500, 0., 500.);
+  TH1D* h1_mTb1W = new TH1D("mTb1W", "", 1000, 0., 1000.);
   h1_mTb1W->Sumw2();
-  TH1D* h1_mTb2W = new TH1D("mTb2W", "", 500, 0., 500.);
+  TH1D* h1_mTb2W = new TH1D("mTb2W", "", 1000, 0., 1000.);
   h1_mTb2W->Sumw2();
-  TH1D* h1_mTbW_best = new TH1D("mTbW_best", "", 500, 0., 500.);
+  TH1D* h1_mTbW_best = new TH1D("mTbW_best", "", 1000, 0., 1000.);
   h1_mTbW_best->Sumw2();
+  TH1D* h1_mTbW_max = new TH1D("mTbW_max", "", 1000, 0., 1000.);
+  h1_mTbW_max->Sumw2();
 
-  TH1D* h1_mTb1WZ = new TH1D("mTb1WZ", "", 500, 0., 500.);
+  TH1D* h1_mTb1WZ = new TH1D("mTb1WZ", "", 1000, 0., 1000.);
   h1_mTb1WZ->Sumw2();
-  TH1D* h1_mTb2WZ = new TH1D("mTb2WZ", "", 500, 0., 500.);
+  TH1D* h1_mTb2WZ = new TH1D("mTb2WZ", "", 1000, 0., 1000.);
   h1_mTb2WZ->Sumw2();
-  TH1D* h1_mTbWZ_best = new TH1D("mTbWZ_best", "", 500, 0., 500.);
+  TH1D* h1_mTbWZ_best = new TH1D("mTbWZ_best", "", 1000, 0., 1000.);
   h1_mTbWZ_best->Sumw2();
+  TH1D* h1_mTbWZ_max = new TH1D("mTbWZ_max", "", 1000, 0., 1000.);
+  h1_mTbWZ_max->Sumw2();
 
 
 
@@ -528,7 +536,7 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   float mZll_t, ptZll_t;
   float ptLeptZ1_t, ptLeptZ2_t, etaLeptZ1_t, etaLeptZ2_t;
   float ptLept3_t, etaLept3_t;
-  //float ptJetB1_t, ptJetB2_t, etaJetB1_t, etaJetB2_t;
+  float ptJetB1_t, ptJetB2_t, etaJetB1_t, etaJetB2_t;
   //float bTagJetB1_t, bTagJetB2_t;
   //float ptJet3_t, ptJet4_t, etaJet3_t, etaJet4_t;
   float HLTSF;
@@ -543,15 +551,19 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   float mb1jj;
   float mb2jj;
   float mbjj_best;
+  float mbjj_max;
   float mb1jjZ;
   float mb2jjZ;
   float mbjjZ_best;
+  float mbjjZ_max;
   float mTb1W;
   float mTb2W;
   float mTbW_best;
+  float mTbW_max;
   float mTb1WZ;
   float mTb2WZ;
   float mTbWZ_best;
+  float mTbWZ_max;
 
   tree_passedEvents->Branch( "run", &run, "run/I" );
   tree_passedEvents->Branch( "LS", &LS, "LS/I" );
@@ -570,7 +582,7 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   tree_passedEvents->Branch( "ptZll", &ptZll_t, "ptZll_t/F" );
   tree_passedEvents->Branch( "mZll", &mZll_t, "mZll_t/F" );
   tree_passedEvents->Branch( "etaLept3", &etaLept3_t, "etaLept3_t/F" );
-  //tree_passedEvents->Branch( "ptJetB1", &ptJetB1_t, "ptJetB1_t/F" );
+  tree_passedEvents->Branch( "ptJetB1", &ptJetB1_t, "ptJetB1_t/F" );
   //tree_passedEvents->Branch( "ptJetB2", &ptJetB2_t, "ptJetB2_t/F" );
   //tree_passedEvents->Branch( "bTagJetB1", &bTagJetB1_t, "bTagJetB1_t/F" );
   //tree_passedEvents->Branch( "bTagJetB2", &bTagJetB2_t, "bTagJetB2_t/F" );
@@ -591,15 +603,19 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   tree_passedEvents->Branch("mb1jj"     , &mb1jj     , "mb1jj/F");
   tree_passedEvents->Branch("mb2jj"     , &mb2jj     , "mb2jj/F");
   tree_passedEvents->Branch("mbjj_best" , &mbjj_best , "mbjj_best/F");
+  tree_passedEvents->Branch("mbjj_max" , &mbjj_max , "mbjj_max/F");
   tree_passedEvents->Branch("mb1jjZ"    , &mb1jjZ    , "mb1jjZ/F");
   tree_passedEvents->Branch("mb2jjZ"    , &mb2jjZ    , "mb2jjZ/F");
   tree_passedEvents->Branch("mbjjZ_best", &mbjjZ_best, "mbjjZ_best/F");
+  tree_passedEvents->Branch("mbjjZ_max", &mbjjZ_max, "mbjjZ_max/F");
   tree_passedEvents->Branch("mTb1W"     , &mTb1W     , "mTb1W/F");
   tree_passedEvents->Branch("mTb2W"     , &mTb2W     , "mTb2W/F");
   tree_passedEvents->Branch("mTbW_best" , &mTbW_best , "mTbW_best/F");
+  tree_passedEvents->Branch("mTbW_max" , &mTbW_max , "mTbW_max/F");
   tree_passedEvents->Branch("mTb1WZ"    , &mTb1WZ    , "mTb1WZ/F");
   tree_passedEvents->Branch("mTb2WZ"    , &mTb2WZ    , "mTb2WZ/F");
   tree_passedEvents->Branch("mTbWZ_best", &mTbWZ_best, "mTbWZ_best/F");
+  tree_passedEvents->Branch("mTbWZ_max", &mTbWZ_max, "mTbWZ_max/F");
       
 
 
@@ -1155,8 +1171,11 @@ ofstream ofs("run_event.txt");
         h1_etaZll->Fill( diLepton.Eta(), eventWeight );
 
 
-        h1_ptJetB1->Fill( jetB1.Pt(), eventWeight );
-        h1_ptJetB2->Fill( jetB2.Pt(), eventWeight );
+        ptJetB1_t = jetB1.Pt();
+        ptJetB2_t = jetB2.Pt();
+
+        h1_ptJetB1->Fill( ptJetB1_t, eventWeight );
+        h1_ptJetB2->Fill( ptJetB2_t, eventWeight );
         h1_ptJet3->Fill( jet3.Pt(), eventWeight );
         h1_ptJet4->Fill( jet4.Pt(), eventWeight );
 
@@ -1207,7 +1226,10 @@ ofstream ofs("run_event.txt");
         else
           mbjj_best = mb2jj;
 
+        mbjj_max = TMath::Max(mb1jj,mb2jj);
+
         h1_mbjj_best->Fill( mbjj_best, eventWeight );
+        h1_mbjj_max->Fill( mbjj_max, eventWeight );
 
 
         mb1jjZ = b1jjZ.M();
@@ -1221,7 +1243,10 @@ ofstream ofs("run_event.txt");
         else
           mbjjZ_best = mb2jjZ;
 
+        mbjjZ_max = TMath::Max(mb1jjZ,mb2jjZ);
+
         h1_mbjjZ_best->Fill( mbjjZ_best, eventWeight );
+        h1_mbjjZ_max->Fill( mbjjZ_max, eventWeight );
 
 
 
@@ -1241,8 +1266,11 @@ ofstream ofs("run_event.txt");
           mTbW_best = mTb1W;
         else
           mTbW_best = mTb2W;
+    
+        mTbW_max = TMath::Max(mTb1W,mTb2W);
 
-        h1_mTbW_best->Fill( mTb2W, eventWeight );
+        h1_mTbW_best->Fill( mTbW_best, eventWeight );
+        h1_mTbW_max->Fill( mTbW_max, eventWeight );
 
         
         mTb1WZ = b1WZ.Mt();
@@ -1256,7 +1284,10 @@ ofstream ofs("run_event.txt");
         else
           mTbWZ_best = mTb2WZ;
 
+        mTbWZ_max = TMath::Max(mTb1WZ,mTb2WZ);
+
         h1_mTbWZ_best->Fill( mTbWZ_best, eventWeight );
+        h1_mTbWZ_max->Fill( mTbWZ_max, eventWeight );
       
       } // is mzll signal region
 
@@ -1412,18 +1443,22 @@ ofstream ofs("run_event.txt");
   h1_mb1jj->Write();
   h1_mb2jj->Write();
   h1_mbjj_best->Write();
+  h1_mbjj_max->Write();
   
   h1_mb1jjZ->Write();
   h1_mb2jjZ->Write();
   h1_mbjjZ_best->Write();
+  h1_mbjjZ_max->Write();
 
   h1_mTb1W->Write();
   h1_mTb2W->Write();
   h1_mTbW_best->Write();
+  h1_mTbW_max->Write();
 
   h1_mTb1WZ->Write();
   h1_mTb2WZ->Write();
   h1_mTbWZ_best->Write();
+  h1_mTbWZ_max->Write();
 
 
   outFile_->Close();
@@ -1461,6 +1496,32 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
     ptZll_thresh_ = 0.;
 
     met_thresh_ = 0.;
+    ht_thresh_ = 0.;
+ 
+  } else if( selectionType_=="preselplus" ) {
+
+    ptLeptZ1_thresh_ = 10.;
+    ptLeptZ2_thresh_ = 10.;
+    ptLept3_thresh_ = 10.;
+    etaLeptZ1_thresh_ = 3.;
+    etaLeptZ2_thresh_ = 3.;
+    etaLept3_thresh_ = 3.;
+
+    combinedIsoRelLept3_thresh_ = 1.;
+
+    ptJet_thresh_ = 20.;
+    etaJet_thresh_ = 2.4;
+
+    njets_thresh_ = 3;
+    nBjets_loose_thresh_ = 0;
+    nBjets_medium_thresh_ = 1;
+
+    mZll_threshLo_ = 81.;
+    mZll_threshHi_ = 101.;
+
+    ptZll_thresh_ = 0.;
+
+    met_thresh_ = 30.;
     ht_thresh_ = 0.;
  
   } else if( selectionType_=="sel1" ) {
