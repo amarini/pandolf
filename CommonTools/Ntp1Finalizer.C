@@ -97,8 +97,6 @@ void Ntp1Finalizer::addFile(const std::string& dataset, const std::string& selec
   }
   infile->Close();
 
-  dataset_ = dataset;
-
 }
 
 
