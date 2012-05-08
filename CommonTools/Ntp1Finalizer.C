@@ -22,6 +22,8 @@ Ntp1Finalizer::Ntp1Finalizer( const std::string& analyzerType, const std::string
   nCounterW_ = 0.;
   nCounterPU_ = 0.;
 
+  h1_nPU_gen_ = new TH1F("nPU_gen", "", 55, -0.5, 54.5);
+
 } //constructor
 
 
@@ -85,6 +87,7 @@ void Ntp1Finalizer::addFile(const std::string& dataset, const std::string& selec
   TH1F* h1_nCounter = (TH1F*)infile->Get("nCounter");
   TH1F* h1_nCounterW = (TH1F*)infile->Get("nCounterW");
   TH1F* h1_nCounterPU = (TH1F*)infile->Get("nCounterPU");
+  h1_nPU_gen_->Add((TH1F*)infile->Get("nPU_gen"));
   if( h1_nCounter!= 0 && h1_nCounterW != 0 && h1_nCounterPU ) {
     nCounter_ += h1_nCounter->GetBinContent(1);
     nCounterW_ += h1_nCounterW->GetBinContent(1);
@@ -94,6 +97,7 @@ void Ntp1Finalizer::addFile(const std::string& dataset, const std::string& selec
   }
   infile->Close();
 
+  dataset_ = dataset;
 
 }
 
@@ -129,6 +133,7 @@ void Ntp1Finalizer::writeResponseHistos( TFile* file, std::vector<TH1F*> h1_resp
   file->cd();
 
 }
+
 
 
 
