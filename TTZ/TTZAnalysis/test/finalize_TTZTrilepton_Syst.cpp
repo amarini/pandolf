@@ -103,7 +103,10 @@ void runOnAllDatasets( Ntp1Finalizer_TTZTrilepton* nf ) {
 
   
   runOnSingleDataset( nf, "TTZ_TuneZ2_7TeV-madgraphCMSSW42xPUv3_spadhi" );
-  runOnSingleDataset( nf, "BG" );
+  runOnSingleDataset( nf, "VV_Summer11" );
+  runOnSingleDataset( nf, "TTJ_Fall11_highstat" );
+  runOnSingleDataset( nf, "DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Fall11" );
+  //runOnSingleDataset( nf, "BG" );
 
 }
 
