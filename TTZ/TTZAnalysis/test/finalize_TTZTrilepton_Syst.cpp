@@ -5,8 +5,10 @@
 
 
 
-void runOnAllBackgrounds( Ntp1Finalizer_TTZTrilepton* nf );
-void runOnSingleBackground( Ntp1Finalizer_TTZTrilepton* nf, const std::string& dataset );
+void runOnAllDatasets( Ntp1Finalizer_TTZTrilepton* nf );
+void runOnSingleDataset( Ntp1Finalizer_TTZTrilepton* nf, const std::string& dataset );
+void haddBGFiles( const std::string& selection, const std::string& flag );
+std::string getFileName( const std::string& dataset, const std::string& selection, const std::string& suffix );
 
 
 
@@ -40,7 +42,8 @@ int main( int argc, char* argv[] ) {
   nf->set_inputAnalyzerType("TTZ");
 
   // run once with no syst
-  runOnAllBackgrounds( nf );
+  runOnAllDatasets( nf );
+  haddBGFiles( selectionType, "" );
 
 
   std::cout << std::endl << "++++++++++++++++++++++" << std::endl;
@@ -48,7 +51,8 @@ int main( int argc, char* argv[] ) {
   std::cout << "++++++++++++++++++++++" << std::endl << std::endl;
   nf->set_btagSyst(1);
 
-  runOnAllBackgrounds( nf );
+  runOnAllDatasets( nf );
+  haddBGFiles( selectionType, "BTagUP" );
 
 
   std::cout << std::endl << "++++++++++++++++++++++" << std::endl;
@@ -56,7 +60,8 @@ int main( int argc, char* argv[] ) {
   std::cout << "++++++++++++++++++++++" << std::endl << std::endl;
   nf->set_btagSyst(-1);
 
-  runOnAllBackgrounds( nf );
+  runOnAllDatasets( nf );
+  haddBGFiles( selectionType, "BTagDOWN" );
 
   nf->set_btagSyst(0);
 
@@ -66,14 +71,26 @@ int main( int argc, char* argv[] ) {
   std::cout << "+++++++++++++++++++++" << std::endl << std::endl;
   nf->set_jes(1);
 
-  runOnAllBackgrounds( nf );
+  runOnAllDatasets( nf );
+  haddBGFiles( selectionType, "JESUP" );
 
   std::cout << std::endl << "+++++++++++++++++++++" << std::endl;
   std::cout << "+++ JES Syst -1 Sigma" << std::endl;
   std::cout << "+++++++++++++++++++++" << std::endl << std::endl;
   nf->set_jes(-1);
 
-  runOnAllBackgrounds( nf );
+  runOnAllDatasets( nf );
+  haddBGFiles( selectionType, "JESDOWN" );
+
+  nf->set_jes(0);
+
+  std::cout << std::endl << "+++++++++++++++++++++" << std::endl;
+  std::cout << "+++ JER Syst +1 Sigma" << std::endl;
+  std::cout << "+++++++++++++++++++++" << std::endl << std::endl;
+  nf->set_jer(true);
+
+  runOnAllDatasets( nf );
+  haddBGFiles( selectionType, "JERUP" );
 
   return 0;
 
@@ -82,18 +99,16 @@ int main( int argc, char* argv[] ) {
 
 
 
-void runOnAllBackgrounds( Ntp1Finalizer_TTZTrilepton* nf ) {
+void runOnAllDatasets( Ntp1Finalizer_TTZTrilepton* nf ) {
 
   
-  runOnSingleBackground( nf, "BG" );
-  //runOnSingleBackground( nf, "VV_Summer11" );
-  //runOnSingleBackground( nf, "TTJ_Fall11_highstat" );
-  //runOnSingleBackground( nf, "DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Fall11" );
+  runOnSingleDataset( nf, "TTZ_TuneZ2_7TeV-madgraphCMSSW42xPUv3_spadhi" );
+  runOnSingleDataset( nf, "BG" );
 
 }
 
 
-void runOnSingleBackground( Ntp1Finalizer_TTZTrilepton* nf, const std::string& dataset ) {
+void runOnSingleDataset( Ntp1Finalizer_TTZTrilepton* nf, const std::string& dataset ) {
 
   nf->clearTree();
 
@@ -123,3 +138,37 @@ void runOnSingleBackground( Ntp1Finalizer_TTZTrilepton* nf, const std::string& d
   nf_syst->finalize();
 
 } 
+
+
+
+
+void haddBGFiles( const std::string& selection, const std::string& flag ) {
+
+  std::string suffix = flag;
+  if( suffix!="" ) suffix = "_" + suffix;
+
+  std::string hadd_command = "hadd -f ";
+
+  hadd_command += getFileName( "BG", selection, suffix );
+  hadd_command += " ";
+  hadd_command += getFileName( "VV_Summer11", selection, suffix );
+  hadd_command += " ";
+  hadd_command += getFileName( "TTJ_Fall11_highstat", selection, suffix );
+  hadd_command += " ";
+  hadd_command += getFileName( "DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Fall11", selection, suffix );
+  hadd_command += " ";
+
+  std::cout << "-> Hadding BG files:" << std::endl;
+  std::cout << hadd_command << std::endl;
+  system(hadd_command.c_str());
+
+}
+
+
+std::string getFileName( const std::string& dataset, const std::string& selection, const std::string& suffix ) {
+
+  std::string fileName = "TTZTrilepton_" + dataset + "_" + selection + "_TCHE_ALL" + suffix + ".root";
+
+  return fileName;
+
+}
