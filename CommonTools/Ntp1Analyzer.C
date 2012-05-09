@@ -1,10 +1,11 @@
 #include "Ntp1Analyzer.h"
-#include "TH1F.h"
-#include "TRandom.h"
 #include <cstdlib>
 #include <fstream>
 #include <cmath>
 
+#include "TH1F.h"
+#include "TRandom.h"
+#include "TLorentzVector.h"
 
 
 
@@ -363,6 +364,42 @@ bool Ntp1Analyzer::PassedHLT( int iEntry, const std::string& HLTName ) { //defau
 
 
 
+bool Ntp1Analyzer::isMatchedToHLT( float eta, float phi, float deltaR_max ) {
+
+
+  bool match=false;
+  for( int i=0; i<index_requiredTriggers_.size(); i++ ) {  // loop over require trigger paths
+    
+    int pathIndex=index_requiredTriggers_[i];
+    // std::cout << "testing trigger " << pathIndex << " with " << sizePassing[pathIndex] << " passing objects" << std::endl; 
+    
+    if( sizePassing[pathIndex]>  0 ) {  //some object has passed the required trigger 
+      
+      for(int np = 0; np < sizePassing[pathIndex]; np++ ){
+        int iP = indexPassing[ indexPassingPerPath[pathIndex] +np];
+        // std::cout << "passing object eta: " << triggerObsEta[iP] << " phi: " <<  triggerObsPhi[iP] << std::endl; 
+
+        TLorentzVector recoObject;
+        recoObject.SetPtEtaPhiE( 10., eta, phi, 10. );
+        TLorentzVector hltObject;
+        hltObject.SetPtEtaPhiE( 10., triggerObsEta[iP], triggerObsPhi[iP], 10. );
+        if( recoObject.DeltaR( hltObject ) < deltaR_max ) {
+          match=true;
+          //std::cout << "MATCH!" <<std::endl;	
+          break;
+        }
+      }
+    }
+    if(match)  //it's enough if one path matches	
+      break;
+  }
+
+  return match;
+
+}
+
+
+
 
 void Ntp1Analyzer::CreateOutputFile() {
 
@@ -471,6 +508,16 @@ void Ntp1Analyzer::Init(TTree *tree)
    fChain->SetBranchAddress("nHLT", &nHLT, &b_nHLT);
    fChain->SetBranchAddress("nameHLT", &nameHLT, &b_nameHLT);
    fChain->SetBranchAddress("indexHLT", indexHLT, &b_indexHLT);
+   fChain->SetBranchAddress("nTriggerPaths", &nTriggerPaths, &b_nTriggerPaths);
+   fChain->SetBranchAddress("nTriggerObsPassing", &nTriggerObsPassing, &b_nTriggerObsPassing);
+   fChain->SetBranchAddress("sizePassing", sizePassing, &b_sizePassing);
+   fChain->SetBranchAddress("indexPassing", indexPassing, &b_indexPassing);
+   fChain->SetBranchAddress("indexPassingPerPath", indexPassingPerPath, &b_indexPassingPerPath);
+   fChain->SetBranchAddress("nTriggerObs", &nTriggerObs, &b_nTriggerObs);
+   fChain->SetBranchAddress("triggerObsPt", triggerObsPt, &b_triggerObsPt);
+   fChain->SetBranchAddress("triggerObsPhi", triggerObsPhi, &b_triggerObsPhi);
+   fChain->SetBranchAddress("triggerObsEta", triggerObsEta, &b_triggerObsEta);
+   fChain->SetBranchAddress("triggerObsMass", triggerObsMass, &b_triggerObsMass);
    fChain->SetBranchAddress("nEle", &nEle, &b_nEle);
    fChain->SetBranchAddress("chargeEle", chargeEle, &b_chargeEle);
    fChain->SetBranchAddress("energyEle", energyEle, &b_energyEle);
