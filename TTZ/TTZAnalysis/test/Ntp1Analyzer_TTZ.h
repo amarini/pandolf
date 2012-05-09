@@ -49,7 +49,6 @@ class Ntp1Analyzer_TTZ : public Ntp1Analyzer {
    Bool_t passed_HLT_Mu8_Ele17_CaloIdL_;
    Bool_t passed_HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_;
 
-
    int leptType_; //0: muon; 1: electron; 2: e+m-; 3: e-m+
    int leptTypeMC_; //0: muon; 1: electron
 
@@ -64,6 +63,7 @@ class Ntp1Analyzer_TTZ : public Ntp1Analyzer {
    Float_t phiLeptZ1_;
    Int_t   chargeLeptZ1_;
    Float_t combinedIsoRelLeptZ1_;
+   bool matchedToHLTLeptZ1_;
 
    Float_t eLeptZ1Gen_;
    Float_t ptLeptZ1Gen_;
@@ -76,6 +76,7 @@ class Ntp1Analyzer_TTZ : public Ntp1Analyzer {
    Float_t phiLeptZ2_;
    Int_t   chargeLeptZ2_;
    Float_t combinedIsoRelLeptZ2_;
+   bool matchedToHLTLeptZ2_;
 
    Float_t eLeptZ2Gen_;
    Float_t ptLeptZ2Gen_;

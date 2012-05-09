@@ -923,12 +923,15 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
  
      if( leptons.size()<2 ) continue;
 
+  
+
      eLeptZ1_ = leptons[0].Energy();
      ptLeptZ1_ = leptons[0].Pt();
      etaLeptZ1_ = leptons[0].Eta();
      phiLeptZ1_ = leptons[0].Phi();
      chargeLeptZ1_ = leptons[0].charge;
      combinedIsoRelLeptZ1_ = leptons[0].isolation;
+     matchedToHLTLeptZ1_ = isMatchedToHLT(leptons[0].Eta(),leptons[0].Phi(),0.3);
      
      eLeptZ2_ = leptons[1].Energy();
      ptLeptZ2_ = leptons[1].Pt();
@@ -936,6 +939,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      phiLeptZ2_ = leptons[1].Phi();
      chargeLeptZ2_ = leptons[1].charge;
      combinedIsoRelLeptZ2_ = leptons[1].isolation;
+     matchedToHLTLeptZ2_ = isMatchedToHLT(leptons[1].Eta(),leptons[1].Phi(),0.3);
 
 
      
