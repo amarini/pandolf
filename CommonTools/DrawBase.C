@@ -1646,6 +1646,8 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
     std::string canvasName = outputdir_ + "/" + name;
     if( flags!="" )
       canvasName = canvasName + "_" + flags;
+    if( flags_!="" )
+      canvasName = canvasName + "_" + flags_;
 
 
 
@@ -2581,6 +2583,18 @@ void DrawBase::add_dataFile( TFile* dataFile, float weight, const std::string& d
   std::cout << "-> Added DATA file '" << dataFile->GetName() << "'." << std::endl;
 
 }
+
+
+
+
+void DrawBase::clearFiles() {
+
+  dataFiles_.clear();
+  mcFiles_.clear();
+  mcFiles_superimp_.clear();
+
+}
+
 
 
 
