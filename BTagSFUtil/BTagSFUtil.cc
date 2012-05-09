@@ -25,12 +25,16 @@ BTagSFUtil::BTagSFUtil( const std::string& btagAlgo, int seed ) {
   init_medium_ = false;
   init_tight_ = false;
 
+  // this function used if no SF has to be applied
+  f1_one_ = new TF1("f1_one", "1.", 0., 10000.);
+
 }
 
 
 BTagSFUtil::~BTagSFUtil() {
 
   delete rand_;
+  delete f1_one_;
 
 }
 
@@ -736,7 +740,11 @@ TF1* BTagSFUtil::GetFunctionEtaBins( float eta, const std::vector<float>& etaBin
       iEta=i;
   }
 
-  return functions[iEta];
+  TF1* returnFunction;
+  if( iEta<0 ) returnFunction = f1_one_;
+  else         returnFunction = functions[iEta];
+
+  return returnFunction;
 
 }
 
