@@ -88,6 +88,9 @@ class DrawBase {
                    bool logx=false, bool logy=false);
 
 
+
+  void clearFiles(); 
+
   void add_dataFile( TFile* dataFile, const std::string& datasetName, const std::string& legendName="Data", int markerColor=-1, int markerStyle=-1, int fillStyle=-1 );
   void add_dataFile( TFile* dataFile, float weight, const std::string& datasetName, const std::string& legendName="Data", int markerColor=-1, int markerStyle=-1, int fillStyle=-1 );
   void add_mcFile( TFile* mcFile, const std::string& datasetName, const std::string& legendName, int fillColor=-1, int fillStyle=-1, int markerStyle=-1, int lineColor=-1, int lineWidth=-1 );
@@ -131,6 +134,7 @@ class DrawBase {
 
   void resetStyle() const { style_->cd(); };
 
+  float get_lumi() const { return lumi_; };
   LegendBox get_legendBox( int legendQuadrant=1, const std::vector<std::string>* legendNames=0 ) const;
   TPaveText* get_labelCMS( int legendQuadrant=0 ) const;
   TPaveText* get_labelCMStop( bool wide=false ) const;
