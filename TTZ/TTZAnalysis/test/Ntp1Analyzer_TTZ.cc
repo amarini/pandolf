@@ -20,7 +20,7 @@
 //#include "fitTools.h"
 
 
-int DEBUG_EVENTNUMBER = 715236831;
+int DEBUG_EVENTNUMBER = 157480550;
 float mZ = 91.1876;
 
 
@@ -737,6 +737,9 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
      if( electrons.size() < 2 && muons.size() < 2 ) { //this is the ttbar opposite flavour control region:
 
+       if( event_==DEBUG_EVENTNUMBER ) 
+         std::cout << "Going in emu control region." << std::endl;
+
        // at least one opposite-sign pair:
        if( (electronsPlus.size()+muonsPlus.size())==0 || (electronsMinus.size()+muonsMinus.size())==0 ) continue;
 
@@ -751,6 +754,9 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
          if( fabs(Zepmm.M()-mZ) < fabs(Zemmp.M()-mZ) ) {
 
+           if( event_==DEBUG_EVENTNUMBER ) 
+             std::cout << "LeptType=2." << std::endl;
+
            leptType_=2;
            if( elePlus_muMinus[0].Pt() > elePlus_muMinus[1].Pt() ) {
              leptons.push_back( elePlus_muMinus[0] );
@@ -761,6 +767,9 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
            }
 
          } else { 
+
+           if( event_==DEBUG_EVENTNUMBER ) 
+             std::cout << "LeptType=3." << std::endl;
 
            leptType_=3;
            if( eleMinus_muPlus[0].Pt() > eleMinus_muPlus[1].Pt() ) {
@@ -775,6 +784,9 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
 
        } else if( elePlus_muMinus.size() == 2 ) {
+
+         if( event_==DEBUG_EVENTNUMBER ) 
+           std::cout << "LeptType=2." << std::endl;
 
          leptType_ = 2;
 
@@ -791,6 +803,9 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
          }
 
        } else if( eleMinus_muPlus.size() == 2 ) {
+
+         if( event_==DEBUG_EVENTNUMBER ) 
+           std::cout << "LeptType=3." << std::endl;
 
          leptType_ = 3;
 
@@ -816,12 +831,21 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
      } else { // this is the (same flavor) signal region
 
+       if( event_==DEBUG_EVENTNUMBER ) 
+         std::cout << "This is the same flavor region." << std::endl;
+
        if( electrons.size() == 2 && muons.size() == 2 ) { 
+
+         if( event_==DEBUG_EVENTNUMBER ) 
+           std::cout << "Going to choose pair with best Z mass." << std::endl;
 
          TLorentzVector Zee = electrons[0] + electrons[1];
          TLorentzVector Zmm = muons[0] + muons[1];
 
          if( fabs(Zee.M()-mZ) < fabs(Zmm.M()-mZ) ) {
+
+           if( event_==DEBUG_EVENTNUMBER ) 
+             std::cout << "Chose electron pair. LeptType=1." << std::endl;
 
            leptType_=1;
            if( electrons[0].Pt() > electrons[1].Pt() ) {
@@ -833,6 +857,9 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
            }
 
          } else { 
+
+           if( event_==DEBUG_EVENTNUMBER ) 
+             std::cout << "Chose muon pair. LeptType=0." << std::endl;
 
            leptType_=0;
            if( muons[0].Pt() > muons[1].Pt() ) {
@@ -847,6 +874,9 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
 
        } else if( electrons.size() == 2 ) {
+
+         if( event_==DEBUG_EVENTNUMBER ) 
+           std::cout << "LeptType=1." << std::endl;
 
          leptType_ = 1;
 
@@ -863,6 +893,9 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
          }
 
        } else if( muons.size() == 2 ) {
+
+         if( event_==DEBUG_EVENTNUMBER ) 
+           std::cout << "LeptType=0." << std::endl;
 
          leptType_ = 0;
 
@@ -887,6 +920,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
      } // if opposite flavour control region
 
+ 
      if( leptons.size()<2 ) continue;
 
      eLeptZ1_ = leptons[0].Energy();
@@ -904,6 +938,10 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      combinedIsoRelLeptZ2_ = leptons[1].isolation;
 
 
+     
+     if( event_==DEBUG_EVENTNUMBER ) 
+       std::cout << "Now adding in other leptons." << std::endl;
+
      // save other leptons:
      nLept_=0;
      for( unsigned iMuonPlus=0; iMuonPlus<muonsPlus.size() && nLept_<10; ++iMuonPlus ) {
@@ -916,6 +954,8 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
          phiLept_[nLept_] = muonsPlus[iMuonPlus].Phi();
          chargeLept_[nLept_] = muonsPlus[iMuonPlus].charge;
          combinedIsoRelLept_[nLept_] = muonsPlus[iMuonPlus].isolation;
+         if( event_==DEBUG_EVENTNUMBER ) 
+           std::cout << "Added a positive muon: pt=" << ptLept_[nLept_] << ", eta=" << etaLept_[nLept_] << std::endl;
          nLept_++;
        }
      }
@@ -929,6 +969,8 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
          phiLept_[nLept_] = muonsMinus[iMuonMinus].Phi();
          chargeLept_[nLept_] = muonsMinus[iMuonMinus].charge;
          combinedIsoRelLept_[nLept_] = muonsMinus[iMuonMinus].isolation;
+         if( event_==DEBUG_EVENTNUMBER ) 
+           std::cout << "Added a negative muon: pt=" << ptLept_[nLept_] << ", eta=" << etaLept_[nLept_] << std::endl;
          nLept_++;
        }
      }
@@ -942,6 +984,8 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
          phiLept_[nLept_] = electronsPlus[iElectronPlus].Phi();
          chargeLept_[nLept_] = electronsPlus[iElectronPlus].charge;
          combinedIsoRelLept_[nLept_] = electronsPlus[iElectronPlus].isolation;
+         if( event_==DEBUG_EVENTNUMBER ) 
+           std::cout << "Added a positive electron: pt=" << ptLept_[nLept_] << ", eta=" << etaLept_[nLept_] << std::endl;
          nLept_++;
        }
      }
@@ -955,6 +999,8 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
          phiLept_[nLept_] = electronsMinus[iElectronMinus].Phi();
          chargeLept_[nLept_] = electronsMinus[iElectronMinus].charge;
          combinedIsoRelLept_[nLept_] = electronsMinus[iElectronMinus].isolation;
+         if( event_==DEBUG_EVENTNUMBER ) 
+           std::cout << "Added a negative electron: pt=" << ptLept_[nLept_] << ", eta=" << etaLept_[nLept_] << std::endl;
          nLept_++;
        }
      }
@@ -1012,7 +1058,10 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      // JETS
      // ------------------
 
-     float jetPt_thresh = 19.; //so that we can vary the JES uncert down one sigma (uncert is never > 5% in eta<2.5)
+     if( event_==DEBUG_EVENTNUMBER ) 
+       std::cout << "Now adding in jets." << std::endl;
+
+     float jetPt_thresh = 18.; //so that we can vary the JER uncert up one sigma (max value is ~10%)
      float jetEta_thresh = 2.5;
 
      // first save leading jets in event:
@@ -1119,6 +1168,9 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      }
 
 
+     if( event_==DEBUG_EVENTNUMBER ) 
+       std::cout << "leadJets.size(): " << leadJets.size() << std::endl;
+
      if( leadJets.size()<2 ) continue;
      if( leadJets[1].Pt()<jetPt_thresh ) continue; //at least 2 jets over thresh
 
@@ -1176,11 +1228,16 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        etaPartJet_[nJets_] = leadJets[iJet].etaPart;
        phiPartJet_[nJets_] = leadJets[iJet].phiPart;
        pdgIdPartJet_[nJets_] = leadJets[iJet].pdgIdPart;
+  
+       if( event_==DEBUG_EVENTNUMBER ) 
+         std::cout << "Adding jet: pt=" << ptJet_[nJets_] << " eta=" << etaJet_[nJets_] << std::endl;
 
        nJets_++;
 
      }
 
+     if( event_==DEBUG_EVENTNUMBER ) 
+       std::cout << "Found a total of " << nJets_ << " jets." << std::endl;
 
      // at least 3 jets in the event
      if( nJets_<3 ) continue;
@@ -1224,6 +1281,9 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
      } // if is mc
 
+
+     if( event_==DEBUG_EVENTNUMBER ) 
+       std::cout << "This is event passed all cuts." << std::endl;
 
      reducedTree_->Fill(); 
 
