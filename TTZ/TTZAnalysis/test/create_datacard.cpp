@@ -1,8 +1,13 @@
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
+#include <cmath>
+
+#include "TFile.h"
+#include "TH1D.h"
 
 
+float getBGSyst( const std::string& syst, const std::string& sel );
 
 
 int main(int argc, char* argv[]) {
@@ -58,20 +63,56 @@ int main(int argc, char* argv[]) {
 
   datacard << std::endl << std::endl;
 
-  datacard << "bin         \t1\t1" << std::endl; 
-  datacard << "process     \tttZ\tbg" << std::endl; 
-  datacard << "process     \t0\t1" << std::endl; 
+  datacard << "bin         \t1      \t1" << std::endl; 
+  datacard << "process     \tttZ    \tbg" << std::endl; 
+  datacard << "process     \t0      \t1" << std::endl; 
   datacard << "rate        \t" << s << "\t" << b_pred << std::endl; 
 
   datacard << std::endl << std::endl;
 
-  datacard << "lumi lnN    \t1.035\t1.035" << std::endl;
-  datacard << "bgUncert    \t-    \t" << 1. + b_pred_err/b_pred << std::endl;
+  datacard << "lumi     lnN\t1.035  \t1.035" << std::endl;
+  datacard << "bgUncert lnN\t-      \t" << 1. + b_pred_err/b_pred << std::endl;
+
+  datacard << "btag     lnN\t-      \t" << getBGSyst( "BTag", selection ) << std::endl;
+  datacard << "jes      lnN\t-      \t" << getBGSyst( "JES", selection ) << std::endl;
 
   datacard.close();
 
   std::cout << "-> Created datacard: " << datacardName << std::endl;
 
   return 0;
+
+}
+
+
+
+
+float getBGSyst( const std::string& syst, const std::string& sel ) {
+
+  std::string systFile = "TTZTrilepton_BG_" + sel + "_TCHE_ALL.root";
+  std::string systFileUP = "TTZTrilepton_BG_" + sel + "_TCHE_ALL_" + syst + "UP.root";
+  std::string systFileDOWN = "TTZTrilepton_BG_" + sel + "_TCHE_ALL_" + syst + "DOWN.root";
+
+  TFile* file_systFile = TFile::Open( systFile.c_str() );
+  TFile* file_systFileUP = TFile::Open( systFileUP.c_str() );
+  TFile* file_systFileDOWN = TFile::Open( systFileDOWN.c_str() );
+
+  TH1D* h1_mean = (TH1D*)file_systFile->Get("channelYields");
+  TH1D* h1_systUP = (TH1D*)file_systFileUP->Get("channelYields");
+  TH1D* h1_systDOWN = (TH1D*)file_systFileDOWN->Get("channelYields");
+
+  float int_mean = h1_mean->Integral();
+  float int_systUP = h1_systUP->Integral();
+  float int_systDOWN = h1_systDOWN->Integral();
+
+  float systUP = (int_systUP-int_mean)/int_mean;
+  float systDOWN = (int_systDOWN-int_mean)/int_mean;
+
+  std::cout << syst << " Syst: UP: " << systUP << " DOWN: " << systDOWN << std::endl;
+  float systValue = ( fabs(systUP)>fabs(systDOWN) ) ? systUP : systDOWN;
+  
+  systValue += 1.;
+
+  return systValue;
 
 }
