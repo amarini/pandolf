@@ -79,6 +79,9 @@ int main(int argc, char* argv[]) {
   std::pair< float, float >  jesSyst = getBGSyst( "JES", selection );
   datacard << "jes      lnN\t-      \t" << jesSyst.first << "/" << jesSyst.second << std::endl;
 
+  std::pair< float, float >  jerSyst = getBGSyst( "JER", selection );
+  datacard << "jer      lnN\t-      \t" << jerSyst.second << std::endl;
+
   datacard.close();
 
   std::cout << "-> Created datacard: " << datacardName << std::endl;
@@ -102,14 +105,14 @@ std::pair<float, float>  getBGSyst( const std::string& syst, const std::string& 
 
   TH1D* h1_mean = (TH1D*)file_systFile->Get("channelYields");
   TH1D* h1_systUP = (TH1D*)file_systFileUP->Get("channelYields");
-  TH1D* h1_systDOWN = (TH1D*)file_systFileDOWN->Get("channelYields");
+  TH1D* h1_systDOWN = (file_systFileDOWN!=0) ? (TH1D*)file_systFileDOWN->Get("channelYields") : 0;
 
   float int_mean = h1_mean->Integral();
   float int_systUP = h1_systUP->Integral();
-  float int_systDOWN = h1_systDOWN->Integral();
+  float int_systDOWN = (h1_systDOWN!=0) ? h1_systDOWN->Integral() : -1.;
 
   float systUP = (int_systUP-int_mean)/int_mean;
-  float systDOWN = (int_systDOWN-int_mean)/int_mean;
+  float systDOWN = (int_systDOWN>0.) ? (int_systDOWN-int_mean)/int_mean : 0.;
 
   std::cout << syst << " Syst: UP: " << systUP << " DOWN: " << systDOWN << std::endl;
 //  float systValue = ( fabs(systUP)>fabs(systDOWN) ) ? systUP : systDOWN;
