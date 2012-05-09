@@ -63,7 +63,7 @@ void drawSingleSyst( DrawBase* db, const std::string& syst, const std::string& s
   newdb->drawHisto( "nJets_presel", "Jet Multiplicity", "", "Events");
   newdb->drawHisto( "nBJets_loose_presel", "b-Jet Multiplicity (Loose)", "", "Events");
   newdb->drawHisto( "nBJets_medium_presel", "b-Jet Multiplicity (Medium)", "", "Events");
-  newdb->drawHisto( "channelYields", "", "", "Events");
+  newdb->drawHisto( "channelYields", "", "", "Events", false, 2);
 
 
 }
