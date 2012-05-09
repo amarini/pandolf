@@ -7,7 +7,7 @@
 #include "TH1D.h"
 
 
-std::pair< float, float >  getBGSyst( const std::string& syst, const std::string& sel );
+std::pair< float, float >  getSyst( const std::string& syst, const std::string& sel, const std::string& bg_signal );
 
 
 int main(int argc, char* argv[]) {
@@ -63,24 +63,27 @@ int main(int argc, char* argv[]) {
 
   datacard << std::endl << std::endl;
 
-  datacard << "bin         \t1      \t1" << std::endl; 
-  datacard << "process     \tttZ    \tbg" << std::endl; 
-  datacard << "process     \t0      \t1" << std::endl; 
-  datacard << "rate        \t" << s << "\t" << b_pred << std::endl; 
+  datacard << "bin         \t1      \t\t1" << std::endl; 
+  datacard << "process     \tttZ    \t\tbg" << std::endl; 
+  datacard << "process     \t0      \t\t1" << std::endl; 
+  datacard << "rate        \t" << s << "\t\t" << b_pred << std::endl; 
 
   datacard << std::endl << std::endl;
 
-  datacard << "lumi     lnN\t1.035  \t1.035" << std::endl;
-  datacard << "bgUncert lnN\t-      \t" << 1. + b_pred_err/b_pred << std::endl;
+  datacard << "lumi     lnN\t1.022  \t\t1.022" << std::endl; //taken from SMP-12-008
+  datacard << "bgUncert lnN\t-      \t\t" << 1. + b_pred_err/b_pred << std::endl;
 
-  std::pair< float, float >  btagSyst = getBGSyst( "BTag", selection );
-  datacard << "btag     lnN\t-      \t" << btagSyst.first << "/" << btagSyst.second << std::endl;
+  std::pair< float, float >  btagSystBG = getSyst( "BTag", selection, "BG" );
+  std::pair< float, float >  btagSystSignal = getSyst( "BTag", selection, "Signal" );
+  datacard << "btag     lnN\t" <<  btagSystSignal.first << "/" << btagSystSignal.second << "\t" << btagSystBG.first << "/" << btagSystBG.second << std::endl;
 
-  std::pair< float, float >  jesSyst = getBGSyst( "JES", selection );
-  datacard << "jes      lnN\t-      \t" << jesSyst.first << "/" << jesSyst.second << std::endl;
+  std::pair< float, float >  jesSystBG = getSyst( "JES", selection, "BG" );
+  std::pair< float, float >  jesSystSignal = getSyst( "JES", selection, "Signal" );
+  datacard << "jes      lnN\t" <<  jesSystSignal.first << "/" << jesSystSignal.second << "\t" << jesSystBG.first << "/" << jesSystBG.second << std::endl;
 
-  std::pair< float, float >  jerSyst = getBGSyst( "JER", selection );
-  datacard << "jer      lnN\t-      \t" << jerSyst.second << std::endl;
+  std::pair< float, float >  jerSystBG = getSyst( "JER", selection, "BG" );
+  std::pair< float, float >  jerSystSignal = getSyst( "JER", selection, "Signal" );
+  datacard << "jer      lnN\t" << jerSystSignal.second << "\t\t" << jerSystBG.second << std::endl;
 
   datacard.close();
 
@@ -93,11 +96,20 @@ int main(int argc, char* argv[]) {
 
 
 
-std::pair<float, float>  getBGSyst( const std::string& syst, const std::string& sel ) {
+std::pair<float, float>  getSyst( const std::string& syst, const std::string& sel, const std::string& bg_signal ) {
 
-  std::string systFile = "TTZTrilepton_BG_" + sel + "_TCHE_ALL.root";
-  std::string systFileUP = "TTZTrilepton_BG_" + sel + "_TCHE_ALL_" + syst + "UP.root";
-  std::string systFileDOWN = "TTZTrilepton_BG_" + sel + "_TCHE_ALL_" + syst + "DOWN.root";
+
+  if( bg_signal!="BG" && bg_signal!="Signal" ) {
+    std::cout << "bg_signal must be either 'BG' or 'Signal'. Exiting." << std::endl;
+    exit(73);
+  }
+
+  std::string dataset = (bg_signal=="BG") ? bg_signal : "TTZ_TuneZ2_7TeV-madgraphCMSSW42xPUv3_spadhi";
+  
+
+  std::string systFile = "TTZTrilepton_" + dataset + "_" + sel + "_TCHE_ALL.root";
+  std::string systFileUP = "TTZTrilepton_" + dataset + "_" + sel + "_TCHE_ALL_" + syst + "UP.root";
+  std::string systFileDOWN = "TTZTrilepton_" + dataset + "_" + sel + "_TCHE_ALL_" + syst + "DOWN.root";
 
   TFile* file_systFile = TFile::Open( systFile.c_str() );
   TFile* file_systFileUP = TFile::Open( systFileUP.c_str() );
@@ -113,11 +125,6 @@ std::pair<float, float>  getBGSyst( const std::string& syst, const std::string& 
 
   float systUP = (int_systUP-int_mean)/int_mean;
   float systDOWN = (int_systDOWN>0.) ? (int_systDOWN-int_mean)/int_mean : 0.;
-
-  std::cout << syst << " Syst: UP: " << systUP << " DOWN: " << systDOWN << std::endl;
-//  float systValue = ( fabs(systUP)>fabs(systDOWN) ) ? systUP : systDOWN;
-//  //float systValue = TMath::Max(systUP, systDOWN);
-  
 
   std::pair<float, float> returnSyst;
   returnSyst.first = 1. + systDOWN;
