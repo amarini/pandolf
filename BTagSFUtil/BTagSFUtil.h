@@ -125,6 +125,7 @@ class BTagSFUtil {
   TF1* SFbFunct_loose_;
   TF1* SFbFunct_medium_;
 
+  TF1* f1_one_;
 
   TRandom3* rand_;
   std::string sfFileName_;
