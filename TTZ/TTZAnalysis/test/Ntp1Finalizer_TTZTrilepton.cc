@@ -8,6 +8,7 @@
 #include "TH2D.h"
 #include "TProfile.h"
 #include "TRegexp.h"
+#include "TRandom3.h"
 
 #include "QGLikelihood/QGLikelihoodCalculator.h"
 #include "HelicityLikelihoodDiscriminant/HelicityLikelihoodDiscriminant.h"
@@ -21,7 +22,7 @@
 
 bool USE_MC_MASS=false;
 
-int DEBUG_EVENTNUMBER = 166986733;
+int DEBUG_EVENTNUMBER = -1;
 
 
 
@@ -29,6 +30,7 @@ int DEBUG_EVENTNUMBER = 166986733;
 float getMuonHLTSF_DoubleTrigger( float pt, float eta, const std::string& runPeriod );
 float getMuonHLTSF_SingleTrigger( float pt, float eta, const std::string& runPeriod );
 float getEventHLTSF( float effSingle1, float effSingle2, float effDouble1, float effDouble2 );
+float getJERSF( float eta );
 
 
 // constructor:
@@ -47,6 +49,10 @@ Ntp1Finalizer_TTZTrilepton::Ntp1Finalizer_TTZTrilepton( const std::string& datas
 
   bTaggerType_ = bTaggerType;
   leptType_ = leptType;
+
+  jes_ = 0;
+  btagSyst_ = 0;
+  jer_ = false;
 
   setSelectionType(selectionType);
 
@@ -87,12 +93,14 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
     std::string fullFlags_tmp(fullFlags_char);
     fullFlags = fullFlags_tmp;
   }
+  if( jer_ ) fullFlags = fullFlags + "_JERUP";
   this->set_flags(fullFlags); //this is for the outfile name
   this->createOutputFile();
 
 
 
   TTree* tree_passedEvents = new TTree("tree_passedEvents", "Unbinned data for statistical treatment");
+
 
   TH1D* h1_nCounter = new TH1D("nCounter", "", 1, 0., 1.);
   h1_nCounter->Sumw2();
@@ -113,6 +121,8 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   h1_pfMet_presel->Sumw2();
   TH1D* h1_pfMet = new TH1D("pfMet", "", 500, 0., 500.);
   h1_pfMet->Sumw2();
+  TH1D* h1_ht = new TH1D("ht", "", 1000, 0., 1000.);
+  h1_ht->Sumw2();
 
   TH1D* h1_metSignificance= new TH1D("metSignificance", "", 80, 0., 40.);
   h1_metSignificance->Sumw2();
@@ -190,6 +200,16 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   h1_nJets_presel->Sumw2();
   TH1D* h1_nJets = new TH1D("nJets", "", 7, 3.5, 10.5);
   h1_nJets->Sumw2();
+
+  TH1D* h1_nBJets_loose_presel = new TH1D("nBJets_loose_presel", "", 11, -0.5, 10.5);
+  h1_nBJets_loose_presel->Sumw2();
+  TH1D* h1_nBJets_loose = new TH1D("nBJets_loose", "", 7, 3.5, 10.5);
+  h1_nBJets_loose->Sumw2();
+
+  TH1D* h1_nBJets_medium_presel = new TH1D("nBJets_medium_presel", "", 11, -0.5, 10.5);
+  h1_nBJets_medium_presel->Sumw2();
+  TH1D* h1_nBJets_medium = new TH1D("nBJets_medium", "", 7, 3.5, 10.5);
+  h1_nBJets_medium->Sumw2();
 
 
   TH1D* h1_bTagJetB1 = new TH1D("bTagJetB1", "", 420, -1., 20.);
@@ -271,7 +291,13 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   h1_mTbWZ_max->Sumw2();
 
 
-
+  TH1D* h1_channelYields = new TH1D("channelYields", "", 5, 0., 5.);
+  h1_channelYields->GetXaxis()->SetLabelSize(0.085);
+  h1_channelYields->GetXaxis()->SetBinLabel(1, "(ee)e");
+  h1_channelYields->GetXaxis()->SetBinLabel(2, "(ee)#mu");
+  h1_channelYields->GetXaxis()->SetBinLabel(3, "(#mu#mu)e");
+  h1_channelYields->GetXaxis()->SetBinLabel(4, "(#mu#mu)#mu");
+  h1_channelYields->GetXaxis()->SetBinLabel(5, "Total" );
 
 
 
@@ -370,14 +396,14 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   tree_->SetBranchAddress("etaJet", etaJet);
   Float_t phiJet[50];
   tree_->SetBranchAddress("phiJet", phiJet);
-  Float_t eJetGen[50];
-  tree_->SetBranchAddress("eJetGen", eJetGen);
-  Float_t ptJetGen[50];
-  tree_->SetBranchAddress("ptJetGen", ptJetGen);
-  Float_t etaJetGen[50];
-  tree_->SetBranchAddress("etaJetGen", etaJetGen);
-  Float_t phiJetGen[50];
-  tree_->SetBranchAddress("phiJetGen", phiJetGen);
+  Float_t eGenJet[50];
+  tree_->SetBranchAddress("eGenJet", eGenJet);
+  Float_t ptGenJet[50];
+  tree_->SetBranchAddress("ptGenJet", ptGenJet);
+  Float_t etaGenJet[50];
+  tree_->SetBranchAddress("etaGenJet", etaGenJet);
+  Float_t phiGenJet[50];
+  tree_->SetBranchAddress("phiGenJet", phiGenJet);
   Float_t eChargedHadronsJet[50];
   tree_->SetBranchAddress("eChargedHadronsJet", eChargedHadronsJet);
   Float_t rmsCandJet[50];
@@ -623,6 +649,7 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
 ofstream ofs("run_event.txt");
 
 
+  TRandom3* rand = new TRandom3(1313);
 
 
   std::cout << std::endl << std::endl;
@@ -815,6 +842,22 @@ ofstream ofs("run_event.txt");
       // JES syst:
       float ptJet_corr = ptJet[iJet] + (float)jes_*ptUncertJet[iJet]*ptJet[iJet];
 
+      // JER syst:
+      if( jer_ ) {
+        AnalysisJet thisJet_tmp;
+        thisJet_tmp.SetPtEtaPhiE( ptJet_corr, etaJet[iJet], phiJet[iJet], eJet[iJet]);
+        AnalysisJet thisGenJet_tmp;
+        thisGenJet_tmp.SetPtEtaPhiE( ptGenJet[iJet], etaGenJet[iJet], phiGenJet[iJet], eGenJet[iJet]);
+        float jer_SF = getJERSF( thisJet_tmp.Eta() );
+        bool matched = thisJet_tmp.DeltaR(thisGenJet_tmp)<0.5;
+        if( matched )
+          ptJet_corr = TMath::Max(0., thisGenJet_tmp.Pt()+jer_SF*(thisJet_tmp.Pt()-thisGenJet_tmp.Pt() ) );
+        else
+          ptJet_corr *= rand->Gaus( 1., fabs(1.-jer_SF) );
+
+      }
+      
+
       if( ptJet_corr < ptJet_thresh_ ) continue;
       if( fabs(etaJet[iJet]) > etaJet_thresh_ ) continue;
 
@@ -845,10 +888,10 @@ ofstream ofs("run_event.txt");
       thisJet.jetBProbabilityBJetTag              = jetBProbabilityBJetTagJet[iJet];
       thisJet.jetProbabilityBJetTag               = jetProbabilityBJetTagJet[iJet];
 
-      thisJet.ptGen = ptJetGen[iJet];
-      thisJet.etaGen = etaJetGen[iJet];
-      thisJet.phiGen = phiJetGen[iJet];
-      thisJet.eGen = eJetGen[iJet];
+      thisJet.ptGen = ptGenJet[iJet];
+      thisJet.etaGen = etaGenJet[iJet];
+      thisJet.phiGen = phiGenJet[iJet];
+      thisJet.eGen = eGenJet[iJet];
 
       ////match to parton:
       //int partFlavor=0;
@@ -954,10 +997,10 @@ ofstream ofs("run_event.txt");
       thisJet.jetBProbabilityBJetTag              = jetBProbabilityBJetTagJet[iJet];
       thisJet.jetProbabilityBJetTag               = jetProbabilityBJetTagJet[iJet];
 
-      thisJet.ptGen = ptJetGen[iJet];
-      thisJet.etaGen = etaJetGen[iJet];
-      thisJet.phiGen = phiJetGen[iJet];
-      thisJet.eGen = eJetGen[iJet];
+      thisJet.ptGen = ptGenJet[iJet];
+      thisJet.etaGen = etaGenJet[iJet];
+      thisJet.phiGen = phiGenJet[iJet];
+      thisJet.eGen = eGenJet[iJet];
 
       ////match to parton:
       //int partFlavor=0;
@@ -1065,6 +1108,8 @@ ofstream ofs("run_event.txt");
 
 
     h1_nJets_presel->Fill( njets, eventWeight );
+    h1_nBJets_loose_presel->Fill( nBjets_loose, eventWeight );
+    h1_nBJets_medium_presel->Fill( nBjets_medium, eventWeight );
     h1_pfMet_presel->Fill( pfMet, eventWeight);
     h1_rhoPF_presel->Fill( rhoPF, eventWeight);
 
@@ -1121,8 +1166,89 @@ ofstream ofs("run_event.txt");
 
    
     h1_nJets->Fill( njets , eventWeight );
+    h1_nBJets_loose->Fill( nBjets_loose , eventWeight );
+    h1_nBJets_medium->Fill( nBjets_medium , eventWeight );
+
+
+
+    // define all kinematic variables:
+    
+    TLorentzVector met;
+    met.SetPtEtaPhiE( pfMet, 0., phiMet, pfMet );
+
+    TLorentzVector W = lept3 + met;
+    // this is for tree_passedEvents:
+    mt = W.Mt();
+
+
+    h1_mTW->Fill( W.Mt() , eventWeight );
+
+    TLorentzVector lZ = lept3 + diLepton;
+    TLorentzVector lZ_plusMet = lZ + met;
+
+    mT_lZmet = ( sqrt( lZ.Pt()*lZ.Pt() + lZ.M()*lZ.M() ) + pfMet )*( sqrt( lZ.Pt()*lZ.Pt() + lZ.M()*lZ.M() ) + pfMet )  -  lZ_plusMet.Pt()*lZ_plusMet.Pt();
+    mT_lZmet = sqrt(mT_lZmet);
+
+    ptJetB1_t = jetB1.Pt();
+    ptJetB2_t = jetB2.Pt();
+
+    TLorentzVector b1jj = jetB1 + jet3 + jet4;
+    TLorentzVector b2jj = jetB2 + jet3 + jet4;
+
+    TLorentzVector b1jjZ = jetB1 + jet3 + jet4 + diLepton;
+    TLorentzVector b2jjZ = jetB2 + jet3 + jet4 + diLepton;
+
+    mb1jj = b1jj.M();
+    mb2jj = b2jj.M();
+
+    if( fabs(mb1jj-tmass) < fabs(mb2jj-tmass) )
+      mbjj_best = mb1jj;
+    else
+      mbjj_best = mb2jj;
+
+    mbjj_max = TMath::Max(mb1jj,mb2jj);
+
+    mb1jjZ = b1jjZ.M();
+    mb2jjZ = b2jjZ.M();
+
+    if( fabs(mb1jjZ-tmass) < fabs(mb2jjZ-tmass) )
+      mbjjZ_best = mb1jjZ;
+    else
+      mbjjZ_best = mb2jjZ;
+
+    mbjjZ_max = TMath::Max(mb1jjZ,mb2jjZ);
+
+
+    TLorentzVector b1W = jetB1 + lept3 + met;
+    TLorentzVector b2W = jetB2 + lept3 + met;
+
+    TLorentzVector b1WZ = jetB1 + diLepton + lept3 + met;
+    TLorentzVector b2WZ = jetB2 + diLepton + lept3 + met;
+
+    mTb1W = b1W.Mt();
+    mTb2W = b2W.Mt();
+
+    if( fabs(mTb1W-tmass) < fabs(mTb2W-tmass) )
+      mTbW_best = mTb1W;
+    else
+      mTbW_best = mTb2W;
+    
+    mTbW_max = TMath::Max(mTb1W,mTb2W);
+
+    mTb1WZ = b1WZ.Mt();
+    mTb2WZ = b2WZ.Mt();
+
+    if( fabs(mTb1WZ-tmass) < fabs(mTb2WZ-tmass) )
+      mTbWZ_best = mTb1WZ;
+    else
+      mTbWZ_best = mTb2WZ;
+
+    mTbWZ_max = TMath::Max(mTb1WZ,mTb2WZ);
+
+
 
     if( ht<ht_thresh_ ) continue;
+    if( mbjjZ_best<mbjjZ_best_thresh_ ) continue;
 
 
 
@@ -1136,23 +1262,8 @@ ofstream ofs("run_event.txt");
       if( isMZllSignalRegion ) {
 
         h1_pfMet->Fill( pfMet, eventWeight );
+        h1_ht->Fill( ht, eventWeight );
         h1_metSignificance->Fill( metSignificance, eventWeight );
-
-        TLorentzVector met;
-        met.SetPtEtaPhiE( pfMet, 0., phiMet, pfMet );
-
-        TLorentzVector W = lept3 + met;
-        // this is for tree_passedEvents:
-        mt = W.Mt();
-
-
-        h1_mTW->Fill( W.Mt() , eventWeight );
-
-        TLorentzVector lZ = lept3 + diLepton;
-        TLorentzVector lZ_plusMet = lZ + met;
-
-        mT_lZmet = ( sqrt( lZ.Pt()*lZ.Pt() + lZ.M()*lZ.M() ) + pfMet )*( sqrt( lZ.Pt()*lZ.Pt() + lZ.M()*lZ.M() ) + pfMet )  -  lZ_plusMet.Pt()*lZ_plusMet.Pt();
-        mT_lZmet = sqrt(mT_lZmet);
 
         h1_mT_lZmet->Fill( mT_lZmet, eventWeight );
 
@@ -1170,9 +1281,6 @@ ofstream ofs("run_event.txt");
         h1_ptZll->Fill( diLepton.Pt(), eventWeight );
         h1_etaZll->Fill( diLepton.Eta(), eventWeight );
 
-
-        ptJetB1_t = jetB1.Pt();
-        ptJetB2_t = jetB2.Pt();
 
         h1_ptJetB1->Fill( ptJetB1_t, eventWeight );
         h1_ptJetB2->Fill( ptJetB2_t, eventWeight );
@@ -1206,88 +1314,49 @@ ofstream ofs("run_event.txt");
         h1_bTagJetB2->Fill( bTaggerJetB2, eventWeight );
 
 
-
         h1_deltaRbb->Fill( jetB1.DeltaR(jetB2), eventWeight );
-
-        TLorentzVector b1jj = jetB1 + jet3 + jet4;
-        TLorentzVector b2jj = jetB2 + jet3 + jet4;
-
-        TLorentzVector b1jjZ = jetB1 + jet3 + jet4 + diLepton;
-        TLorentzVector b2jjZ = jetB2 + jet3 + jet4 + diLepton;
-
-        mb1jj = b1jj.M();
-        mb2jj = b2jj.M();
 
         h1_mb1jj->Fill( mb1jj, eventWeight );
         h1_mb2jj->Fill( mb2jj, eventWeight );
-
-        if( fabs(mb1jj-tmass) < fabs(mb2jj-tmass) )
-          mbjj_best = mb1jj;
-        else
-          mbjj_best = mb2jj;
-
-        mbjj_max = TMath::Max(mb1jj,mb2jj);
 
         h1_mbjj_best->Fill( mbjj_best, eventWeight );
         h1_mbjj_max->Fill( mbjj_max, eventWeight );
 
 
-        mb1jjZ = b1jjZ.M();
-        mb2jjZ = b2jjZ.M();
-
         h1_mb1jjZ->Fill( mb1jjZ, eventWeight );
         h1_mb2jjZ->Fill( mb2jjZ, eventWeight );
 
-        if( fabs(mb1jjZ-tmass) < fabs(mb2jjZ-tmass) )
-          mbjjZ_best = mb1jjZ;
-        else
-          mbjjZ_best = mb2jjZ;
-
-        mbjjZ_max = TMath::Max(mb1jjZ,mb2jjZ);
 
         h1_mbjjZ_best->Fill( mbjjZ_best, eventWeight );
         h1_mbjjZ_max->Fill( mbjjZ_max, eventWeight );
 
 
-
-        TLorentzVector b1W = jetB1 + lept3 + met;
-        TLorentzVector b2W = jetB2 + lept3 + met;
-
-        TLorentzVector b1WZ = jetB1 + diLepton + lept3 + met;
-        TLorentzVector b2WZ = jetB2 + diLepton + lept3 + met;
-
-        mTb1W = b1W.Mt();
-        mTb2W = b2W.Mt();
-
         h1_mTb1W->Fill( mTb1W, eventWeight );
         h1_mTb2W->Fill( mTb2W, eventWeight );
-
-        if( fabs(mTb1W-tmass) < fabs(mTb2W-tmass) )
-          mTbW_best = mTb1W;
-        else
-          mTbW_best = mTb2W;
-    
-        mTbW_max = TMath::Max(mTb1W,mTb2W);
 
         h1_mTbW_best->Fill( mTbW_best, eventWeight );
         h1_mTbW_max->Fill( mTbW_max, eventWeight );
 
         
-        mTb1WZ = b1WZ.Mt();
-        mTb2WZ = b2WZ.Mt();
-
         h1_mTb1WZ->Fill( mTb1WZ, eventWeight );
         h1_mTb2WZ->Fill( mTb2WZ, eventWeight );
 
-        if( fabs(mTb1WZ-tmass) < fabs(mTb2WZ-tmass) )
-          mTbWZ_best = mTb1WZ;
-        else
-          mTbWZ_best = mTb2WZ;
-
-        mTbWZ_max = TMath::Max(mTb1WZ,mTb2WZ);
-
         h1_mTbWZ_best->Fill( mTbWZ_best, eventWeight );
         h1_mTbWZ_max->Fill( mTbWZ_max, eventWeight );
+
+
+        int leptType_forYield=-1;
+        if( leptType==1 && leptTypeLept[0]==1 ) leptType_forYield = 0;
+        if( leptType==1 && leptTypeLept[0]==0 ) leptType_forYield = 1;
+        if( leptType==0 && leptTypeLept[0]==1 ) leptType_forYield = 2;
+        if( leptType==0 && leptTypeLept[0]==0 ) leptType_forYield = 3;
+        if( leptType_forYield<0 ) {
+          std::cout << "There must be a problem, leptType_forYield can't be negative" << std::endl;
+          exit(55);
+        }
+        h1_channelYields->Fill( leptType_forYield, eventWeight );
+        h1_channelYields->Fill( 4, eventWeight ); //this is the total
+
       
       } // is mzll signal region
 
@@ -1371,6 +1440,7 @@ ofstream ofs("run_event.txt");
 
   h1_pfMet->Write();
   h1_pfMet_presel->Write();
+  h1_ht->Write();
 
   h1_metSignificance->Write();
 
@@ -1417,6 +1487,12 @@ ofstream ofs("run_event.txt");
   h1_nJets_presel->Write();
   h1_nJets->Write();
 
+  h1_nBJets_loose_presel->Write();
+  h1_nBJets_loose->Write();
+
+  h1_nBJets_medium_presel->Write();
+  h1_nBJets_medium->Write();
+
 
   h1_bTagJetB1->Write();
   h1_bTagJetB2->Write();
@@ -1460,6 +1536,7 @@ ofstream ofs("run_event.txt");
   h1_mTbWZ_best->Write();
   h1_mTbWZ_max->Write();
 
+  h1_channelYields->Write();
 
   outFile_->Close();
 
@@ -1474,8 +1551,8 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
 
   if( selectionType_=="presel" ) {
 
-    ptLeptZ1_thresh_ = 10.;
-    ptLeptZ2_thresh_ = 10.;
+    ptLeptZ1_thresh_ = 20.;
+    ptLeptZ2_thresh_ = 20.;
     ptLept3_thresh_ = 10.;
     etaLeptZ1_thresh_ = 3.;
     etaLeptZ2_thresh_ = 3.;
@@ -1497,11 +1574,12 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
 
     met_thresh_ = 0.;
     ht_thresh_ = 0.;
+    mbjjZ_best_thresh_ = 0.;
  
   } else if( selectionType_=="preselplus" ) {
 
-    ptLeptZ1_thresh_ = 10.;
-    ptLeptZ2_thresh_ = 10.;
+    ptLeptZ1_thresh_ = 20.;
+    ptLeptZ2_thresh_ = 20.;
     ptLept3_thresh_ = 10.;
     etaLeptZ1_thresh_ = 3.;
     etaLeptZ2_thresh_ = 3.;
@@ -1523,6 +1601,7 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
 
     met_thresh_ = 30.;
     ht_thresh_ = 0.;
+    mbjjZ_best_thresh_ = 0.;
  
   } else if( selectionType_=="sel1" ) {
 
@@ -1549,6 +1628,7 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
 
     met_thresh_ = 30.;
     ht_thresh_ = 0.;
+    mbjjZ_best_thresh_ = 0.;
 
   } else if( selectionType_=="sel2" ) {
 
@@ -1575,6 +1655,7 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
 
     met_thresh_ = 0.;
     ht_thresh_ = 0.;
+    mbjjZ_best_thresh_ = 0.;
 
   } else if( selectionType_=="sel3" ) {
 
@@ -1601,6 +1682,7 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
 
     met_thresh_ = 0.;
     ht_thresh_ = 0.;
+    mbjjZ_best_thresh_ = 0.;
 
   } else if( selectionType_=="optsel1" ) {
 
@@ -1625,8 +1707,117 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
 
     ptZll_thresh_ = 28.;
 
-    met_thresh_ = 0.;
+    met_thresh_ = 30.;
     ht_thresh_ = 184.;
+    mbjjZ_best_thresh_ = 0.;
+
+  } else if( selectionType_=="optsel2" ) {
+
+    ptLeptZ1_thresh_ = 20.;
+    ptLeptZ2_thresh_ = 20.;
+    ptLept3_thresh_ = 10.;
+    etaLeptZ1_thresh_ = 3.;
+    etaLeptZ2_thresh_ = 3.;
+    etaLept3_thresh_ = 3.;
+
+    combinedIsoRelLept3_thresh_ = 1.;
+
+    ptJet_thresh_ = 20.;
+    etaJet_thresh_ = 2.4;
+
+    njets_thresh_ = 3;
+    nBjets_loose_thresh_ = 0;
+    nBjets_medium_thresh_ = 1;
+
+    mZll_threshLo_ = 81.;
+    mZll_threshHi_ = 101.;
+
+    ptZll_thresh_ = 30.;
+
+    met_thresh_ = 30.;
+    ht_thresh_ = 0.;
+    mbjjZ_best_thresh_ = 200.;
+
+  } else if( selectionType_=="optsel2_noHT" ) {
+
+    ptLeptZ1_thresh_ = 20.;
+    ptLeptZ2_thresh_ = 20.;
+    ptLept3_thresh_ = 10.;
+    etaLeptZ1_thresh_ = 3.;
+    etaLeptZ2_thresh_ = 3.;
+    etaLept3_thresh_ = 3.;
+
+    combinedIsoRelLept3_thresh_ = 1.;
+
+    ptJet_thresh_ = 20.;
+    etaJet_thresh_ = 2.4;
+
+    njets_thresh_ = 3;
+    nBjets_loose_thresh_ = 0;
+    nBjets_medium_thresh_ = 1;
+
+    mZll_threshLo_ = 81.;
+    mZll_threshHi_ = 101.;
+
+    ptZll_thresh_ = 30.;
+
+    met_thresh_ = 30.;
+    ht_thresh_ = 0.;
+    mbjjZ_best_thresh_ = 0.;
+
+  } else if( selectionType_=="optsel3" ) {
+
+    ptLeptZ1_thresh_ = 20.;
+    ptLeptZ2_thresh_ = 20.;
+    ptLept3_thresh_ = 10.;
+    etaLeptZ1_thresh_ = 3.;
+    etaLeptZ2_thresh_ = 3.;
+    etaLept3_thresh_ = 3.;
+
+    combinedIsoRelLept3_thresh_ = 1.;
+
+    ptJet_thresh_ = 20.;
+    etaJet_thresh_ = 2.4;
+
+    njets_thresh_ = 3;
+    nBjets_loose_thresh_ = 2;
+    nBjets_medium_thresh_ = 1;
+
+    mZll_threshLo_ = 81.;
+    mZll_threshHi_ = 101.;
+
+    ptZll_thresh_ = 35.;
+
+    met_thresh_ = 0.;
+    ht_thresh_ = 120.;
+    mbjjZ_best_thresh_ = 0.;
+
+  } else if( selectionType_=="presel_2LB_1MB" ) {
+
+    ptLeptZ1_thresh_ = 20.;
+    ptLeptZ2_thresh_ = 20.;
+    ptLept3_thresh_ = 10.;
+    etaLeptZ1_thresh_ = 3.;
+    etaLeptZ2_thresh_ = 3.;
+    etaLept3_thresh_ = 3.;
+
+    combinedIsoRelLept3_thresh_ = 1.;
+
+    ptJet_thresh_ = 20.;
+    etaJet_thresh_ = 2.4;
+
+    njets_thresh_ = 3;
+    nBjets_loose_thresh_ = 2;
+    nBjets_medium_thresh_ = 1;
+
+    mZll_threshLo_ = 81.;
+    mZll_threshHi_ = 101.;
+
+    ptZll_thresh_ = 35.;
+
+    met_thresh_ = 0.;
+    ht_thresh_ = 120.;
+    mbjjZ_best_thresh_ = 0.;
 
 
   } else {
@@ -1777,5 +1968,33 @@ float getEventHLTSF( float effSingle1, float effSingle2, float effDouble1, float
 
 }
 
+
+
+float getJERSF( float eta ) {
+
+  // scale factors taken from https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution
+ 
+  float SF=-1.;
+
+  if( fabs(eta)<0.5 ) {
+    SF = 1.052;
+  } else if( fabs(eta)<1.1 ) {
+    SF = 1.057;
+  } else if( fabs(eta)<1.7 ) {
+    SF = 1.096;
+  } else if( fabs(eta)<2.3 ) {
+    SF = 1.134;
+  } else {
+    SF = 1.288;
+  }
+
+  if( SF<0. ) {
+    std::cout << "JERSF is negative, this shouldn't be possible." << std::endl;
+    exit(1123);
+  }
+
+  return SF;
+
+}
 
 

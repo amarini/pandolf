@@ -28,6 +28,7 @@ class Ntp1Finalizer_TTZTrilepton : public Ntp1Finalizer {
   void set_jes( int jes ) { jes_ = jes; };
   void set_btagSyst( int btagSyst ) { btagSyst_ = btagSyst; };
 
+  void set_jer( bool jer ) { jer_ = jer; };
 
  private:
 
@@ -53,6 +54,7 @@ class Ntp1Finalizer_TTZTrilepton : public Ntp1Finalizer {
 
    float  met_thresh_;
    float  ht_thresh_;
+   float  mbjjZ_best_thresh_;
 
    float  mZll_threshLo_;
    float  mZll_threshHi_;
@@ -62,6 +64,7 @@ class Ntp1Finalizer_TTZTrilepton : public Ntp1Finalizer {
    // syst flags:
    int jes_; // number of sigmas
    int btagSyst_; // number of sigmas
+   bool jer_;
 
 };
 
