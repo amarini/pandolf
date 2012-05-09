@@ -90,6 +90,15 @@ int main( int argc, char* argv[] ) {
   tree->SetBranchAddress("passed_HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL", &passed_HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL);
   Bool_t passed_HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL;
   tree->SetBranchAddress("passed_HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL", &passed_HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL);
+
+
+  Bool_t matchedToHLTLeptZ1;
+  if( analysisType_=="TTZ" )
+    tree->SetBranchAddress("matchedToHLTLeptZ1", &matchedToHLTLeptZ1);
+  Bool_t matchedToHLTLeptZ2;
+  if( analysisType_=="TTZ" )
+    tree->SetBranchAddress("matchedToHLTLeptZ2", &matchedToHLTLeptZ2);
+
   
   std::string outfilename = analysisType_ + "_2ndLevelTreeW_"+dataset;
   if( flags_!="" ) outfilename += "_" + flags_;
@@ -128,14 +137,25 @@ int main( int argc, char* argv[] ) {
                     && !passed_HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL && !passed_HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL
                     && !passed_HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL;
 
-      if( analysisType_ == "TTZ" )
+      if( analysisType_ == "TTZ" ) {
+
         passedHLT = passedHLT && !passed_HLT_Mu17_Ele8_CaloIdL && !passed_HLT_Mu8_Ele17_CaloIdL && !passed_HLT_Mu8_Ele17_CaloIdT_CaloIsoVL;
+
+        //explicit HLT matching required (at least one of them):
+        passedHLT = passedHLT && ( matchedToHLTLeptZ1 || matchedToHLTLeptZ2 );
+
+      }
+
 
       if( !passedHLT ) continue;
 
     } else if( dataset_tstr.BeginsWith("DoubleMu") ) {
 
       bool passedHLT = passed_HLT_DoubleMu7 || passed_HLT_Mu13_Mu8 || passed_HLT_Mu17_Mu8;
+
+      //explicit HLT matching required (both of them):
+      if( analysisType_ == "TTZ" ) 
+        passedHLT = passedHLT && ( matchedToHLTLeptZ1 && matchedToHLTLeptZ2 );
 
       if( !passedHLT ) continue;
 
@@ -145,8 +165,12 @@ int main( int argc, char* argv[] ) {
                        || passed_HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL )
                        && !passed_HLT_DoubleMu7 && !passed_HLT_Mu13_Mu8 && !passed_HLT_Mu17_Mu8;
 
-        if( analysisType_ == "TTW" )
-          passedHLT = passedHLT && !passed_HLT_Mu17_Ele8_CaloIdL && !passed_HLT_Mu8_Ele17_CaloIdL && !passed_HLT_Mu8_Ele17_CaloIdT_CaloIsoVL;
+      if( analysisType_ == "TTW" )
+        passedHLT = passedHLT && !passed_HLT_Mu17_Ele8_CaloIdL && !passed_HLT_Mu8_Ele17_CaloIdL && !passed_HLT_Mu8_Ele17_CaloIdT_CaloIsoVL;
+
+      //explicit HLT matching required (both of them):
+      if( analysisType_ == "TTZ" ) 
+        passedHLT = passedHLT && ( matchedToHLTLeptZ1 && matchedToHLTLeptZ2 );
 
       if( !passedHLT ) continue;
 
@@ -159,6 +183,12 @@ int main( int argc, char* argv[] ) {
         passedHLT = passedHLT && !passed_HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL && !passed_HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL
                               && !passed_HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL;
                        
+      //explicit HLT matching required (both of them):
+      if( analysisType_ == "TTZ" ) 
+        passedHLT = passedHLT && ( matchedToHLTLeptZ1 && matchedToHLTLeptZ2 );
+
+      if( !passedHLT ) continue;
+
     }
     
 
