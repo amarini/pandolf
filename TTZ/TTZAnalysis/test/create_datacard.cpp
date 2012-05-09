@@ -7,7 +7,7 @@
 #include "TH1D.h"
 
 
-float getBGSyst( const std::string& syst, const std::string& sel );
+std::pair< float, float >  getBGSyst( const std::string& syst, const std::string& sel );
 
 
 int main(int argc, char* argv[]) {
@@ -73,8 +73,11 @@ int main(int argc, char* argv[]) {
   datacard << "lumi     lnN\t1.035  \t1.035" << std::endl;
   datacard << "bgUncert lnN\t-      \t" << 1. + b_pred_err/b_pred << std::endl;
 
-  datacard << "btag     lnN\t-      \t" << getBGSyst( "BTag", selection ) << std::endl;
-  datacard << "jes      lnN\t-      \t" << getBGSyst( "JES", selection ) << std::endl;
+  std::pair< float, float >  btagSyst = getBGSyst( "BTag", selection );
+  datacard << "btag     lnN\t-      \t" << btagSyst.first << "/" << btagSyst.second << std::endl;
+
+  std::pair< float, float >  jesSyst = getBGSyst( "JES", selection );
+  datacard << "jes      lnN\t-      \t" << jesSyst.first << "/" << jesSyst.second << std::endl;
 
   datacard.close();
 
@@ -87,7 +90,7 @@ int main(int argc, char* argv[]) {
 
 
 
-float getBGSyst( const std::string& syst, const std::string& sel ) {
+std::pair<float, float>  getBGSyst( const std::string& syst, const std::string& sel ) {
 
   std::string systFile = "TTZTrilepton_BG_" + sel + "_TCHE_ALL.root";
   std::string systFileUP = "TTZTrilepton_BG_" + sel + "_TCHE_ALL_" + syst + "UP.root";
@@ -109,10 +112,14 @@ float getBGSyst( const std::string& syst, const std::string& sel ) {
   float systDOWN = (int_systDOWN-int_mean)/int_mean;
 
   std::cout << syst << " Syst: UP: " << systUP << " DOWN: " << systDOWN << std::endl;
-  float systValue = ( fabs(systUP)>fabs(systDOWN) ) ? systUP : systDOWN;
+//  float systValue = ( fabs(systUP)>fabs(systDOWN) ) ? systUP : systDOWN;
+//  //float systValue = TMath::Max(systUP, systDOWN);
   
-  systValue += 1.;
 
-  return systValue;
+  std::pair<float, float> returnSyst;
+  returnSyst.first = 1. + systDOWN;
+  returnSyst.second = 1. + systUP;
+
+  return returnSyst;
 
 }
