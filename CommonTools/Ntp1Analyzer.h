@@ -1253,7 +1253,7 @@ public :
    virtual void AddRequiredTrigger( const std::string& trigger, int runMin=-1, int runMax=-1 );
    virtual void AddRequiredTriggerNOT( const std::string& trigger, int runMin=-1, int runMax=-1 );
    virtual bool PassedHLT( int iEntry, const std::string& HLTName="" );
-   bool isMatchedToHLT( float eta, float phi, float deltaR_max );
+   bool isMatchedToHLT( float eta, float phi, float deltaR_max=0.3 );
 
    virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
