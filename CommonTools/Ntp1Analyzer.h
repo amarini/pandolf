@@ -71,6 +71,16 @@ public :
    Int_t           nHLT;
    Int_t           indexHLT[3000];   //[nHLT]
    std::vector<std::string>  *nameHLT;
+   Int_t           nTriggerPaths;
+   Int_t           nTriggerObsPassing;
+   Int_t           sizePassing[5000];   //[nTriggerPaths]
+   Int_t           indexPassing[5000];   //[nTriggerObsPassing]
+   Int_t           indexPassingPerPath[5000];   //[nTriggerPaths]
+   Int_t           nTriggerObs;
+   Float_t         triggerObsPt[5000];   //[nTriggerObs]
+   Float_t         triggerObsPhi[5000];   //[nTriggerObs]
+   Float_t         triggerObsEta[5000];   //[nTriggerObs]
+   Float_t         triggerObsMass[5000];   //[nTriggerObs]
    Int_t           nEle;
    Int_t           chargeEle[150];   //[nEle]
    Float_t         energyEle[150];   //[nEle]
@@ -671,6 +681,16 @@ public :
    TBranch        *b_nHLT;   //!
    TBranch        *b_nameHLT;   //!
    TBranch        *b_indexHLT;   //!
+   TBranch        *b_nTriggerPaths;   //!
+   TBranch        *b_nTriggerObsPassing;   //!
+   TBranch        *b_sizePassing;   //!
+   TBranch        *b_indexPassing;   //!
+   TBranch        *b_indexPassingPerPath;   //!
+   TBranch        *b_nTriggerObs;   //!
+   TBranch        *b_triggerObsPt;   //!
+   TBranch        *b_triggerObsPhi;   //!
+   TBranch        *b_triggerObsEta;   //!
+   TBranch        *b_triggerObsMass;   //!
    TBranch        *b_nEle;   //!
    TBranch        *b_chargeEle;   //!
    TBranch        *b_energyEle;   //!
@@ -1233,6 +1253,7 @@ public :
    virtual void AddRequiredTrigger( const std::string& trigger, int runMin=-1, int runMax=-1 );
    virtual void AddRequiredTriggerNOT( const std::string& trigger, int runMin=-1, int runMax=-1 );
    virtual bool PassedHLT( int iEntry, const std::string& HLTName="" );
+   bool isMatchedToHLT( float eta, float phi, float deltaR_max );
 
    virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
