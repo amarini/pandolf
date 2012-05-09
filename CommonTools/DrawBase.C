@@ -1548,10 +1548,14 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
 
 
 
-    h2_axes->SetXTitle(xAxis.c_str());
     h2_axes->SetYTitle(yAxis.c_str());
 
-    if( !noBinLabels ) h2_axes->GetXaxis()->SetLabelSize(0.07);
+    if( !noBinLabels ) 
+      h2_axes->GetXaxis()->SetLabelSize(0.07);
+    else
+      h2_axes->SetXTitle(xAxis.c_str());
+
+
     if( getBinLabels_ ) {
       for( unsigned iBinx=1; iBinx<nBinsx+1; ++iBinx ) {
         if( refHisto->GetXaxis()->GetBinLabel(iBinx)!="" )
