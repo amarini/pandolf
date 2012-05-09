@@ -71,6 +71,8 @@ int main( int argc, char* argv[] ) {
   tree->SetBranchAddress("passed_HLT_DoubleMu7", &passed_HLT_DoubleMu7);
   Bool_t passed_HLT_Mu13_Mu8;
   tree->SetBranchAddress("passed_HLT_Mu13_Mu8", &passed_HLT_Mu13_Mu8);
+  Bool_t passed_HLT_Mu17_Mu8;
+  tree->SetBranchAddress("passed_HLT_Mu17_Mu8", &passed_HLT_Mu17_Mu8);
   Bool_t passed_HLT_IsoMu24;
   tree->SetBranchAddress("passed_HLT_IsoMu24", &passed_HLT_IsoMu24);
   Bool_t passed_HLT_Mu17_Ele8_CaloIdL;
@@ -122,7 +124,7 @@ int main( int argc, char* argv[] ) {
     if( dataset_tstr.BeginsWith("SingleMu") ) {
 
       bool passedHLT = passed_HLT_IsoMu24
-                    && !passed_HLT_DoubleMu7 && !passed_HLT_Mu13_Mu8
+                    && !passed_HLT_DoubleMu7 && !passed_HLT_Mu13_Mu8 && !passed_HLT_Mu17_Mu8
                     && !passed_HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL && !passed_HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL
                     && !passed_HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL;
 
@@ -133,7 +135,7 @@ int main( int argc, char* argv[] ) {
 
     } else if( dataset_tstr.BeginsWith("DoubleMu") ) {
 
-      bool passedHLT = passed_HLT_DoubleMu7 || passed_HLT_Mu13_Mu8;
+      bool passedHLT = passed_HLT_DoubleMu7 || passed_HLT_Mu13_Mu8 || passed_HLT_Mu17_Mu8;
 
       if( !passedHLT ) continue;
 
@@ -141,7 +143,7 @@ int main( int argc, char* argv[] ) {
 
       bool passedHLT = (passed_HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL || passed_HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL
                        || passed_HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL )
-                       && !passed_HLT_DoubleMu7 && !passed_HLT_Mu13_Mu8;
+                       && !passed_HLT_DoubleMu7 && !passed_HLT_Mu13_Mu8 && !passed_HLT_Mu17_Mu8;
 
         if( analysisType_ == "TTW" )
           passedHLT = passedHLT && !passed_HLT_Mu17_Ele8_CaloIdL && !passed_HLT_Mu8_Ele17_CaloIdL && !passed_HLT_Mu8_Ele17_CaloIdT_CaloIsoVL;
@@ -151,7 +153,7 @@ int main( int argc, char* argv[] ) {
     } else if ( dataset_tstr.BeginsWith("MuEG") ) {
 
       bool passedHLT = (passed_HLT_Mu17_Ele8_CaloIdL || passed_HLT_Mu8_Ele17_CaloIdL || passed_HLT_Mu8_Ele17_CaloIdT_CaloIsoVL) 
-                    && !passed_HLT_DoubleMu7 && !passed_HLT_Mu13_Mu8;
+                    && !passed_HLT_DoubleMu7 && !passed_HLT_Mu13_Mu8 && !passed_HLT_Mu17_Mu8;
 
       if( analysisType_ == "TTZ" )
         passedHLT = passedHLT && !passed_HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL && !passed_HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL
