@@ -299,6 +299,7 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   h1_channelYields->GetXaxis()->SetBinLabel(3, "(#mu#mu)e");
   h1_channelYields->GetXaxis()->SetBinLabel(4, "(#mu#mu)#mu");
   h1_channelYields->GetXaxis()->SetBinLabel(5, "Total" );
+  h1_channelYields->Sumw2();
 
 
 
