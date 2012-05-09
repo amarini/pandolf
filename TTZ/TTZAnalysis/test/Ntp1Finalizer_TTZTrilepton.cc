@@ -69,6 +69,7 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   tree_->SetBranchAddress("run", &run);
   tree_->GetEntry(0);
   bool isMC = (run < 160000);
+
   std::string fullFlags = selectionType_ + "_" + bTaggerType_;
   fullFlags = fullFlags + "_" + leptType_;
   if( jes_ == 1 ) fullFlags = fullFlags + "_JESUP";
@@ -317,10 +318,10 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   tree_->SetBranchAddress("eventWeightPU", &eventWeightPU);
   Float_t eventWeightPU_ave;
   tree_->SetBranchAddress("eventWeightPU_ave", &eventWeightPU_ave);
-  Float_t eventWeight_Zee;
-  tree_->SetBranchAddress("eventWeight_Zee", &eventWeight_Zee);
-  Float_t eventWeight_Zmm;
-  tree_->SetBranchAddress("eventWeight_Zmm", &eventWeight_Zmm);
+  //Float_t eventWeight_Zee;
+  //tree_->SetBranchAddress("eventWeight_Zee", &eventWeight_Zee);
+  //Float_t eventWeight_Zmm;
+  //tree_->SetBranchAddress("eventWeight_Zmm", &eventWeight_Zmm);
 
   Float_t ptHat;
   tree_->SetBranchAddress("ptHat", &ptHat);
@@ -668,6 +669,7 @@ ofstream ofs("run_event.txt");
 
     tree_->GetEntry(iEntry);
 
+//std::cout << "new event" << std::endl;
 
     if( eventWeight <= 0. ) eventWeight = 1.;
 
@@ -837,6 +839,9 @@ ofstream ofs("run_event.txt");
     TLorentzVector pfMet_vector;
     pfMet_vector.SetPtEtaPhiE( pfMet, 0., phiMet, pfMet );
 
+    std::vector< TLorentzVector > selectedJets;
+
+
     for( unsigned iJet=0; iJet<nJets; ++iJet) {
 
       // JES syst:
@@ -849,12 +854,11 @@ ofstream ofs("run_event.txt");
         AnalysisJet thisGenJet_tmp;
         thisGenJet_tmp.SetPtEtaPhiE( ptGenJet[iJet], etaGenJet[iJet], phiGenJet[iJet], eGenJet[iJet]);
         float jer_SF = getJERSF( thisJet_tmp.Eta() );
-        bool matched = thisJet_tmp.DeltaR(thisGenJet_tmp)<0.5;
+        bool matched = (thisGenJet_tmp.Pt()>3.) ? thisJet_tmp.DeltaR(thisGenJet_tmp)<0.5 : false;
         if( matched )
           ptJet_corr = TMath::Max(0., thisGenJet_tmp.Pt()+jer_SF*(thisJet_tmp.Pt()-thisGenJet_tmp.Pt() ) );
         else
           ptJet_corr *= rand->Gaus( 1., fabs(1.-jer_SF) );
-
       }
       
 
@@ -946,6 +950,8 @@ ofstream ofs("run_event.txt");
         jetB2 = thisJet;
       }
 
+      selectedJets.push_back(thisJet);
+
 
     } // for jets
 
@@ -971,57 +977,46 @@ ofstream ofs("run_event.txt");
     
     // now add other jets ordered in pt:
     int istep=0;
-    for( unsigned iJet=0; iJet<nJets; ++iJet) {
+    for( unsigned iJet=0; iJet<selectedJets.size(); ++iJet) {
 
-      float ptJet_corr = ptJet[iJet] + (float)jes_*ptUncertJet[iJet]*ptJet[iJet];
+      AnalysisJet thisJet = selectedJets[iJet];
 
-      if( iJet==i_jetB1 || iJet==i_jetB2 ) continue;
+      if( thisJet==jetB1 || thisJet==jetB2 ) continue;
+      //if( iJet==i_jetB1 || iJet==i_jetB2 ) continue;
  
-      if( ptJet_corr < ptJet_thresh_ ) continue;
-      if( fabs(etaJet[iJet]) > etaJet_thresh_ ) continue;
+      //if( ptJet_corr < ptJet_thresh_ ) continue;
+      //if( fabs(etaJet[iJet]) > etaJet_thresh_ ) continue;
 
-      AnalysisJet thisJet;
-      thisJet.SetPtEtaPhiE( ptJet_corr, etaJet[iJet], phiJet[iJet], eJet[iJet]);
+      //AnalysisJet thisJet;
+      //thisJet.SetPtEtaPhiE( ptJet_corr, etaJet[iJet], phiJet[iJet], eJet[iJet]);
 
-      thisJet.rmsCand = rmsCandJet[iJet];
-      thisJet.ptD = ptDJet[iJet];
-      thisJet.nCharged = nChargedJet[iJet];
-      thisJet.nNeutral = nNeutralJet[iJet];
-      thisJet.eMuons = eMuonsJet[iJet]/thisJet.Energy();
-      thisJet.eElectrons = eElectronsJet[iJet]/thisJet.Energy();
+      //thisJet.rmsCand = rmsCandJet[iJet];
+      //thisJet.ptD = ptDJet[iJet];
+      //thisJet.nCharged = nChargedJet[iJet];
+      //thisJet.nNeutral = nNeutralJet[iJet];
+      //thisJet.eMuons = eMuonsJet[iJet]/thisJet.Energy();
+      //thisJet.eElectrons = eElectronsJet[iJet]/thisJet.Energy();
 
-      thisJet.trackCountingHighEffBJetTag = trackCountingHighEffBJetTagJet[iJet];
-      thisJet.trackCountingHighPurBJetTag = trackCountingHighPurBJetTagJet[iJet];
-      thisJet.simpleSecondaryVertexHighEffBJetTag = simpleSecondaryVertexHighEffBJetTagJet[iJet];
-      thisJet.simpleSecondaryVertexHighPurBJetTag = simpleSecondaryVertexHighPurBJetTagJet[iJet];
-      thisJet.jetBProbabilityBJetTag              = jetBProbabilityBJetTagJet[iJet];
-      thisJet.jetProbabilityBJetTag               = jetProbabilityBJetTagJet[iJet];
+      //thisJet.trackCountingHighEffBJetTag = trackCountingHighEffBJetTagJet[iJet];
+      //thisJet.trackCountingHighPurBJetTag = trackCountingHighPurBJetTagJet[iJet];
+      //thisJet.simpleSecondaryVertexHighEffBJetTag = simpleSecondaryVertexHighEffBJetTagJet[iJet];
+      //thisJet.simpleSecondaryVertexHighPurBJetTag = simpleSecondaryVertexHighPurBJetTagJet[iJet];
+      //thisJet.jetBProbabilityBJetTag              = jetBProbabilityBJetTagJet[iJet];
+      //thisJet.jetProbabilityBJetTag               = jetProbabilityBJetTagJet[iJet];
 
-      thisJet.ptGen = ptGenJet[iJet];
-      thisJet.etaGen = etaGenJet[iJet];
-      thisJet.phiGen = phiGenJet[iJet];
-      thisJet.eGen = eGenJet[iJet];
+      //thisJet.ptGen = ptGenJet[iJet];
+      //thisJet.etaGen = etaGenJet[iJet];
+      //thisJet.phiGen = phiGenJet[iJet];
+      //thisJet.eGen = eGenJet[iJet];
 
-      ////match to parton:
-      //int partFlavor=0;
-      //float deltaRmin=999.;
-      //for(unsigned iPart=0; iPart<nPart; ++iPart ) {
-      //  TLorentzVector thisPart;
-      //  thisPart.SetPtEtaPhiE( ptPart[iPart], etaPart[iPart], phiPart[iPart], ePart[iPart] );
-      //  float thisDeltaR = thisJet.DeltaR(thisPart);
-      //  if( thisDeltaR<deltaRmin ) {
-      //    partFlavor = pdgIdPart[iPart];
-      //    deltaRmin = thisDeltaR;
-      //  }
+      //if( isMC ) {
+      //  TLorentzVector parton;
+      //  parton.SetPtEtaPhiE( thisJet.Pt(), etaPartJet[iJet], phiPartJet[iJet], thisJet.Energy() );
+      //  float deltaR = parton.DeltaR( thisJet );
+      //  thisJet.pdgIdPart = (deltaR<0.5) ? pdgIdPartJet[iJet] : 21; //needed only for btag SF's
+      //} else {
+      //  thisJet.pdgIdPart = 0;
       //}
-      if( isMC ) {
-        TLorentzVector parton;
-        parton.SetPtEtaPhiE( thisJet.Pt(), etaPartJet[iJet], phiPartJet[iJet], thisJet.Energy() );
-        float deltaR = parton.DeltaR( thisJet );
-        thisJet.pdgIdPart = (deltaR<0.5) ? pdgIdPartJet[iJet] : 21; //needed only for btag SF's
-      } else {
-        thisJet.pdgIdPart = 0;
-      }
 
 
       if( istep==0 ) {
