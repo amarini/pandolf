@@ -25,11 +25,17 @@ bool USE_MC_MASS=false;
 int DEBUG_EVENTNUMBER = -1;
 
 
+struct ValueAndError {
+
+  float val;
+  float err;
+
+};
 
 
-float getMuonHLTSF_DoubleTrigger( float pt, float eta, const std::string& runPeriod );
-float getMuonHLTSF_SingleTrigger( float pt, float eta, const std::string& runPeriod );
-float getEventHLTSF( float effSingle1, float effSingle2, float effDouble1, float effDouble2 );
+ValueAndError getMuonHLTSF_DoubleTrigger( float pt, float eta, const std::string& runPeriod );
+ValueAndError getMuonHLTSF_SingleTrigger( float pt, float eta, const std::string& runPeriod );
+ValueAndError getEventHLTSF( ValueAndError effSingle1, ValueAndError effSingle2, ValueAndError effDouble1, ValueAndError effDouble2 );
 float getJERSF( float eta );
 
 
@@ -746,33 +752,33 @@ ofstream ofs("run_event.txt");
       // scale factor for double mu triggers:
       if( leptType==0 ) {
 
-        float effDouble1_Run2011A = getMuonHLTSF_DoubleTrigger( ptLeptZ1, etaLeptZ1, "Run2011A" );
-        float effDouble2_Run2011A = getMuonHLTSF_DoubleTrigger( ptLeptZ2, etaLeptZ2, "Run2011A" );
+        ValueAndError effDouble1_Run2011A = getMuonHLTSF_DoubleTrigger( ptLeptZ1, etaLeptZ1, "Run2011A" );
+        ValueAndError effDouble2_Run2011A = getMuonHLTSF_DoubleTrigger( ptLeptZ2, etaLeptZ2, "Run2011A" );
 
-        float effDouble1_Run2011B = getMuonHLTSF_DoubleTrigger( ptLeptZ1, etaLeptZ1, "Run2011B" );
-        float effDouble2_Run2011B = getMuonHLTSF_DoubleTrigger( ptLeptZ2, etaLeptZ2, "Run2011B" );
+        ValueAndError effDouble1_Run2011B = getMuonHLTSF_DoubleTrigger( ptLeptZ1, etaLeptZ1, "Run2011B" );
+        ValueAndError effDouble2_Run2011B = getMuonHLTSF_DoubleTrigger( ptLeptZ2, etaLeptZ2, "Run2011B" );
 
-        float effSingle1_Run2011A1 = getMuonHLTSF_SingleTrigger( ptLeptZ1, etaLeptZ1, "Run2011A1");
-        float effSingle2_Run2011A1 = getMuonHLTSF_SingleTrigger( ptLeptZ2, etaLeptZ2, "Run2011A1");
+        ValueAndError effSingle1_Run2011A1 = getMuonHLTSF_SingleTrigger( ptLeptZ1, etaLeptZ1, "Run2011A1");
+        ValueAndError effSingle2_Run2011A1 = getMuonHLTSF_SingleTrigger( ptLeptZ2, etaLeptZ2, "Run2011A1");
 
-        float effSingle1_Run2011A2 = getMuonHLTSF_SingleTrigger( ptLeptZ1, etaLeptZ1, "Run2011A2");
-        float effSingle2_Run2011A2 = getMuonHLTSF_SingleTrigger( ptLeptZ2, etaLeptZ2, "Run2011A2");
+        ValueAndError effSingle1_Run2011A2 = getMuonHLTSF_SingleTrigger( ptLeptZ1, etaLeptZ1, "Run2011A2");
+        ValueAndError effSingle2_Run2011A2 = getMuonHLTSF_SingleTrigger( ptLeptZ2, etaLeptZ2, "Run2011A2");
 
-        float effSingle1_Run2011A3 = getMuonHLTSF_SingleTrigger( ptLeptZ1, etaLeptZ1, "Run2011A3");
-        float effSingle2_Run2011A3 = getMuonHLTSF_SingleTrigger( ptLeptZ2, etaLeptZ2, "Run2011A3");
+        ValueAndError effSingle1_Run2011A3 = getMuonHLTSF_SingleTrigger( ptLeptZ1, etaLeptZ1, "Run2011A3");
+        ValueAndError effSingle2_Run2011A3 = getMuonHLTSF_SingleTrigger( ptLeptZ2, etaLeptZ2, "Run2011A3");
 
-        float effSingle1_Run2011B = getMuonHLTSF_SingleTrigger( ptLeptZ1, etaLeptZ1, "Run2011B");
-        float effSingle2_Run2011B = getMuonHLTSF_SingleTrigger( ptLeptZ2, etaLeptZ2, "Run2011B");
+        ValueAndError effSingle1_Run2011B = getMuonHLTSF_SingleTrigger( ptLeptZ1, etaLeptZ1, "Run2011B");
+        ValueAndError effSingle2_Run2011B = getMuonHLTSF_SingleTrigger( ptLeptZ2, etaLeptZ2, "Run2011B");
 
 
-        float HLTSF_Run2011A1 = getEventHLTSF( effSingle1_Run2011A1, effSingle2_Run2011A1, effDouble1_Run2011A, effDouble2_Run2011A );
-        float HLTSF_Run2011A2 = getEventHLTSF( effSingle1_Run2011A2, effSingle2_Run2011A2, effDouble1_Run2011A, effDouble2_Run2011A );
-        float HLTSF_Run2011A3 = getEventHLTSF( effSingle1_Run2011A3, effSingle2_Run2011A3, effDouble1_Run2011A, effDouble2_Run2011A );
-        float HLTSF_Run2011B  = getEventHLTSF( effSingle1_Run2011B, effSingle2_Run2011B, effDouble1_Run2011B, effDouble2_Run2011B );
+        ValueAndError HLTSF_Run2011A1 = getEventHLTSF( effSingle1_Run2011A1, effSingle2_Run2011A1, effDouble1_Run2011A, effDouble2_Run2011A );
+        ValueAndError HLTSF_Run2011A2 = getEventHLTSF( effSingle1_Run2011A2, effSingle2_Run2011A2, effDouble1_Run2011A, effDouble2_Run2011A );
+        ValueAndError HLTSF_Run2011A3 = getEventHLTSF( effSingle1_Run2011A3, effSingle2_Run2011A3, effDouble1_Run2011A, effDouble2_Run2011A );
+        ValueAndError HLTSF_Run2011B  = getEventHLTSF( effSingle1_Run2011B, effSingle2_Run2011B, effDouble1_Run2011B, effDouble2_Run2011B );
 
 
         // weighted average over full run (weighted with lumi):
-        HLTSF = (217.*HLTSF_Run2011A1 + 920.*HLTSF_Run2011A2 + 1000.*HLTSF_Run2011A3 + 2100.*HLTSF_Run2011B)/(217.+920.+1000.+2100.);
+        HLTSF = (217.*HLTSF_Run2011A1.val + 920.*HLTSF_Run2011A2.val + 1000.*HLTSF_Run2011A3.val + 2100.*HLTSF_Run2011B.val)/(217.+920.+1000.+2100.);
 
       } else if( leptType==1 ) { //electrons
 
@@ -1857,30 +1863,50 @@ float Ntp1Finalizer_TTZTrilepton::get_btagThresh( const std::string& btag_OP_ ) 
 
 
 
-float getMuonHLTSF_DoubleTrigger( float pt, float eta, const std::string& runPeriod ) {
+ValueAndError getMuonHLTSF_DoubleTrigger( float pt, float eta, const std::string& runPeriod ) {
 
   float hltsf = 0.;
+  float hltsf_err = 0.;
 
+  // these numbers taken from AN2011-399-v4
   if( runPeriod=="Run2011A" ) {
 
-    if( fabs(eta)<0.8 ) 
+    if( fabs(eta)<0.8 ) {
       hltsf = 0.975;
-    else if( fabs(eta)<2.1 )
-      hltsf = 0.955;
-    else 
+      hltsf_err = 0.004;
+    } else if( fabs(eta)<2.1 ) {
+      hltsf = 0.950;
+      hltsf_err = 0.005;
+    } else  {
       hltsf = 0.910;
+      hltsf_err = 0.01;
+    }
 
   } else if( runPeriod=="Run2011B" ) {
 
-    if( fabs(eta)<0.8 ) 
-      hltsf = 0.972;
-    else if( fabs(eta)<2.1 )
-      hltsf = 0.945;
-    else { // eta 2.1 -> 2.4
+    if( fabs(eta)<0.8 ) {
       if( pt<40. ) {
-        hltsf = 0.85;
+        hltsf = 0.977;
+        hltsf_err = 0.001;
       } else {
-        hltsf = 0.87;
+        hltsf = 0.975;
+        hltsf_err = 0.001;
+      }
+    } else if( fabs(eta)<2.1 ){
+      if( pt<40. ) {
+        hltsf = 0.955;
+        hltsf_err = 0.002;
+      } else {
+        hltsf = 0.955;
+        hltsf_err = 0.001;
+      }
+    } else { // eta 2.1 -> 2.4
+      if( pt<40. ) {
+        hltsf = 0.89;
+        hltsf_err = 0.007;
+      } else {
+        hltsf = 0.90;
+        hltsf_err = 0.006;
       }
     }
 
@@ -1890,54 +1916,80 @@ float getMuonHLTSF_DoubleTrigger( float pt, float eta, const std::string& runPer
 
   }
 
-  return hltsf;
+  ValueAndError ve_hlt;
+  ve_hlt.val = hltsf;
+  ve_hlt.err = hltsf_err;
+
+  return ve_hlt;
 
 }
 
 
 
 
-float getMuonHLTSF_SingleTrigger( float pt, float eta, const std::string& runPeriod ) {
+ValueAndError getMuonHLTSF_SingleTrigger( float pt, float eta, const std::string& runPeriod ) {
 
-  if( pt<25. ) return 0.;
+  if( pt<25. ) { 
+    ValueAndError ve_hlt;
+    ve_hlt.val = 0.;
+    ve_hlt.err = 0.;
+    return ve_hlt;
+  }
 
   float hltsf = 0.;
+  float hltsf_err = 0.;
 
   if( runPeriod=="Run2011A1" ) { //up to may10 technical stop
 
-    if( fabs(eta)<0.8 ) 
+    if( fabs(eta)<0.8 ) {
       hltsf = 0.896;
-    else if( fabs(eta)<2.1 )
+      hltsf_err = 0.001;
+    } else if( fabs(eta)<2.1 ){
       hltsf = 0.807;
-    else 
+      hltsf_err = 0.001;
+    } else {
       hltsf = 0.608;
+      hltsf_err = 0.001;
+    }
 
   } else if( runPeriod=="Run2011A2" ) { //from may10 to EPS
 
-    if( fabs(eta)<0.8 ) 
+    if( fabs(eta)<0.8 ) {
       hltsf = 0.895;
-    else if( fabs(eta)<2.1 )
+      hltsf_err = 0.001;
+    } else if( fabs(eta)<2.1 ){
       hltsf = 0.838;
-    else 
+      hltsf_err = 0.001;
+    } else {
       hltsf = 0.738;
+      hltsf_err = 0.001;
+    }
 
   } else if( runPeriod=="Run2011A3" ) { //from EPS to end of Run2011A
 
-    if( fabs(eta)<0.8 ) 
+    if( fabs(eta)<0.8 ) {
       hltsf = 0.890;
-    else if( fabs(eta)<2.1 )
+      hltsf_err = 0.001;
+    } else if( fabs(eta)<2.1 ){
       hltsf = 0.809;
-    else 
+      hltsf_err = 0.001;
+    } else {
       hltsf = 0.493;
+      hltsf_err = 0.001;
+    }
 
   } else if( runPeriod=="Run2011B" ) {
 
-    if( fabs(eta)<0.8 ) 
+    if( fabs(eta)<0.8 ) {
       hltsf = 0.87;
-    else if( fabs(eta)<2.1 )
+      hltsf_err = 0.001;
+    } else if( fabs(eta)<2.1 ){
       hltsf = 0.79;
-    else  //using HLT_IsoMu24_eta2p1
+      hltsf_err = 0.001;
+    } else  { //using HLT_IsoMu24_eta2p1
       hltsf = 0.;
+      hltsf_err = 0.;
+    }
 
   } else {
 
@@ -1945,22 +1997,36 @@ float getMuonHLTSF_SingleTrigger( float pt, float eta, const std::string& runPer
 
   }
 
-  return hltsf;
+  ValueAndError ve_hlt;
+  ve_hlt.val = hltsf;
+  ve_hlt.err = hltsf_err;
+
+  return ve_hlt;
+
 
 }
 
 
-float getEventHLTSF( float effSingle1, float effSingle2, float effDouble1, float effDouble2 ) {
+ValueAndError getEventHLTSF( ValueAndError effSingle1, ValueAndError effSingle2, ValueAndError effDouble1, ValueAndError effDouble2 ) {
 
-  float HLTSF = effDouble1 * effDouble2 +
-                effSingle2 * (1. - effDouble2 ) +
-                effSingle1 * (1. - effDouble1 );
+  float HLTSF = effDouble1.val * effDouble2.val +
+                effSingle2.val * (1. - effDouble2.val ) +
+                effSingle1.val * (1. - effDouble1.val );
 
-//float HLTSF = effDouble1 * effDouble2 +
-//                effSingle2 * (1. - effDouble1*effDouble2 ) +
-//                effSingle1 * (1. - effDouble1*effDouble2 ) * (1. - effSingle2);
+  float HLTSF_err = effDouble1.err * effDouble1.err* effDouble2.val * effDouble2.val +
+                    effDouble1.val * effDouble1.val* effDouble2.err * effDouble2.err +
+                    effSingle2.err * effSingle2.err * (1. - effDouble2.val ) * (1. - effDouble2.val ) +
+                    effSingle2.val * effSingle2.val * effDouble2.err * effDouble2.err +
+                    effSingle1.err * effSingle1.err * (1. - effDouble1.val ) * (1. - effDouble1.val ) +
+                    effSingle1.val * effSingle1.val * effDouble1.err * effDouble1.err;
 
-  return HLTSF;
+  HLTSF_err = sqrt( HLTSF_err );
+
+  ValueAndError ve_hlt;
+  ve_hlt.val = HLTSF;
+  ve_hlt.err = HLTSF_err;
+
+  return ve_hlt;
 
 }
 
