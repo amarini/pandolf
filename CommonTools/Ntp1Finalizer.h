@@ -39,7 +39,10 @@ class Ntp1Finalizer {
   bool get_DEBUG() { return DEBUG_; };
   int get_nBTags( const AnalysisJet& jet1, const AnalysisJet& jet2, BTagSFUtil* btsfutil, bool losebtags=true );
 
+  void clear();
+
   void set_outFile( const std::string& fileName="", const std::string& suffix="" );
+  void set_dataset( const std::string& dataset ) { dataset_ = dataset; };
   void set_inputAnalyzerType( const std::string& analyzerType ) { inputAnalyzerType_ = analyzerType; };
   void set_flags( const std::string& flags ) { flags_ = flags; };
   void set_DEBUG( bool DEBUG ) { DEBUG_ = DEBUG; };
@@ -52,6 +55,8 @@ class Ntp1Finalizer {
   float nCounter_;
   float nCounterW_;
   float nCounterPU_;
+
+  TH1F* h1_nPU_gen_;
 
   std::string analyzerType_;
   std::string inputAnalyzerType_;
