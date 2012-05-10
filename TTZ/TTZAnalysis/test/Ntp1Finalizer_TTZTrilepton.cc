@@ -36,6 +36,10 @@ struct ValueAndError {
 ValueAndError getMuonHLTSF_DoubleTrigger( float pt, float eta, const std::string& runPeriod );
 ValueAndError getMuonHLTSF_SingleTrigger( float pt, float eta, const std::string& runPeriod );
 ValueAndError getEventHLTSF( ValueAndError effSingle1, ValueAndError effSingle2, ValueAndError effDouble1, ValueAndError effDouble2 );
+ValueAndError getMuonRecoSF( float pt, float eta );
+ValueAndError getMuonIsoSF( float pt, float eta );
+ValueAndError getElectronRecoSF( float pt, float eta );
+ValueAndError getElectronIsoSF( float pt, float eta );
 float getJERSF( float eta );
 
 
@@ -56,6 +60,7 @@ Ntp1Finalizer_TTZTrilepton::Ntp1Finalizer_TTZTrilepton( const std::string& datas
   bTaggerType_ = bTaggerType;
   leptType_ = leptType;
 
+  leptSyst_ = 0;
   jes_ = 0;
   btagSyst_ = 0;
   jer_ = false;
@@ -97,6 +102,17 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
       sprintf( fullFlags_char, "%s_BTagDOWN%d", fullFlags.c_str(), btagSyst_ );
     else
       sprintf( fullFlags_char, "%s_BTagUP%d", fullFlags.c_str(), btagSyst_ );
+    std::string fullFlags_tmp(fullFlags_char);
+    fullFlags = fullFlags_tmp;
+  }
+  if( leptSyst_ == 1 ) fullFlags = fullFlags + "_LeptUP";
+  else if( leptSyst_ == -1 ) fullFlags = fullFlags + "_LeptDOWN";
+  else if( leptSyst_ != 0 ) {
+    char fullFlags_char[100];
+    if( leptSyst_ < 0 )
+      sprintf( fullFlags_char, "%s_LeptDOWN%d", fullFlags.c_str(), leptSyst_ );
+    else
+      sprintf( fullFlags_char, "%s_LeptUP%d", fullFlags.c_str(), leptSyst_ );
     std::string fullFlags_tmp(fullFlags_char);
     fullFlags = fullFlags_tmp;
   }
@@ -573,7 +589,7 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   float ptJetB1_t, ptJetB2_t, etaJetB1_t, etaJetB2_t;
   //float bTagJetB1_t, bTagJetB2_t;
   //float ptJet3_t, ptJet4_t, etaJet3_t, etaJet4_t;
-  float HLTSF;
+  float HLTSF, leptonSF;
   int leptType3;
   bool isMZllSignalRegion;
   bool passed_btag;
@@ -604,6 +620,7 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   tree_passedEvents->Branch( "event", &event, "event/I" );
   tree_passedEvents->Branch( "eventWeight", &eventWeight, "eventWeight/F" );
   tree_passedEvents->Branch( "HLTSF", &HLTSF, "HLTSF/F" );
+  tree_passedEvents->Branch( "leptonSF", &leptonSF, "leptonSF/F" );
   tree_passedEvents->Branch( "PUWeight", &eventWeightPU, "eventWeightPU/F" );
   tree_passedEvents->Branch( "pfMet", &pfMet, "pfMet/F" );
   tree_passedEvents->Branch( "leptType", &leptType, "leptType/I" );
@@ -748,6 +765,13 @@ ofstream ofs("run_event.txt");
     if( isMC ) {
 
       HLTSF = 1.;
+      float HLTSF_err = 0.;
+
+      float leptonRecoSF = 1.;
+      float leptonIsoSF  = 1.;
+
+      float leptonRecoSF_err = 0.;
+      float leptonIsoSF_err  = 0.;
 
       // scale factor for double mu triggers:
       if( leptType==0 ) {
@@ -779,10 +803,61 @@ ofstream ofs("run_event.txt");
 
         // weighted average over full run (weighted with lumi):
         HLTSF = (217.*HLTSF_Run2011A1.val + 920.*HLTSF_Run2011A2.val + 1000.*HLTSF_Run2011A3.val + 2100.*HLTSF_Run2011B.val)/(217.+920.+1000.+2100.);
+        HLTSF_err = (217.*217.*HLTSF_Run2011A1.err*HLTSF_Run2011A1.err + 
+                     920.*920.*HLTSF_Run2011A2.err*HLTSF_Run2011A2.err + 
+                     1000.*1000.*HLTSF_Run2011A3.err*HLTSF_Run2011A3.err +
+                     2100.*2100.*HLTSF_Run2011B.err*HLTSF_Run2011B.err);
+        HLTSF_err = HLTSF_err / ( (217.+920.+1000.+2100.)*(217.+920.+1000.+2100.) );
+        HLTSF_err = sqrt( HLTSF_err );
+
+
+        ValueAndError muonRecoSF1 = getMuonRecoSF( ptLeptZ1, etaLeptZ1 );
+        ValueAndError muonRecoSF2 = getMuonRecoSF( ptLeptZ2, etaLeptZ2 );
+        float muonRecoSF = muonRecoSF1.val*muonRecoSF2.val;
+        float muonRecoSF_err = muonRecoSF1.val*muonRecoSF1.val*muonRecoSF2.err*muonRecoSF2.err +
+                               muonRecoSF2.val*muonRecoSF2.val*muonRecoSF1.err*muonRecoSF1.err;
+        muonRecoSF_err = sqrt( muonRecoSF_err );
+
+        leptonRecoSF = muonRecoSF;
+        leptonRecoSF_err = muonRecoSF_err;
+
+
+        ValueAndError muonIsoSF1 = getMuonIsoSF( ptLeptZ1, etaLeptZ1 );
+        ValueAndError muonIsoSF2 = getMuonIsoSF( ptLeptZ2, etaLeptZ2 );
+        float muonIsoSF = muonIsoSF1.val*muonIsoSF2.val;
+        float muonIsoSF_err = muonIsoSF1.val*muonIsoSF1.val*muonIsoSF2.err*muonIsoSF2.err +
+                              muonIsoSF2.val*muonIsoSF2.val*muonIsoSF1.err*muonIsoSF1.err;
+        muonIsoSF_err = sqrt( muonIsoSF_err );
+
+        leptonIsoSF = muonIsoSF;
+        leptonIsoSF_err = muonIsoSF_err;
+
 
       } else if( leptType==1 ) { //electrons
 
         HLTSF = 1.;
+        HLTSF_err = 0.01;
+
+        ValueAndError electronRecoSF1 = getElectronRecoSF( ptLeptZ1, etaLeptZ1 );
+        ValueAndError electronRecoSF2 = getElectronRecoSF( ptLeptZ2, etaLeptZ2 );
+        float electronRecoSF = electronRecoSF1.val*electronRecoSF2.val;
+        float electronRecoSF_err = electronRecoSF1.val*electronRecoSF1.val*electronRecoSF2.err*electronRecoSF2.err +
+                               electronRecoSF2.val*electronRecoSF2.val*electronRecoSF1.err*electronRecoSF1.err;
+        electronRecoSF_err = sqrt( electronRecoSF_err );
+
+        leptonRecoSF = electronRecoSF;
+        leptonRecoSF_err = electronRecoSF_err;
+
+
+        ValueAndError electronIsoSF1 = getElectronIsoSF( ptLeptZ1, etaLeptZ1 );
+        ValueAndError electronIsoSF2 = getElectronIsoSF( ptLeptZ2, etaLeptZ2 );
+        float electronIsoSF = electronIsoSF1.val*electronIsoSF2.val;
+        float electronIsoSF_err = electronIsoSF1.val*electronIsoSF1.val*electronIsoSF2.err*electronIsoSF2.err +
+                              electronIsoSF2.val*electronIsoSF2.val*electronIsoSF1.err*electronIsoSF1.err;
+        electronIsoSF_err = sqrt( electronIsoSF_err );
+
+        leptonIsoSF = electronIsoSF;
+        leptonIsoSF_err = electronIsoSF_err;
 
       } else if( leptType==2 ) { // e+mu-
 
@@ -791,6 +866,13 @@ ofstream ofs("run_event.txt");
 
         //HLTSF = ( (217.+920.+1000.)*effSingle_Run2011A + 2100.*effSingle_Run2011B)/(217.+920.+1000.+2100.);
         HLTSF = 1.; // not needed as signal doesnt have OF leptons and ttbar is scaled
+        HLTSF_err = 0.; // not needed as signal doesnt have OF leptons and ttbar is scaled
+
+        leptonRecoSF = 1.;
+        leptonRecoSF_err = 0.;
+
+        leptonIsoSF = 1.;
+        leptonIsoSF_err = 0.;
 
       } else if( leptType==3 ) { // e-mu+
 
@@ -799,10 +881,25 @@ ofstream ofs("run_event.txt");
 
         //HLTSF = ( (217.+920.+1000.)*effSingle_Run2011A + 2100.*effSingle_Run2011B)/(217.+920.+1000.+2100.);
         HLTSF = 1.; // not needed as signal doesnt have OF leptons and ttbar is scaled
+        HLTSF_err = 0.; // not needed as signal doesnt have OF leptons and ttbar is scaled
+
+        leptonRecoSF = 1.;
+        leptonRecoSF_err = 0.;
+
+        leptonIsoSF = 1.;
+        leptonIsoSF_err = 0.;
 
       }
 
-      eventWeight *= HLTSF;
+      leptonSF = leptonRecoSF*leptonIsoSF*HLTSF;
+      float leptonSF_err = leptonRecoSF*leptonRecoSF*leptonIsoSF*leptonIsoSF*HLTSF_err*HLTSF_err + 
+                           leptonRecoSF*leptonRecoSF*leptonIsoSF_err*leptonIsoSF_err*HLTSF*HLTSF + 
+                           leptonRecoSF_err*leptonRecoSF_err*leptonIsoSF*leptonIsoSF*HLTSF*HLTSF ;
+      leptonSF_err = sqrt( leptonSF_err );
+
+      leptonSF = leptonSF + (float)leptSyst_*leptonSF_err;
+
+      eventWeight *= leptonSF;
       eventWeight *= fPUWeight->GetWeight(nPU);
 
 
@@ -2029,6 +2126,137 @@ ValueAndError getEventHLTSF( ValueAndError effSingle1, ValueAndError effSingle2,
   return ve_hlt;
 
 }
+
+
+
+ValueAndError getMuonRecoSF( float pt, float eta ) {
+
+  float recoSF;
+  float recoSF_err;
+
+  if( fabs(eta)<1.2 ) {
+    recoSF = 0.996;
+    recoSF_err = 0.001;
+  } else {
+    recoSF = 0.986;
+    recoSF_err = 0.001;
+  }
+
+  ValueAndError ve_reco;
+  ve_reco.val = recoSF;
+  ve_reco.err = recoSF_err;
+
+  return ve_reco;
+
+}
+
+
+ValueAndError getElectronRecoSF( float pt, float eta ) {
+
+  float recoSF;
+  float recoSF_err;
+
+  if( fabs(eta)<0.8 ) {
+    recoSF = 0.999;
+    recoSF_err = 0.005;
+  } else if( fabs(eta)<1.44 ) {
+    recoSF = 0.964;
+    recoSF_err = 0.003;
+  } else if( fabs(eta)<1.57 ) {
+    recoSF = 0.99;
+    recoSF_err = 0.04;
+  } else if( fabs(eta)<2.0 ) {
+    recoSF = 0.992;
+    recoSF_err = 0.006;
+  } else {
+    recoSF = 1.001;
+    recoSF_err = 0.006;
+  }
+
+  ValueAndError ve_reco;
+  ve_reco.val = recoSF;
+  ve_reco.err = recoSF_err;
+
+  return ve_reco;
+
+}
+
+
+
+ValueAndError getMuonIsoSF( float pt, float eta ) {
+
+  float recoSF;
+  float recoSF_err;
+
+  if( pt<40. ) {
+
+    if( fabs(eta)<0.9 ) {
+      recoSF = 0.987;
+      recoSF_err = 0.006;
+    } else {
+      recoSF = 0.995;
+      recoSF_err = 0.005;
+    }
+   
+  } else {
+
+    if( fabs(eta)<0.9 ) {
+      recoSF = 0.994;
+      recoSF_err = 0.002;
+    } else {
+      recoSF = 0.996;
+      recoSF_err = 0.002;
+    }
+   
+  }
+
+
+  ValueAndError ve_reco;
+  ve_reco.val = recoSF;
+  ve_reco.err = recoSF_err;
+
+  return ve_reco;
+
+}
+
+
+ValueAndError getElectronIsoSF( float pt, float eta ) {
+
+  float recoSF;
+  float recoSF_err;
+
+  if( pt<40. ) {
+
+    if( fabs(eta)<1.5 ) {
+      recoSF = 0.988;
+      recoSF_err = 0.006;
+    } else {
+      recoSF = 0.998;
+      recoSF_err = 0.011;
+    }
+   
+  } else {
+
+    if( fabs(eta)<1.5 ) {
+      recoSF = 0.988;
+      recoSF_err = 0.003;
+    } else {
+      recoSF = 1.016;
+      recoSF_err = 0.064;
+    }
+   
+  }
+
+
+  ValueAndError ve_reco;
+  ve_reco.val = recoSF;
+  ve_reco.err = recoSF_err;
+
+  return ve_reco;
+
+}
+
+
 
 
 
