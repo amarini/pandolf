@@ -75,6 +75,8 @@ int main( int argc, char* argv[] ) {
   tree->SetBranchAddress("passed_HLT_Mu17_Mu8", &passed_HLT_Mu17_Mu8);
   Bool_t passed_HLT_IsoMu24;
   tree->SetBranchAddress("passed_HLT_IsoMu24", &passed_HLT_IsoMu24);
+  Bool_t passed_HLT_IsoMu24_eta2p1;
+  tree->SetBranchAddress("passed_HLT_IsoMu24_eta2p1", &passed_HLT_IsoMu24_eta2p1);
   Bool_t passed_HLT_Mu17_Ele8_CaloIdL;
   if( analysisType_=="TTW" || analysisType_=="TTZ" )
     tree->SetBranchAddress("passed_HLT_Mu17_Ele8_CaloIdL", &passed_HLT_Mu17_Ele8_CaloIdL);
@@ -132,19 +134,14 @@ int main( int argc, char* argv[] ) {
 
     if( dataset_tstr.BeginsWith("SingleMu") ) {
 
-      bool passedHLT = passed_HLT_IsoMu24
+      bool passedHLT = (passed_HLT_IsoMu24 || passed_HLT_IsoMu24_eta2p1)
                     && !passed_HLT_DoubleMu7 && !passed_HLT_Mu13_Mu8 && !passed_HLT_Mu17_Mu8
                     && !passed_HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL && !passed_HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL
                     && !passed_HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL;
 
-      if( analysisType_ == "TTZ" ) {
-
-        passedHLT = passedHLT && !passed_HLT_Mu17_Ele8_CaloIdL && !passed_HLT_Mu8_Ele17_CaloIdL && !passed_HLT_Mu8_Ele17_CaloIdT_CaloIsoVL;
-
-        //explicit HLT matching required (at least one of them):
+      //explicit HLT matching required (at least one of them):
+      if( analysisType_ == "TTZ" )
         passedHLT = passedHLT && ( matchedToHLTLeptZ1 || matchedToHLTLeptZ2 );
-
-      }
 
 
       if( !passedHLT ) continue;
@@ -183,9 +180,13 @@ int main( int argc, char* argv[] ) {
         passedHLT = passedHLT && !passed_HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL && !passed_HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL
                               && !passed_HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL;
                        
-      //explicit HLT matching required (both of them):
-      if( analysisType_ == "TTZ" ) 
+      if( analysisType_ == "TTZ" )  {
+
+        passedHLT = passedHLT && !passed_HLT_IsoMu24 && !passed_HLT_IsoMu24_eta2p1;
+        //explicit HLT matching required (both of them):
         passedHLT = passedHLT && ( matchedToHLTLeptZ1 && matchedToHLTLeptZ2 );
+
+      }
 
       if( !passedHLT ) continue;
 
