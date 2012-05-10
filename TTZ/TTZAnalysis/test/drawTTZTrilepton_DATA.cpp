@@ -7,11 +7,19 @@
 
 
 
-float get_ttbarSF( const DrawBase& db );
-float get_DYWZSF( const DrawBase& db );
+struct ValueAndError {
+
+  float val;
+  float err;
+
+};
+
+
+ValueAndError get_ttbarSF( const DrawBase& db );
+ValueAndError get_DYWZSF( const DrawBase& db );
 float computeChiSquare( TH1D* h1_DATA, TH1D* h1_MC );
 
-void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char selection[], float lumi_fb, float ttbarSF, float DYWZSF );
+void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char selection[], float lumi_fb, ValueAndError ttbarSF, ValueAndError DYWZSF );
 
 
 int main(int argc, char* argv[]) {
@@ -167,17 +175,17 @@ int main(int argc, char* argv[]) {
   //db->drawHisto("mZll_OF2_prepresel", "Opposite Flavor Dilepton Mass", "GeV", "Events");
   //db->drawHisto("mZll_OF3_prepresel", "Opposite Flavor Dilepton Mass", "GeV", "Events");
   // scale ttbar MC to match data:
-  float ttbarSF = get_ttbarSF( *db );
-  db->set_mcWeight( "TTtW", ttbarSF );
+  ValueAndError ttbarSF = get_ttbarSF( *db );
+  db->set_mcWeight( "TTtW", ttbarSF.val );
   db->drawHisto("mZll_OF_prepresel", "Opposite Flavor Dilepton Mass", "GeV", "Events", false, 1, "scaled");
 
 
   // now add one lepton (prepresel -> presel)
   // anti-btag: control region for Z+Jets and WZ:
   db->drawHisto("mZll_presel_antibtag", "Dilepton Invariant Mass", "GeV", "Events", true, 2);
-  float DYWZSF = get_DYWZSF( *db );
-  db->set_mcWeight( "ZJets", DYWZSF );
-  db->set_mcWeight( "VV_Summer11", DYWZSF );
+  ValueAndError DYWZSF = get_DYWZSF( *db );
+  db->set_mcWeight( "ZJets", DYWZSF.val );
+  db->set_mcWeight( "VV_Summer11", DYWZSF.val );
 
   db->drawHisto("mZll_presel", "Dilepton Invariant Mass", "GeV", "Events", true, 2 );
   db->set_rebin();
@@ -214,7 +222,11 @@ int main(int argc, char* argv[]) {
   db->set_xAxisMax();
 
 
-  drawChannelYieldPlot( db, "noScaling", "", lumi_fb, 1., 1. );
+  ValueAndError noCorr;
+  noCorr.val = 1.;
+  noCorr.err = 0.;
+
+  drawChannelYieldPlot( db, "noScaling", "", lumi_fb, noCorr, noCorr );
   drawChannelYieldPlot( db, "", "", lumi_fb, ttbarSF, DYWZSF );
   drawChannelYieldPlot( db, "ptZll80", "eventWeight*(ptZll>80.)", lumi_fb, ttbarSF, DYWZSF );
 
@@ -360,7 +372,7 @@ int main(int argc, char* argv[]) {
 
 
 
-void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char selection[], float lumi_fb, float ttbarSF, float DYWZSF ) {
+void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char selection[], float lumi_fb, ValueAndError ttbarSF, ValueAndError DYWZSF ) {
 
   TH1F::AddDirectory(kTRUE);
 
@@ -444,6 +456,11 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
     TH1D* h1_mc_eem = new TH1D("mc_eem", "", 100, 0., 10000.);
     TH1D* h1_mc_eee = new TH1D("mc_eee", "", 100, 0., 10000.);
 
+    h1_mc_mmm->Sumw2();
+    h1_mc_mme->Sumw2();
+    h1_mc_eem->Sumw2();
+    h1_mc_eee->Sumw2();
+
     tree_mc->Project("mc_mmm", "ptZll", sel_mmm.c_str());
     tree_mc->Project("mc_mme", "ptZll", sel_mme.c_str());
     tree_mc->Project("mc_eem", "ptZll", sel_eem.c_str());
@@ -456,8 +473,8 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
     float tot_mc = mmm_mc + mme_mc + eem_mc + eee_mc;
 
     float scaling = lumi_fb*1000.;
-    if( db->get_mcFile(iMC).datasetName=="TTtW" ) scaling *= ttbarSF;
-    if( db->get_mcFile(iMC).datasetName=="ZJets" || db->get_mcFile(iMC).datasetName=="VV_Summer11" ) scaling *= DYWZSF;
+    if( db->get_mcFile(iMC).datasetName=="TTtW" ) scaling *= ttbarSF.val;
+    if( db->get_mcFile(iMC).datasetName=="ZJets" || db->get_mcFile(iMC).datasetName=="VV_Summer11" ) scaling *= DYWZSF.val;
 
     char hname[100];
     sprintf( hname, "yields_mc_%d", iMC);
@@ -570,7 +587,7 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
 
 
 
-float get_ttbarSF( const DrawBase& db ) {
+ValueAndError get_ttbarSF( const DrawBase& db ) {
 
 
   //TH1D* h1_DATA = new TH1D(*(db->get_lastHistos_data()[0]));
@@ -607,11 +624,12 @@ float get_ttbarSF( const DrawBase& db ) {
 
 
   float minChiSquare = 9999.;
+  float minChiSquare_bin = 0;
   float foundSF = -1.;
 
-  for( unsigned i=0; i<nSteps; ++i ) {
+  for( unsigned i=0; i<h1_chiSquare->GetNbinsX(); ++i ) {
 
-    float thisSF = minSF + i*step;
+    float thisSF = h1_chiSquare->GetBinCenter(i+1);
 
     TH1D* h1_TTJets_sf = new TH1D(*h1_TTJets);
     h1_TTJets_sf->Scale( thisSF );
@@ -625,6 +643,7 @@ float get_ttbarSF( const DrawBase& db ) {
 
     if( thisChiSquare < minChiSquare ) {
       minChiSquare = thisChiSquare;
+      minChiSquare_bin = i+1;
       foundSF = thisSF;
     }
 
@@ -632,26 +651,81 @@ float get_ttbarSF( const DrawBase& db ) {
 
   }
 
+  // now search for error on SF (minChiSquare+1)
+  float minChiSquare_oneSigma = minChiSquare+1.;
+  float bestDiff_right = 999.;
+  float bestDiff_left = 999.;
+  float foundSF_minus = -1.;
+  float foundSF_plus = -1.;
+
+  for( unsigned iBin=1; iBin<h1_chiSquare->GetNbinsX()+1; ++iBin ) {
+
+    float thisSF = h1_chiSquare->GetBinCenter(iBin);
+    float thisChiSquare = h1_chiSquare->GetBinContent(iBin);
+    
+    if( iBin<minChiSquare_bin ) { //left side of parabola
+
+      if( fabs(thisChiSquare-minChiSquare_oneSigma) < bestDiff_left ) {
+        bestDiff_left = fabs(thisChiSquare-minChiSquare_oneSigma);
+        foundSF_minus = thisSF;
+      }
+
+    } else { //right side
+  
+      if( fabs(thisChiSquare-minChiSquare_oneSigma) < bestDiff_right ) {
+        bestDiff_right = fabs(thisChiSquare-minChiSquare_oneSigma);
+        foundSF_plus = thisSF;
+      }
+
+    } // left-right
+
+  } // for bins
+
+
+  float err_plus = foundSF_plus-foundSF;
+  float err_minus = foundSF-foundSF_minus;
+
+  float err = 0.5*(err_plus+err_minus);
+
+  float yMax = 1.1*h1_chiSquare->GetMaximum();
+
   h1_chiSquare->SetXTitle( "t#bar{t} Scale Factor" );
   h1_chiSquare->SetYTitle( "#chi^{2}" );
   h1_chiSquare->SetMarkerStyle( 20 );
   h1_chiSquare->SetMarkerSize( 1.6 );
   h1_chiSquare->SetMarkerColor( 46 );
-  h1_chiSquare->GetYaxis()->SetRangeUser(0., h1_chiSquare->GetMaximum());
+  h1_chiSquare->GetYaxis()->SetRangeUser(0., yMax);
 
   std::cout << std::endl << "-> TTbar Scaling" << std::endl;
   std::cout << "Min Chi Square: " << minChiSquare << std::endl;
-  std::cout << "Best SF: " << foundSF << std::endl;
+  std::cout << "Best SF: " << foundSF << " +/- " << err << std::endl;
+
+
+  TLine* line_plus = new TLine( foundSF_plus, 0., foundSF_plus, yMax );
+  TLine* line_minus = new TLine( foundSF_minus, 0., foundSF_minus, yMax );
+
+  line_plus->SetLineWidth( 2 );
+  line_minus->SetLineWidth( 2 );
+  
+  line_plus->SetLineStyle( 2 );
+  line_minus->SetLineStyle( 2 );
+  
+  line_plus->SetLineColor( 38 );
+  line_minus->SetLineColor( 38 );
 
   TPaveText* label_sqrt = db.get_labelSqrt();
 
   TCanvas* c1 = new TCanvas("c1", "", 600, 600);
   c1->cd();
   
-  h1_chiSquare->Draw( "P" );
-  label_sqrt->Draw( "P" );
-
   
+  h1_chiSquare->Draw( "P" );
+  line_plus->Draw("same");
+  line_minus->Draw("same");
+  label_sqrt->Draw( "Psame" );
+  
+  gPad->RedrawAxis();
+
   char canvasName[500];
   sprintf( canvasName, "%s/ttbarChiSquareScan.eps", db.get_outputdir().c_str() );
   c1->SaveAs(canvasName);
@@ -661,8 +735,11 @@ float get_ttbarSF( const DrawBase& db ) {
   delete h1_TTJets;
   delete h1_DATA;
 
+  ValueAndError ve;
+  ve.val = foundSF;
+  ve.err = err;
 
-  return foundSF;
+  return ve;
 
 }
 
@@ -697,7 +774,7 @@ float computeChiSquare( TH1D* h1_DATA, TH1D* h1_MC ) {
 
 
 
-float get_DYWZSF( const DrawBase& db ) {
+ValueAndError get_DYWZSF( const DrawBase& db ) {
 
 
   TH1D* h1_DATA = new TH1D(*(db.get_lastHistos_data()[0]));
@@ -710,10 +787,15 @@ float get_DYWZSF( const DrawBase& db ) {
       mcIntegral += lastHistosMC[iHisto]->Integral();
 
   float sf = dataIntegral/mcIntegral;
+  float sf_err = sqrt(dataIntegral)/mcIntegral;
 
   std::cout << std::endl << "-> DY/WZ Scaling" << std::endl;
-  std::cout << "SF: " << sf << std::endl;
+  std::cout << "SF: " << sf << " +/- " << sf_err << std::endl;
 
-  return sf;
+  ValueAndError ve;
+  ve.val = sf;
+  ve.err = sf_err;
+
+  return ve;
 
 }
