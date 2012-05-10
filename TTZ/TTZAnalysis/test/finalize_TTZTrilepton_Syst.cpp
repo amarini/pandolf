@@ -47,6 +47,26 @@ int main( int argc, char* argv[] ) {
 
 
   std::cout << std::endl << "++++++++++++++++++++++" << std::endl;
+  std::cout << "+++ Lept Syst +1 Sigma" << std::endl;
+  std::cout << "++++++++++++++++++++++" << std::endl << std::endl;
+  nf->set_leptSyst(1);
+
+  runOnAllDatasets( nf );
+  haddBGFiles( selectionType, "LeptUP" );
+
+
+  std::cout << std::endl << "++++++++++++++++++++++" << std::endl;
+  std::cout << "+++ Lept Syst -1 Sigma" << std::endl;
+  std::cout << "++++++++++++++++++++++" << std::endl << std::endl;
+  nf->set_leptSyst(-1);
+
+  runOnAllDatasets( nf );
+  haddBGFiles( selectionType, "LeptDOWN" );
+
+  nf->set_leptSyst(0);
+
+
+  std::cout << std::endl << "++++++++++++++++++++++" << std::endl;
   std::cout << "+++ BTag Syst +1 Sigma" << std::endl;
   std::cout << "++++++++++++++++++++++" << std::endl << std::endl;
   nf->set_btagSyst(1);
@@ -106,14 +126,13 @@ void runOnAllDatasets( Ntp1Finalizer_TTZTrilepton* nf ) {
   runOnSingleDataset( nf, "VV_Summer11" );
   runOnSingleDataset( nf, "TTJ_Fall11_highstat" );
   runOnSingleDataset( nf, "DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Fall11" );
-  //runOnSingleDataset( nf, "BG" );
 
 }
 
 
 void runOnSingleDataset( Ntp1Finalizer_TTZTrilepton* nf, const std::string& dataset ) {
 
-  nf->clearTree();
+  nf->clear();
 
   Ntp1Finalizer_TTZTrilepton* nf_syst = new Ntp1Finalizer_TTZTrilepton( *nf );
   nf_syst->set_dataset(dataset);
