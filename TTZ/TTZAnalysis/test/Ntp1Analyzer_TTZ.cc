@@ -102,6 +102,7 @@ void Ntp1Analyzer_TTZ::CreateOutputFile() {
   reducedTree_->Branch("phiLeptZ1",  &phiLeptZ1_,  "phiLeptZ1_/F");
   reducedTree_->Branch("chargeLeptZ1",  &chargeLeptZ1_,  "chargeLeptZ1_/I");
   reducedTree_->Branch("combinedIsoRelLeptZ1",  &combinedIsoRelLeptZ1_,  "combinedIsoRelLeptZ1_/F");
+  reducedTree_->Branch("matchedToHLTLeptZ1",  &matchedToHLTLeptZ1_,  "matchedToHLTLeptZ1_/F");
 
   reducedTree_->Branch("eLeptZ1Gen",  &eLeptZ1Gen_,  "eLeptZ1Gen_/F");
   reducedTree_->Branch("ptLeptZ1Gen",  &ptLeptZ1Gen_,  "ptLeptZ1Gen_/F");
@@ -114,6 +115,7 @@ void Ntp1Analyzer_TTZ::CreateOutputFile() {
   reducedTree_->Branch("phiLeptZ2",  &phiLeptZ2_,  "phiLeptZ2_/F");
   reducedTree_->Branch("chargeLeptZ2",  &chargeLeptZ2_,  "chargeLeptZ2_/I");
   reducedTree_->Branch("combinedIsoRelLeptZ2",  &combinedIsoRelLeptZ2_,  "combinedIsoRelLeptZ2_/F");
+  reducedTree_->Branch("matchedToHLTLeptZ2",  &matchedToHLTLeptZ2_,  "matchedToHLTLeptZ2_/F");
 
   reducedTree_->Branch("eLeptZ2Gen",  &eLeptZ2Gen_,  "eLeptZ2Gen_/F");
   reducedTree_->Branch("ptLeptZ2Gen",  &ptLeptZ2Gen_,  "ptLeptZ2Gen_/F");
