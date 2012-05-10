@@ -37,6 +37,8 @@ Ntp1Finalizer::~Ntp1Finalizer() {
     tree_=0;
   }
 
+  delete h1_nPU_gen_;
+
 } //destructor
 
 
@@ -69,6 +71,15 @@ void Ntp1Finalizer::createOutputFile( const std::string& additionalFlags ) {
 
 
 
+void Ntp1Finalizer::clear() {
+
+  if( tree_!=0 ) delete tree_;
+  tree_ = new TChain("reducedTree");
+
+  if( h1_nPU_gen_!=0 ) delete h1_nPU_gen_;
+  h1_nPU_gen_ = new TH1F("nPU_gen", "", 55, -0.5, 54.5);
+
+}
 
 
 void Ntp1Finalizer::addFile(const std::string& dataset, const std::string& selection) {
