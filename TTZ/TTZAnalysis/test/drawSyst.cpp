@@ -1,10 +1,11 @@
 #include <iostream>
 #include <string>
+#include <cstdlib>
 
 #include "DrawBase.h"
 
 
-void drawSingleSyst( DrawBase* db, const std::string& syst, const std::string& sel );
+void drawSingleSyst( DrawBase* db, const std::string& syst, const std::string& sel, const std::string& bg_signal );
 
 
 int main( int argc, char* argv[] ) {
@@ -22,9 +23,15 @@ int main( int argc, char* argv[] ) {
   std::string outputdir_str = "TTZTrileptonPlots_DATA_Run2011_FULL_" + selection + "_" + bTaggerType + "_ALL";
   db->set_outputdir(outputdir_str);
 
-  drawSingleSyst( db, "BTag", selection );
-  drawSingleSyst( db, "JES", selection );
-  drawSingleSyst( db, "JER", selection );
+  drawSingleSyst( db, "Lept", selection, "BG" );
+  drawSingleSyst( db, "BTag", selection, "BG" );
+  drawSingleSyst( db, "JES" , selection, "BG" );
+  drawSingleSyst( db, "JER" , selection, "BG" );
+
+  drawSingleSyst( db, "Lept", selection, "Signal" );
+  drawSingleSyst( db, "BTag", selection, "Signal" );
+  drawSingleSyst( db, "JES" , selection, "Signal" );
+  drawSingleSyst( db, "JER" , selection, "Signal" );
 
   return 0;
 
@@ -33,11 +40,18 @@ int main( int argc, char* argv[] ) {
 
 
 
-void drawSingleSyst( DrawBase* db, const std::string& syst, const std::string& sel ) {
+void drawSingleSyst( DrawBase* db, const std::string& syst, const std::string& sel, const std::string& bg_signal ) {
 
-  std::string systFile = "TTZTrilepton_BG_" + sel + "_TCHE_ALL.root";
-  std::string systFileUP = "TTZTrilepton_BG_" + sel + "_TCHE_ALL_" + syst + "UP.root";
-  std::string systFileDOWN = "TTZTrilepton_BG_" + sel + "_TCHE_ALL_" + syst + "DOWN.root";
+  if( bg_signal!="BG" && bg_signal!="Signal" ) {
+    std::cout << "bg_signal must be either 'BG' or 'Signal'. Exiting." << std::endl;
+    exit(73);
+  }
+
+  std::string dataset = (bg_signal=="BG") ? bg_signal : "TTZ_TuneZ2_7TeV-madgraphCMSSW42xPUv3_spadhi";
+  
+  std::string systFile = "TTZTrilepton_" + dataset + "_" + sel + "_TCHE_ALL.root";
+  std::string systFileUP = "TTZTrilepton_" + dataset + "_" + sel + "_TCHE_ALL_" + syst + "UP.root";
+  std::string systFileDOWN = "TTZTrilepton_" + dataset + "_" + sel + "_TCHE_ALL_" + syst + "DOWN.root";
 
   TFile* file_systFile = TFile::Open( systFile.c_str() );
   TFile* file_systFileUP = TFile::Open( systFileUP.c_str() );
@@ -49,7 +63,7 @@ void drawSingleSyst( DrawBase* db, const std::string& syst, const std::string& s
 
   DrawBase* newdb = new DrawBase( *db );
 
-  std::string systFlagName = syst + "Syst";
+  std::string systFlagName = bg_signal + "Only" + syst + "Syst";
   newdb->set_flags( systFlagName );
 
   std::string legendTitle = syst + " Systematic";
@@ -60,10 +74,12 @@ void drawSingleSyst( DrawBase* db, const std::string& syst, const std::string& s
   if( file_systFileDOWN!=0 ) //JER has no down
     newdb->add_mcFile( file_systFileDOWN, "systDOWN", systDOWN_text, 50, 0 );
 
-  newdb->drawHisto( "nJets_presel", "Jet Multiplicity", "", "Events");
-  newdb->drawHisto( "nBJets_loose_presel", "b-Jet Multiplicity (Loose)", "", "Events");
-  newdb->drawHisto( "nBJets_medium_presel", "b-Jet Multiplicity (Medium)", "", "Events");
-  newdb->drawHisto( "channelYields", "", "", "Events", false, 2);
-
+  std::string instanceName = bg_signal + " Events";
+  newdb->drawHisto( "nJets_presel", "Jet Multiplicity", "", instanceName );
+  newdb->drawHisto( "nBJets_loose_presel", "b-Jet Multiplicity (Loose)", "", instanceName );
+  newdb->drawHisto( "nBJets_medium_presel", "b-Jet Multiplicity (Medium)", "", instanceName );
+  newdb->set_getBinLabels(true);
+  newdb->drawHisto( "channelYields", "", "", instanceName, false, 2);
+  newdb->set_getBinLabels(false);
 
 }
