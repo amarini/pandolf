@@ -73,6 +73,10 @@ int main(int argc, char* argv[]) {
   datacard << "lumi     lnN\t1.022  \t\t1.022" << std::endl; //taken from SMP-12-008
   datacard << "bgUncert lnN\t-      \t\t" << 1. + b_pred_err/b_pred << std::endl;
 
+  std::pair< float, float >  leptSystBG = getSyst( "Lept", selection, "BG" );
+  std::pair< float, float >  leptSystSignal = getSyst( "Lept", selection, "Signal" );
+  datacard << "lept     lnN\t" <<  leptSystSignal.first << "/" << leptSystSignal.second << "\t" << leptSystBG.first << "/" << leptSystBG.second << std::endl;
+
   std::pair< float, float >  btagSystBG = getSyst( "BTag", selection, "BG" );
   std::pair< float, float >  btagSystSignal = getSyst( "BTag", selection, "Signal" );
   datacard << "btag     lnN\t" <<  btagSystSignal.first << "/" << btagSystSignal.second << "\t" << btagSystBG.first << "/" << btagSystBG.second << std::endl;
