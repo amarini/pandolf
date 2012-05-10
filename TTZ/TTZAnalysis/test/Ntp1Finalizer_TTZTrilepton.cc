@@ -583,12 +583,14 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   //fPUWeight->SetMCHistogram(h1_nPU_mc);
 
 
+
   float mZll_t, ptZll_t;
   float ptLeptZ1_t, ptLeptZ2_t, etaLeptZ1_t, etaLeptZ2_t;
   float ptLept3_t, etaLept3_t;
   float ptJetB1_t, ptJetB2_t, etaJetB1_t, etaJetB2_t;
   //float bTagJetB1_t, bTagJetB2_t;
   //float ptJet3_t, ptJet4_t, etaJet3_t, etaJet4_t;
+  float PUWeight;
   float HLTSF, leptonSF;
   int leptType3;
   bool isMZllSignalRegion;
@@ -621,7 +623,7 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   tree_passedEvents->Branch( "eventWeight", &eventWeight, "eventWeight/F" );
   tree_passedEvents->Branch( "HLTSF", &HLTSF, "HLTSF/F" );
   tree_passedEvents->Branch( "leptonSF", &leptonSF, "leptonSF/F" );
-  tree_passedEvents->Branch( "PUWeight", &eventWeightPU, "eventWeightPU/F" );
+  tree_passedEvents->Branch( "PUWeight", &PUWeight, "PUWeight/F" );
   tree_passedEvents->Branch( "pfMet", &pfMet, "pfMet/F" );
   tree_passedEvents->Branch( "leptType", &leptType, "leptType/I" );
   tree_passedEvents->Branch( "leptType3", &leptType3, "leptType3/I" );
