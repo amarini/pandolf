@@ -683,6 +683,14 @@ ofstream ofs("run_event.txt");
   std::cout << "----> SELECTION: " << selectionType_ << std::endl;
   std::cout << "----> B-TAGGER: " << bTaggerType_ << std::endl;
   std::cout << "----> LEPT TYPE: " << leptType_ << std::endl;
+  if( jes_!= 0 )
+    std::cout << "----> JES SYST: " << jes_ << " sigma" << std::endl;
+  if( btagSyst_!= 0 )
+    std::cout << "----> BTag SYST: " << btagSyst_ << " sigma" << std::endl;
+  if( leptSyst_!= 0 )
+    std::cout << "----> LEPT SYST: " << leptSyst_ << " sigma" << std::endl;
+  if( jer_ )
+    std::cout << "----> JER SYST ON" << std::endl;
   std::cout << std::endl << std::endl;
 
 
