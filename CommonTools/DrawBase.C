@@ -1610,7 +1610,7 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
           if( mcFiles_[backwardsIndex].markerStyle!=-1 )
             mcHistos[backwardsIndex]->Draw("p same");
           else
-            mcHistos[backwardsIndex]->Draw("h same");
+            mcHistos[backwardsIndex]->Draw("histo same");
         }
       }
     } // if !nomc
