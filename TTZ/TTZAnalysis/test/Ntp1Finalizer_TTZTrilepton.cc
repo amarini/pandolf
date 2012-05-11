@@ -221,21 +221,21 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   h1_nJets_prepresel->Sumw2();
   TH1D* h1_nJets_presel = new TH1D("nJets_presel", "", 11, -0.5, 10.5);
   h1_nJets_presel->Sumw2();
-  TH1D* h1_nJets = new TH1D("nJets", "", 7, 3.5, 10.5);
+  TH1D* h1_nJets = new TH1D("nJets", "", 11, -0.5, 10.5);
   h1_nJets->Sumw2();
 
   TH1D* h1_nBJets_loose_prepresel = new TH1D("nBJets_loose_prepresel", "", 11, -0.5, 10.5);
   h1_nBJets_loose_prepresel->Sumw2();
   TH1D* h1_nBJets_loose_presel = new TH1D("nBJets_loose_presel", "", 11, -0.5, 10.5);
   h1_nBJets_loose_presel->Sumw2();
-  TH1D* h1_nBJets_loose = new TH1D("nBJets_loose", "", 7, 3.5, 10.5);
+  TH1D* h1_nBJets_loose = new TH1D("nBJets_loose", "", 11, -0.5, 10.5);
   h1_nBJets_loose->Sumw2();
 
   TH1D* h1_nBJets_medium_prepresel = new TH1D("nBJets_medium_prepresel", "", 11, -0.5, 10.5);
   h1_nBJets_medium_prepresel->Sumw2();
   TH1D* h1_nBJets_medium_presel = new TH1D("nBJets_medium_presel", "", 11, -0.5, 10.5);
   h1_nBJets_medium_presel->Sumw2();
-  TH1D* h1_nBJets_medium = new TH1D("nBJets_medium", "", 7, 3.5, 10.5);
+  TH1D* h1_nBJets_medium = new TH1D("nBJets_medium", "", 11, -0.5, 10.5);
   h1_nBJets_medium->Sumw2();
 
 
@@ -1217,6 +1217,8 @@ ofstream ofs("run_event.txt");
 
     h1_rhoPF_prepresel->Fill( rhoPF, eventWeight);
     h1_nJets_prepresel->Fill( njets, eventWeight );
+    h1_nBJets_loose_prepresel->Fill( nBjets_loose, eventWeight );
+    h1_nBJets_medium_prepresel->Fill( nBjets_medium, eventWeight );
 
 
 
