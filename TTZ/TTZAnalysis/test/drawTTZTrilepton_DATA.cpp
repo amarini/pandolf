@@ -159,7 +159,11 @@ int main(int argc, char* argv[]) {
   db->drawHisto("nvertex_PUW", "Number of Reconstructed Vertexes", "", "Events", true);
 
   // prepresel (basically only dilepton + 3 jets):
+  db->set_xAxisMin(3);
   db->drawHisto("nJets_prepresel", "Jet Multiplicity", "", "Events", true);
+  db->set_xAxisMin(0);
+  db->drawHisto("nBJets_loose_prepresel", "b-Jet Multiplicity (loose)", "", "Events", true);
+  db->drawHisto("nBJets_medium_prepresel", "b-Jet Multiplicity (medium)", "", "Events", true);
   db->drawHisto("rhoPF_noPUW", "Particle Flow Energy Density", "GeV", "Events", true);
   db->drawHisto("rhoPF_prepresel", "Particle Flow Energy Density", "GeV", "Events", true);
   db->set_rebin(2);
@@ -180,6 +184,15 @@ int main(int argc, char* argv[]) {
   db->drawHisto("mZll_OF_prepresel", "Opposite Flavor Dilepton Mass", "GeV", "Events", false, 1, "scaled");
 
 
+  db->set_rebin();
+  db->set_xAxisMax();
+  db->drawHisto("nJets_presel", "Jet Multiplicity", "", "Events", true);
+
+  db->set_rebin(4);
+  db->set_xAxisMin(50.);
+  db->set_xAxisMax(130.);
+  db->drawHisto("mZll_presel", "Dilepton Invariant Mass", "GeV", "Events", true, 2, "noscaling" );
+
   // now add one lepton (prepresel -> presel)
   // anti-btag: control region for Z+Jets and WZ:
   db->drawHisto("mZll_presel_antibtag", "Dilepton Invariant Mass", "GeV", "Events", true, 2);
@@ -187,16 +200,10 @@ int main(int argc, char* argv[]) {
   db->set_mcWeight( "ZJets", DYWZSF.val );
   db->set_mcWeight( "VV_Summer11", DYWZSF.val );
 
-  db->drawHisto("mZll_presel", "Dilepton Invariant Mass", "GeV", "Events", true, 2 );
-  db->set_rebin();
-  db->set_xAxisMax();
-  db->drawHisto("nJets_presel", "Jet Multiplicity", "", "Events", true);
-
-  db->set_rebin(4);
-  db->set_xAxisMax(130.);
   db->drawHisto("mZll_presel_antibtag", "Dilepton Invariant Mass", "GeV", "Events", true, 2, "scaled");
   db->set_rebin();
   db->set_xAxisMax();
+  db->set_xAxisMin();
   db->drawHisto("nJets_presel", "Jet Multiplicity", "", "Events", true, 1, "scaled");
 
 
@@ -723,7 +730,7 @@ ValueAndError get_ttbarSF( const DrawBase& db ) {
   float yMax = 1.1*h1_chiSquare->GetMaximum();
 
   h1_chiSquare->SetXTitle( "t#bar{t} Scale Factor" );
-  h1_chiSquare->SetYTitle( "#chi^{2}" );
+  h1_chiSquare->SetYTitle( "Normalized #chi^{2} (Data-MC)" );
   h1_chiSquare->SetMarkerStyle( 20 );
   h1_chiSquare->SetMarkerSize( 1.6 );
   h1_chiSquare->SetMarkerColor( 46 );
