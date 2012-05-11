@@ -170,7 +170,7 @@ int main(int argc, char* argv[]) {
 
 
   // opposite flavor leptons: control region for ttbar:
-  db->set_rebin(4);
+  db->set_rebin(5);
   db->drawHisto("mZll_OF_prepresel", "Opposite Flavor Dilepton Mass", "GeV", "Events");
   //db->drawHisto("mZll_OF2_prepresel", "Opposite Flavor Dilepton Mass", "GeV", "Events");
   //db->drawHisto("mZll_OF3_prepresel", "Opposite Flavor Dilepton Mass", "GeV", "Events");
@@ -473,17 +473,50 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
     float tot_mc = mmm_mc + mme_mc + eem_mc + eee_mc;
 
     float scaling = lumi_fb*1000.;
-    if( db->get_mcFile(iMC).datasetName=="TTtW" ) scaling *= ttbarSF.val;
-    if( db->get_mcFile(iMC).datasetName=="ZJets" || db->get_mcFile(iMC).datasetName=="VV_Summer11" ) scaling *= DYWZSF.val;
+    float scaling_err = 0.;
+    if( db->get_mcFile(iMC).datasetName=="TTtW" ) {
+      scaling *= ttbarSF.val;
+      scaling_err = ttbarSF.err;
+    }
+    if( db->get_mcFile(iMC).datasetName=="ZJets" || db->get_mcFile(iMC).datasetName=="VV_Summer11" ) {
+      scaling *= DYWZSF.val;
+      scaling_err = DYWZSF.err;
+    }
+
+    eee_mc *= scaling;
+    eem_mc *= scaling;
+    mme_mc *= scaling;
+    mmm_mc *= scaling;
+    tot_mc *= scaling;
 
     char hname[100];
     sprintf( hname, "yields_mc_%d", iMC);
     TH1D* h1_yields_mc = new TH1D(hname, "", 5, 0., 5.);
-    h1_yields_mc->SetBinContent( 1, scaling*eee_mc );
-    h1_yields_mc->SetBinContent( 2, scaling*eem_mc );
-    h1_yields_mc->SetBinContent( 3, scaling*mme_mc );
-    h1_yields_mc->SetBinContent( 4, scaling*mmm_mc );
-    h1_yields_mc->SetBinContent( 5, scaling*tot_mc );
+    h1_yields_mc->SetBinContent( 1, eee_mc );
+    h1_yields_mc->SetBinContent( 2, eem_mc );
+    h1_yields_mc->SetBinContent( 3, mme_mc );
+    h1_yields_mc->SetBinContent( 4, mmm_mc );
+    h1_yields_mc->SetBinContent( 5, tot_mc );
+  
+
+    // add in quadrature scaling error:
+    float oldErr_eee = h1_yields_mc->GetBinError(1);
+    float oldErr_eem = h1_yields_mc->GetBinError(2);
+    float oldErr_mme = h1_yields_mc->GetBinError(3);
+    float oldErr_mmm = h1_yields_mc->GetBinError(4);
+    float oldErr_tot = h1_yields_mc->GetBinError(5);
+ 
+    float newErr_eee = sqrt( oldErr_eee*oldErr_eee + eee_mc*eee_mc*scaling_err*scaling_err );
+    float newErr_eem = sqrt( oldErr_eem*oldErr_eem + eem_mc*eem_mc*scaling_err*scaling_err );
+    float newErr_mme = sqrt( oldErr_mme*oldErr_mme + mme_mc*mme_mc*scaling_err*scaling_err );
+    float newErr_mmm = sqrt( oldErr_mmm*oldErr_mmm + mmm_mc*mmm_mc*scaling_err*scaling_err );
+    float newErr_tot = sqrt( oldErr_tot*oldErr_tot + tot_mc*tot_mc*scaling_err*scaling_err );
+
+    h1_yields_mc->SetBinError( 1, newErr_eee );
+    h1_yields_mc->SetBinError( 2, newErr_eem );
+    h1_yields_mc->SetBinError( 3, newErr_mme );
+    h1_yields_mc->SetBinError( 4, newErr_mmm );
+    h1_yields_mc->SetBinError( 5, newErr_tot );
   
 
     h1_yields_mc->SetFillColor( db->get_mcFile(iMC).fillColor );
@@ -703,14 +736,17 @@ ValueAndError get_ttbarSF( const DrawBase& db ) {
 
   TLine* line_plus = new TLine( foundSF_plus, 0., foundSF_plus, yMax );
   TLine* line_minus = new TLine( foundSF_minus, 0., foundSF_minus, yMax );
+  TLine* line_mean = new TLine( foundSF, 0., foundSF, yMax );
 
   line_plus->SetLineWidth( 2 );
+  line_mean->SetLineWidth( 2 );
   line_minus->SetLineWidth( 2 );
   
   line_plus->SetLineStyle( 2 );
   line_minus->SetLineStyle( 2 );
   
   line_plus->SetLineColor( 38 );
+  line_mean->SetLineColor( kBlack );
   line_minus->SetLineColor( 38 );
 
   TPaveText* label_sqrt = db.get_labelSqrt();
@@ -721,8 +757,10 @@ ValueAndError get_ttbarSF( const DrawBase& db ) {
   
   h1_chiSquare->Draw( "P" );
   line_plus->Draw("same");
+  line_mean->Draw("same");
   line_minus->Draw("same");
   label_sqrt->Draw( "Psame" );
+  h1_chiSquare->Draw( "Psame" );
   
   gPad->RedrawAxis();
 
