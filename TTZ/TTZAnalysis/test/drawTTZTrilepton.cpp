@@ -13,7 +13,7 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selType, const std::
 int main(int argc, char* argv[]) {
 
   if(  argc != 2 && argc != 3 ) {
-    std::cout << "USAGE: ./drawTTZTrilepton [(string)selType] [bTaggerType=\"SSVHE\"]" << std::endl;
+    std::cout << "USAGE: ./drawTTZTrilepton [(string)selType] [bTaggerType=\"TCHE\"]" << std::endl;
     exit(23);
   }
 
@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
 
   std::string PUType = "PUHR11_73pb";
 
-  std::string bTaggerType = "SSVHE";
+  std::string bTaggerType = "TCHE";
   if( argc>=3 ) {
     std::string bTaggerType_str(argv[2]);
     bTaggerType = bTaggerType_str;
@@ -48,7 +48,7 @@ int main(int argc, char* argv[]) {
   std::string outputdir_str = "TTZTrileptonPlots_MConly_" + selType + "_" + bTaggerType + "_" + leptType;
   db->set_outputdir(outputdir_str);
 
-  int signalFillColor = 42;
+  int signalFillColor = 46;
 
   std::string TTZFileName = "TTZTrilepton_TTZ_TuneZ2_7TeV-madgraphCMSSW42xPUv3_spadhi";
   TTZFileName += "_" + selType;
@@ -57,18 +57,26 @@ int main(int argc, char* argv[]) {
   TTZFileName += "_" + leptType;
   TTZFileName += ".root";
   TFile* TTZFile = TFile::Open(TTZFileName.c_str());
-  db->add_mcFile( TTZFile, "ttZ", "t#bar{t} + Z", signalFillColor, 3005);
+  db->add_mcFile( TTZFile, "ttZ", "t#bar{t} + Z", signalFillColor, 0);
 
 
-  std::string mcZJetsFileName = "TTZTrilepton_DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1";
+  std::string mcDYVVFileName = "TTZTrilepton_VV_Summer11";
+  mcDYVVFileName += "_" + selType;
+  mcDYVVFileName += "_" + bTaggerType;
+  //mcVVFileName += "_" + PUType;
+  mcDYVVFileName += "_" + leptType;
+  mcDYVVFileName += ".root";
+  TFile* mcDYVVFile = TFile::Open(mcDYVVFileName.c_str());
+  db->add_mcFile( mcDYVVFile, "diboson", "DY+Diboson", 29, 3005);
+
+  std::string mcZJetsFileName = "TTZTrilepton_DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Fall11";
   mcZJetsFileName += "_" + selType;
   mcZJetsFileName += "_" + bTaggerType;
   //mcZJetsFileName += "_" + PUType;
   mcZJetsFileName += "_" + leptType;
   mcZJetsFileName += ".root";
   TFile* mcZJetsFile = TFile::Open(mcZJetsFileName.c_str());
-  db->add_mcFile( mcZJetsFile, "ZJets", "Z + jets", 46, 3004);
-  //db->add_mcFile( mcZJetsFile, "ZJets", "Z + jets", 30, 3004);
+  //db->add_mcFile( mcZJetsFile, "ZJets", "Z + jets", 46, 3004);
 
   //std::string mcTTbarFileName = "TTZTrilepton_TTJets_TuneZ2_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1";
   std::string mcTTbarFileName = "TTZTrilepton_TTJ_Fall11_highstat";
@@ -78,8 +86,17 @@ int main(int argc, char* argv[]) {
   mcTTbarFileName += "_" + leptType;
   mcTTbarFileName += ".root";
   TFile* mcTTbarFile = TFile::Open(mcTTbarFileName.c_str());
-  db->add_mcFile( mcTTbarFile, "TTtW", "t#bar{t}", 39, 0);
+  db->add_mcFile( mcTTbarFile, "TTtW", "t#bar{t}", 39, 3004);
 
+
+  std::string mcVVFileName = "TTZTrilepton_VV_Summer11";
+  mcVVFileName += "_" + selType;
+  mcVVFileName += "_" + bTaggerType;
+  //mcVVFileName += "_" + PUType;
+  mcVVFileName += "_" + leptType;
+  mcVVFileName += ".root";
+  TFile* mcVVFile = TFile::Open(mcVVFileName.c_str());
+  //db->add_mcFile( mcVVFile, "diboson", "Diboson", 29, 3005);
 
 
 
@@ -93,7 +110,15 @@ int main(int argc, char* argv[]) {
 
   //db->set_legendTitle("Trilepton channel");
 
-  db->drawHisto("nJets", "Jet Multiplicity (p_{T} > 10 GeV)", "", "Events", log);
+  db->set_yAxisMaxScale(1.1);
+
+  db->drawHisto("nJets", "Jet Multiplicity", "", "Events", log);
+  db->set_xAxisMax(6.5);
+  db->drawHisto("nBJets_loose", "b-Jet Multiplicity (loose)", "", "Events", log);
+  db->drawHisto("nBJets_medium", "b-Jet Multiplicity (medium)", "", "Events", log);
+
+  db->set_xAxisMax(0);
+  db->set_rebin(4);
   db->drawHisto("mZll_prepresel", "Dilepton mass", "GeV", "Events");
   db->drawHisto("mZll", "Dilepton mass", "GeV", "Events");
 
@@ -120,11 +145,6 @@ int main(int argc, char* argv[]) {
   db->set_xAxisMax(150.);
   db->drawHisto("ptLeptZ2", "Sublead Z Lepton p_{T}", "GeV", "Events");
 
-  db->set_xAxisMax();
-  db->set_rebin();
-  db->drawHisto_fromTree("tree_passedEvents", "nBjets_loose", "eventWeight", 9, -0.5, 8.5, "nBjets_loose", "Number of b-Jets (loose)");
-  db->drawHisto_fromTree("tree_passedEvents", "nBjets_medium", "eventWeight", 9, -0.5, 8.5, "nBjets_medium", "Number of b-Jets (medium)");
-  
   db->set_xAxisMax(5.);
   db->set_rebin(5);
   std::string axisName = "Leading b-Tag (" + bTaggerType + ")";
@@ -132,8 +152,9 @@ int main(int argc, char* argv[]) {
   axisName = "Subleading b-Tag (" + bTaggerType + ")";
   db->drawHisto("bTagJetB2", "Subleading b-Tag");
 
-  db->set_xAxisMax();
-  db->set_rebin(20);
+  db->set_xAxisMax(700);
+  db->set_rebin(40);
+  db->drawHisto("ht", "H_{T}", "GeV", "Events");
   db->drawHisto("mTW", "", "GeV", "Events");
   db->drawHisto("mT_lZmet", "", "GeV", "Events");
 
@@ -142,36 +163,39 @@ int main(int argc, char* argv[]) {
   db->drawHisto("mb1jj", "", "GeV", "Events");
   db->drawHisto("mb2jj", "", "GeV", "Events");
   db->drawHisto("mbjj_best", "", "GeV", "Events");
+  db->drawHisto("mbjj_max", "", "GeV", "Events");
 
   db->drawHisto("mb1jjZ", "", "GeV", "Events");
   db->drawHisto("mb2jjZ", "", "GeV", "Events");
   db->drawHisto("mbjjZ_best", "", "GeV", "Events");
+  db->drawHisto("mbjjZ_max", "", "GeV", "Events");
 
+  db->drawHisto("mTW", "", "GeV", "Events");
   db->drawHisto("mTb1W", "", "GeV", "Events");
   db->drawHisto("mTb2W", "", "GeV", "Events");
   db->drawHisto("mTbW_best", "", "GeV", "Events");
+  db->drawHisto("mTbW_max", "", "GeV", "Events");
 
   db->drawHisto("mTb1WZ", "", "GeV", "Events");
   db->drawHisto("mTb2WZ", "", "GeV", "Events");
   db->drawHisto("mTbWZ_best", "", "GeV", "Events");
+  db->drawHisto("mTbWZ_max", "", "GeV", "Events");
+
+  db->set_xAxisMax();
+  db->drawHisto("ptZll", "", "GeV", "Events");
 
   db->set_rebin();
-  db->drawHisto_fromTree("tree_passedEvents", "ht", "eventWeight", 50, 60., 560., "ht", "H_{T}", "GeV");
-  db->drawHisto_fromTree("tree_passedEvents", "ptZll", "eventWeight*(mZll>81. && mZll<101.)", 30, 0., 300., "ptZll", "p_{T} (Z)", "GeV");
+  //db->drawHisto_fromTree("tree_passedEvents", "ht", "eventWeight", 50, 60., 560., "ht", "H_{T}", "GeV");
+  //db->drawHisto_fromTree("tree_passedEvents", "ptZll", "eventWeight*(mZll>81. && mZll<101.)", 30, 0., 300., "ptZll", "p_{T} (Z)", "GeV");
+
+  db->drawHisto_fromTree("tree_passedEvents", "mbjjZ_max", "eventWeight*(mZll>81. && mZll<101. && pfMet>30.)", 50, 0., 1000., "mbjjZ_max_met30", "mbjjZ_max", "GeV");
+  db->drawHisto_fromTree("tree_passedEvents", "mbjjZ_best", "eventWeight*(mZll>81. && mZll<101. && pfMet>30.)", 50, 0., 1000., "mbjjZ_best_met30", "mbjjZ_best", "GeV");
 
 
 
 
 
-  std::string mcWZFileName = "TTZTrilepton_WZJetsTo3LNu_TuneZ2_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1";
-  mcWZFileName += "_" + selType;
-  mcWZFileName += "_" + bTaggerType;
-  //mcWZFileName += "_" + PUType;
-  mcWZFileName += "_" + leptType;
-  mcWZFileName += ".root";
-  TFile* mcWZFile = TFile::Open(mcWZFileName.c_str());
-  db->add_mcFile( mcWZFile, "WZtoAnything_TuneZ2", "WZ + jets", 38, 3004);
-
+/*
 
   std::string mcTTWFileName = "TTZTrilepton_TTW_TuneZ2_7TeV-madgraphCMSSW42xPUv2_spadhi";
   mcTTWFileName += "_" + selType;
@@ -247,6 +271,8 @@ int main(int argc, char* argv[]) {
 
   delete db;
   db = 0;
+*/
+
 
   return 0;
 
