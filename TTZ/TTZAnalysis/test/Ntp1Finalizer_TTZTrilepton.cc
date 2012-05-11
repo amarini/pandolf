@@ -224,11 +224,15 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   TH1D* h1_nJets = new TH1D("nJets", "", 7, 3.5, 10.5);
   h1_nJets->Sumw2();
 
+  TH1D* h1_nBJets_loose_prepresel = new TH1D("nBJets_loose_prepresel", "", 11, -0.5, 10.5);
+  h1_nBJets_loose_prepresel->Sumw2();
   TH1D* h1_nBJets_loose_presel = new TH1D("nBJets_loose_presel", "", 11, -0.5, 10.5);
   h1_nBJets_loose_presel->Sumw2();
   TH1D* h1_nBJets_loose = new TH1D("nBJets_loose", "", 7, 3.5, 10.5);
   h1_nBJets_loose->Sumw2();
 
+  TH1D* h1_nBJets_medium_prepresel = new TH1D("nBJets_medium_prepresel", "", 11, -0.5, 10.5);
+  h1_nBJets_medium_prepresel->Sumw2();
   TH1D* h1_nBJets_medium_presel = new TH1D("nBJets_medium_presel", "", 11, -0.5, 10.5);
   h1_nBJets_medium_presel->Sumw2();
   TH1D* h1_nBJets_medium = new TH1D("nBJets_medium", "", 7, 3.5, 10.5);
@@ -532,15 +536,14 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   TString dataset_tstr(dataset_);
   if( dataset_tstr.Contains("Fall11") ) {
     puType = "Fall11";
-    //puType = "Fall11Truth";
   }
 
 
   PUWeight* fPUWeight = new PUWeight(-1, "2011A", puType);
   //PUWeight* fPUWeight_ave = new PUWeight(-1, "2011A", puType_ave);
   std::string puFileName;
-  //puFileName = "all2011AB.pileup_v2_73mb.root";
-  puFileName = "Pileup_DATA_up_to_178479_SiXie.root";
+  puFileName = "all2011AB.pileup_v2_73mb.root";
+  //puFileName = "Pileup_DATA_up_to_178479_SiXie.root";
   //puFileName = "PileupTruth_v2.root";
   //puFileName = "PileupObs_v2.root";
   //puFileName = "FullData_178078.root"; 
@@ -552,7 +555,7 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   fPUWeight->SetDataHistogram(h1_nPU_data);
 
 
-  if( dataset_tstr.Contains("spadhi") )
+  //if( dataset_tstr.Contains("spadhi") )
     fPUWeight->SetMCHistogram(h1_nPU_gen_);
   
 
@@ -702,6 +705,12 @@ ofstream ofs("run_event.txt");
     if( (iEntry % 100000)==0 ) std::cout << "Entry: " << iEntry << " /" << nEntries << std::endl;
 
     tree_->GetEntry(iEntry);
+
+
+    // need this to be compatible with trigger!!! (just put it in analyzer, but dont want to rerun yet)
+    if( ptLeptZ1<20. ) continue;
+    if( ptLeptZ2<20. ) continue;
+
 
 //std::cout << "new event" << std::endl;
 
@@ -1596,9 +1605,11 @@ ofstream ofs("run_event.txt");
   h1_nJets_presel->Write();
   h1_nJets->Write();
 
+  h1_nBJets_loose_prepresel->Write();
   h1_nBJets_loose_presel->Write();
   h1_nBJets_loose->Write();
 
+  h1_nBJets_medium_prepresel->Write();
   h1_nBJets_medium_presel->Write();
   h1_nBJets_medium->Write();
 
