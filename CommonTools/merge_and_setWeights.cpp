@@ -140,8 +140,10 @@ int main( int argc, char* argv[] ) {
                     && !passed_HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL;
 
       //explicit HLT matching required (at least one of them):
-      if( analysisType_ == "TTZ" )
+      if( analysisType_ == "TTZ" ) {
+        passedHLT = passedHLT && !(passed_HLT_Mu17_Ele8_CaloIdL || passed_HLT_Mu8_Ele17_CaloIdL || passed_HLT_Mu8_Ele17_CaloIdT_CaloIsoVL);
         passedHLT = passedHLT && ( matchedToHLTLeptZ1 || matchedToHLTLeptZ2 );
+      }
 
 
       if( !passedHLT ) continue;
@@ -182,7 +184,6 @@ int main( int argc, char* argv[] ) {
                        
       if( analysisType_ == "TTZ" )  {
 
-        passedHLT = passedHLT && !passed_HLT_IsoMu24 && !passed_HLT_IsoMu24_eta2p1;
         //explicit HLT matching required (both of them):
         passedHLT = passedHLT && ( matchedToHLTLeptZ1 && matchedToHLTLeptZ2 );
 
