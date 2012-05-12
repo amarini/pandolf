@@ -337,6 +337,22 @@ void DrawBase::set_lumiOnRightSide( bool set ) {
 
 
 
+void DrawBase::reset() {
+
+  rebin_ = 1;
+
+  logx_ = false;
+
+  xAxisMin_ = 9999.;
+  xAxisMax_ = 9999.;
+
+  yAxisMax_ = 9999.;
+  yAxisMaxScale_ = 1.4;
+  yAxisMaxScaleLog_ = 5.;
+
+}
+
+
 
 void DrawBase::drawHisto_vs_pt( int nBinsPt, float* ptBins, const std::string& name, const std::string& axisName, const std::string& units, const std::string& instanceName, bool log_aussi, int legendQuadrant, std::string flags, const std::string& labelText ) {
 
