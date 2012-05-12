@@ -70,6 +70,7 @@ int main(int argc, char* argv[]) {
 
   datacard << std::endl << std::endl;
 
+  datacard << "#syst" << std::endl;
   datacard << "lumi     lnN\t1.022  \t\t1.022" << std::endl; //taken from SMP-12-008
   datacard << "bgUncert lnN\t-      \t\t" << 1. + b_pred_err/b_pred << std::endl;
 
