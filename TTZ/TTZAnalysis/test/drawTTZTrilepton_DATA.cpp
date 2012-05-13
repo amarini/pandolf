@@ -344,6 +344,10 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
   h1_yields_mc_totBG->Sumw2();
   TH1D* h1_yields_mc_signal = new TH1D("yields_mc_signal", "", 5, 0., 5.);
   h1_yields_mc_signal->Sumw2();
+  TH1D* h1_yields_mc_ttZ = new TH1D("yields_mc_ttZ", "", 5, 0., 5.);
+  h1_yields_mc_ttZ->Sumw2();
+  TH1D* h1_yields_mc_ttW = new TH1D("yields_mc_ttW", "", 5, 0., 5.);
+  h1_yields_mc_ttW->Sumw2();
 
 
   for( unsigned i=0; i<db->get_mcFiles().size(); ++i) {
@@ -429,8 +433,13 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
 
     if( db->get_mcFile(iMC).datasetName!="ttZ" && db->get_mcFile(iMC).datasetName!="ttW" )
       h1_yields_mc_totBG->Add(h1_yields_mc);
-    else 
+    else {
       h1_yields_mc_signal->Add(h1_yields_mc);
+      if( db->get_mcFile(iMC).datasetName=="ttZ" )
+        h1_yields_mc_ttZ->Add(h1_yields_mc);
+      else // ttW
+        h1_yields_mc_ttW->Add(h1_yields_mc);
+    }
 
     delete h1_mc_mmm;
     delete h1_mc_mme;
@@ -491,12 +500,12 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
 
   ofstream ofs(yieldfilename.c_str());
 
-  ofs << "channel\tobserved\tsignal\tb_pred\tb_pred_error" << std::endl;
-  ofs << "(ee)e  \t" << h1_yields_data->GetBinContent(1) << "\t\t" << h1_yields_mc_signal->GetBinContent(1) << "\t" << h1_yields_mc_totBG->GetBinContent(1) << "\t" << h1_yields_mc_totBG->GetBinError(1) << std::endl;
-  ofs << "(ee)m  \t" << h1_yields_data->GetBinContent(2) << "\t\t" << h1_yields_mc_signal->GetBinContent(2) << "\t" << h1_yields_mc_totBG->GetBinContent(2) << "\t" << h1_yields_mc_totBG->GetBinError(2) << std::endl;
-  ofs << "(mm)e  \t" << h1_yields_data->GetBinContent(3) << "\t\t" << h1_yields_mc_signal->GetBinContent(3) << "\t" << h1_yields_mc_totBG->GetBinContent(3) << "\t" << h1_yields_mc_totBG->GetBinError(3) << std::endl;
-  ofs << "(mm)m  \t" << h1_yields_data->GetBinContent(4) << "\t\t" << h1_yields_mc_signal->GetBinContent(4) << "\t" << h1_yields_mc_totBG->GetBinContent(4) << "\t" << h1_yields_mc_totBG->GetBinError(4) << std::endl;
-  ofs << "Total  \t" << h1_yields_data->GetBinContent(5) << "\t\t" << h1_yields_mc_signal->GetBinContent(5) << "\t" << h1_yields_mc_totBG->GetBinContent(5) << "\t" << h1_yields_mc_totBG->GetBinError(5) << std::endl;
+  ofs << "channel\tobserved\tsignal\tttZ     \tttW    \tb_pred\tb_pred_error" << std::endl;
+  ofs << "(ee)e  \t" << h1_yields_data->GetBinContent(1) << "\t\t" << h1_yields_mc_signal->GetBinContent(1) << "\t" << h1_yields_mc_ttZ->GetBinContent(1) << "\t" << h1_yields_mc_ttW->GetBinContent(1) << "\t" << h1_yields_mc_totBG->GetBinContent(1) << "\t" << h1_yields_mc_totBG->GetBinError(1) << std::endl;
+  ofs << "(ee)m  \t" << h1_yields_data->GetBinContent(2) << "\t\t" << h1_yields_mc_signal->GetBinContent(2) << "\t" << h1_yields_mc_ttZ->GetBinContent(2) << "\t" << h1_yields_mc_ttW->GetBinContent(2) << "\t" << h1_yields_mc_totBG->GetBinContent(2) << "\t" << h1_yields_mc_totBG->GetBinError(2) << std::endl;
+  ofs << "(mm)e  \t" << h1_yields_data->GetBinContent(3) << "\t\t" << h1_yields_mc_signal->GetBinContent(3) << "\t" << h1_yields_mc_ttZ->GetBinContent(3) << "\t" << h1_yields_mc_ttW->GetBinContent(3) << "\t" << h1_yields_mc_totBG->GetBinContent(3) << "\t" << h1_yields_mc_totBG->GetBinError(3) << std::endl;
+  ofs << "(mm)m  \t" << h1_yields_data->GetBinContent(4) << "\t\t" << h1_yields_mc_signal->GetBinContent(4) << "\t" << h1_yields_mc_ttZ->GetBinContent(4) << "\t" << h1_yields_mc_ttW->GetBinContent(4) << "\t" << h1_yields_mc_totBG->GetBinContent(4) << "\t" << h1_yields_mc_totBG->GetBinError(4) << std::endl;
+  ofs << "Total  \t" << h1_yields_data->GetBinContent(5) << "\t\t" << h1_yields_mc_signal->GetBinContent(5) << "\t" << h1_yields_mc_ttZ->GetBinContent(5) << "\t" << h1_yields_mc_ttW->GetBinContent(5) << "\t" << h1_yields_mc_totBG->GetBinContent(5) << "\t" << h1_yields_mc_totBG->GetBinError(5) << std::endl;
 
 
   ofs.close();
@@ -508,6 +517,8 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
   delete h1_yields_data;
   delete h1_yields_mc_totBG;
   delete h1_yields_mc_signal;
+  delete h1_yields_mc_ttZ;
+  delete h1_yields_mc_ttW;
 
   delete h1_data_mmm;
   delete h1_data_mme;
