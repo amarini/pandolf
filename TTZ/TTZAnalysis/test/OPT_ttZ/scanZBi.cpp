@@ -19,7 +19,7 @@
 
 int main( int argc, char* argv[] ) {
 
-  std::string selectionType = "presel";
+  std::string selectionType = "May7_ht_noMET_2loosebjets";
   if( argc>1 ) {
     std::string selectionType_str(argv[1]);
     selectionType = selectionType_str;
@@ -129,7 +129,7 @@ int main( int argc, char* argv[] ) {
 std::cout << "signal: " << signal << " bg: " << background << " +- " << background_error << std::endl;
 
 
-    float effS = (float)h1_signal->GetEntries()/nGen_signal;
+    float effS = (float)h1_signal->GetEntries()/nGen_signal/(0.22*0.22*0.67);
     //float effS = (float)h1_signal->GetEntries()/nGen_signal/(0.22*0.22*0.67);
 
     if( effS > effMax )
