@@ -74,7 +74,8 @@ void drawSingleSyst( DrawBase* db, const std::string& syst, const std::string& s
   if( file_systFileDOWN!=0 ) //JER has no down
     newdb->add_mcFile( file_systFileDOWN, "systDOWN", systDOWN_text, 50, 0 );
 
-  std::string instanceName = bg_signal + " Events";
+  std::string instanceName = (bg_signal=="BG") ? "Background" : bg_signal; 
+  instanceName = instanceName + " Events";
   newdb->drawHisto( "nJets_presel", "Jet Multiplicity", "", instanceName );
   newdb->drawHisto( "nBJets_loose_presel", "b-Jet Multiplicity (Loose)", "", instanceName );
   newdb->drawHisto( "nBJets_medium_presel", "b-Jet Multiplicity (Medium)", "", instanceName );
