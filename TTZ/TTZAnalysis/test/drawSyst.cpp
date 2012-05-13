@@ -76,7 +76,10 @@ void drawSingleSyst( DrawBase* db, const std::string& syst, const std::string& s
 
   std::string instanceName = (bg_signal=="BG") ? "Background" : bg_signal; 
   instanceName = instanceName + " Events";
+  newdb->set_xAxisMin(2.5);
   newdb->drawHisto( "nJets_presel", "Jet Multiplicity", "", instanceName );
+  newdb->drawHisto( "nJets", "Jet Multiplicity", "", instanceName );
+  newdb->reset();
   newdb->drawHisto( "nBJets_loose_presel", "b-Jet Multiplicity (Loose)", "", instanceName );
   newdb->drawHisto( "nBJets_medium_presel", "b-Jet Multiplicity (Medium)", "", instanceName );
   newdb->set_getBinLabels(true);
