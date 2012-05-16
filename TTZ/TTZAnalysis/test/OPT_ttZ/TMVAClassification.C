@@ -1,4 +1,4 @@
-// @(#)root/tmva $Id: TMVAClassification.C,v 1.1 2012/04/23 13:50:22 pandolf Exp $
+// @(#)root/tmva $Id: TMVAClassification.C,v 1.2 2012/05/07 08:45:36 pandolf Exp $
 /**********************************************************************************
  * Project   : TMVA - a Root-integrated toolkit for multivariate data analysis    *
  * Package   : TMVA                                                               *
@@ -177,28 +177,28 @@ void TMVAClassification( std::string optName, TString myMethodList = "" )
    //factory->AddVariable( "ptLept3"       , "Third Lepton p_{T}", "GeV", 'F');
    factory->AddVariable( "ptZll"         , "p_{T} (Z)", "GeV", 'F');
    factory->AddVariable( "ht"            , "H_{T}", "GeV", 'F');
-   factory->AddVariable("mT_lZmet"  , "mT_lZmet", "GeV", 'F');
-   factory->AddVariable("mb1jj"     , "mb1jj", "GeV", 'F');
+   //factory->AddVariable("mbjjZ_best", "mbjjZ_best", "GeV", 'F');
+   //factory->AddVariable("mT_lZmet"  , "mT_lZmet", "GeV", 'F');
+   //factory->AddVariable("mb1jj"     , "mb1jj", "GeV", 'F');
    //factory->AddVariable("mb2jj"     , "mb2jj", "GeV", 'F');
-   factory->AddVariable("mbjj_best" , "mbjj_best", "GeV", 'F');
-   factory->AddVariable("mb1jjZ"    , "mb1jjZ", "GeV", 'F');
+   //factory->AddVariable("mbjj_best" , "mbjj_best", "GeV", 'F');
+   //factory->AddVariable("mb1jjZ"    , "mb1jjZ", "GeV", 'F');
    //factory->AddVariable("mb2jjZ"    , "mb2jjZ", "GeV", 'F');
-   factory->AddVariable("mbjjZ_best", "mbjjZ_best", "GeV", 'F');
    //factory->AddVariable("mTb1W"     , "mTb1W", "GeV", 'F');
    //factory->AddVariable("mTb2W"     , "mTb2W", "GeV", 'F');
-   factory->AddVariable("mTbW_best" , "mTbW_best", "GeV", 'F');
+   //factory->AddVariable("mTbW_best" , "mTbW_best", "GeV", 'F');
    //factory->AddVariable("mTb1WZ"    , "mTb1WZ", "GeV", 'F');
    //factory->AddVariable("mTb2WZ"    , "mTb2WZ", "GeV", 'F');
-   factory->AddVariable("mTbWZ_best", "mTbWZ_best", "GeV", 'F');
+   //factory->AddVariable("mTbWZ_best", "mTbWZ_best", "GeV", 'F');
    //factory->AddVariable( "mt"            , "M_{T}", "GeV", 'F');
-   factory->AddVariable( "ptJetB1"      , "Lead b-Jet p_{T}", "GeV", 'F');
+   //factory->AddVariable( "ptJetB1"      , "Lead b-Jet p_{T}", "GeV", 'F');
    //factory->AddVariable( "ptJetB2"      , "Sublead Lepton p_{T}", "GeV", 'F');
    factory->AddVariable( "ptLeptZ1"      , "Lead Lepton p_{T}", "GeV", 'F');
    //factory->AddVariable( "ptLeptZ2"      , "Sublead Lepton p_{T}", "GeV", 'F');
    factory->AddVariable( "pfMet"         , "ME_{T}", "GeV", 'F');
    //factory->AddVariable( "nBjets_medium"   , "N B Jets (medium)", "", 'I');
-   //factory->AddVariable( "nBjets_loose"      , "N B Jets", "", 'I');
-   //factory->AddVariable( "njets"       , "N Jets", "", 'I');
+   factory->AddVariable( "nBjets_loose"      , "N B Jets", "", 'I');
+   factory->AddVariable( "njets"       , "N Jets", "", 'I');
    //factory->AddVariable( "mZll"          , "DiLepton Mass", "GeV", 'F');
 
    // You can add so-called "Spectator variables", which are not used in the MVA training, 
@@ -330,8 +330,11 @@ void TMVAClassification( std::string optName, TString myMethodList = "" )
    //char presel[500];
    //sprintf( presel, "NJ>=%d && NbJ>=%d && pT1>%f && pT2>%f", nJ_min_presel, nbJ_min_presel, ptLep1_min_presel, ptLep2_min_presel );
 
-   TCut mycuts = "nBjets_medium>0 && mZll > 81. && mZll < 101. && pfMet>30. && leptType<2"; // for example: TCut mycuts = "abs(var1)<0.5 && abs(var2-0.5)<1";
-   TCut mycutb = "nBjets_medium>0 && mZll > 81. && mZll < 101. && pfMet>30. && leptType<2"; // for example: TCut mycutb = "abs(var1)<0.5";
+   TCut mycuts = "nBjets_loose>1 && nBjets_medium>0 && mZll > 81. && mZll < 101. && leptType<2"; // for example: TCut mycuts = "abs(var1)<0.5 && abs(var2-0.5)<1";
+   TCut mycutb = "nBjets_loose>1 && nBjets_medium>0 && mZll > 81. && mZll < 101. && leptType<2"; // for example: TCut mycutb = "abs(var1)<0.5";
+
+   //TCut mycuts = "nBjets_loose>1 && nBjets_medium>0 && mZll > 81. && mZll < 101. && pfMet>30. && leptType<2"; // for example: TCut mycuts = "abs(var1)<0.5 && abs(var2-0.5)<1";
+   //TCut mycutb = "nBjets_loose>1 && nBjets_medium>0 && mZll > 81. && mZll < 101. && pfMet>30. && leptType<2"; // for example: TCut mycutb = "abs(var1)<0.5";
 
    //TCut mycuts = ""; // for example: TCut mycuts = "abs(var1)<0.5 && abs(var2-0.5)<1";
    //TCut mycutb = ""; // for example: TCut mycutb = "abs(var1)<0.5";
@@ -361,11 +364,9 @@ void TMVAClassification( std::string optName, TString myMethodList = "" )
       std::string bookConditions;
       bookConditions = "H:!V:FitMethod=MC";
       bookConditions += ":VarProp[0]=FMax"; //ptZ
-      bookConditions += ":VarProp[1]=FMax"; //ht
-   //factory->AddVariable( "ptZll"         , "p_{T} (Z)", "GeV", 'F');
-   //factory->AddVariable( "ht"            , "H_{T}", "GeV", 'F');
+      bookConditions += ":VarProp[1]=FMax"; //mbjjZ_best/ht
 
-      //bookConditions += ":EffSel:SampleSize=50000000"; // this for the actual opt
+      //bookConditions += ":EffSel:SampleSize=200000000"; // this for the actual opt
       bookConditions += ":EffSel:SampleSize=500000"; // this for the ranking
 
 
@@ -607,6 +608,9 @@ void TMVAClassification( std::string optName, TString myMethodList = "" )
 
        //if( !found_NbJmed && btagMed_presel_ ) ofs << "NbJmed 1 100000." << std::endl;
        ofs << "nBjets_medium 1 10000" << std::endl;
+       ofs << "nBjets_loose 2 10000" << std::endl;
+       //ofs << "pfMet 30. 10000." << std::endl;
+       ofs << "mZll 81. 101." << std::endl;
 
        ofs.close();
 
