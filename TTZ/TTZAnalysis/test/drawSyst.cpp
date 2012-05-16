@@ -81,10 +81,10 @@ void drawSingleSyst( DrawBase* db, const std::string& syst, const std::string& s
   newdb->drawHisto( "nJets", "Jet Multiplicity", "", instanceName );
   newdb->reset();
   newdb->set_xAxisMax(6.5);
-  newdb->drawHisto( "nBJets_loose_presel", "b-Jet Multiplicity (Loose)", "", instanceName );
-  newdb->drawHisto( "nBJets_medium_presel", "b-Jet Multiplicity (Medium)", "", instanceName );
-  newdb->drawHisto( "nBJets_loose", "b-Jet Multiplicity (Loose)", "", instanceName );
-  newdb->drawHisto( "nBJets_medium", "b-Jet Multiplicity (Medium)", "", instanceName );
+  newdb->drawHisto( "nBJets_loose_presel", "b-Jet Multiplicity (loose)", "", instanceName );
+  newdb->drawHisto( "nBJets_medium_presel", "b-Jet Multiplicity (medium)", "", instanceName );
+  newdb->drawHisto( "nBJets_loose", "b-Jet Multiplicity (loose)", "", instanceName );
+  newdb->drawHisto( "nBJets_medium", "b-Jet Multiplicity (medium)", "", instanceName );
   newdb->set_getBinLabels(true);
   newdb->reset();
   newdb->drawHisto( "channelYields", "", "", instanceName, false, 2);
