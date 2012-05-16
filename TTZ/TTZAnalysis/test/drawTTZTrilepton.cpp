@@ -125,7 +125,7 @@ int main(int argc, char* argv[]) {
 
   db->set_rebin(10); 
   db->set_xAxisMax(200.); 
-  db->drawHisto("pfMet", "pfME_{T}", "GeV", "Events", log);
+  db->drawHisto("pfMet", "Particle Flow ME_{T}", "GeV", "Events", log);
   db->drawHisto("pfMet_presel", "pfME_{T}", "GeV", "Events", log);
   db->set_rebin(4); 
   db->set_xAxisMax(250.); 
@@ -155,34 +155,34 @@ int main(int argc, char* argv[]) {
   db->set_xAxisMax(700);
   db->set_rebin(40);
   db->drawHisto("ht", "H_{T}", "GeV", "Events");
-  db->drawHisto("mTW", "", "GeV", "Events");
-  db->drawHisto("mT_lZmet", "", "GeV", "Events");
+  db->drawHisto("mTW", "M_{T} (ME_{T} + l_{3})", "GeV", "Events");
+  db->drawHisto("mT_lZmet", "M_{T} (ME_{T} + Z + l_{3})", "GeV", "Events");
 
   db->drawHisto("deltaRbb", "", "GeV", "Events");
 
-  db->drawHisto("mb1jj", "", "GeV", "Events");
-  db->drawHisto("mb2jj", "", "GeV", "Events");
-  db->drawHisto("mbjj_best", "", "GeV", "Events");
-  db->drawHisto("mbjj_max", "", "GeV", "Events");
+  db->set_xAxisMax(1000);
+  db->drawHisto("mb1jj", "M(b_{1} jj)", "GeV", "Events");
+  db->drawHisto("mb2jj", "M(b_{2} jj)", "GeV", "Events");
+  db->drawHisto("mbjj_best", "Best M(bjj)", "GeV", "Events");
+  db->drawHisto("mbjj_max", "Max M(bjj)", "GeV", "Events");
 
-  db->drawHisto("mb1jjZ", "", "GeV", "Events");
-  db->drawHisto("mb2jjZ", "", "GeV", "Events");
-  db->drawHisto("mbjjZ_best", "", "GeV", "Events");
-  db->drawHisto("mbjjZ_max", "", "GeV", "Events");
+  db->drawHisto("mb1jjZ", "M(b_{1} jjZ)", "GeV", "Events");
+  db->drawHisto("mb2jjZ", "M(b_{2} jjZ)", "GeV", "Events");
+  db->drawHisto("mbjjZ_best", "Best M(bjjZ)", "GeV", "Events");
+  db->drawHisto("mbjjZ_max", "Max M(bjjZ)", "GeV", "Events");
 
-  db->drawHisto("mTW", "", "GeV", "Events");
-  db->drawHisto("mTb1W", "", "GeV", "Events");
-  db->drawHisto("mTb2W", "", "GeV", "Events");
-  db->drawHisto("mTbW_best", "", "GeV", "Events");
-  db->drawHisto("mTbW_max", "", "GeV", "Events");
+  db->drawHisto("mTb1W", "M_{T} (ME_{T} + l_{3} + b_{1})", "GeV", "Events");
+  db->drawHisto("mTb2W", "M_{T} (ME_{T} + l_{3} + b_{2})", "GeV", "Events");
+  db->drawHisto("mTbW_best", "Best M_{T} (ME_{T} + l_{3} + b)", "GeV", "Events");
+  db->drawHisto("mTbW_max", "Max M_{T} (ME_{T} + l_{3} + b)", "GeV", "Events");
 
-  db->drawHisto("mTb1WZ", "", "GeV", "Events");
-  db->drawHisto("mTb2WZ", "", "GeV", "Events");
-  db->drawHisto("mTbWZ_best", "", "GeV", "Events");
-  db->drawHisto("mTbWZ_max", "", "GeV", "Events");
+  db->drawHisto("mTb1WZ", "M_{T} (ME_{T} + l_{3} + b_{1} + Z)", "GeV", "Events");
+  db->drawHisto("mTb2WZ", "M_{T} (ME_{T} + l_{3} + b_{2} + Z)", "GeV", "Events");
+  db->drawHisto("mTbWZ_best", "Best M_{T} (ME_{T} + l_{3} + b + Z)", "GeV", "Events");
+  db->drawHisto("mTbWZ_max", "Max M_{T} (ME_{T} + l_{3} + b + Z)", "GeV", "Events");
 
   db->set_xAxisMax();
-  db->drawHisto("ptZll", "", "GeV", "Events");
+  db->drawHisto("ptZll", "p_{T} (Z)", "GeV", "Events");
 
   db->set_rebin();
   //db->drawHisto_fromTree("tree_passedEvents", "ht", "eventWeight", 50, 60., 560., "ht", "H_{T}", "GeV");
