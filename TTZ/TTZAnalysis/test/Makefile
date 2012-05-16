@@ -27,10 +27,22 @@ do2ndLevel_TTZ_DATA: Ntp1Analyzer.o Ntp1Analyzer_TTZ.o AnalysisElectron.o Analys
 computeTTJetsSF: computeTTJetsSF.cpp DrawBase.o fitTools.o
 	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/ -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -I$(CMSSW_BASE)/src/UserCode/pandolf/QGLikelihood -o computeTTJetsSF computeTTJetsSF.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
 
+computeTTZCrossSection: computeTTZCrossSection.cpp StatTools.o 
+	$(CC) -Wall $(INCLUDES) -o computeTTZCrossSection computeTTZCrossSection.cpp StatTools.o $(ROOTFLAG) $(EXTRALIBS)
+
+create_datacard: create_datacard.cpp 
+	$(CC) -Wall $(INCLUDES) -o create_datacard create_datacard.cpp $(ROOTFLAG) $(EXTRALIBS)
 
 
-finalize_TTZTrilepton: Ntp1Finalizer.o Ntp1Finalizer_TTZTrilepton.o finalize_TTZTrilepton.cpp  QGLikelihoodCalculator.o AnalysisJet.o BTagSFUtil.o PUWeight.o
-	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/ -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -I$(CMSSW_BASE)/src/UserCode/pandolf/QGLikelihood -o finalize_TTZTrilepton finalize_TTZTrilepton.cpp Ntp1Finalizer.o Ntp1Finalizer_TTZTrilepton.o QGLikelihoodCalculator.o AnalysisJet.o BTagSFUtil.o PUWeight.o $(ROOTFLAG) $(EXTRALIBS)
+
+finalize_TTZTrilepton: Ntp1Finalizer.o Ntp1Finalizer_TTZTrilepton.o finalize_TTZTrilepton.cpp  QGLikelihoodCalculator.o AnalysisJet.o BTagSFUtil.o PUWeight.o SFlightFuncs.o MistagFuncs.o
+	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/ -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -I$(CMSSW_BASE)/src/UserCode/pandolf/QGLikelihood -o finalize_TTZTrilepton finalize_TTZTrilepton.cpp Ntp1Finalizer.o Ntp1Finalizer_TTZTrilepton.o QGLikelihoodCalculator.o AnalysisJet.o BTagSFUtil.o PUWeight.o SFlightFuncs.o MistagFuncs.o $(ROOTFLAG) $(EXTRALIBS)
+
+finalize_TTZTrilepton_SignalSyst: Ntp1Finalizer.o Ntp1Finalizer_TTZTrilepton.o finalize_TTZTrilepton_SignalSyst.cpp  QGLikelihoodCalculator.o AnalysisJet.o BTagSFUtil.o PUWeight.o SFlightFuncs.o MistagFuncs.o
+	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/ -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -I$(CMSSW_BASE)/src/UserCode/pandolf/QGLikelihood -o finalize_TTZTrilepton_SignalSyst finalize_TTZTrilepton_SignalSyst.cpp Ntp1Finalizer.o Ntp1Finalizer_TTZTrilepton.o QGLikelihoodCalculator.o AnalysisJet.o BTagSFUtil.o PUWeight.o SFlightFuncs.o MistagFuncs.o $(ROOTFLAG) $(EXTRALIBS)
+
+finalize_TTZTrilepton_Syst: Ntp1Finalizer.o Ntp1Finalizer_TTZTrilepton.o finalize_TTZTrilepton_Syst.cpp  QGLikelihoodCalculator.o AnalysisJet.o BTagSFUtil.o PUWeight.o SFlightFuncs.o MistagFuncs.o
+	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/ -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -I$(CMSSW_BASE)/src/UserCode/pandolf/QGLikelihood -o finalize_TTZTrilepton_Syst finalize_TTZTrilepton_Syst.cpp Ntp1Finalizer.o Ntp1Finalizer_TTZTrilepton.o QGLikelihoodCalculator.o AnalysisJet.o BTagSFUtil.o PUWeight.o SFlightFuncs.o MistagFuncs.o $(ROOTFLAG) $(EXTRALIBS)
 
 finalize_TTZDilepton: Ntp1Finalizer.o Ntp1Finalizer_TTZDilepton.o finalize_TTZDilepton.cpp  QGLikelihoodCalculator.o AnalysisJet.o BTagSFUtil.o PUWeight.o
 	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/ -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -I$(CMSSW_BASE)/src/UserCode/pandolf/QGLikelihood -o finalize_TTZDilepton finalize_TTZDilepton.cpp Ntp1Finalizer.o Ntp1Finalizer_TTZDilepton.o QGLikelihoodCalculator.o AnalysisJet.o BTagSFUtil.o PUWeight.o $(ROOTFLAG) $(EXTRALIBS)
@@ -41,6 +53,12 @@ drawTTZTrilepton: DrawBase.o fitTools.o drawTTZTrilepton.cpp
 
 drawTTZTrilepton_DATA: DrawBase.o fitTools.o drawTTZTrilepton_DATA.cpp
 	$(CC) -Wall $(INCLUDES) -o drawTTZTrilepton_DATA drawTTZTrilepton_DATA.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
+
+drawSyst: DrawBase.o fitTools.o drawSyst.cpp
+	$(CC) -Wall $(INCLUDES) -o drawSyst drawSyst.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
+
+drawMeasurement_vs_NLO: DrawBase.o fitTools.o drawMeasurement_vs_NLO.cpp
+	$(CC) -Wall $(INCLUDES) -o drawMeasurement_vs_NLO drawMeasurement_vs_NLO.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
 
 
 
@@ -55,8 +73,8 @@ Ntp1Analyzer_TTZ.o: Ntp1Analyzer_TTZ.cc
 Ntp1Finalizer.o: $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/Ntp1Finalizer.C
 	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/ $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/Ntp1Finalizer.C $(ROOTFLAG)
 
-Ntp1Finalizer_TTZTrilepton.o: Ntp1Finalizer_TTZTrilepton.cc BTagSFUtil.o
-	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/ -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -I$(CMSSW_BASE)/src/UserCode/emanuele/CommonTools Ntp1Finalizer_TTZTrilepton.cc BTagSFUtil.o $(ROOTFLAG)
+Ntp1Finalizer_TTZTrilepton.o: Ntp1Finalizer_TTZTrilepton.cc
+	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/ -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -I$(CMSSW_BASE)/src/UserCode/emanuele/CommonTools Ntp1Finalizer_TTZTrilepton.cc  $(ROOTFLAG)
 
 Ntp1Finalizer_TTZDilepton.o: Ntp1Finalizer_TTZDilepton.cc
 	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/ -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -I$(CMSSW_BASE)/src/UserCode/emanuele/CommonTools Ntp1Finalizer_TTZDilepton.cc $(ROOTFLAG)
@@ -93,12 +111,21 @@ DrawBase.o: $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/DrawBase.C fitTools.o
 fitTools.o: $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/fitTools.C
 	$(CC) $(CFLAGS) $(INCLUDES) $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/fitTools.C $(ROOTFLAG) $(EXTRALIBS)
 
+StatTools.o: $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/StatTools.cc
+	$(CC) $(CFLAGS) $(INCLUDES) $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/StatTools.cc $(ROOTFLAG) $(EXTRALIBS)
+
 QGLikelihoodCalculator.o: $(CMSSW_BASE)/src/UserCode/pandolf/QGLikelihood/QGLikelihoodCalculator.C
 	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/QGLikelihood/ $(CMSSW_BASE)/src/UserCode/pandolf/QGLikelihood/QGLikelihoodCalculator.C $(ROOTFLAG)
 
 
 BTagSFUtil.o: $(CMSSW_BASE)/src/UserCode/pandolf/BTagSFUtil/BTagSFUtil.cc
 	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/BTagSFUtil/ $(CMSSW_BASE)/src/UserCode/pandolf/BTagSFUtil/BTagSFUtil.cc $(ROOTFLAG)
+
+SFlightFuncs.o: $(CMSSW_BASE)/src/UserCode/pandolf/BTagSFUtil/SFlightFuncs.cc
+	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/BTagSFUtil/ $(CMSSW_BASE)/src/UserCode/pandolf/BTagSFUtil/SFlightFuncs.cc $(ROOTFLAG)
+
+MistagFuncs.o: $(CMSSW_BASE)/src/UserCode/pandolf/BTagSFUtil/MistagFuncs.cc
+	$(CC) $(CFLAGS) -I$(CMSSW_BASE)/src/UserCode/pandolf/BTagSFUtil/ $(CMSSW_BASE)/src/UserCode/pandolf/BTagSFUtil/MistagFuncs.cc $(ROOTFLAG)
 
 PUWeight.o: $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/PUWeight.C
 	$(CC) $(CFLAGS) $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/PUWeight.C $(ROOTFLAG)
