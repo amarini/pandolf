@@ -12,3 +12,5 @@
 ./merge_and_setWeights DoubleMu_Run2011A_FULL TTZ
 ./merge_and_setWeights MuEG_Run2011B TTZ
 ./merge_and_setWeights MuEG_Run2011A_FULL TTZ
+./merge_and_setWeights SingleMu_Run2011B_v2 TTZ
+./merge_and_setWeights SingleMu_Run2011A_FULL TTZ
