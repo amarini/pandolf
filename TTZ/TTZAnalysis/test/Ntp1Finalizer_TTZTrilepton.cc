@@ -273,7 +273,7 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   h1_partFlavorJet4->Sumw2();
 
 
-  TH1D* h1_mTW = new TH1D("mTW", "", 300, 0., 300.);
+  TH1D* h1_mTW = new TH1D("mTW", "", 700, 0., 700.);
   h1_mTW->Sumw2();
   TH1D* h1_mT_lZmet = new TH1D("mT_lZmet", "", 1000, 0., 1000.);
   h1_mT_lZmet->Sumw2();
@@ -542,8 +542,8 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   PUWeight* fPUWeight = new PUWeight(-1, "2011A", puType);
   //PUWeight* fPUWeight_ave = new PUWeight(-1, "2011A", puType_ave);
   std::string puFileName;
-  puFileName = "all2011AB.pileup_v2_73mb.root";
-  //puFileName = "Pileup_DATA_up_to_178479_SiXie.root";
+  //puFileName = "all2011AB.pileup_v2_73mb.root";
+  puFileName = "Pileup_DATA_up_to_178479_SiXie.root";
   //puFileName = "PileupTruth_v2.root";
   //puFileName = "PileupObs_v2.root";
   //puFileName = "FullData_178078.root"; 
@@ -555,7 +555,7 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   fPUWeight->SetDataHistogram(h1_nPU_data);
 
 
-  //if( dataset_tstr.Contains("spadhi") )
+  if( dataset_tstr.Contains("spadhi") )
     fPUWeight->SetMCHistogram(h1_nPU_gen_);
   
 
@@ -1301,8 +1301,6 @@ ofstream ofs("run_event.txt");
     mt = W.Mt();
 
 
-    h1_mTW->Fill( W.Mt() , eventWeight );
-
     TLorentzVector lZ = lept3 + diLepton;
     TLorentzVector lZ_plusMet = lZ + met;
 
@@ -1381,6 +1379,8 @@ ofstream ofs("run_event.txt");
 
       if( isMZllSignalRegion ) {
 
+        ofs << run << " " << LS << " " << event << std::endl;
+
         h1_pfMet->Fill( pfMet, eventWeight );
         h1_ht->Fill( ht, eventWeight );
         h1_metSignificance->Fill( metSignificance, eventWeight );
@@ -1435,6 +1435,8 @@ ofstream ofs("run_event.txt");
 
 
         h1_deltaRbb->Fill( jetB1.DeltaR(jetB2), eventWeight );
+
+        h1_mTW->Fill( W.Mt() , eventWeight );
 
         h1_mb1jj->Fill( mb1jj, eventWeight );
         h1_mb2jj->Fill( mb2jj, eventWeight );
