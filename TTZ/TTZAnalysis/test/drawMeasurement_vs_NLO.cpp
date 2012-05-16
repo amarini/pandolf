@@ -157,13 +157,13 @@ int main() {
   gr_trilept->SetMarkerSize(2.);
   gr_trilept->SetMarkerColor(38);
 
-  gr_ssdl->SetPoint(0, 0.29, 1.5);
-  gr_ssdl->SetPointError(0, 0.20, 0.23, 0., 0.);
+  gr_ssdl->SetPoint(0, 0.27, 1.5);
+  gr_ssdl->SetPointError(0, 0.20, 0.24, 0., 0.);
   gr_ssdl->SetMarkerStyle(21);
   gr_ssdl->SetMarkerSize(2.);
   gr_ssdl->SetMarkerColor(39);
 
-  gr_combined->SetPoint(0, 0.38, 0.5);
+  gr_combined->SetPoint(0, 0.37, 0.5);
   gr_combined->SetPointError(0, 0.19, 0.19, 0., 0.);
   gr_combined->SetMarkerStyle(20);
   gr_combined->SetMarkerSize(2.);
@@ -200,7 +200,7 @@ int main() {
   label_sqrt->SetTextAlign(31);
   label_sqrt->AddText("CMS Preliminary, L = 4.98 fb ^{-1} at  #sqrt{s} = 7 TeV");
   
-  TH2D* h2_axes = new TH2D("axes", "", 10, 0., 1.8, 1, 0., 3.);
+  TH2D* h2_axes = new TH2D("axes", "", 10, 0., 1.7, 1, 0., 3.);
   h2_axes->GetYaxis()->SetBinLabel(1, "");
   h2_axes->SetXTitle("Cross Section [pb]");
 
