@@ -22,13 +22,13 @@ int main( int argc, char* argv[] ) {
   std::string selectionType(argv[2]);
 
   std::string bTaggerType="TCHE";
-  if( argc==4 ) {
+  if( argc>3 ) {
     std::string bTaggerType_str(argv[3]);
     bTaggerType = bTaggerType_str;
   }
 
   std::string leptType="ALL";
-  if( argc==5 ) {
+  if( argc>4 ) {
     std::string leptType_str(argv[4]);
     leptType = leptType_str;
   }
@@ -53,6 +53,21 @@ int main( int argc, char* argv[] ) {
     nf->addFile("WZJetsTo3LNu_TuneZ2_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1");
     nf->addFile("ZZ_TuneZ2_7TeV_pythia6_tauola_Summer11-PU_S4_START42_V11-v1");
     nf->addFile("WW_TuneZ2_7TeV_pythia6_tauola_Summer11-PU_S4_START42_V11-v1");
+
+  } else if( dataset=="DY_VV" ) {
+
+    nf->addFile("DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Fall11");
+    nf->addFile("WZJetsTo3LNu_TuneZ2_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1");
+    nf->addFile("ZZ_TuneZ2_7TeV_pythia6_tauola_Summer11-PU_S4_START42_V11-v1");
+    nf->addFile("WW_TuneZ2_7TeV_pythia6_tauola_Summer11-PU_S4_START42_V11-v1");
+
+  } else if( dataset=="BG" ) {
+
+    nf->addFile("WZJetsTo3LNu_TuneZ2_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1");
+    nf->addFile("ZZ_TuneZ2_7TeV_pythia6_tauola_Summer11-PU_S4_START42_V11-v1");
+    nf->addFile("WW_TuneZ2_7TeV_pythia6_tauola_Summer11-PU_S4_START42_V11-v1");
+    nf->addFile("TTJ_Fall11_highstat");
+    nf->addFile("DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Fall11");
 
   } else {
   
