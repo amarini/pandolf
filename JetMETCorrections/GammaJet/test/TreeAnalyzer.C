@@ -459,12 +459,12 @@ void TreeAnalyzer::Init(TTree *tree)
        fChain->SetBranchAddress(branchName.c_str(), trackCountingHighEffBJetTags, &b_trackCountingHighEffBJetTags);
        branchName = "simpleSecondaryVertexHighEffBJetTags";
        fChain->SetBranchAddress(branchName.c_str(), simpleSecondaryVertexHighEffBJetTags, &b_simpleSecondaryVertexHighEffBJetTags);
+       branchName = "beta_"+algoType_;
+       fChain->SetBranchAddress(branchName.c_str(), betaJet, &b_betaJet);
+       branchName = "betaStar_"+algoType_;
+       fChain->SetBranchAddress(branchName.c_str(), betaStarJet, &b_betaStarJet);
      }
    }
-   branchName = "betaJet_"+algoType_;
-   fChain->SetBranchAddress(branchName.c_str(), betaJet, &b_betaJet);
-   branchName = "betaStarJet_"+algoType_;
-   fChain->SetBranchAddress(branchName.c_str(), betaStarJet, &b_betaStarJet);
    branchName = "nJetGen_"+jetAlgo_;
    fChain->SetBranchAddress(branchName.c_str(), &nJetGen, &b_nJetGen);
    branchName = "ptJetGen_"+jetAlgo_+" ";
