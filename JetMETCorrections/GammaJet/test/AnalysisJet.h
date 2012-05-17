@@ -43,6 +43,9 @@ class AnalysisJet : public TLorentzVector {
   Float_t ptD;
   Float_t rmsCand;
 
+  Float_t beta;
+  Float_t betaStar;
+
   Float_t eGen;
   Float_t ptGen;
   Float_t etaGen;
