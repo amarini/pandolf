@@ -107,6 +107,8 @@ public :
    Float_t         fRBXJet[100];
    Float_t         ptDJet[100];   
    Float_t         rmsCandJet[100];   
+   Float_t         betaJet[100][100];   
+   Float_t         betaStarJet[100][100];   
    Float_t         trackCountingHighEffBJetTags[100];   
    Float_t         simpleSecondaryVertexHighEffBJetTags[100];   
    Int_t           nChargedHadrons[100];
@@ -314,6 +316,8 @@ public :
    TBranch        *b_fRBXJet;   //!
    TBranch        *b_ptDJet;   //!
    TBranch        *b_rmsCandJet;   //!
+   TBranch        *b_betaJet;   //!
+   TBranch        *b_betaStarJet;   //!
    TBranch        *b_trackCountingHighEffBJetTags;   //!
    TBranch        *b_simpleSecondaryVertexHighEffBJetTags;   //!
    TBranch        *b_nChargedHadrons;   //!

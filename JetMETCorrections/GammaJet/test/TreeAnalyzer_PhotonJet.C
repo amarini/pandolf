@@ -122,6 +122,10 @@ void TreeAnalyzer_PhotonJet::CreateOutputFile() {
   jetTree_->Branch("passed_Photon135", &passed_Photon135_, "passed_Photon135_/O");
   jetTree_->Branch("passed_Photon400", &passed_Photon400_, "passed_Photon400_/O");
 
+  jetTree_->Branch("passed_Photon20_CaloIdVL_IsoL",  &passed_Photon20_CaloIdVL_IsoL_, "passed_Photon20_CaloIdVL_IsoL_/O");
+  jetTree_->Branch("passed_Photon20_CaloIdVL",      &passed_Photon20_CaloIdVL_,      "passed_Photon20_CaloIdVL_/O");
+  jetTree_->Branch("passed_Photon30_CaloIdVL_IsoL",  &passed_Photon30_CaloIdVL_IsoL_, "passed_Photon30_CaloIdVL_IsoL_/O");
+  jetTree_->Branch("passed_Photon30_CaloIdVL",      &passed_Photon30_CaloIdVL_,      "passed_Photon30_CaloIdVL_/O");
   jetTree_->Branch("passed_Photon50_CaloIdVL_IsoL",  &passed_Photon50_CaloIdVL_IsoL_, "passed_Photon50_CaloIdVL_IsoL_/O");
   jetTree_->Branch("passed_Photon50_CaloIdVL",      &passed_Photon50_CaloIdVL_,      "passed_Photon50_CaloIdVL_/O");
   jetTree_->Branch("passed_Photon75_CaloIdVL_IsoL", &passed_Photon75_CaloIdVL_IsoL_, "passed_Photon75_CaloIdVL_IsoL_/O");
@@ -162,6 +166,8 @@ void TreeAnalyzer_PhotonJet::CreateOutputFile() {
   jetTree_->Branch( "ptDJetReco",  &ptDJetReco_,  "ptDJetReco_/F");
   jetTree_->Branch( "rmsCandJetReco",  &rmsCandJetReco_,  "rmsCandJetReco_/F");
   jetTree_->Branch( "QGLikelihoodJetReco",  &QGLikelihoodJetReco_,  "QGLikelihoodJetReco_/F");
+  jetTree_->Branch( "betaJetReco",  &betaJetReco_,  "betaJetReco_/F");
+  jetTree_->Branch( "betaStarJetReco",  &betaStarJetReco_,  "betaStarJetReco_/F");
   jetTree_->Branch("trackCountingHighEffBJetTagsJetReco",  &trackCountingHighEffBJetTagsJetReco_,  "trackCountingHighEffBJetTagsJetReco_/F");
   jetTree_->Branch(  "eJetGen",   &eJetGen_,   "eJetGen_/F");
   jetTree_->Branch(  "ptJetGen",   &ptJetGen_,   "ptJetGen_/F");
@@ -554,6 +560,9 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
        thisJet.ptD = (recoType_=="pf" && jetAlgo_=="akt5") ? ptDJet[iRecoJet] : 0.;
        thisJet.rmsCand = (recoType_=="pf" && jetAlgo_=="akt5") ? rmsCandJet[iRecoJet] : 0.;
 
+       thisJet.beta = betaJet[iRecoJet][0];
+       thisJet.betaStar = betaStarJet[iRecoJet][0];
+
        thisJet.trackCountingHighEffBJetTags = (recoType_=="pf" && jetAlgo_=="akt5") ? trackCountingHighEffBJetTags[iRecoJet] : 0.;
 
        thisJet.nTracksReco = (recoType_=="pf" && jetAlgo_=="akt5") ? nChargedHadrons[iRecoJet] : 0;
@@ -664,7 +673,7 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
        Int_t  nElectronsGen_i = (jetAlgo_=="akt5") ? nElectronsGen[iGenJet] : 0;
 
        Float_t deltaEta = firstJet.etaReco - etaJetGen_i;
-       Float_t deltaPhi = firstJet.phiReco - phiJetGen_i;
+       Float_t deltaPhi = fitTools::delta_phi(firstJet.phiReco, phiJetGen_i);
 
        Float_t deltaR = sqrt( deltaEta*deltaEta + deltaPhi*deltaPhi );
 
@@ -745,10 +754,12 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
      etaJetReco_  =  firstJet.etaReco;
      ptDJetReco_  =  firstJet.ptD;
  rmsCandJetReco_  =  firstJet.rmsCand;
+    betaJetReco_  =  firstJet.beta;
+betaStarJetReco_  =  firstJet.betaStar;
      if( fabs(etaJetReco_)<2.4 ) {
        QGLikelihoodJetReco_  =  qglikeli->computeQGLikelihoodPU( firstJet.ptCorrReco, rhoPF, firstJet.nCharged(), firstJet.nNeutral(), firstJet.ptD );
      } else if(  fabs(etaJetReco_)>3. &&  fabs(etaJetReco_)<5. ) {
-       QGLikelihoodJetReco_  =  qglikeli->computeQGLikelihoodFwd( firstJet.ptCorrReco, rhoPF, firstJet.ptD, -log( firstJet.rmsCand ) );
+       QGLikelihoodJetReco_  =  (firstJet.rmsCand>0.) ? qglikeli->computeQGLikelihoodFwd( firstJet.ptCorrReco, rhoPF, firstJet.ptD, -log( firstJet.rmsCand ) ) : 0.;
      } else {
        QGLikelihoodJetReco_  =  -1.;
      }
@@ -938,6 +949,10 @@ if( DEBUG_VERBOSE_ && passedPhotonID_medium_==true) {
      passed_Photon135_ = (passedTrigger_regexp("HLT_Photon135_v") || passedTrigger_regexp("HLT_Photon135_L1R_v"));
      passed_Photon400_ = (passedTrigger_regexp("HLT_Photon400_v") || passedTrigger_regexp("HLT_Photon400_L1R_v"));
 
+     passed_Photon20_CaloIdVL_IsoL_ = passedTrigger_regexp("HLT_Photon20_CaloIdVL_IsoL_v");
+     passed_Photon20_CaloIdVL_      = passedTrigger_regexp("HLT_Photon20_CaloIdVL_v");
+     passed_Photon30_CaloIdVL_IsoL_ = passedTrigger_regexp("HLT_Photon30_CaloIdVL_IsoL_v");
+     passed_Photon30_CaloIdVL_      = passedTrigger_regexp("HLT_Photon30_CaloIdVL_v");
      passed_Photon50_CaloIdVL_IsoL_ = passedTrigger_regexp("HLT_Photon50_CaloIdVL_IsoL_v");
      passed_Photon50_CaloIdVL_      = passedTrigger_regexp("HLT_Photon50_CaloIdVL_v");
      passed_Photon75_CaloIdVL_IsoL_ = passedTrigger_regexp("HLT_Photon75_CaloIdVL_IsoL_v");

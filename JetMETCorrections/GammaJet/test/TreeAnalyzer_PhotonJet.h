@@ -80,6 +80,10 @@ class TreeAnalyzer_PhotonJet : public TreeAnalyzer {
    Bool_t passed_Photon135_;
    Bool_t passed_Photon400_;
 
+   Bool_t passed_Photon20_CaloIdVL_IsoL_;
+   Bool_t passed_Photon20_CaloIdVL_;
+   Bool_t passed_Photon30_CaloIdVL_IsoL_;
+   Bool_t passed_Photon30_CaloIdVL_;
    Bool_t passed_Photon50_CaloIdVL_IsoL_;
    Bool_t passed_Photon50_CaloIdVL_;
    Bool_t passed_Photon75_CaloIdVL_IsoL_;
@@ -122,6 +126,8 @@ class TreeAnalyzer_PhotonJet : public TreeAnalyzer {
    Float_t  ptDJetReco_;
    Float_t  rmsCandJetReco_;
    Float_t  QGLikelihoodJetReco_;
+   Float_t  betaJetReco_;
+   Float_t  betaStarJetReco_;
    Float_t  trackCountingHighEffBJetTagsJetReco_;
    Float_t   ptJetGen_;
 
