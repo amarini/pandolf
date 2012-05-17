@@ -324,6 +324,8 @@ void TreeAnalyzer::Init(TTree *tree)
  //Float_t nEntries_cut = (Float_t)tree->GetEntries(cutOnPtHat);
  //eventWeight_ = ( (nEntries_cut>0.) && (xsection>0.) ) ? xsection/nEntries_cut : 1.;
 
+   eventWeight_ = 1.;
+
    //will cut on pt_hat, so nCounter needs to be set to number of actual events which will be analyzed:
    char cutOnPtHat[70];
    sprintf( cutOnPtHat, "genpt>%lf && genpt<%lf", (Double_t)ptHatMin_, (Double_t)ptHatMax_);
@@ -459,6 +461,10 @@ void TreeAnalyzer::Init(TTree *tree)
        fChain->SetBranchAddress(branchName.c_str(), simpleSecondaryVertexHighEffBJetTags, &b_simpleSecondaryVertexHighEffBJetTags);
      }
    }
+   branchName = "betaJet_"+algoType_;
+   fChain->SetBranchAddress(branchName.c_str(), betaJet, &b_betaJet);
+   branchName = "betaStarJet_"+algoType_;
+   fChain->SetBranchAddress(branchName.c_str(), betaStarJet, &b_betaStarJet);
    branchName = "nJetGen_"+jetAlgo_;
    fChain->SetBranchAddress(branchName.c_str(), &nJetGen, &b_nJetGen);
    branchName = "ptJetGen_"+jetAlgo_+" ";
@@ -883,6 +889,7 @@ bool TreeAnalyzer::passedTrigger_regexp( const std::string& trigger ) {
   for(unsigned iTrig=0; iTrig<HLTNames->size(); ++iTrig ) {
 
     TString hltname_tstr( HLTNames->at(iTrig) );
+//std::cout << hltname_tstr << std::endl;
     if( hltname_tstr.Contains(regexp) ) {
       if( HLTResults->at(iTrig)==true ) returnBool = true;
       break; // logical OR requires at least one OK
