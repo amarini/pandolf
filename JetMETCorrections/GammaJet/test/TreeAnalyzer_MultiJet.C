@@ -51,6 +51,8 @@ void TreeAnalyzer_MultiJet::CreateOutputFile() {
   jetTree_->Branch("phiJet", phiJet_, "phiJet_[nJet_]/F");
   jetTree_->Branch( "ptDJet",  ptDJet_,  "ptDJet_[nJet_]/F");
   jetTree_->Branch( "rmsCandJet",  rmsCandJet_,  "rmsCandJet_[nJet_]/F");
+  jetTree_->Branch( "betaJet",  betaJet_,  "betaJet_[nJet_]/F");
+  jetTree_->Branch( "betaStarJet",  betaStarJet_,  "betaStarJet_[nJet_]/F");
   jetTree_->Branch( "QGLikelihoodJet",  QGLikelihoodJet_,  "QGLikelihoodJet_[nJet_]/F");
   jetTree_->Branch("trackCountingHighEffBJetTagsJet",  trackCountingHighEffBJetTagsJet_,  "trackCountingHighEffBJetTagsJet_[nJet_]/F");
   jetTree_->Branch("simpleSecondaryVertexHighEffBJetTagsJet",  simpleSecondaryVertexHighEffBJetTagsJet_,  "simpleSecondaryVertexHighEffBJetTagsJet_[nJet_]/F");
@@ -239,6 +241,9 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        thisJet.ptD = ptDJet[iRecoJet];
        thisJet.rmsCand = rmsCandJet[iRecoJet];
 
+       thisJet.beta = betaJet[iRecoJet][0];
+       thisJet.betaStar = betaStarJet[iRecoJet][0];
+
        thisJet.trackCountingHighEffBJetTags = trackCountingHighEffBJetTags[iRecoJet];
        thisJet.simpleSecondaryVertexHighEffBJetTags = simpleSecondaryVertexHighEffBJetTags[iRecoJet];
 
@@ -372,6 +377,9 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
        ptDJet_[iJet]= jets[iJet]->ptD;
        rmsCandJet_[iJet]= jets[iJet]->rmsCand;
+
+       betaJet_[iJet]= jets[iJet]->beta;
+       betaStarJet_[iJet]= jets[iJet]->betaStar;
 
        trackCountingHighEffBJetTagsJet_[iJet]= jets[iJet]->trackCountingHighEffBJetTags;
        simpleSecondaryVertexHighEffBJetTagsJet_[iJet]= jets[iJet]->simpleSecondaryVertexHighEffBJetTags;
