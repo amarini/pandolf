@@ -69,6 +69,8 @@ class TreeAnalyzer_MultiJet : public TreeAnalyzer {
    Float_t etaJet_[20];
    Float_t  ptDJet_[20];
    Float_t  rmsCandJet_[20];
+   Float_t  betaJet_[20];
+   Float_t  betaStarJet_[20];
    Float_t  QGLikelihoodJet_[20];
    Float_t  trackCountingHighEffBJetTagsJet_[20];
    Float_t  simpleSecondaryVertexHighEffBJetTagsJet_[20];
@@ -119,6 +121,8 @@ class TreeAnalyzer_MultiJet : public TreeAnalyzer {
 
    Float_t ht_akt5_;
 
+   Bool_t passed_HT150_;
+   Bool_t passed_HT200_;
    Bool_t passed_HT250_;
    Bool_t passed_HT300_;
    Bool_t passed_HT350_;
