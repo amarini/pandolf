@@ -92,6 +92,8 @@ void computeEfficiency( DrawBase* db, const std::string& varName, const std::str
   c1->SaveAs(canvasName);
 
   delete c1;
+  delete axes;
+  delete legend;
 
 }
 
