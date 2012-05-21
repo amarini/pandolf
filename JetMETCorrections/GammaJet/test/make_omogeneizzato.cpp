@@ -7,6 +7,8 @@
 #include "TTree.h"
 #include "TChain.h"
 
+#include "PUWeight.h"
+
 
 
 Float_t eventWeight_out;
@@ -17,7 +19,9 @@ Int_t nChargedJet0_out;
 Int_t nNeutralJet0_out;
 Float_t ptDJet0_out;
 Float_t rmsCandJet0_out;
+Float_t betaStarJet0_out;
 Float_t QGLikelihoodJet0_out;
+Bool_t matchedToGenJet_out;
 
 
 struct DummyJet {
@@ -29,7 +33,9 @@ struct DummyJet {
   int nNeutral;
   float ptD;
   float rmsCand;
+  float betaStar;
   float QGLikelihood;
+  bool matchedToGenJet;
 
 };
 
@@ -137,6 +143,12 @@ int main( int argc, char* argv[] ) {
   if( controlSample=="DiJet" || controlSample=="MultiJet" )
     chain->SetBranchAddress( "rmsCandJet1", &rmsCandJet1 );
 
+  Float_t betaStarJet0;
+  chain->SetBranchAddress( "betaStarJet0", &betaStarJet0 );
+  Float_t betaStarJet1;
+  if( controlSample=="DiJet" || controlSample=="MultiJet" )
+    chain->SetBranchAddress( "betaStarJet1", &betaStarJet1 );
+
   Float_t QGLikelihoodJet0;
   chain->SetBranchAddress( "QGLikelihoodJet0", &QGLikelihoodJet0 );
   Float_t QGLikelihoodJet1;
@@ -222,6 +234,21 @@ int main( int argc, char* argv[] ) {
   Bool_t btagged;
   if( controlSample=="PhotonJet" )
     chain->SetBranchAddress( "btagged", &btagged);
+  Bool_t matchedToGenJet;
+  chain->SetBranchAddress( "matchedToGenJet", &matchedToGenJet);
+
+
+  std::string puFileName_Photon50 = "pileup_nvertex_QGStudies_pt50_100.root";
+  TFile* filePU_Photon50 = TFile::Open(puFileName_Photon50.c_str());
+  TH1F* h1_nPU_data_Photon50 = (TH1F*)filePU_Photon50->Get("pileupdata");
+  TH1F* h1_nPU_mc_Photon50 = (TH1F*)filePU_Photon50->Get("pileupmc");
+
+  std::string puFileName_Photon90 = "pileup_nvertex_QGStudies_pt100_150.root";
+  TFile* filePU_Photon90 = TFile::Open(puFileName_Photon90.c_str());
+  TH1F* h1_nPU_data_Photon90 = (TH1F*)filePU_Photon90->Get("pileupdata");
+  TH1F* h1_nPU_mc_Photon90 = (TH1F*)filePU_Photon90->Get("pileupmc");
+
+  
 
 
   std::string outfileName = "Omog_" + analyzerType + "_" + dataset + ".root";
@@ -244,7 +271,9 @@ int main( int argc, char* argv[] ) {
   tree_omogeneizzato->Branch( "nNeutralJet0", &nNeutralJet0_out, "nNeutralJet0_out/I" );
   tree_omogeneizzato->Branch( "ptDJet0", &ptDJet0_out, "ptDJet0_out/F" );
   tree_omogeneizzato->Branch( "rmsCandJet0", &rmsCandJet0_out, "rmsCandJet0_out/F" );
+  tree_omogeneizzato->Branch( "betaStarJet0", &betaStarJet0_out, "betaStarJet0_out/F" );
   tree_omogeneizzato->Branch( "QGLikelihoodJet0", &QGLikelihoodJet0_out, "QGLikelihoodJet0_out/F" );
+  tree_omogeneizzato->Branch( "matchedToGenJet", &matchedToGenJet_out, "matchedToGenJet_out/F" );
 
   
   int nEntries = chain->GetEntries();
@@ -264,6 +293,27 @@ int main( int argc, char* argv[] ) {
     }
 
 
+    if( run<5 ) { //mc 
+
+      if( ptJet0>=50. && ptJet0<100. ) {
+
+        //int bin = h1_nPU_mc_Photon50->FindBin( nvertex );
+        float mc_binvalue = h1_nPU_mc_Photon50->GetBinContent(nvertex+1);
+        float data_binvalue = h1_nPU_data_Photon50->GetBinContent(nvertex+1);
+        float puweight = (mc_binvalue>0.) ? data_binvalue/mc_binvalue : 0.;
+        eventWeight *= puweight;
+
+      } else if( ptJet0>=100. && ptJet0<150. ) {
+
+        float mc_binvalue = h1_nPU_mc_Photon90->GetBinContent(nvertex+1);
+        float data_binvalue = h1_nPU_data_Photon90->GetBinContent(nvertex+1);
+        float puweight = (mc_binvalue>0.) ? data_binvalue/mc_binvalue : 0.;
+        eventWeight *= puweight;
+
+      }
+
+    }
+
 
     DummyJet jet0;
     jet0.pt  = ptJet0;
@@ -272,8 +322,10 @@ int main( int argc, char* argv[] ) {
     jet0.nNeutral = nNeutralJet0;
     jet0.ptD = ptDJet0;
     jet0.rmsCand = -log(rmsCandJet0);
+    jet0.betaStar = betaStarJet0;
     jet0.QGLikelihood = QGLikelihoodJet0;
     jet0.pdgId = pdgIdJet0;
+    jet0.matchedToGenJet = matchedToGenJet;
 
     std::vector<DummyJet> jets;
     //if( fabs(jet0.eta)<2.4 ) 
@@ -288,8 +340,10 @@ int main( int argc, char* argv[] ) {
       jet1.nNeutral = nNeutralJet1;
       jet1.ptD = ptDJet1;
       jet1.rmsCand = -log(rmsCandJet1);
+      jet1.betaStar = betaStarJet1;
       jet1.QGLikelihood = QGLikelihoodJet1;
       jet1.pdgId = pdgIdJet1;
+      jet1.matchedToGenJet = matchedToGenJet;
 
       jets.push_back(jet1);
 
@@ -352,8 +406,10 @@ bool fillFromTrigger( TTree* tree, bool passedHLT, float HLTvar, float HLTvar_th
     nNeutralJet0_out = jets[i].nNeutral;
     ptDJet0_out = jets[i].ptD;
     rmsCandJet0_out = jets[i].rmsCand;
+    betaStarJet0_out = jets[i].betaStar;
     pdgIdJet0_out = jets[i].pdgId;
     QGLikelihoodJet0_out = jets[i].QGLikelihood;
+    matchedToGenJet_out = jets[i].matchedToGenJet;
 
     tree->Fill();
 

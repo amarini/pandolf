@@ -18,13 +18,16 @@
 #include <vector>
 #include <cmath>
 
-#include "AnalysisJet.C"
-#include "AnalysisPhoton.C"
+#include "AnalysisJet.h"
+#include "AnalysisPhoton.h"
 
 //#include "/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/CommonTools/PUWeight.C"
 //#include "/cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/UserCode/pandolf/QGLikelihood/QGLikelihoodCalculator.C"
-#include "/shome/pandolf/CMSSW_4_2_8/src/UserCode/pandolf/CommonTools/PUWeight.C"
-#include "/shome/pandolf/CMSSW_4_2_8/src/UserCode/pandolf/QGLikelihood/QGLikelihoodCalculator.C"
+////#include "/shome/pandolf/CMSSW_4_2_8/src/UserCode/pandolf/CommonTools/PUWeight.C"
+////#include "/shome/pandolf/CMSSW_4_2_8/src/UserCode/pandolf/QGLikelihood/QGLikelihoodCalculator.C"
+
+#include "CommonTools/PUWeight.h"
+#include "QGLikelihood/QGLikelihoodCalculator.h"
 
 
 
@@ -326,12 +329,24 @@ void TreeFinalizerC_QGStudies::finalize() {
   tree_->SetBranchAddress("nNeutralHadronsReco", &nNeutralHadronsReco);
   Int_t nPhotonsReco;
   tree_->SetBranchAddress("nPhotonsReco", &nPhotonsReco);
+  Int_t nHFHadronsReco;
+  tree_->SetBranchAddress("nHFHadronsReco", &nHFHadronsReco);
+  Int_t nHFEMReco;
+  tree_->SetBranchAddress("nHFEMReco", &nHFEMReco);
   Float_t eNeutralHadronsReco;
   tree_->SetBranchAddress("eNeutralHadronsReco", &eNeutralHadronsReco);
   Float_t ePhotonsReco;
   tree_->SetBranchAddress("ePhotonsReco", &ePhotonsReco);
+  Float_t eHFHadronsReco;
+  tree_->SetBranchAddress("eHFHadronsReco", &eHFHadronsReco);
+  Float_t eHFEMReco;
+  tree_->SetBranchAddress("eHFEMReco", &eHFEMReco);
   Float_t ptDJetReco;
   tree_->SetBranchAddress("ptDJetReco", &ptDJetReco);
+  Float_t rmsCandJetReco;
+  tree_->SetBranchAddress("rmsCandJetReco", &rmsCandJetReco);
+  Float_t betaStarJetReco;
+  tree_->SetBranchAddress("betaStarJetReco", &betaStarJetReco);
   Float_t QGLikelihoodJetReco;
   tree_->SetBranchAddress("QGLikelihoodJetReco", &QGLikelihoodJetReco);
   Float_t trackCountingHighEffBJetTagsJetReco;
@@ -416,6 +431,7 @@ void TreeFinalizerC_QGStudies::finalize() {
   Bool_t passedID_FULL;
   Bool_t secondJetOK;
   Bool_t btagged;
+  Bool_t matchedToGenJet;
   Float_t eventWeight_noPU;
   Float_t PUWeight_Photon50, PUWeight_Photon90, PUWeight_Photon135;
 
@@ -440,6 +456,8 @@ void TreeFinalizerC_QGStudies::finalize() {
   tree_passedEvents->Branch( "passed_Photon90_CaloIdVL_IsoL", &passed_Photon90_CaloIdVL_IsoL, "passed_Photon90_CaloIdVL_IsoL/O");
   tree_passedEvents->Branch( "passed_Photon135", &passed_Photon135, "passed_Photon135/O");
   tree_passedEvents->Branch( "btagged", &btagged, "btagged/O");
+  tree_passedEvents->Branch( "matchedToGenJet", &matchedToGenJet, "matchedToGenJet/O");
+  tree_passedEvents->Branch( "ptJetGen", &ptJetGen, "ptJetGen/F");
   tree_passedEvents->Branch( "ptPhot", &ptPhotReco, "ptPhotReco/F");
   tree_passedEvents->Branch( "etaPhot", &etaPhotReco, "etaPhotReco/F");
   tree_passedEvents->Branch( "ptJet0", &ptCorrJetReco, "ptCorrJetReco/F");
@@ -449,6 +467,8 @@ void TreeFinalizerC_QGStudies::finalize() {
   tree_passedEvents->Branch( "nChargedJet0", &nTracksReco, "nTracksReco/I");
   tree_passedEvents->Branch( "nNeutralJet0", &nNeutralJetReco, "nNeutralJetReco/I");
   tree_passedEvents->Branch( "ptDJet0", &ptDJetReco, "ptDJetReco/F");
+  tree_passedEvents->Branch( "rmsCandJet0", &rmsCandJetReco, "rmsCandJetReco/F");
+  tree_passedEvents->Branch( "betaStarJet0", &betaStarJetReco, "betaStarJetReco/F");
   tree_passedEvents->Branch( "QGLikelihoodJet0", &QGlikelihood, "QGlikelihood/F");
   tree_passedEvents->Branch( "pdgIdPartJet0", &pdgIdPart, "pdgIdPart/I");
 
@@ -463,12 +483,22 @@ void TreeFinalizerC_QGStudies::finalize() {
   std::string puType = "Spring11_Flat10";
   if( dataset_tstr.Contains("Summer11") ) puType = "Summer11_S4";
 
+  //PUWeight* fPUWeight_Photon50 = new PUWeight(-1, "Photon50", puType);
+  ////std::string puFileName_Photon50 = "pileup_Photon50.root";
+  //std::string puFileName_Photon50 = "pileup_Photon135.root";
+  //TFile* filePU_Photon50 = TFile::Open(puFileName_Photon50.c_str());
+  //TH1F* h1_nPU_data_Photon50 = (TH1F*)filePU_Photon50->Get("pileup");
+  //fPUWeight_Photon50->SetDataHistogram(h1_nPU_data_Photon50);
+
+  // lets try pu reweighing my hand on nvertex distribution:
   PUWeight* fPUWeight_Photon50 = new PUWeight(-1, "Photon50", puType);
   //std::string puFileName_Photon50 = "pileup_Photon50.root";
-  std::string puFileName_Photon50 = "pileup_Photon135.root";
+  std::string puFileName_Photon50 = "pileup_nvertex_QGStudies_pt50_100.root";
   TFile* filePU_Photon50 = TFile::Open(puFileName_Photon50.c_str());
-  TH1F* h1_nPU_data_Photon50 = (TH1F*)filePU_Photon50->Get("pileup");
+  TH1F* h1_nPU_data_Photon50 = (TH1F*)filePU_Photon50->Get("pileupdata");
+  TH1F* h1_nPU_mc_Photon50 = (TH1F*)filePU_Photon50->Get("pileupmc");
   fPUWeight_Photon50->SetDataHistogram(h1_nPU_data_Photon50);
+  fPUWeight_Photon50->SetMCHistogram(h1_nPU_mc_Photon50);
 
   PUWeight* fPUWeight_Photon90 = new PUWeight(-1, "Photon90", puType);
   //std::string puFileName_Photon90 = "pileup_Photon90.root";
@@ -537,10 +567,15 @@ void TreeFinalizerC_QGStudies::finalize() {
 
       // PU reweighting:
       eventWeight_noPU = eventWeight;
-      PUWeight_Photon50 = fPUWeight_Photon50->GetWeight(nPU);
+      PUWeight_Photon50 = fPUWeight_Photon50->GetWeight(nvertex); //try this
       PUWeight_Photon90 = fPUWeight_Photon90->GetWeight(nPU);
       PUWeight_Photon135 = fPUWeight_Photon135->GetWeight(nPU);
-      eventWeight *= PUWeight_Photon135;
+
+      if( ptJetReco<100. )      eventWeight *= 1.;
+      //if( ptJetReco<100. )      eventWeight *= PUWeight_Photon50;
+      else if( ptJetReco<150. ) eventWeight *= 1.;
+      //else if( ptJetReco<150. ) eventWeight *= PUWeight_Photon90;
+      else                      eventWeight *= PUWeight_Photon135;
 
     } else { //it's data: remove duplicate events (if any):
 
@@ -601,12 +636,12 @@ void TreeFinalizerC_QGStudies::finalize() {
     if( ptPhotReco<20. ) continue;
     if( fabs(etaPhotReco)>1.3 ) continue;
     if( clusterMinPhotReco<0.15 ) continue; //protection vs EB spikes
-    if( fabs(etaJetReco)>2.4 ) continue; //jet in tracker region
+    //if( fabs(etaJetReco)>2.4 ) continue; //jet in tracker region
 
     // jet id:
-    if( nTracksReco==0 ) continue;
-    if( (nTracksReco+nPhotonsReco+nNeutralHadronsReco)==1 ) continue;
-    if( ePhotonsReco>0.99 ) continue;
+    if( fabs(etaJetReco)<2.4 && nTracksReco==0 ) continue;
+    if( (nTracksReco+nPhotonsReco+nNeutralHadronsReco+nHFHadronsReco+nHFEMReco)==1 ) continue;
+    if( ePhotonsReco+eHFEMReco>0.99 ) continue;
     if( eNeutralHadronsReco>0.99 ) continue;
 
 
@@ -805,6 +840,17 @@ void TreeFinalizerC_QGStudies::finalize() {
    QGlikelihood = QGLikelihoodJetReco;
   
 
+   TLorentzVector parton;
+   parton.SetPtEtaPhiE( ptPart, etaPart, phiPart, ptPart );
+   TLorentzVector jet;
+   jet.SetPtEtaPhiE( ptCorrJetReco, etaJetReco, phiJetReco, eJetReco*ptCorrJetReco/ptJetReco );
+   TLorentzVector genjet;
+   genjet.SetPtEtaPhiE( ptJetGen, etaJetGen, phiJetGen, eJetGen );
+
+
+   if( isMC ) matchedToGenJet = (jet.DeltaR(genjet)<0.5 && genjet.Pt()/jet.Pt()>0.3);
+   else       matchedToGenJet = true;
+
 
    tree_passedEvents->Fill();
 
@@ -812,10 +858,6 @@ void TreeFinalizerC_QGStudies::finalize() {
     // fill parton matched histos before photon ID:
     if( !btagged ) {
 
-      TLorentzVector parton;
-      parton.SetPtEtaPhiE( ptPart, etaPart, phiPart, ptPart );
-      TLorentzVector jet;
-      jet.SetPtEtaPhiE( ptCorrJetReco, etaJetReco, phiJetReco, eJetReco*ptCorrJetReco/ptJetReco );
 
       if( ptCorrJetReco>30. && ptCorrJetReco<50. ) {
 
