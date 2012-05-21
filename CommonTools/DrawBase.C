@@ -2867,10 +2867,14 @@ std::string DrawBase::get_lumiText() const {
   }
 
   char lumiText[200];
-  if( onlyOneDecimal )
-    sprintf( lumiText, "%.0f %s", lumi4Text, units.c_str());
-  else
-    sprintf( lumiText, "%.1f %s", lumi4Text, units.c_str());
+  if( lumi_==4980. ) { // CMS policy
+    sprintf( lumiText, "%.2f %s", lumi4Text, units.c_str());
+  } else {
+    if( onlyOneDecimal )
+      sprintf( lumiText, "%.0f %s", lumi4Text, units.c_str());
+    else
+      sprintf( lumiText, "%.1f %s", lumi4Text, units.c_str());
+  }
 
   std::string lumiText_str(lumiText);
 
@@ -3106,7 +3110,7 @@ TPaveText* DrawBase::get_labelSqrt( int legendQuadrant ) const {
   TPaveText* label_sqrt = new TPaveText(x1,y1,x2,y2, "brNDC");
   label_sqrt->SetFillColor(kWhite);
   label_sqrt->SetTextSize(0.038);
-  label_sqrt->SetTextFont(42);
+  label_sqrt->SetTextFont(62);
   std::string label_sqrt_text = this->get_sqrtText();
 
 
@@ -3126,10 +3130,12 @@ TPaveText* DrawBase::get_labelSqrt( int legendQuadrant ) const {
           cmsText = "CMS Preliminary";
       }
       std::string lumiText = this->get_lumiText();
-      if( scaleFactor_>=0. )
+      if( scaleFactor_>=0. ) {
         label_sqrt->AddText(Form("%s, L = %s at  #sqrt{s} = 7 TeV", cmsText.c_str(), lumiText.c_str()));
-      else
+std::cout << Form("%s, L = %s at  #sqrt{s} = 7 TeV", cmsText.c_str(), lumiText.c_str()) << std::endl;
+      } else {
         label_sqrt->AddText(Form("%s,  #sqrt{s} = 7 TeV", cmsText.c_str()) );
+      }
     } else { //if lumiOnRightSide
       label_sqrt->AddText("#sqrt{s} = 7 TeV");
     }
