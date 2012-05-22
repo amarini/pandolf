@@ -13,9 +13,9 @@
 
 
 
-void computeEfficiency_vs_eta( DrawBase* db, const std::string& varName, const std::string& axisName, TTree* treedata, TTree* treemc, float ptMin, float ptMax );
+void computeEfficiency_vs_eta( DrawBase* db, const std::string& varName, const std::string& axisName, TTree* treedata, TTree* treemc, float ptMin, float ptMax, bool symm=false );
 void computeEfficiency_vs_pt( DrawBase* db, const std::string& varName, const std::string& axisName, TTree* treedata, TTree* treemc, float etaMin=0., float etaMax=4.7 );
-TGraphAsymmErrors* getSingleEff_vs_eta( const std::string& varName, TTree* tree, float ptMin, float ptMax, bool isData=false );
+TGraphAsymmErrors* getSingleEff_vs_eta( const std::string& varName, TTree* tree, float ptMin, float ptMax, bool symm=false, bool isData=false );
 TGraphAsymmErrors* getSingleEff_vs_pt( const std::string& varName, TTree* tree, float etaMin=0., float etaMax=4.7, bool isData=false );
 
 
@@ -36,30 +36,38 @@ int main() {
   treemc->Add("Omog_QGStudies_QCD_EMEnriched_Summer11.root/omog");
 
 
+  computeEfficiency_vs_eta( db, "rmsCandJet0", "Jet Candidate RMS", treedata, treemc, 30., 50.);
   computeEfficiency_vs_eta( db, "rmsCandJet0", "Jet Candidate RMS", treedata, treemc, 50., 100.);
   computeEfficiency_vs_eta( db, "rmsCandJet0", "Jet Candidate RMS", treedata, treemc, 100., 150.);
 
-  computeEfficiency_vs_eta( db, "betaStarJet0", "Jet #beta*", treedata, treemc, 50., 100.);
-  computeEfficiency_vs_eta( db, "betaStarJet0", "Jet #beta*", treedata, treemc, 100., 150.);
+  computeEfficiency_vs_eta( db, "rmsCandJet0", "Jet Candidate RMS", treedata, treemc, 30., 50., true);
+  computeEfficiency_vs_eta( db, "rmsCandJet0", "Jet Candidate RMS", treedata, treemc, 50., 100., true);
+  computeEfficiency_vs_eta( db, "rmsCandJet0", "Jet Candidate RMS", treedata, treemc, 100., 150., true);
 
+  computeEfficiency_vs_eta( db, "betaStar_and_rmsCandJet0", "#beta* + RMS", treedata, treemc, 30., 50.);
   computeEfficiency_vs_eta( db, "betaStar_and_rmsCandJet0", "#beta* + RMS", treedata, treemc, 50., 100.);
   computeEfficiency_vs_eta( db, "betaStar_and_rmsCandJet0", "#beta* + RMS", treedata, treemc, 100., 150.);
 
-  computeEfficiency_vs_pt( db, "betaStarJet0", "Jet #beta*", treedata, treemc, 0., 4.7);
-  computeEfficiency_vs_pt( db, "betaStarJet0", "Jet #beta*", treedata, treemc, 0., 4.7);
+  computeEfficiency_vs_eta( db, "betaStar_and_rmsCandJet0", "#beta* + RMS", treedata, treemc, 30., 50., true);
+  computeEfficiency_vs_eta( db, "betaStar_and_rmsCandJet0", "#beta* + RMS", treedata, treemc, 50., 100., true);
+  computeEfficiency_vs_eta( db, "betaStar_and_rmsCandJet0", "#beta* + RMS", treedata, treemc, 100., 150., true);
+
+  computeEfficiency_vs_pt( db, "betaStarJet0", "Jet #beta*", treedata, treemc, 0., 2.5);
+  computeEfficiency_vs_pt( db, "rmsCandJet0", "Jet Candidate RMS", treedata, treemc, 0., 4.7);
+  computeEfficiency_vs_pt( db, "betaStar_and_rmsCandJet0", "#beta* + RMS", treedata, treemc, 0., 4.7);
 
   return 0;
 
 }
 
 
-void computeEfficiency_vs_eta( DrawBase* db, const std::string& varName, const std::string& axisName, TTree* treedata, TTree* treemc, float ptMin, float ptMax ) {
+void computeEfficiency_vs_eta( DrawBase* db, const std::string& varName, const std::string& axisName, TTree* treedata, TTree* treemc, float ptMin, float ptMax, bool symm ) {
 
   //std::cout << "Pt bin: " << ptMin << " - " << ptMax << std::endl;
   //std::cout << "Efficiency for " << varName << " (MC): " << getSingleEff_vs_eta( varName, treemc, ptMin, ptMax ) << std::endl;
   //std::cout << "Efficiency for " << varName << " (data): " <<  getSingleEff_vs_eta( varName, treedata, ptMin, ptMax ) << std::endl;
-  TGraphAsymmErrors* effmc = getSingleEff_vs_eta( varName, treemc, ptMin, ptMax );
-  TGraphAsymmErrors* effdata = getSingleEff_vs_eta( varName, treedata, ptMin, ptMax, true );
+  TGraphAsymmErrors* effmc = getSingleEff_vs_eta( varName, treemc, ptMin, ptMax, symm );
+  TGraphAsymmErrors* effdata = getSingleEff_vs_eta( varName, treedata, ptMin, ptMax, symm, true );
 
   effdata->SetMarkerStyle(20);
   effdata->SetMarkerSize(1.6);
@@ -71,17 +79,36 @@ void computeEfficiency_vs_eta( DrawBase* db, const std::string& varName, const s
 
   std::string yAxisTitle = axisName + " Efficiency";
 
-  float yMin = (varName=="betStar_and_rmsCandJet0") ? 0.7 : 0.8;
+  float yMin = (varName=="betaStar_and_rmsCandJet0") ? 0.7 : 0.8;
+  float xMin = (symm) ? 0. : -4.99;
 
-  TH2D* axes = new TH2D("axes", "", 10, -4.99, 4.99, 10, yMin, 1.);
-  axes->SetXTitle("Jet Pseudorapidity");
+  TH2D* axes = new TH2D("axes", "", 10, xMin, 4.99, 10, yMin, 1.);
+  if( symm ) 
+    axes->SetXTitle("Jet |#eta|");
+  else
+    axes->SetXTitle("Jet #eta");
   axes->SetYTitle(yAxisTitle.c_str());
 
   char legendTitle[300];
   sprintf( legendTitle, "%.0f < p_{T} < %.0f GeV", ptMin, ptMax );
 
+  float xmin_l = 0.22;
+  float ymin_l = 0.2 ;
+  float xmax_l = 0.45;
+  float ymax_l = 0.42;
+  if( ptMin==30. ) {
+    xmin_l = 0.4;
+    ymin_l = 0.65;
+    xmax_l = 0.6;
+    ymax_l = 0.87;
+    if( symm ) {
+      xmin_l = 0.2;
+      xmax_l = 0.45;
+    }
+  }
+
   //TLegend* legend = new TLegend( 0.6, 0.2, 0.88, 0.4, axisName.c_str() );
-  TLegend* legend = new TLegend( 0.22, 0.2, 0.45, 0.42, legendTitle );
+  TLegend* legend = new TLegend( xmin_l, ymin_l, xmax_l, ymax_l, legendTitle );
   legend->SetFillColor(0);
   legend->SetTextSize(0.038);
   legend->AddEntry( effdata, "Data", "P" );
@@ -99,7 +126,10 @@ void computeEfficiency_vs_eta( DrawBase* db, const std::string& varName, const s
   label_sqrt->Draw("same");
 
   char canvasName[300];
-  sprintf( canvasName, "eff_%s_pt%.0f_%.0f.eps", varName.c_str(), ptMin, ptMax );
+  if( symm )
+    sprintf( canvasName, "eff_%s_vs_etaSymm_pt%.0f_%.0f.eps", varName.c_str(), ptMin, ptMax );
+  else
+    sprintf( canvasName, "eff_%s_vs_eta_pt%.0f_%.0f.eps", varName.c_str(), ptMin, ptMax );
   c1->SaveAs(canvasName);
 
   delete c1;
@@ -127,10 +157,19 @@ void computeEfficiency_vs_pt( DrawBase* db, const std::string& varName, const st
 
   std::string yAxisTitle = axisName + " Efficiency";
 
-  float yMin = (varName=="betStar_and_rmsCandJet0") ? 0.7 : 0.8;
+  float yMin = (varName=="betaStar_and_rmsCandJet0") ? 0.8 : 0.85;
 
-  TH2D* axes = new TH2D("axes", "", 10, -4.99, 4.99, 10, yMin, 1.);
-  axes->SetXTitle("Jet Pseudorapidity");
+//Double_t xMin, y;
+//effmc->GetPoint( 0, xMin, y);
+//xMin -= effmc->GetErrorXlow(0);
+
+//Double_t xMax;
+//effmc->GetPoint( effmc->GetN(), xMax, y);
+//xMax += effmc->GetErrorXhigh(effmc->GetN());
+
+  TH2D* axes = new TH2D("axes", "", 10, 30., 150., 10, yMin, 1.);
+  //TH2D* axes = new TH2D("axes", "", 10, xMin, xMax, 10, yMin, 1.);
+  axes->SetXTitle("Jet p_{T} [GeV]");
   axes->SetYTitle(yAxisTitle.c_str());
 
   TLegend* legend;
@@ -138,9 +177,9 @@ void computeEfficiency_vs_pt( DrawBase* db, const std::string& varName, const st
   if( etaMin!=0. && etaMax!=4.7 ) {
     char legendTitle[300];
     sprintf( legendTitle, "%.0f < |#eta| < %.0f GeV", etaMin, etaMax );
-    legend = new TLegend( 0.22, 0.2, 0.45, 0.42, legendTitle );
+    legend = new TLegend( 0.62, 0.2, 0.88, 0.42, legendTitle );
   } else {
-    legend = new TLegend( 0.22, 0.2, 0.45, 0.42 );
+    legend = new TLegend( 0.62, 0.2, 0.88, 0.42 );
   }
 
   //TLegend* legend = new TLegend( 0.6, 0.2, 0.88, 0.4, axisName.c_str() );
@@ -161,7 +200,10 @@ void computeEfficiency_vs_pt( DrawBase* db, const std::string& varName, const st
   label_sqrt->Draw("same");
 
   char canvasName[300];
-  sprintf( canvasName, "eff_%s_eta%.0f_%.0f.eps", varName.c_str(), etaMin, etaMax );
+  if( etaMin!=0. && etaMax!=4.7 )
+    sprintf( canvasName, "eff_%s_vs_pt_.eps", varName.c_str() );
+  else
+    sprintf( canvasName, "eff_%s_vs_pt_eta%.0f_%.0f.eps", varName.c_str(), etaMin, 10.*etaMax );
   c1->SaveAs(canvasName);
 
   delete c1;
@@ -171,7 +213,7 @@ void computeEfficiency_vs_pt( DrawBase* db, const std::string& varName, const st
 }
 
 
-TGraphAsymmErrors* getSingleEff_vs_eta( const std::string& varName, TTree* tree, float ptMin, float ptMax, bool isData ) {
+TGraphAsymmErrors* getSingleEff_vs_eta( const std::string& varName, TTree* tree, float ptMin, float ptMax, bool symm, bool isData ) {
 
   // will compute eff vs eta:
   Double_t etaBins[7];
@@ -183,10 +225,24 @@ TGraphAsymmErrors* getSingleEff_vs_eta( const std::string& varName, TTree* tree,
   etaBins[5] = 3.;
   etaBins[6] = 4.7;
 
-  TH1D* h1_denom = new TH1D("denom", "", 6, etaBins );
-  h1_denom->Sumw2();
-  TH1D* h1_num = new TH1D("num", "", 6, etaBins );
-  h1_num->Sumw2();
+  Double_t etaBins_symm[4];
+  etaBins_symm[0] = 0.;
+  etaBins_symm[1] = 2.5;
+  etaBins_symm[2] = 3.;
+  etaBins_symm[3] = 4.7;
+
+  TH1D* h1_denom, *h1_num;
+  if( symm ) {
+    h1_denom = new TH1D("denom", "", 3, etaBins_symm );
+    h1_denom->Sumw2();
+    h1_num = new TH1D("num", "", 3, etaBins_symm );
+    h1_num->Sumw2();
+  } else {
+    h1_denom = new TH1D("denom", "", 6, etaBins );
+    h1_denom->Sumw2();
+    h1_num = new TH1D("num", "", 6, etaBins );
+    h1_num->Sumw2();
+  }
 
 
   std::string varselection;
@@ -271,6 +327,7 @@ TGraphAsymmErrors* getSingleEff_vs_eta( const std::string& varName, TTree* tree,
 }
 
 
+
 TGraphAsymmErrors* getSingleEff_vs_pt( const std::string& varName, TTree* tree, float etaMin, float etaMax, bool isData ) {
 
   // will compute eff vs pt:
@@ -301,33 +358,15 @@ TGraphAsymmErrors* getSingleEff_vs_pt( const std::string& varName, TTree* tree, 
   
 
   char denomselection[700];
-  //sprintf( denomselection, "(%s)", ptselection );
   sprintf( denomselection, "eventWeight*(%s)", etaselection );
 
   char numselection[700];
-  //sprintf( numselection, "(%s && %s)", varselection.c_str(), ptselection );
   sprintf( numselection, "eventWeight*(%s && %s)", varselection.c_str(), etaselection );
 
 
   tree->Project( "denom", "ptJet0", denomselection);
   tree->Project( "num", "ptJet0", numselection);
 
-  //// set bin content to integers:
-  //for( unsigned iBin=1; iBin<h1_denom->GetNbinsX()+1; ++iBin ) {
-  //  h1_denom->SetBinContent(iBin, (int)h1_denom->GetBinContent(iBin) );
-  //  h1_num->SetBinContent(iBin, (int)h1_num->GetBinContent(iBin) );
-  //}
-
-  //TFile* prova = TFile::Open("prova.root", "recreate");
-  //prova->cd();
-  //h1_denom->Write();
-  //h1_num->Write();
-  //prova->Close();
-  //exit(1);
-
-  //TEfficiency* eff_vs_eta = new TEfficiency( *h1_num, *h1_denom );
-  //eff_vs_eta->SetConfidenceLevel(0.683);
-  //eff_vs_eta->SetStatisticOption(TEfficiency::kBUniform);
 
   char effName[300];
   sprintf( effName, "%s_eta%.0f_%.0f", varName.c_str(), etaMin, etaMax );
