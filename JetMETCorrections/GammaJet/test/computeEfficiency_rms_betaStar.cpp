@@ -79,7 +79,7 @@ void computeEfficiency_vs_eta( DrawBase* db, const std::string& varName, const s
 
   std::string yAxisTitle = axisName + " Efficiency";
 
-  float yMin = (varName=="betaStar_and_rmsCandJet0") ? 0.7 : 0.8;
+  float yMin = 0.7;
   float xMin = (symm) ? 0. : -4.99;
 
   TH2D* axes = new TH2D("axes", "", 10, xMin, 4.99, 10, yMin, 1.);
@@ -157,7 +157,7 @@ void computeEfficiency_vs_pt( DrawBase* db, const std::string& varName, const st
 
   std::string yAxisTitle = axisName + " Efficiency";
 
-  float yMin = (varName=="betaStar_and_rmsCandJet0") ? 0.8 : 0.85;
+  float yMin = (varName=="betaStar") ? 0.8 : 0.7;
 
 //Double_t xMin, y;
 //effmc->GetPoint( 0, xMin, y);
