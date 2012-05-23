@@ -13,7 +13,7 @@
 #include "QGLikelihood/QGLikelihoodCalculator.h"
 #include "HelicityLikelihoodDiscriminant/HelicityLikelihoodDiscriminant.h"
 #include "KinematicFit/DiJetKinFitter.h"
-#include "BTagSFUtil/BTagSFUtil.h"
+#include "BTagSFUtil/interface/BTagSFUtil.h"
 
 #include "PUWeight.h"
 
@@ -209,6 +209,8 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   h1_mZll_OF2_prepresel->Sumw2();
   TH1D* h1_mZll_OF3_prepresel = new TH1D("mZll_OF3_prepresel", "", 220, 50., 160.);
   h1_mZll_OF3_prepresel->Sumw2();
+  TH1D* h1_mZll_OF_presel = new TH1D("mZll_OF_presel", "", 220, 50., 160.);
+  h1_mZll_OF_presel->Sumw2();
   TH1D* h1_mZll_presel = new TH1D("mZll_presel", "", 220, 50., 160.);
   h1_mZll_presel->Sumw2();
   TH1D* h1_mZll_presel_antibtag = new TH1D("mZll_presel_antibtag", "", 220, 50., 160.);
@@ -245,6 +247,8 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   h1_bTagJetB2->Sumw2();
 
 
+  TH1D* h1_ptJetMax = new TH1D("ptJetMax", "", 500, 20., 520.);
+  h1_ptJetMax->Sumw2();
   TH1D* h1_ptJetB1 = new TH1D("ptJetB1", "", 400, 20., 420.);
   h1_ptJetB1->Sumw2();
   TH1D* h1_ptJetB2 = new TH1D("ptJetB2", "", 400, 20., 420.);
@@ -601,6 +605,7 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   int njets;
   int nBjets_loose;
   int nBjets_medium;
+  float ptJetMax_t;
   float ht, mt;
   float mT_lZmet;
   float mb1jj;
@@ -672,6 +677,7 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   tree_passedEvents->Branch("mTb2WZ"    , &mTb2WZ    , "mTb2WZ/F");
   tree_passedEvents->Branch("mTbWZ_best", &mTbWZ_best, "mTbWZ_best/F");
   tree_passedEvents->Branch("mTbWZ_max", &mTbWZ_max, "mTbWZ_max/F");
+  tree_passedEvents->Branch("ptJetMax", &ptJetMax_t, "ptJetMax_t/F");
       
 
 
@@ -813,6 +819,15 @@ ofstream ofs("run_event.txt");
         ValueAndError effSingle1_Run2011B = getMuonHLTSF_SingleTrigger( ptLeptZ1, etaLeptZ1, "Run2011B");
         ValueAndError effSingle2_Run2011B = getMuonHLTSF_SingleTrigger( ptLeptZ2, etaLeptZ2, "Run2011B");
 
+        //effSingle1_Run2011A1.val = 0.;
+        //effSingle1_Run2011A2.val = 0.;
+        //effSingle1_Run2011A3.val = 0.;
+        //effSingle1_Run2011B.val = 0.;
+
+        //effSingle2_Run2011A1.val = 0.;
+        //effSingle2_Run2011A2.val = 0.;
+        //effSingle2_Run2011A3.val = 0.;
+        //effSingle2_Run2011B.val = 0.;
 
         ValueAndError HLTSF_Run2011A1 = getEventHLTSF( effSingle1_Run2011A1, effSingle2_Run2011A1, effDouble1_Run2011A, effDouble2_Run2011A );
         ValueAndError HLTSF_Run2011A2 = getEventHLTSF( effSingle1_Run2011A2, effSingle2_Run2011A2, effDouble1_Run2011A, effDouble2_Run2011A );
@@ -1105,41 +1120,6 @@ ofstream ofs("run_event.txt");
       AnalysisJet thisJet = selectedJets[iJet];
 
       if( thisJet==jetB1 || thisJet==jetB2 ) continue;
-      //if( iJet==i_jetB1 || iJet==i_jetB2 ) continue;
- 
-      //if( ptJet_corr < ptJet_thresh_ ) continue;
-      //if( fabs(etaJet[iJet]) > etaJet_thresh_ ) continue;
-
-      //AnalysisJet thisJet;
-      //thisJet.SetPtEtaPhiE( ptJet_corr, etaJet[iJet], phiJet[iJet], eJet[iJet]);
-
-      //thisJet.rmsCand = rmsCandJet[iJet];
-      //thisJet.ptD = ptDJet[iJet];
-      //thisJet.nCharged = nChargedJet[iJet];
-      //thisJet.nNeutral = nNeutralJet[iJet];
-      //thisJet.eMuons = eMuonsJet[iJet]/thisJet.Energy();
-      //thisJet.eElectrons = eElectronsJet[iJet]/thisJet.Energy();
-
-      //thisJet.trackCountingHighEffBJetTag = trackCountingHighEffBJetTagJet[iJet];
-      //thisJet.trackCountingHighPurBJetTag = trackCountingHighPurBJetTagJet[iJet];
-      //thisJet.simpleSecondaryVertexHighEffBJetTag = simpleSecondaryVertexHighEffBJetTagJet[iJet];
-      //thisJet.simpleSecondaryVertexHighPurBJetTag = simpleSecondaryVertexHighPurBJetTagJet[iJet];
-      //thisJet.jetBProbabilityBJetTag              = jetBProbabilityBJetTagJet[iJet];
-      //thisJet.jetProbabilityBJetTag               = jetProbabilityBJetTagJet[iJet];
-
-      //thisJet.ptGen = ptGenJet[iJet];
-      //thisJet.etaGen = etaGenJet[iJet];
-      //thisJet.phiGen = phiGenJet[iJet];
-      //thisJet.eGen = eGenJet[iJet];
-
-      //if( isMC ) {
-      //  TLorentzVector parton;
-      //  parton.SetPtEtaPhiE( thisJet.Pt(), etaPartJet[iJet], phiPartJet[iJet], thisJet.Energy() );
-      //  float deltaR = parton.DeltaR( thisJet );
-      //  thisJet.pdgIdPart = (deltaR<0.5) ? pdgIdPartJet[iJet] : 21; //needed only for btag SF's
-      //} else {
-      //  thisJet.pdgIdPart = 0;
-      //}
 
 
       if( istep==0 ) {
@@ -1179,6 +1159,8 @@ ofstream ofs("run_event.txt");
 
 
 
+    bool passed_thirdLept = ( nLept>0 && ptLept[0]>ptLept3_thresh_ && combinedIsoRelLept[0]<combinedIsoRelLept3_thresh_ );
+
 
     if( leptType<=1 ) {
       h1_mZll_prepresel->Fill( diLepton.M(), eventWeight );
@@ -1194,6 +1176,10 @@ ofstream ofs("run_event.txt");
         h1_mZll_OF2_prepresel->Fill( diLepton.M(), eventWeight );
       if( leptType==3 )
         h1_mZll_OF3_prepresel->Fill( diLepton.M(), eventWeight );
+
+      if( passed_thirdLept )  // this is presel
+        h1_mZll_OF_presel->Fill( diLepton.M(), eventWeight );
+
       continue;
     }
 
@@ -1204,7 +1190,7 @@ ofstream ofs("run_event.txt");
     if( nBjets_medium == 0 ) {
     //if( !passed_btag ) {
       h1_mZll_prepresel_antibtag->Fill( diLepton.M(), eventWeight );
-      if( nLept>0 )
+      if( passed_thirdLept )
         h1_mZll_presel_antibtag->Fill( diLepton.M(), eventWeight );
     }
 
@@ -1285,10 +1271,6 @@ ofstream ofs("run_event.txt");
     //std::cout << std::endl << std::endl << std::endl;
 
    
-    h1_nJets->Fill( njets , eventWeight );
-    h1_nBJets_loose->Fill( nBjets_loose , eventWeight );
-    h1_nBJets_medium->Fill( nBjets_medium , eventWeight );
-
 
 
     // define all kinematic variables:
@@ -1309,6 +1291,10 @@ ofstream ofs("run_event.txt");
 
     ptJetB1_t = jetB1.Pt();
     ptJetB2_t = jetB2.Pt();
+
+    float ptMax_bjets = TMath::Max(ptJetB1_t,ptJetB2_t);
+    float ptMax_jets = TMath::Max(jet3.Pt(),jet4.Pt());
+    ptJetMax_t = TMath::Max( ptMax_bjets,ptMax_jets );
 
     TLorentzVector b1jj = jetB1 + jet3 + jet4;
     TLorentzVector b2jj = jetB2 + jet3 + jet4;
@@ -1367,6 +1353,7 @@ ofstream ofs("run_event.txt");
 
     if( ht<ht_thresh_ ) continue;
     if( mbjjZ_best<mbjjZ_best_thresh_ ) continue;
+    if( ptJetMax_t<ptJetMax_thresh_ ) continue;
 
 
 
@@ -1380,6 +1367,10 @@ ofstream ofs("run_event.txt");
       if( isMZllSignalRegion ) {
 
         ofs << run << " " << LS << " " << event << std::endl;
+
+        h1_nJets->Fill( njets , eventWeight );
+        h1_nBJets_loose->Fill( nBjets_loose , eventWeight );
+        h1_nBJets_medium->Fill( nBjets_medium , eventWeight );
 
         h1_pfMet->Fill( pfMet, eventWeight );
         h1_ht->Fill( ht, eventWeight );
@@ -1402,6 +1393,7 @@ ofstream ofs("run_event.txt");
         h1_etaZll->Fill( diLepton.Eta(), eventWeight );
 
 
+        h1_ptJetMax->Fill( TMath::Max( ptMax_bjets,ptMax_jets ), eventWeight );
         h1_ptJetB1->Fill( ptJetB1_t, eventWeight );
         h1_ptJetB2->Fill( ptJetB2_t, eventWeight );
         h1_ptJet3->Fill( jet3.Pt(), eventWeight );
@@ -1597,6 +1589,7 @@ ofstream ofs("run_event.txt");
   h1_mZll_OF_prepresel->Write();
   h1_mZll_OF2_prepresel->Write();
   h1_mZll_OF3_prepresel->Write();
+  h1_mZll_OF_presel->Write();
   h1_mZll_presel->Write();
   h1_mZll_presel_antibtag->Write();
   h1_mZll->Write();
@@ -1622,6 +1615,7 @@ ofstream ofs("run_event.txt");
   h1_bTagJetB2->Write();
 
 
+  h1_ptJetMax->Write();
   h1_ptJetB1->Write();
   h1_ptJetB2->Write();
   h1_ptJet3->Write();
@@ -1691,6 +1685,34 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
     nBjets_loose_thresh_ = 0;
     nBjets_medium_thresh_ = 0;
 
+    mZll_threshLo_ = 0.;
+    mZll_threshHi_ = 10000.;
+
+    ptZll_thresh_ = 0.;
+
+    met_thresh_ = 0.;
+    ht_thresh_ = 0.;
+    mbjjZ_best_thresh_ = 0.;
+    ptJetMax_thresh_ = 0.;
+ 
+  } else if( selectionType_=="presel_plusZ" ) {
+
+    ptLeptZ1_thresh_ = 20.;
+    ptLeptZ2_thresh_ = 20.;
+    ptLept3_thresh_ = 10.;
+    etaLeptZ1_thresh_ = 3.;
+    etaLeptZ2_thresh_ = 3.;
+    etaLept3_thresh_ = 3.;
+
+    combinedIsoRelLept3_thresh_ = 1.;
+
+    ptJet_thresh_ = 20.;
+    etaJet_thresh_ = 2.4;
+
+    njets_thresh_ = 3;
+    nBjets_loose_thresh_ = 0;
+    nBjets_medium_thresh_ = 0;
+
     mZll_threshLo_ = 70.;
     mZll_threshHi_ = 110.;
 
@@ -1699,6 +1721,7 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
     met_thresh_ = 0.;
     ht_thresh_ = 0.;
     mbjjZ_best_thresh_ = 0.;
+    ptJetMax_thresh_ = 0.;
  
   } else if( selectionType_=="preselplus" ) {
 
@@ -1726,6 +1749,7 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
     met_thresh_ = 30.;
     ht_thresh_ = 0.;
     mbjjZ_best_thresh_ = 0.;
+    ptJetMax_thresh_ = 0.;
  
   } else if( selectionType_=="sel1" ) {
 
@@ -1753,6 +1777,7 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
     met_thresh_ = 30.;
     ht_thresh_ = 0.;
     mbjjZ_best_thresh_ = 0.;
+    ptJetMax_thresh_ = 0.;
 
   } else if( selectionType_=="sel2" ) {
 
@@ -1807,6 +1832,7 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
     met_thresh_ = 0.;
     ht_thresh_ = 0.;
     mbjjZ_best_thresh_ = 0.;
+    ptJetMax_thresh_ = 0.;
 
   } else if( selectionType_=="optsel1" ) {
 
@@ -1834,6 +1860,7 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
     met_thresh_ = 30.;
     ht_thresh_ = 184.;
     mbjjZ_best_thresh_ = 0.;
+    ptJetMax_thresh_ = 0.;
 
   } else if( selectionType_=="optsel2" ) {
 
@@ -1861,6 +1888,7 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
     met_thresh_ = 30.;
     ht_thresh_ = 0.;
     mbjjZ_best_thresh_ = 200.;
+    ptJetMax_thresh_ = 0.;
 
   } else if( selectionType_=="optsel2_noHT" ) {
 
@@ -1888,6 +1916,7 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
     met_thresh_ = 30.;
     ht_thresh_ = 0.;
     mbjjZ_best_thresh_ = 0.;
+    ptJetMax_thresh_ = 0.;
 
   } else if( selectionType_=="optsel3" ) {
 
@@ -1915,6 +1944,7 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
     met_thresh_ = 0.;
     ht_thresh_ = 120.;
     mbjjZ_best_thresh_ = 0.;
+    ptJetMax_thresh_ = 50.;
 
   } else if( selectionType_=="presel_2LB_1MB" ) {
 
@@ -1942,6 +1972,7 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
     met_thresh_ = 0.;
     ht_thresh_ = 120.;
     mbjjZ_best_thresh_ = 0.;
+    ptJetMax_thresh_ = 0.;
 
 
   } else {
