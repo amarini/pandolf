@@ -75,8 +75,8 @@ int main( int argc, char* argv[] ) {
   tree->SetBranchAddress("passed_HLT_Mu17_Mu8", &passed_HLT_Mu17_Mu8);
   Bool_t passed_HLT_IsoMu24;
   tree->SetBranchAddress("passed_HLT_IsoMu24", &passed_HLT_IsoMu24);
-  Bool_t passed_HLT_IsoMu24_eta2p1;
-  tree->SetBranchAddress("passed_HLT_IsoMu24_eta2p1", &passed_HLT_IsoMu24_eta2p1);
+  //Bool_t passed_HLT_IsoMu24_eta2p1;
+  //tree->SetBranchAddress("passed_HLT_IsoMu24_eta2p1", &passed_HLT_IsoMu24_eta2p1);
   Bool_t passed_HLT_Mu17_Ele8_CaloIdL;
   if( analysisType_=="TTW" || analysisType_=="TTZ" )
     tree->SetBranchAddress("passed_HLT_Mu17_Ele8_CaloIdL", &passed_HLT_Mu17_Ele8_CaloIdL);
@@ -134,7 +134,8 @@ int main( int argc, char* argv[] ) {
 
     if( dataset_tstr.BeginsWith("SingleMu") ) {
 
-      bool passedHLT = (passed_HLT_IsoMu24 || passed_HLT_IsoMu24_eta2p1)
+      //bool passedHLT = (passed_HLT_IsoMu24 || passed_HLT_IsoMu24_eta2p1)
+      bool passedHLT = (passed_HLT_IsoMu24 )
                     && !passed_HLT_DoubleMu7 && !passed_HLT_Mu13_Mu8 && !passed_HLT_Mu17_Mu8
                     && !passed_HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL && !passed_HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL
                     && !passed_HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL;
@@ -142,7 +143,7 @@ int main( int argc, char* argv[] ) {
       //explicit HLT matching required (at least one of them):
       if( analysisType_ == "TTZ" ) {
         passedHLT = passedHLT && !(passed_HLT_Mu17_Ele8_CaloIdL || passed_HLT_Mu8_Ele17_CaloIdL || passed_HLT_Mu8_Ele17_CaloIdT_CaloIsoVL);
-        passedHLT = passedHLT && ( matchedToHLTLeptZ1 || matchedToHLTLeptZ2 );
+      //  passedHLT = passedHLT && ( matchedToHLTLeptZ1 || matchedToHLTLeptZ2 );
       }
 
 
@@ -152,9 +153,9 @@ int main( int argc, char* argv[] ) {
 
       bool passedHLT = passed_HLT_DoubleMu7 || passed_HLT_Mu13_Mu8 || passed_HLT_Mu17_Mu8;
 
-      //explicit HLT matching required (both of them):
-      if( analysisType_ == "TTZ" ) 
-        passedHLT = passedHLT && ( matchedToHLTLeptZ1 && matchedToHLTLeptZ2 );
+    ////explicit HLT matching required (both of them):
+    //if( analysisType_ == "TTZ" ) 
+    //  passedHLT = passedHLT && ( matchedToHLTLeptZ1 && matchedToHLTLeptZ2 );
 
       if( !passedHLT ) continue;
 
@@ -167,9 +168,9 @@ int main( int argc, char* argv[] ) {
       if( analysisType_ == "TTW" )
         passedHLT = passedHLT && !passed_HLT_Mu17_Ele8_CaloIdL && !passed_HLT_Mu8_Ele17_CaloIdL && !passed_HLT_Mu8_Ele17_CaloIdT_CaloIsoVL;
 
-      //explicit HLT matching required (both of them):
-      if( analysisType_ == "TTZ" ) 
-        passedHLT = passedHLT && ( matchedToHLTLeptZ1 && matchedToHLTLeptZ2 );
+   // //explicit HLT matching required (both of them):
+   // if( analysisType_ == "TTZ" ) 
+   //   passedHLT = passedHLT && ( matchedToHLTLeptZ1 && matchedToHLTLeptZ2 );
 
       if( !passedHLT ) continue;
 
@@ -626,9 +627,10 @@ float getWeight( const std::string& dataset, int nEvents ) {
   } else if( dataset_tstr.BeginsWith("WWTo2L2Nu") ) {
     xSection = 42.9*0.108*2.*0.108*2.;
   } else if( dataset_tstr.BeginsWith("WZtoAnything")||dataset_tstr.BeginsWith("WZ_") ) {
-    xSection = 18.3;//## //MCFM NLO see http://ceballos.web.cern.ch/ceballos/hwwlnln/cross_sections_backgrounds.txt
+    xSection = 17.0; // measured in CMS PAS EWK 11-010
+    //xSection = 18.3;//## //MCFM NLO see http://ceballos.web.cern.ch/ceballos/hwwlnln/cross_sections_backgrounds.txt
   } else if( dataset_tstr.BeginsWith("WZTo3LNu") || dataset_tstr.BeginsWith("WZJetsTo3LNu") ) {
-    xSection = 0.558; // measured in CMS PAS 11-259
+    xSection = 0.558; // measured in CMS PAS EWK 11-010
     //xSection = 18.3*0.108*3.*0.0337*3.; 
   } else if( dataset_tstr.BeginsWith("TTZ") ) {
     xSection = 0.139; //taken from https://twiki.cern.ch/twiki/bin/viewauth/CMS/SameSignDilepton2011#MC_samples_for_the_2011_paper
@@ -686,13 +688,9 @@ float getWeight( const std::string& dataset, int nEvents ) {
     xSection = 7.466;
   } else if( dataset_tstr.BeginsWith("WJetsToLNu") ) {//## W+Jets
     xSection = 31314.; //NNLO taken from https://twiki.cern.ch/twiki/pub/CMS/GeneratorMain/ShortXsec.pdf
-  } else if( dataset=="DYToEE_M-10To20_TuneZ2_7TeV-pythia6_Spring11-PU_S1_START311_V1G1-v1_2" ) {//## DY. EE 10to20
+  } else if( dataset_tstr.BeginsWith("DYToEE_M-10To20") || dataset_tstr.BeginsWith("DYToMuMu_M-10To20") ) {//## DY. EE 10to20
     xSection = 3457./3.;//##
-  } else if( dataset=="DYToEE_M-20_TuneZ2_7TeV-pythia6_Spring11-PU_S1_START311_V1G1-v1_2" ) {//## DY. EE >20
-    xSection = 4819.6/3.;//##
-  } else if( dataset=="DYToMuMu_M-10To20_TuneZ2_7TeV-pythia6_Spring11-PU_S1_START311_V1G1-v1_2" ) {//## DY. MUMU 10to20
-    xSection = 3457./3.;//##
-  } else if( dataset=="DYToMuMu_M-20_TuneZ2_7TeV-pythia6_Spring11-PU_S1_START311_V1G1-v1_2" ) {//## DY. MUMU >20
+  } else if( dataset_tstr.BeginsWith("DYToEE_M-20") || dataset_tstr.BeginsWith("DYToMuMu_M-20") ) {//## DY. EE >20
     xSection = 4819.6/3.;//##
   } else {
     std::cout << std::endl << std::endl;
