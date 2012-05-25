@@ -410,6 +410,8 @@ void TreeFinalizerC_QGStudies::finalize() {
   Bool_t passed_Photon135;
   tree_->SetBranchAddress("passed_Photon135", &passed_Photon135);
 
+  Bool_t passed_Photon30_CaloIdVL;
+  tree_->SetBranchAddress("passed_Photon30_CaloIdVL", &passed_Photon30_CaloIdVL);
   Bool_t passed_Photon50_CaloIdVL;
   tree_->SetBranchAddress("passed_Photon50_CaloIdVL", &passed_Photon50_CaloIdVL);
   Bool_t passed_Photon75_CaloIdVL;
@@ -417,6 +419,8 @@ void TreeFinalizerC_QGStudies::finalize() {
   Bool_t passed_Photon90_CaloIdVL;
   tree_->SetBranchAddress("passed_Photon90_CaloIdVL", &passed_Photon90_CaloIdVL);
 
+  Bool_t passed_Photon30_CaloIdVL_IsoL;
+  tree_->SetBranchAddress("passed_Photon30_CaloIdVL_IsoL", &passed_Photon30_CaloIdVL_IsoL);
   Bool_t passed_Photon50_CaloIdVL_IsoL;
   tree_->SetBranchAddress("passed_Photon50_CaloIdVL_IsoL", &passed_Photon50_CaloIdVL_IsoL);
   Bool_t passed_Photon75_CaloIdVL_IsoL;
@@ -432,6 +436,7 @@ void TreeFinalizerC_QGStudies::finalize() {
   Bool_t secondJetOK;
   Bool_t btagged;
   Bool_t matchedToGenJet;
+  Float_t deltaPhi_jet;
   Float_t eventWeight_noPU;
   Float_t PUWeight_Photon50, PUWeight_Photon90, PUWeight_Photon135;
 
@@ -448,9 +453,11 @@ void TreeFinalizerC_QGStudies::finalize() {
   tree_passedEvents->Branch( "passedID_no2ndJet", &passedID_no2ndJet, "passedID_no2ndJet/O");
   tree_passedEvents->Branch( "passedPhotonID", &passedID_FULL, "passedID_FULL/O");
   tree_passedEvents->Branch( "secondJetOK", &secondJetOK, "secondJetOK/O");
+  tree_passedEvents->Branch( "passed_Photon30_CaloIdVL", &passed_Photon30_CaloIdVL, "passed_Photon30_CaloIdVL/O");
   tree_passedEvents->Branch( "passed_Photon50_CaloIdVL", &passed_Photon50_CaloIdVL, "passed_Photon50_CaloIdVL/O");
   tree_passedEvents->Branch( "passed_Photon75_CaloIdVL", &passed_Photon75_CaloIdVL, "passed_Photon75_CaloIdVL/O");
   tree_passedEvents->Branch( "passed_Photon90_CaloIdVL", &passed_Photon90_CaloIdVL, "passed_Photon90_CaloIdVL/O");
+  tree_passedEvents->Branch( "passed_Photon30_CaloIdVL_IsoL", &passed_Photon30_CaloIdVL_IsoL, "passed_Photon30_CaloIdVL_IsoL/O");
   tree_passedEvents->Branch( "passed_Photon50_CaloIdVL_IsoL", &passed_Photon50_CaloIdVL_IsoL, "passed_Photon50_CaloIdVL_IsoL/O");
   tree_passedEvents->Branch( "passed_Photon75_CaloIdVL_IsoL", &passed_Photon75_CaloIdVL_IsoL, "passed_Photon75_CaloIdVL_IsoL/O");
   tree_passedEvents->Branch( "passed_Photon90_CaloIdVL_IsoL", &passed_Photon90_CaloIdVL_IsoL, "passed_Photon90_CaloIdVL_IsoL/O");
@@ -471,6 +478,7 @@ void TreeFinalizerC_QGStudies::finalize() {
   tree_passedEvents->Branch( "betaStarJet0", &betaStarJetReco, "betaStarJetReco/F");
   tree_passedEvents->Branch( "QGLikelihoodJet0", &QGlikelihood, "QGlikelihood/F");
   tree_passedEvents->Branch( "pdgIdPartJet0", &pdgIdPart, "pdgIdPart/I");
+  tree_passedEvents->Branch( "deltaPhi_jet", &deltaPhi_jet, "deltaPhi_jet/F");
 
 
 
@@ -671,7 +679,7 @@ void TreeFinalizerC_QGStudies::finalize() {
 
     //leading jet and photon back2back in transverse plane
     bool back2back = true;
-    Float_t deltaPhi_jet = fabs(delta_phi(phiPhotReco, phiJetReco));
+    deltaPhi_jet = fabs(delta_phi(phiPhotReco, phiJetReco));
     Float_t pi = TMath::Pi();
     float deltaPhiThreshold = 1.;
     if( fabs(deltaPhi_jet) < (pi - deltaPhiThreshold) ) back2back = false; //loose back to back for now
@@ -848,7 +856,7 @@ void TreeFinalizerC_QGStudies::finalize() {
    genjet.SetPtEtaPhiE( ptJetGen, etaJetGen, phiJetGen, eJetGen );
 
 
-   if( isMC ) matchedToGenJet = (jet.DeltaR(genjet)<0.5 && genjet.Pt()/jet.Pt()>0.3);
+   if( isMC ) matchedToGenJet = (jet.DeltaR(genjet)<0.25 && genjet.Pt()/jet.Pt()>0.3);
    else       matchedToGenJet = true;
 
 
