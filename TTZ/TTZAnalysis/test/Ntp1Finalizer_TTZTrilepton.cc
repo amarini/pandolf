@@ -247,6 +247,8 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   h1_bTagJetB2->Sumw2();
 
 
+  TH1D* h1_ptJetMax_prepresel = new TH1D("ptJetMax_prepresel", "", 500, 20., 520.);
+  h1_ptJetMax_prepresel->Sumw2();
   TH1D* h1_ptJetMax = new TH1D("ptJetMax", "", 500, 20., 520.);
   h1_ptJetMax->Sumw2();
   TH1D* h1_ptJetB1 = new TH1D("ptJetB1", "", 400, 20., 420.);
@@ -979,6 +981,7 @@ ofstream ofs("run_event.txt");
 
     std::vector< TLorentzVector > selectedJets;
 
+    ptJetMax_t = 0.;
 
     for( unsigned iJet=0; iJet<nJets; ++iJet) {
 
@@ -1000,6 +1003,7 @@ ofstream ofs("run_event.txt");
       }
       
 
+      if( ptJet_corr > ptJetMax_t ) ptJetMax_t = ptJet_corr;
       if( ptJet_corr < ptJet_thresh_ ) continue;
       if( fabs(etaJet[iJet]) > etaJet_thresh_ ) continue;
 
@@ -1095,6 +1099,7 @@ ofstream ofs("run_event.txt");
 
 
     if( njets < njets_thresh_ ) continue;
+    if( ptJetMax_t < ptJetMax_thresh_ ) continue;
     //if( nBjets_loose < nBjets_loose_thresh_ ) continue;
     //if( nBjets_medium < nBjets_medium_thresh_ ) continue;
 
@@ -1163,6 +1168,7 @@ ofstream ofs("run_event.txt");
 
 
     if( leptType<=1 ) {
+      h1_ptJetMax_prepresel->Fill( ptJetMax_t, eventWeight );
       h1_mZll_prepresel->Fill( diLepton.M(), eventWeight );
       if( leptType==0 )
         h1_mZll_prepresel_MU->Fill( diLepton.M(), eventWeight );
@@ -1292,9 +1298,6 @@ ofstream ofs("run_event.txt");
     ptJetB1_t = jetB1.Pt();
     ptJetB2_t = jetB2.Pt();
 
-    float ptMax_bjets = TMath::Max(ptJetB1_t,ptJetB2_t);
-    float ptMax_jets = TMath::Max(jet3.Pt(),jet4.Pt());
-    ptJetMax_t = TMath::Max( ptMax_bjets,ptMax_jets );
 
     TLorentzVector b1jj = jetB1 + jet3 + jet4;
     TLorentzVector b2jj = jetB2 + jet3 + jet4;
@@ -1353,7 +1356,6 @@ ofstream ofs("run_event.txt");
 
     if( ht<ht_thresh_ ) continue;
     if( mbjjZ_best<mbjjZ_best_thresh_ ) continue;
-    if( ptJetMax_t<ptJetMax_thresh_ ) continue;
 
 
 
@@ -1393,7 +1395,7 @@ ofstream ofs("run_event.txt");
         h1_etaZll->Fill( diLepton.Eta(), eventWeight );
 
 
-        h1_ptJetMax->Fill( TMath::Max( ptMax_bjets,ptMax_jets ), eventWeight );
+        h1_ptJetMax->Fill( ptJetMax_t, eventWeight );
         h1_ptJetB1->Fill( ptJetB1_t, eventWeight );
         h1_ptJetB2->Fill( ptJetB2_t, eventWeight );
         h1_ptJet3->Fill( jet3.Pt(), eventWeight );
@@ -1616,6 +1618,7 @@ ofstream ofs("run_event.txt");
 
 
   h1_ptJetMax->Write();
+  h1_ptJetMax_prepresel->Write();
   h1_ptJetB1->Write();
   h1_ptJetB2->Write();
   h1_ptJet3->Write();
@@ -1739,17 +1742,17 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
 
     njets_thresh_ = 3;
     nBjets_loose_thresh_ = 0;
-    nBjets_medium_thresh_ = 1;
+    nBjets_medium_thresh_ = 0;
 
-    mZll_threshLo_ = 81.;
-    mZll_threshHi_ = 101.;
+    mZll_threshLo_ = 70.;
+    mZll_threshHi_ = 110.;
 
     ptZll_thresh_ = 0.;
 
-    met_thresh_ = 30.;
+    met_thresh_ = 0.;
     ht_thresh_ = 0.;
     mbjjZ_best_thresh_ = 0.;
-    ptJetMax_thresh_ = 0.;
+    ptJetMax_thresh_ = 40.;
  
   } else if( selectionType_=="sel1" ) {
 
