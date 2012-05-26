@@ -9,7 +9,7 @@
 
 #include "Ntp1Finalizer.h"
 #include "AnalysisJet.h"
-#include "BTagSFUtil/BTagSFUtil.h"
+#include "BTagSFUtil/interface/BTagSFUtil.h"
 
 
 
@@ -56,6 +56,7 @@ class Ntp1Finalizer_TTZTrilepton : public Ntp1Finalizer {
    float  met_thresh_;
    float  ht_thresh_;
    float  mbjjZ_best_thresh_;
+   float  ptJetMax_thresh_;
 
    float  mZll_threshLo_;
    float  mZll_threshHi_;

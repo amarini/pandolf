@@ -6,6 +6,8 @@
 #include "CommonTools/fitTools.h"
 
 
+bool use_powhegDY=false;
+
 
 struct ValueAndError {
 
@@ -66,6 +68,7 @@ int main(int argc, char* argv[]) {
   db->set_lumiOnRightSide(true);
 
   std::string outputdir_str = "TTZTrileptonPlots_" + data_dataset + "_" + selType + "_" + bTaggerType + "_" + leptType;
+  if( use_powhegDY ) outputdir_str += "_powhegDY";
   db->set_outputdir(outputdir_str);
 
   std::string dataFileName = "TTZTrilepton_" + data_dataset;
@@ -100,8 +103,8 @@ int main(int argc, char* argv[]) {
   db->add_mcFile( mcTTWFile, "ttW", "t#bar{t} + W", 33, 0);
 
 
-  //std::string mcZJetsFileName = "TTZTrilepton_DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1";
   std::string mcZJetsFileName = "TTZTrilepton_DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Fall11";
+  if( use_powhegDY ) mcZJetsFileName = "TTZTrilepton_DYToLL_M-20_CT10_TuneZ2_7TeV-powheg-pythia";
   mcZJetsFileName += "_" + selType;
   mcZJetsFileName += "_" + bTaggerType;
   //mcZJetsFileName += "_" + PUType;
@@ -184,13 +187,31 @@ int main(int argc, char* argv[]) {
   //db->drawHisto("mZll_OF3_prepresel", "Opposite Flavor Dilepton Mass", "GeV", "Events");
   // scale ttbar MC to match data:
   ValueAndError ttbarSF = get_ttbarSF( *db );
+  //ttbarSF.val = 2.;
   db->set_mcWeight( "TTtW", ttbarSF.val );
   db->drawHisto("mZll_OF_prepresel", "Opposite Flavor Dilepton Mass", "GeV", "Events", false, 1, "scaled");
+
+  //// opposite flavor leptons: control region for ttbar:
+  //db->set_rebin(5);
+  //db->set_yAxisMaxScale(1.6);
+  //db->drawHisto("mZll_OF_presel", "Opposite Flavor Dilepton Mass", "GeV", "Events");
+  ////db->drawHisto("mZll_OF2_prepresel", "Opposite Flavor Dilepton Mass", "GeV", "Events");
+  ////db->drawHisto("mZll_OF3_prepresel", "Opposite Flavor Dilepton Mass", "GeV", "Events");
+  //// scale ttbar MC to match data:
+  //ValueAndError ttbarSF = get_ttbarSF( *db );
+  ////ttbarSF.val = 2.;
+  //db->set_mcWeight( "TTtW", ttbarSF.val );
+  //db->drawHisto("mZll_OF_presel", "Opposite Flavor Dilepton Mass", "GeV", "Events", false, 1, "scaled");
 
 
   db->set_rebin();
   db->set_xAxisMax();
   db->drawHisto("nJets_presel", "Jet Multiplicity", "", "Events", true);
+
+  db->set_rebin(5.);
+  db->set_yAxisMaxScale(1.1);
+  db->set_xAxisMax(240.);
+  db->drawHisto("ptJetMax_prepresel", "Leading Jet p_{T}", "GeV", "Events", true);
 
   db->set_rebin(4);
   db->set_xAxisMin(50.);
@@ -198,9 +219,11 @@ int main(int argc, char* argv[]) {
   db->set_yAxisMaxScale(1.1);
   db->drawHisto("mZll_presel", "Dilepton Invariant Mass", "GeV", "Events", true, 2, "noscaling" );
 
+
   // now add one lepton (prepresel -> presel)
   // anti-btag: control region for Z+Jets and WZ:
   db->drawHisto("mZll_presel_antibtag", "Dilepton Invariant Mass", "GeV", "Events", true, 2);
+  //db->drawHisto_fromTree("tree_passedEvents", "mZll", "eventWeight*(ptJetMax>50. && nBjets_medium==0)", 220, 50., 160., "mZll_preselprova", "Dilepton Invariant Mass", "GeV", "Events");
   ValueAndError DYWZSF = get_DYWZSF( *db );
   db->set_mcWeight( "ZJets", DYWZSF.val );
   db->set_mcWeight( "VV_Summer11", DYWZSF.val );
@@ -236,8 +259,11 @@ int main(int argc, char* argv[]) {
   db->set_xAxisMax(5.5);
   db->drawHisto("nBJets_loose", "b-Jet Multiplicity (loose)", "", "Events", true);
   db->drawHisto("nBJets_medium", "b-Jet Multiplicity (medium)", "", "Events", true);
+  db->drawHisto_fromTree("tree_passedEvents", "nBjets_loose", "eventWeight*(mZll>81. && mZll<101.)", 6, -0.5, 5.5, "nBjets_loose_tightZ", "b-Jet Multiplicity (loose)", "", "Events");
+  db->drawHisto_fromTree("tree_passedEvents", "nBjets_medium", "eventWeight*(mZll>81. && mZll<101.)", 6, -0.5, 5.5, "nBjets_medium_tightZ", "b-Jet Multiplicity (medium)", "", "Events");
   db->set_rebin(20);
-  db->set_xAxisMax(200);
+  db->set_xAxisMax(240);
+  db->drawHisto("ptJetMax", "Leading Jet p_{T}", "GeV", "Events");
   db->drawHisto("pfMet", "Particle Flow ME_{T}", "GeV", "Events", true);
   db->set_rebin(50);
   db->set_xAxisMax();
