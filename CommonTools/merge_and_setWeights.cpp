@@ -688,6 +688,8 @@ float getWeight( const std::string& dataset, int nEvents ) {
     xSection = 7.466;
   } else if( dataset_tstr.BeginsWith("WJetsToLNu") ) {//## W+Jets
     xSection = 31314.; //NNLO taken from https://twiki.cern.ch/twiki/pub/CMS/GeneratorMain/ShortXsec.pdf
+  } else if( dataset_tstr.BeginsWith("DYJetsToLL_M-10To50") ) {
+    xSection = 12782.63;
   } else if( dataset_tstr.BeginsWith("DYToEE_M-10To20") || dataset_tstr.BeginsWith("DYToMuMu_M-10To20") ) {//## DY. EE 10to20
     xSection = 3457./3.;//##
   } else if( dataset_tstr.BeginsWith("DYToEE_M-20") || dataset_tstr.BeginsWith("DYToMuMu_M-20") ) {//## DY. EE >20
