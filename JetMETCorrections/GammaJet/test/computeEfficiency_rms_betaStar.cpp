@@ -79,7 +79,7 @@ void computeEfficiency_vs_eta( DrawBase* db, const std::string& varName, const s
 
   std::string yAxisTitle = axisName + " Efficiency";
 
-  float yMin = 0.7;
+	    float yMin = 0.85;
   float xMin = (symm) ? 0. : -4.99;
 
   TH2D* axes = new TH2D("axes", "", 10, xMin, 4.99, 10, yMin, 1.);
@@ -98,14 +98,17 @@ void computeEfficiency_vs_eta( DrawBase* db, const std::string& varName, const s
   float ymax_l = 0.42;
   if( ptMin==30. ) {
     xmin_l = 0.4;
-    ymin_l = 0.65;
     xmax_l = 0.6;
-    ymax_l = 0.87;
     if( symm ) {
       xmin_l = 0.2;
       xmax_l = 0.45;
+      if( varName=="betaStar_and_rmsCandJet0" ) {
+        ymin_l = 0.6;
+        ymax_l = 0.82;
+      }
     }
   }
+  
 
   //TLegend* legend = new TLegend( 0.6, 0.2, 0.88, 0.4, axisName.c_str() );
   TLegend* legend = new TLegend( xmin_l, ymin_l, xmax_l, ymax_l, legendTitle );
@@ -157,7 +160,8 @@ void computeEfficiency_vs_pt( DrawBase* db, const std::string& varName, const st
 
   std::string yAxisTitle = axisName + " Efficiency";
 
-  float yMin = (varName=="betaStar") ? 0.8 : 0.7;
+  float yMin = 0.85;
+  //float yMin = (varName=="betaStar") ? 0.8 : 0.7;
 
 //Double_t xMin, y;
 //effmc->GetPoint( 0, xMin, y);
@@ -247,11 +251,11 @@ TGraphAsymmErrors* getSingleEff_vs_eta( const std::string& varName, TTree* tree,
 
   std::string varselection;
   if( varName=="rmsCandJet0" ) {
-    varselection = "( (abs(etaJet0)<3. && exp(-rmsCandJet0)<0.03) || (abs(etaJet0)>3. && abs(etaJet0)<4.7 && exp(-rmsCandJet0)<0.04) )";
+    varselection = "( (abs(etaJet0)<2.5 && exp(-rmsCandJet0)<0.06) || (abs(etaJet0)>2.5 && abs(etaJet0)<3. && exp(-rmsCandJet0)<0.05) || (abs(etaJet0)>3. && abs(etaJet0)<4.7 && exp(-rmsCandJet0)<0.055) )";
   } else if( varName=="betaStarJet0" ) {
-    varselection = "betaStarJet0 < 0.2 * log( nvertex - 0.67 )";
+    varselection = "( (abs(etaJet0)<2.5 && betaStarJet0 < 0.2 * log( nvertex - 0.67 ) ) || ( ( abs(etaJet0)>2.5 && abs(etaJet0)<2.75 && betaStarJet0 < 0.3 * log( nvertex - 0.67 ) ) )";
   } else if( varName=="betaStar_and_rmsCandJet0" ) {
-    varselection = "( (abs(etaJet0)<2.5 && exp(-rmsCandJet0)<0.03 && betaStarJet0<0.2*log( nvertex-0.67 ) ) || ( abs(etaJet0)>2.5 && abs(etaJet0)<3. && exp(-rmsCandJet0)<0.03) || (abs(etaJet0)>3. && abs(etaJet0)<4.7 && exp(-rmsCandJet0)<0.04) )";
+    varselection = "( (abs(etaJet0)<2.5 && exp(-rmsCandJet0)<0.06 && betaStarJet0<0.2*log( nvertex-0.67 ) ) || ( abs(etaJet0)>2.5 && abs(etaJet0)<2.75 && exp(-rmsCandJet0)<0.05 && betaStarJet0 < 0.3 * log( nvertex - 0.67 )) || ( abs(etaJet0)>2.75 && abs(etaJet0)<3. && exp(-rmsCandJet0)<0.05) || (abs(etaJet0)>3. && abs(etaJet0)<4.7 && exp(-rmsCandJet0)<0.055) )";
   }
 
   char ptselection[500];
@@ -267,9 +271,12 @@ TGraphAsymmErrors* getSingleEff_vs_eta( const std::string& varName, TTree* tree,
   //sprintf( numselection, "(%s && %s)", varselection.c_str(), ptselection );
   sprintf( numselection, "eventWeight*(%s && %s)", varselection.c_str(), ptselection );
 
+  std::string projectVar;
+  if( symm ) projectVar = "abs(etaJet0)";
+  else projectVar = "etaJet0";
 
-  tree->Project( "denom", "etaJet0", denomselection);
-  tree->Project( "num", "etaJet0", numselection);
+  tree->Project( "denom", projectVar.c_str(), denomselection);
+  tree->Project( "num", projectVar.c_str(), numselection);
 
   //// set bin content to integers:
   //for( unsigned iBin=1; iBin<h1_denom->GetNbinsX()+1; ++iBin ) {
@@ -342,15 +349,15 @@ TGraphAsymmErrors* getSingleEff_vs_pt( const std::string& varName, TTree* tree, 
   TH1D* h1_num = new TH1D("num", "", 3, ptBins );
   h1_num->Sumw2();
 
-
   std::string varselection;
   if( varName=="rmsCandJet0" ) {
-    varselection = "( (abs(etaJet0)<3. && exp(-rmsCandJet0)<0.03) || (abs(etaJet0)>3. && abs(etaJet0)<4.7 && exp(-rmsCandJet0)<0.04) )";
+    varselection = "( (abs(etaJet0)<2.5 && exp(-rmsCandJet0)<0.06) || (abs(etaJet0)>2.5 && abs(etaJet0)<3. && exp(-rmsCandJet0)<0.05) || (abs(etaJet0)>3. && abs(etaJet0)<4.7 && exp(-rmsCandJet0)<0.055) )";
   } else if( varName=="betaStarJet0" ) {
-    varselection = "betaStarJet0 < 0.2 * log( nvertex - 0.67 )";
+    varselection = "( (abs(etaJet0)<2.5 && betaStarJet0 < 0.2 * log( nvertex - 0.67 ) ) || ( ( abs(etaJet0)>2.5 && abs(etaJet0)<2.75 && betaStarJet0 < 0.3 * log( nvertex - 0.67 ) ) )";
   } else if( varName=="betaStar_and_rmsCandJet0" ) {
-    varselection = "( (abs(etaJet0)<2.5 && exp(-rmsCandJet0)<0.03 && betaStarJet0<0.2*log( nvertex-0.67 ) ) || ( abs(etaJet0)>2.5 && abs(etaJet0)<3. && exp(-rmsCandJet0)<0.03) || (abs(etaJet0)>3. && abs(etaJet0)<4.7 && exp(-rmsCandJet0)<0.04) )";
+    varselection = "( (abs(etaJet0)<2.5 && exp(-rmsCandJet0)<0.06 && betaStarJet0<0.2*log( nvertex-0.67 ) ) || ( abs(etaJet0)>2.5 && abs(etaJet0)<2.75 && exp(-rmsCandJet0)<0.05 && betaStarJet0 < 0.3 * log( nvertex - 0.67 )) || ( abs(etaJet0)>2.75 && abs(etaJet0)<3. && exp(-rmsCandJet0)<0.05) || (abs(etaJet0)>3. && abs(etaJet0)<4.7 && exp(-rmsCandJet0)<0.055) )";
   }
+
 
   char etaselection[500];
   sprintf( etaselection, "abs(etaJet0)>%f && abs(etaJet0)<%f", etaMin, etaMax );
