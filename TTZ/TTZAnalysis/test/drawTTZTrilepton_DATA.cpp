@@ -103,6 +103,7 @@ int main(int argc, char* argv[]) {
   db->add_mcFile( mcTTWFile, "ttW", "t#bar{t} + W", 33, 0);
 
 
+  //std::string mcZJetsFileName = "TTZTrilepton_DYJetsToLL_TuneZ2_7TeV-madgraph-tauola_Fall11";
   std::string mcZJetsFileName = "TTZTrilepton_DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Fall11";
   if( use_powhegDY ) mcZJetsFileName = "TTZTrilepton_DYToLL_M-20_CT10_TuneZ2_7TeV-powheg-pythia";
   mcZJetsFileName += "_" + selType;
@@ -132,6 +133,15 @@ int main(int argc, char* argv[]) {
   mcVVFileName += ".root";
   TFile* mcVVFile = TFile::Open(mcVVFileName.c_str());
   db->add_mcFile( mcVVFile, "VV_Summer11", "Diboson", 38, 0);
+
+  std::string mcVGFileName = "TTZTrilepton_GVJets_7TeV-madgraph_Fall11";
+  mcVGFileName += "_" + selType;
+  mcVGFileName += "_" + bTaggerType;
+  //mcVGFileName += "_" + PUType;
+  mcVGFileName += "_" + leptType;
+  mcVGFileName += ".root";
+  TFile* mcVGFile = TFile::Open(mcVGFileName.c_str());
+  db->add_mcFile( mcVVFile, "VV_Summer11", "V#gamma", 30, 0);
 
 //std::string mcZZFileName = "TTZTrilepton_ZZ_TuneZ2_7TeV_pythia6_tauola_Summer11-PU_S4_START42_V11-v1";
 //mcZZFileName += "_" + selType;
@@ -358,7 +368,8 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
 
 
   //TLegend* legend = new TLegend( 0.6, 0.57, 0.92, 0.9 );
-  TLegend* legend = new TLegend( 0.2, 0.57, 0.52, 0.9 );
+  //TLegend* legend = new TLegend( 0.2, 0.57, 0.52, 0.9 );
+  TLegend* legend = new TLegend( 0.2, 0.5, 0.52, 0.9 );
   legend->SetFillColor(0);
   legend->SetTextSize(0.042);
   legend->AddEntry( gr_data, "Data", "P" );
