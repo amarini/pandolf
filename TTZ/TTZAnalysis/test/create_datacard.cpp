@@ -8,6 +8,7 @@
 
 
 std::pair< float, float >  getSyst( const std::string& syst, const std::string& sel, const std::string& bg_signal );
+std::string getFileName( const std::string& dataset, const std::string& selection, const std::string& suffix );
 
 
 int main(int argc, char* argv[]) {
@@ -27,10 +28,10 @@ int main(int argc, char* argv[]) {
   std::cout << "-> Opened yield file '" << yieldFileName << "'." << std::endl;
   std::string channel;
   std::string obs_str;
-  std::string s_str, b_pred_str, b_pred_err_str;
+  std::string s_str, ttZ_str, ttW_str, b_pred_str, b_pred_err_str;
   bool found = false;
   while( ifs.good() ) {
-    ifs >> channel >> obs_str >> s_str >> b_pred_str >> b_pred_err_str;
+    ifs >> channel >> obs_str >> s_str >> ttZ_str >> ttW_str >> b_pred_str >> b_pred_err_str;
     if( channel == "Total" ) found = true;
   }
 
@@ -89,6 +90,7 @@ int main(int argc, char* argv[]) {
   std::pair< float, float >  jerSystBG = getSyst( "JER", selection, "BG" );
   std::pair< float, float >  jerSystSignal = getSyst( "JER", selection, "Signal" );
   datacard << "jer      lnN\t" << jerSystSignal.second << "\t\t" << jerSystBG.second << std::endl;
+  datacard << "pileup   lnN\t1.03  \t\t1.03" << std::endl;
 
   datacard.close();
 
@@ -111,6 +113,25 @@ std::pair<float, float>  getSyst( const std::string& syst, const std::string& se
 
   std::string dataset = (bg_signal=="BG") ? bg_signal : "TTZ_TuneZ2_7TeV-madgraphCMSSW42xPUv3_spadhi";
   
+  if( bg_signal=="BG" ) {
+
+    std::string suffix = "";
+
+    std::string hadd_command = "hadd -f ";
+    hadd_command += getFileName( "BG", sel, suffix );
+    hadd_command += " ";
+    hadd_command += getFileName( "VV_Summer11", sel, suffix );
+    hadd_command += " ";
+    hadd_command += getFileName( "TTJ_Fall11_highstat", sel, suffix );
+    hadd_command += " ";
+    hadd_command += getFileName( "DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Fall11", sel, suffix );
+    hadd_command += " ";
+    hadd_command += getFileName( "GVJets_7TeV-madgraph_Fall11", sel, suffix );
+    hadd_command += " ";
+
+    system( hadd_command.c_str() );
+
+  }
 
   std::string systFile = "TTZTrilepton_" + dataset + "_" + sel + "_TCHE_ALL.root";
   std::string systFileUP = "TTZTrilepton_" + dataset + "_" + sel + "_TCHE_ALL_" + syst + "UP.root";
@@ -136,5 +157,14 @@ std::pair<float, float>  getSyst( const std::string& syst, const std::string& se
   returnSyst.second = 1. + systUP;
 
   return returnSyst;
+
+}
+
+
+std::string getFileName( const std::string& dataset, const std::string& selection, const std::string& suffix ) {
+
+  std::string fileName = "TTZTrilepton_" + dataset + "_" + selection + "_TCHE_ALL" + suffix + ".root";
+
+  return fileName;
 
 }
