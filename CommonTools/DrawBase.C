@@ -2779,38 +2779,40 @@ LegendBox DrawBase::get_legendBox( int legendQuadrant, const std::vector<std::st
       nNames_total += mcFiles_.size();
     }
 
+    float yScaleFactor = (nNames_total>5) ? 0.05 : 0.07;
+
     LegendBox lb;
 
     if( legendQuadrant==1 ) {
       lb.xMin = 0.63;
       lb.yMax = 0.91;
-      lb.yMin = lb.yMax - 0.07*(float)nNames_total;
+      lb.yMin = lb.yMax - yScaleFactor*(float)nNames_total;
       lb.xMax = 0.92;
     } else if( legendQuadrant==0 ) {
       lb.xMin = 0.5;
       lb.yMax = 0.88;
-      lb.yMin = lb.yMax - 0.07*(float)nNames_total;
+      lb.yMin = lb.yMax - yScaleFactor*(float)nNames_total;
       lb.xMax = 0.73;
     } else if( legendQuadrant==2 ) {
       lb.xMin = 0.2;
       lb.yMax = 0.91;
-      lb.yMin = lb.yMax - 0.07*(float)nNames_total;
+      lb.yMin = lb.yMax - yScaleFactor*(float)nNames_total;
       lb.xMax = 0.49;
     } else if( legendQuadrant==3 ) {
       lb.xMin = 0.18;
       lb.yMin = 0.15;
       lb.xMax = 0.41;
-      lb.yMax = lb.yMin + 0.07*(float)nNames_total;
+      lb.yMax = lb.yMin + yScaleFactor*(float)nNames_total;
     } else if( legendQuadrant==4 ) {
       lb.xMin = 0.5;
       lb.yMin = 0.15;
       lb.xMax = 0.73;
-      lb.yMax = lb.yMin + 0.07*(float)nNames_total;
+      lb.yMax = lb.yMin + yScaleFactor*(float)nNames_total;
     } else if( legendQuadrant==5 ) {
       lb.xMin = 0.4;
       lb.yMin = 0.15;
       lb.xMax = 0.6;
-      lb.yMax = lb.yMin + 0.07*(float)nNames_total;
+      lb.yMax = lb.yMin + yScaleFactor*(float)nNames_total;
     }
 
     bool widen = false;
