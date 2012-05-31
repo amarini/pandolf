@@ -126,6 +126,7 @@ void runOnAllDatasets( Ntp1Finalizer_TTZTrilepton* nf ) {
   runOnSingleDataset( nf, "VV_Summer11" );
   runOnSingleDataset( nf, "TTJ_Fall11_highstat" );
   runOnSingleDataset( nf, "DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Fall11" );
+  runOnSingleDataset( nf, "GVJets_7TeV-madgraph_Fall11" );
 
 }
 
@@ -150,6 +151,7 @@ void runOnSingleDataset( Ntp1Finalizer_TTZTrilepton* nf, const std::string& data
     nf_syst->addFile("WW_TuneZ2_7TeV_pythia6_tauola_Summer11-PU_S4_START42_V11-v1");
     nf_syst->addFile("TTJ_Fall11_highstat");
     nf_syst->addFile("DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Fall11");
+    nf_syst->addFile("GVJets_7TeV-madgraph_Fall11");
   
   } else {
 
@@ -178,6 +180,8 @@ void haddBGFiles( const std::string& selection, const std::string& flag ) {
   hadd_command += getFileName( "TTJ_Fall11_highstat", selection, suffix );
   hadd_command += " ";
   hadd_command += getFileName( "DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Fall11", selection, suffix );
+  hadd_command += " ";
+  hadd_command += getFileName( "GVJets_7TeV-madgraph_Fall11", selection, suffix );
   hadd_command += " ";
 
   std::cout << "-> Hadding BG files:" << std::endl;
