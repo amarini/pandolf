@@ -17,9 +17,9 @@ struct ValueAndError {
 };
 
 
-ValueAndError get_ttbarSF( const DrawBase& db );
-ValueAndError get_DYWZSF( const DrawBase& db );
-float computeChiSquare( TH1D* h1_DATA, TH1D* h1_MC );
+ValueAndError get_ttbarSF( const DrawBase& db, float xMin=0, float xMax=10000. );
+ValueAndError get_DYWZSF( const DrawBase& db, float xMin=0, float xMax=10000. );
+float computeChiSquare( TH1D* h1_DATA, TH1D* h1_MC, float xMin=0, float xMax=10000. );
 
 void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char selection[], float lumi_fb, ValueAndError ttbarSF, ValueAndError DYWZSF );
 
@@ -141,7 +141,7 @@ int main(int argc, char* argv[]) {
   mcVGFileName += "_" + leptType;
   mcVGFileName += ".root";
   TFile* mcVGFile = TFile::Open(mcVGFileName.c_str());
-  db->add_mcFile( mcVVFile, "VV_Summer11", "V#gamma", 30, 0);
+  db->add_mcFile( mcVGFile, "VG_Summer11", "V#gamma", 30, 0);
 
 //std::string mcZZFileName = "TTZTrilepton_ZZ_TuneZ2_7TeV_pythia6_tauola_Summer11-PU_S4_START42_V11-v1";
 //mcZZFileName += "_" + selType;
@@ -189,14 +189,17 @@ int main(int argc, char* argv[]) {
   db->drawHisto("mZll_prepresel_MU", "Dimuon Invariant Mass", "GeV", "Events", true, 2);
 
 
+  float xMin_mZll = 70.;
   // opposite flavor leptons: control region for ttbar:
   db->set_rebin(5);
-  db->set_yAxisMaxScale(1.6);
+  db->set_yAxisMaxScale(1.3);
+  db->set_xAxisMin(xMin_mZll);
+  db->set_xAxisMax(150.);
   db->drawHisto("mZll_OF_prepresel", "Opposite Flavor Dilepton Mass", "GeV", "Events");
   //db->drawHisto("mZll_OF2_prepresel", "Opposite Flavor Dilepton Mass", "GeV", "Events");
   //db->drawHisto("mZll_OF3_prepresel", "Opposite Flavor Dilepton Mass", "GeV", "Events");
   // scale ttbar MC to match data:
-  ValueAndError ttbarSF = get_ttbarSF( *db );
+  ValueAndError ttbarSF = get_ttbarSF( *db, xMin_mZll );
   //ttbarSF.val = 2.;
   db->set_mcWeight( "TTtW", ttbarSF.val );
   db->drawHisto("mZll_OF_prepresel", "Opposite Flavor Dilepton Mass", "GeV", "Events", false, 1, "scaled");
@@ -214,17 +217,14 @@ int main(int argc, char* argv[]) {
   //db->drawHisto("mZll_OF_presel", "Opposite Flavor Dilepton Mass", "GeV", "Events", false, 1, "scaled");
 
 
-  db->set_rebin();
-  db->set_xAxisMax();
-  db->drawHisto("nJets_presel", "Jet Multiplicity", "", "Events", true);
-
+  db->reset();
   db->set_rebin(5.);
   db->set_yAxisMaxScale(1.1);
   db->set_xAxisMax(240.);
   db->drawHisto("ptJetMax_prepresel", "Leading Jet p_{T}", "GeV", "Events", true);
 
   db->set_rebin(4);
-  db->set_xAxisMin(50.);
+  db->set_xAxisMin(50);
   db->set_xAxisMax(130.);
   db->set_yAxisMaxScale(1.1);
   db->drawHisto("mZll_presel", "Dilepton Invariant Mass", "GeV", "Events", true, 2, "noscaling" );
@@ -234,10 +234,13 @@ int main(int argc, char* argv[]) {
   // anti-btag: control region for Z+Jets and WZ:
   db->drawHisto("mZll_presel_antibtag", "Dilepton Invariant Mass", "GeV", "Events", true, 2);
   //db->drawHisto_fromTree("tree_passedEvents", "mZll", "eventWeight*(ptJetMax>50. && nBjets_medium==0)", 220, 50., 160., "mZll_preselprova", "Dilepton Invariant Mass", "GeV", "Events");
-  ValueAndError DYWZSF = get_DYWZSF( *db );
+  ValueAndError DYWZSF = get_DYWZSF( *db, xMin_mZll );
   db->set_mcWeight( "ZJets", DYWZSF.val );
   db->set_mcWeight( "VV_Summer11", DYWZSF.val );
+  db->set_mcWeight( "VG_Summer11", DYWZSF.val );
 
+  db->set_xAxisMin(50.);
+  db->set_xAxisMax(130.);
   db->drawHisto("mZll_presel_antibtag", "Dilepton Invariant Mass", "GeV", "Events", true, 2, "scaled");
   db->reset();
   db->drawHisto("nJets_presel", "Jet Multiplicity", "", "Events", true, 1, "scaled");
@@ -255,13 +258,15 @@ int main(int argc, char* argv[]) {
   db->drawHisto("combinedIsoRelLept3_presel", "Third Lepton Isolation", "", "Events");
 
   db->set_rebin(4);
-  db->set_xAxisMax(130);
+  db->set_xAxisMin(50.);
+  db->set_xAxisMax(130.);
   db->set_yAxisMaxScale(1.1);
   db->drawHisto("mZll_presel", "Dilepton Invariant Mass", "GeV", "Events", true, 2, "scaled");
   db->drawHisto("mZll", "Dilepton Invariant Mass", "GeV", "Events", true, 2);
   //db->drawHisto_fromTree("tree_passedEvents", "mZll", "eventWeight*(nBjets_medium==0 && isMZllSignalRegion)", 100, 50., 130., "mZll_antibtag", "Dilepton Invariant Mass", "GeV");
   //float DYWZSF2 = get_DYWZSF( *db );
   db->reset();
+  db->set_yAxisMaxScale(1.1);
 
   db->set_xAxisMin(2.5);
   db->drawHisto("nJets", "Jet Multiplicity (p_{T} > 20 GeV)", "", "Events", true);
@@ -333,6 +338,7 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
   std::string sel_mme = selection_str + " isMZllSignalRegion && passed_btag && leptType==0 && leptType3==1)";
   std::string sel_eem = selection_str + " isMZllSignalRegion && passed_btag && leptType==1 && leptType3==0)";
   std::string sel_eee = selection_str + " isMZllSignalRegion && passed_btag && leptType==1 && leptType3==1)";
+  std::string sel_tot = selection_str + " isMZllSignalRegion && passed_btag)";
 
 
   TTree* tree_data = (TTree*)(db->get_dataFile(0).file->Get("tree_passedEvents"));
@@ -341,17 +347,20 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
   TH1D* h1_data_mme = new TH1D("data_mme", "", 100, 0., 10000.);
   TH1D* h1_data_eem = new TH1D("data_eem", "", 100, 0., 10000.);
   TH1D* h1_data_eee = new TH1D("data_eee", "", 100, 0., 10000.);
+  TH1D* h1_data_tot = new TH1D("data_tot", "", 100, 0., 10000.);
 
   tree_data->Project("data_mmm", "ptZll", sel_mmm.c_str());
   tree_data->Project("data_mme", "ptZll", sel_mme.c_str());
   tree_data->Project("data_eem", "ptZll", sel_eem.c_str());
   tree_data->Project("data_eee", "ptZll", sel_eee.c_str());
+  tree_data->Project("data_tot", "ptZll", sel_tot.c_str());
 
   float mmm_data = h1_data_mmm->Integral();
   float mme_data = h1_data_mme->Integral();
   float eem_data = h1_data_eem->Integral();
   float eee_data = h1_data_eee->Integral();
-  float tot_data = mmm_data + mme_data + eem_data + eee_data;
+  float tot_data = h1_data_tot->Integral();
+  //float tot_data = mmm_data + mme_data + eem_data + eee_data;
 
 
   TH1D* h1_yields_data = new TH1D("yields_data", "", 5, 0., 5.);
@@ -393,35 +402,44 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
     int iMC = db->get_mcFiles().size()-i-1;
 
     TTree* tree_mc = (TTree*)(db->get_mcFile(iMC).file->Get("tree_passedEvents"));
+std::cout << "dataset: " << db->get_mcFile(iMC).datasetName << std::endl;
 
     TH1D* h1_mc_mmm = new TH1D("mc_mmm", "", 100, 0., 10000.);
     TH1D* h1_mc_mme = new TH1D("mc_mme", "", 100, 0., 10000.);
     TH1D* h1_mc_eem = new TH1D("mc_eem", "", 100, 0., 10000.);
     TH1D* h1_mc_eee = new TH1D("mc_eee", "", 100, 0., 10000.);
+    TH1D* h1_mc_tot = new TH1D("mc_tot", "", 100, 0., 10000.);
 
     h1_mc_mmm->Sumw2();
     h1_mc_mme->Sumw2();
     h1_mc_eem->Sumw2();
     h1_mc_eee->Sumw2();
+    h1_mc_tot->Sumw2();
 
     tree_mc->Project("mc_mmm", "ptZll", sel_mmm.c_str());
     tree_mc->Project("mc_mme", "ptZll", sel_mme.c_str());
     tree_mc->Project("mc_eem", "ptZll", sel_eem.c_str());
     tree_mc->Project("mc_eee", "ptZll", sel_eee.c_str());
+    tree_mc->Project("mc_tot", "ptZll", sel_tot.c_str());
 
-    float mmm_mc = h1_mc_mmm->Integral();
-    float mme_mc = h1_mc_mme->Integral();
-    float eem_mc = h1_mc_eem->Integral();
-    float eee_mc = h1_mc_eee->Integral();
-    float tot_mc = mmm_mc + mme_mc + eem_mc + eee_mc;
-
+    Double_t mmm_mc_err;
+    Double_t mme_mc_err;
+    Double_t eem_mc_err;
+    Double_t eee_mc_err;
+    Double_t tot_mc_err;
+    Double_t mmm_mc = h1_mc_mmm->IntegralAndError(0, h1_mc_mmm->GetNbinsX()+1, mmm_mc_err);
+    Double_t mme_mc = h1_mc_mme->IntegralAndError(0, h1_mc_mme->GetNbinsX()+1, mme_mc_err);
+    Double_t eem_mc = h1_mc_eem->IntegralAndError(0, h1_mc_eem->GetNbinsX()+1, eem_mc_err);
+    Double_t eee_mc = h1_mc_eee->IntegralAndError(0, h1_mc_eee->GetNbinsX()+1, eee_mc_err);
+    Double_t tot_mc = h1_mc_tot->IntegralAndError(0, h1_mc_tot->GetNbinsX()+1, tot_mc_err);
+    //Double_t tot_mc = mmm_mc + mme_mc + eem_mc + eee_mc;
     float scaling = lumi_fb*1000.;
     float scaling_err = 0.;
     if( db->get_mcFile(iMC).datasetName=="TTtW" ) {
       scaling *= ttbarSF.val;
       scaling_err = ttbarSF.err;
     }
-    if( db->get_mcFile(iMC).datasetName=="ZJets" || db->get_mcFile(iMC).datasetName=="VV_Summer11" ) {
+    if( db->get_mcFile(iMC).datasetName=="ZJets" || db->get_mcFile(iMC).datasetName=="VV_Summer11" || db->get_mcFile(iMC).datasetName=="VG_Summer11" ) {
       scaling *= DYWZSF.val;
       scaling_err = DYWZSF.err;
     }
@@ -431,6 +449,12 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
     mme_mc *= scaling;
     mmm_mc *= scaling;
     tot_mc *= scaling;
+
+    eee_mc_err *= scaling;
+    eem_mc_err *= scaling;
+    mme_mc_err *= scaling;
+    mmm_mc_err *= scaling;
+    tot_mc_err *= scaling;
 
     char hname[100];
     sprintf( hname, "yields_mc_%d", iMC);
@@ -443,11 +467,17 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
   
 
     // add in quadrature scaling error:
-    float oldErr_eee = h1_yields_mc->GetBinError(1);
-    float oldErr_eem = h1_yields_mc->GetBinError(2);
-    float oldErr_mme = h1_yields_mc->GetBinError(3);
-    float oldErr_mmm = h1_yields_mc->GetBinError(4);
-    float oldErr_tot = h1_yields_mc->GetBinError(5);
+    //float oldErr_eee = h1_yields_mc->GetBinError(1);
+    //float oldErr_eem = h1_yields_mc->GetBinError(2);
+    //float oldErr_mme = h1_yields_mc->GetBinError(3);
+    //float oldErr_mmm = h1_yields_mc->GetBinError(4);
+    //float oldErr_tot = h1_yields_mc->GetBinError(5);
+ 
+    float oldErr_eee = eee_mc_err;
+    float oldErr_eem = eem_mc_err;
+    float oldErr_mme = mme_mc_err;
+    float oldErr_mmm = mmm_mc_err;
+    float oldErr_tot = tot_mc_err;
  
     float newErr_eee = sqrt( oldErr_eee*oldErr_eee + eee_mc*eee_mc*scaling_err*scaling_err );
     float newErr_eem = sqrt( oldErr_eem*oldErr_eem + eem_mc*eem_mc*scaling_err*scaling_err );
@@ -455,11 +485,30 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
     float newErr_mmm = sqrt( oldErr_mmm*oldErr_mmm + mmm_mc*mmm_mc*scaling_err*scaling_err );
     float newErr_tot = sqrt( oldErr_tot*oldErr_tot + tot_mc*tot_mc*scaling_err*scaling_err );
 
+    std::cout <<  "mmm_mc: "  <<  mmm_mc << " +- " <<  newErr_mmm << " (entries: " << h1_mc_mmm->GetEntries() << ")" << std::endl;
+    std::cout <<  "mme_mc: "  <<  mme_mc << " +- " <<  newErr_mme << " (entries: " << h1_mc_mme->GetEntries() << ")" << std::endl;
+    std::cout <<  "eem_mc: "  <<  eem_mc << " +- " <<  newErr_eem << " (entries: " << h1_mc_eem->GetEntries() << ")" << std::endl;
+    std::cout <<  "eee_mc: "  <<  eee_mc << " +- " <<  newErr_eee << " (entries: " << h1_mc_eee->GetEntries() << ")" << std::endl;
+    std::cout <<  "tot_mc: "  <<  tot_mc << " +- " <<  newErr_tot << " (entries: " << h1_mc_tot->GetEntries() << ")" << std::endl;
+
+ 
+    //float newErr_eee = sqrt( oldErr_eee*oldErr_eee );
+    //float newErr_eem = sqrt( oldErr_eem*oldErr_eem );
+    //float newErr_mme = sqrt( oldErr_mme*oldErr_mme );
+    //float newErr_mmm = sqrt( oldErr_mmm*oldErr_mmm );
+    //float newErr_tot = sqrt( oldErr_tot*oldErr_tot );
+
     h1_yields_mc->SetBinError( 1, newErr_eee );
     h1_yields_mc->SetBinError( 2, newErr_eem );
     h1_yields_mc->SetBinError( 3, newErr_mme );
     h1_yields_mc->SetBinError( 4, newErr_mmm );
     h1_yields_mc->SetBinError( 5, newErr_tot );
+  
+    //h1_yields_mc->SetBinError( 1, 0. );
+    //h1_yields_mc->SetBinError( 2, 0. );
+    //h1_yields_mc->SetBinError( 3, 0. );
+    //h1_yields_mc->SetBinError( 4, 0. );
+    //h1_yields_mc->SetBinError( 5, 0. );
   
 
     h1_yields_mc->SetFillColor( db->get_mcFile(iMC).fillColor );
@@ -482,6 +531,7 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
     delete h1_mc_mme;
     delete h1_mc_eem;
     delete h1_mc_eee;
+    delete h1_mc_tot;
     
   }
 
@@ -494,6 +544,12 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
 
   } 
 
+
+  
+
+  h1_yields_mc_totBG->SetFillStyle( 3005 );
+  h1_yields_mc_totBG->SetFillColor( 12 );
+  h1_yields_mc_totBG->SetLineWidth( 1 );
 
 
   float yMaxData = h1_yields_data->GetMaximum();
@@ -517,6 +573,7 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
   c1->cd();
   h2_axes->Draw();
   stackMC->Draw("histo same");
+  h1_yields_mc_totBG->Draw("0 E2 same");
   legend->Draw("same");
   gr_data->Draw("P same");
   label_sqrt->Draw("same");
@@ -561,6 +618,7 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
   delete h1_data_mme;
   delete h1_data_eem;
   delete h1_data_eee;
+  delete h1_data_tot;
 
   for( unsigned i=0; i<vh1_yields_mc.size(); ++i ) 
     delete vh1_yields_mc[vh1_yields_mc.size()-i-1];
@@ -570,7 +628,7 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
 
 
 
-ValueAndError get_ttbarSF( const DrawBase& db ) {
+ValueAndError get_ttbarSF( const DrawBase& db, float xMin, float xMax ) {
 
 
   //TH1D* h1_DATA = new TH1D(*(db->get_lastHistos_data()[0]));
@@ -620,7 +678,7 @@ ValueAndError get_ttbarSF( const DrawBase& db ) {
     for( unsigned ihisto=0; ihisto<otherHistosMC.size(); ++ihisto )
       h1_TTJets_sf->Add( otherHistosMC[ihisto] );
 
-    float thisChiSquare = computeChiSquare( h1_DATA, h1_TTJets_sf );
+    float thisChiSquare = computeChiSquare( h1_DATA, h1_TTJets_sf, xMin, xMax );
 
     h1_chiSquare->SetBinContent( i+1, thisChiSquare ); 
 
@@ -734,12 +792,15 @@ ValueAndError get_ttbarSF( const DrawBase& db ) {
 
 
 
-float computeChiSquare( TH1D* h1_DATA, TH1D* h1_MC ) {
+float computeChiSquare( TH1D* h1_DATA, TH1D* h1_MC, float xMin, float xMax ) {
 
   float chiSquare=0.;
   int nbins = h1_DATA->GetNbinsX();
+  float usedBins =0.;
 
-  for( unsigned ibin=1; ibin<nbins+1; ++ibin ) {
+  for( unsigned ibin=1; ibin<nbins; ++ibin ) {
+  
+    if( h1_DATA->GetBinLowEdge(ibin)<xMin || h1_DATA->GetBinLowEdge(ibin+1)>xMax ) continue;
 
     float data = h1_DATA->GetBinContent(ibin);
     float mc = h1_MC->GetBinContent(ibin);
@@ -750,10 +811,11 @@ float computeChiSquare( TH1D* h1_DATA, TH1D* h1_MC ) {
     float addendum = binDifference / err;
 
     chiSquare += (addendum*addendum);
+    usedBins += 1.;
    
   } //for bins
 
-  chiSquare /= (nbins-1.);
+  chiSquare /= (usedBins-1.);
 
   return chiSquare;
 
@@ -762,17 +824,23 @@ float computeChiSquare( TH1D* h1_DATA, TH1D* h1_MC ) {
 
 
 
-ValueAndError get_DYWZSF( const DrawBase& db ) {
+ValueAndError get_DYWZSF( const DrawBase& db, float xMin, float xMax ) {
 
 
   TH1D* h1_DATA = new TH1D(*(db.get_lastHistos_data()[0]));
-  float dataIntegral = h1_DATA->Integral();
+  //float dataIntegral = h1_DATA->Integral();
+  float dataIntegral = 0.;
+  for( unsigned ibin=1; ibin<h1_DATA->GetNbinsX(); ++ibin ) 
+    if( h1_DATA->GetBinLowEdge(ibin) > xMin && h1_DATA->GetBinLowEdge(ibin+1)<xMax ) dataIntegral += h1_DATA->GetBinContent(ibin);
 
   std::vector< TH1D* > lastHistosMC = db.get_lastHistos_mc();
 
   float mcIntegral = 0.;
+  //for( unsigned iHisto=0; iHisto<lastHistosMC.size(); ++iHisto )
+  //    mcIntegral += lastHistosMC[iHisto]->Integral();
   for( unsigned iHisto=0; iHisto<lastHistosMC.size(); ++iHisto )
-      mcIntegral += lastHistosMC[iHisto]->Integral();
+    for( unsigned ibin=1; ibin<lastHistosMC[iHisto]->GetNbinsX(); ++ibin ) 
+      if( lastHistosMC[iHisto]->GetBinLowEdge(ibin) > xMin && lastHistosMC[iHisto]->GetBinLowEdge(ibin+1)<xMax ) mcIntegral += lastHistosMC[iHisto]->GetBinContent(ibin);
 
   float sf = dataIntegral/mcIntegral;
   float sf_err = sqrt(dataIntegral)/mcIntegral;

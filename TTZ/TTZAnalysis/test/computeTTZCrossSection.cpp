@@ -131,6 +131,11 @@ int main( int argc, char* argv[] ) {
   totalSignalSystDOWN = sqrt(totalSignalSystDOWN);
   totalSignalSystUP = sqrt(totalSignalSystUP);
 
+  std::cout << "totalBGSystDOWN : " <<  totalBGSystDOWN << std::endl;
+  std::cout << "totalBGSystUP   : " <<  totalBGSystUP   << std::endl;
+  std::cout << "totalSignalSystDOWN : " << totalSignalSystDOWN << std::endl;
+  std::cout << "totalSignalSystUP   : " << totalSignalSystUP << std::endl;
+
 
 
   // stat error on observed:
@@ -138,6 +143,7 @@ int main( int argc, char* argv[] ) {
   RooHistError::instance().getPoissonInterval(obs,obs_minus,obs_plus,1.);
   double obs_errPlus = obs_plus-obs;
   double obs_errMinus = obs-obs_minus;
+  std::cout << "observed poissonian interval: " << obs_minus << "-" << obs_plus << std::endl;
 
 
   float ZBi = StatTools::computeZBi( s+b_pred, b_pred, b_pred_err );
@@ -163,6 +169,9 @@ int main( int argc, char* argv[] ) {
   float eff_ttW = n_passed_ttW/nTotal_ttW;
 
   float eff_ttV = ( crossSection_ttZ*eff_ttZ + crossSection_ttW*eff_ttW ) / ( crossSection_ttZ + crossSection_ttW );
+std::cout << "n_passed_ttZ: " << n_passed_ttZ << " (" << eff_ttZ << ")" << std::endl;
+std::cout << "n_passed_ttW: " << n_passed_ttW << " (" << eff_ttW << ")" << std::endl;
+std::cout << "eff_ttV: " << eff_ttV << std::endl;
 
   float crossSectionObs_ttZ = obs_ttV / ( lumi_pb*eff_ttZ );
   float crossSectionObs_ttV = obs_ttV / ( lumi_pb*eff_ttV );

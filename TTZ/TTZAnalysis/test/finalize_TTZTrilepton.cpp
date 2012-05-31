@@ -47,6 +47,8 @@ int main( int argc, char* argv[] ) {
     nf->addFile("DoubleElectron_Run2011B_v2");
     nf->addFile("MuEG_Run2011A_FULL");
     nf->addFile("MuEG_Run2011B");
+    //nf->addFile("SingleMu_Run2011A_FULL");
+    //nf->addFile("SingleMu_Run2011B_v2");
 
   } else if( dataset=="VV_Summer11" ) {
 
@@ -68,7 +70,18 @@ int main( int argc, char* argv[] ) {
     nf->addFile("WW_TuneZ2_7TeV_pythia6_tauola_Summer11-PU_S4_START42_V11-v1");
     nf->addFile("TTJ_Fall11_highstat");
     nf->addFile("DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Fall11");
+    nf->addFile("GVJets_7TeV-madgraph_Fall11");
 
+  } else if( dataset=="DYToLL_M-20_CT10_TuneZ2_7TeV-powheg-pythia" ) {
+
+    nf->addFile("DYToMuMu_M-20_CT10_TuneZ2_7TeV-powheg-pythia");
+    nf->addFile("DYToEE_M-20_CT10_TuneZ2_7TeV-powheg-pythia");
+
+  } else if( dataset=="DYJetsToLL_TuneZ2_7TeV-madgraph-tauola_Fall11" ) {
+
+    nf->addFile("DYJetsToLL_M-10To50_TuneZ2_7TeV-madgraph_Fall11-PU_S6_START42_V14B-v1");
+    nf->addFile("DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Fall11");
+  
   } else {
   
     nf->addFile( dataset );

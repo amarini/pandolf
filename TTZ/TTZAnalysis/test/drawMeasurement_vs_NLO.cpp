@@ -151,20 +151,20 @@ int main() {
   TGraphAsymmErrors* gr_ssdl = new TGraphAsymmErrors();
   TGraphAsymmErrors* gr_combined = new TGraphAsymmErrors();
 
-  gr_trilept->SetPoint(0, 0.55, 2.5);
-  gr_trilept->SetPointError(0, 0.32, 0.42, 0., 0.);
+  gr_trilept->SetPoint(0, 0.565937, 2.5);
+  gr_trilept->SetPointError(0, 0.285454, 0.390798, 0., 0.);
   gr_trilept->SetMarkerStyle(22);
   gr_trilept->SetMarkerSize(2.);
   gr_trilept->SetMarkerColor(38);
 
-  gr_ssdl->SetPoint(0, 0.27, 1.5);
-  gr_ssdl->SetPointError(0, 0.20, 0.24, 0., 0.);
+  gr_ssdl->SetPoint(0, 0.270711, 1.5);
+  gr_ssdl->SetPointError(0, 0.189347, 0.2302, 0., 0.);
   gr_ssdl->SetMarkerStyle(21);
   gr_ssdl->SetMarkerSize(2.);
   gr_ssdl->SetMarkerColor(39);
 
-  gr_combined->SetPoint(0, 0.37, 0.5);
-  gr_combined->SetPointError(0, 0.19, 0.19, 0., 0.);
+  gr_combined->SetPoint(0, 0.386399224, 0.5);
+  gr_combined->SetPointError(0, 0.180300611, 0.180300611, 0., 0.);
   gr_combined->SetMarkerStyle(20);
   gr_combined->SetMarkerSize(2.);
   gr_combined->SetMarkerColor(1);

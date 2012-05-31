@@ -1947,7 +1947,7 @@ void Ntp1Finalizer_TTZTrilepton::setSelectionType( const std::string& selectionT
     met_thresh_ = 0.;
     ht_thresh_ = 120.;
     mbjjZ_best_thresh_ = 0.;
-    ptJetMax_thresh_ = 50.;
+    ptJetMax_thresh_ = 0.;
 
   } else if( selectionType_=="presel_2LB_1MB" ) {
 
