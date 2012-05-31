@@ -27,12 +27,14 @@ int main(int argc, char* argv[]) {
 
   std::cout << "-> Opened yield file '" << yieldFileName << "'." << std::endl;
   std::string channel;
-  std::string obs_str;
-  std::string s_str, ttZ_str, ttW_str, b_pred_str, b_pred_err_str;
+  std::string obs_str, s_str, ttZ_str, ttW_str, b_pred_str, b_pred_err_str;
   bool found = false;
   while( ifs.good() ) {
     ifs >> channel >> obs_str >> s_str >> ttZ_str >> ttW_str >> b_pred_str >> b_pred_err_str;
-    if( channel == "Total" ) found = true;
+    if( channel == "Total" ) {
+      found = true;
+      break;
+    }
   }
 
   if( !found ) {
@@ -44,6 +46,7 @@ int main(int argc, char* argv[]) {
   float s = atof(s_str.c_str());
   float b_pred = atof(b_pred_str.c_str());
   float b_pred_err = atof(b_pred_err_str.c_str());
+   
    
   
   // start creating datacard
