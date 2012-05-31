@@ -90,7 +90,7 @@ int main(int argc, char* argv[]) {
   std::pair< float, float >  jerSystBG = getSyst( "JER", selection, "BG" );
   std::pair< float, float >  jerSystSignal = getSyst( "JER", selection, "Signal" );
   datacard << "jer      lnN\t" << jerSystSignal.second << "\t\t" << jerSystBG.second << std::endl;
-  datacard << "pileup   lnN\t1.03  \t\t1.03" << std::endl;
+  datacard << "pu       lnN\t1.03  \t\t-" << std::endl;
 
   datacard.close();
 
