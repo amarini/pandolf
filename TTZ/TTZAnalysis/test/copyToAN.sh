@@ -52,3 +52,6 @@ epstopdf TTZTrileptonPlots_DATA_Run2011_FULL_optsel3_TCHE_ALL/channelYields_Sign
 mv TTZTrileptonPlots_DATA_Run2011_FULL_optsel3_TCHE_ALL/channelYields_SignalOnlyBTagSyst.pdf /afs/cern.ch/user/p/pandolf/tdr2/notes/AN-12-184/trunk/figures/trilepton/syst
 epstopdf TTZTrileptonPlots_DATA_Run2011_FULL_optsel3_TCHE_ALL/channelYields_SignalOnlyLeptSyst.eps
 mv TTZTrileptonPlots_DATA_Run2011_FULL_optsel3_TCHE_ALL/channelYields_SignalOnlyLeptSyst.pdf /afs/cern.ch/user/p/pandolf/tdr2/notes/AN-12-184/trunk/figures/trilepton/syst
+
+epstopdf measurement_vs_NLO.eps
+mv measurement_vs_NLO.eps /afs/cern.ch/user/p/pandolf/tdr2/notes/AN-12-184/trunk/figures/
