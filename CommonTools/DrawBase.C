@@ -1650,7 +1650,7 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
     if( !lumiOnRightSide_ )
       label_cms->Draw("same");
     label_sqrt->Draw("same");
-    if( scaleFactor_<0 && !noDATA )
+    if( scaleFactor_<0 && !noDATA && !noStack_ )
       label_shapeNorm->Draw("same");
     if( label_cuts!=0 )
       label_cuts->Draw("same");
