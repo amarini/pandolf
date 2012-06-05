@@ -618,7 +618,7 @@ float getWeight( const std::string& dataset, int nEvents ) {
 
   } else if( dataset=="GluGluToHToZZTo4L_M-400_7TeV-powheg-pythia6_Fall10" ) {
     xSection = (2.0608)*0.2724*0.100974*0.100974; //sigma x BR(H->ZZ) x BR(Z->ll) x BR(Z->ll) (l=e,m,t)
-  } else if( dataset_tstr.BeginsWith("TTJets") || dataset_tstr.BeginsWith("TT_") || dataset_tstr.BeginsWith("TTJ_") ) {
+  } else if( dataset_tstr.BeginsWith("TTJets") || dataset_tstr.BeginsWith("TT_") || dataset_tstr.BeginsWith("TTJ_") || dataset_tstr.BeginsWith("TTjets_") ) {
     xSection = 157.5; //NLO see https://twiki.cern.ch/twiki/pub/CMS/GeneratorMain/ShortXsec.pdf
   } else if( dataset_tstr.BeginsWith("ZZtoAnything") || dataset_tstr.BeginsWith("ZZ_") ) {
     xSection = 5.9*1.3; //MCFM NLO see http://ceballos.web.cern.ch/ceballos/hwwlnln/cross_sections_backgrounds.txt plus factor 1.3 to account for glu-glu
@@ -694,6 +694,8 @@ float getWeight( const std::string& dataset, int nEvents ) {
     xSection = 3457./3.;//##
   } else if( dataset_tstr.BeginsWith("DYToEE_M-20") || dataset_tstr.BeginsWith("DYToMuMu_M-20") ) {//## DY. EE >20
     xSection = 4819.6/3.;//##
+  } else if( dataset_tstr.BeginsWith("GVJets") ) { //https://twiki.cern.ch/twiki/bin/viewauth/CMS/SameSignDilepton2011#MC_samples_for_the_2011_paper
+    xSection = 56.64;
   } else {
     std::cout << std::endl << std::endl;
     std::cout << "-> WARNING!! Dataset: '" << dataset << "' not present in database. Cross section unknown." << std::endl;
