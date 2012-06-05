@@ -169,8 +169,8 @@ int main( int argc, char* argv[] ) {
   float eff_ttW = n_passed_ttW/nTotal_ttW;
 
   float eff_ttV = ( crossSection_ttZ*eff_ttZ + crossSection_ttW*eff_ttW ) / ( crossSection_ttZ + crossSection_ttW );
-std::cout << "n_passed_ttZ: " << n_passed_ttZ << " (" << eff_ttZ << ")" << std::endl;
-std::cout << "n_passed_ttW: " << n_passed_ttW << " (" << eff_ttW << ")" << std::endl;
+std::cout << "n_passed_ttZ: " << n_passed_ttZ << " (" << eff_ttZ*100./(2.*0.22*0.67*0.06) << ")" << std::endl;
+std::cout << "n_passed_ttW: " << n_passed_ttW << " (" << eff_ttW*100./(0.22*0.22*0.67) << ")" << std::endl;
 std::cout << "eff_ttV: " << eff_ttV << std::endl;
 
   float crossSectionObs_ttZ = obs_ttV / ( lumi_pb*eff_ttZ );
@@ -222,7 +222,7 @@ std::cout << "eff_ttV: " << eff_ttV << std::endl;
   std::cout << "=========================================" << std::endl;
   std::cout << std::endl;
   std::cout << " Expected BG: " << b_pred << " +- " << b_pred_err << std::endl;
-  std::cout << " Expected Signal: " << s << " (eff=" << eff_ttZ*100./(0.22*0.22*0.67) << "%)" << std::endl;
+  std::cout << " Expected Signal: " << s << " (eff=" << eff_ttZ*100./(2.*0.06*0.22*0.67) << "%)" << std::endl;
   std::cout << " Expected B+S: " << s+b_pred << std::endl;
   std::cout << " ZBi (expected): " << ZBi << std::endl;
   std::cout << " Observed Events: " << obs << std::endl;
