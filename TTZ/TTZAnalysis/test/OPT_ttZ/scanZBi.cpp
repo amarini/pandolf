@@ -129,7 +129,7 @@ int main( int argc, char* argv[] ) {
 std::cout << "signal: " << signal << " bg: " << background << " +- " << background_error << std::endl;
 
 
-    float effS = (float)h1_signal->GetEntries()/nGen_signal/(0.22*0.22*0.67);
+    float effS = (float)h1_signal->GetEntries()/nGen_signal/(2.*0.06*0.22*0.67);
     //float effS = (float)h1_signal->GetEntries()/nGen_signal/(0.22*0.22*0.67);
 
     if( effS > effMax )
