@@ -58,8 +58,13 @@ class AnalysisJet : public TLorentzVector {
   float etaPart;
   float phiPart;
   float ePart;
-
   int pdgIdPart;
+
+  float ptPart_status2;
+  float etaPart_status2;
+  float phiPart_status2;
+  float ePart_status2;
+  int pdgIdPart_status2;
 
   bool btag_loose() const;
   bool btag_medium() const;
