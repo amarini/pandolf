@@ -21,13 +21,16 @@ application = "finalize_QGStudies"
 
 
 match_Fall11 = re.search( r'Fall11', dataset, re.M|re.I)
-isDATA = re.search( r'Run2011', dataset, re.M|re.I)
+match_Summer12 = re.search( r'Summer12', dataset, re.M|re.I)
+isDATA = re.search( r'Run201', dataset, re.M|re.I)
 
 if isDATA:
   diskoutputdir = "/shome/pandolf/FinalizedTrees/DATA/" + dataset_path
 else:
   if match_Fall11:
     diskoutputdir = "/shome/pandolf/FinalizedTrees/MC/Fall11/" + dataset_path
+  elif match_Summer12:
+    diskoutputdir = "/shome/pandolf/FinalizedTrees/MC/Summer12/" + dataset_path
   else:
     diskoutputdir = "/shome/pandolf/FinalizedTrees/MC/Summer11/" + dataset_path
 
