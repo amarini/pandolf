@@ -97,11 +97,11 @@ int main(int argc, char* argv[]) {
 
   std::pair< float, float >  scaleSystBG = getSyst( "scale", selection, "BG" );
   std::pair< float, float >  scaleSystSignal = getSyst( "scale", selection, "Signal" );
-  datacard << "scale    lnN\t" <<  scaleSystSignal.first << "/" << scaleSystSignal.second << "\t" << scaleSystBG.first << "/" << scaleSystBG.second << std::endl;
+  datacard << "scale    lnN\t" <<  scaleSystSignal.first << "/" << scaleSystSignal.second << "\t-" << std::endl;
 
   std::pair< float, float >  matchingSystBG = getSyst( "matching", selection, "BG" );
   std::pair< float, float >  matchingSystSignal = getSyst( "matching", selection, "Signal" );
-  datacard << "matching lnN\t" <<  matchingSystSignal.first << "/" << matchingSystSignal.second << "\t" << matchingSystBG.first << "/" << matchingSystBG.second << std::endl;
+  datacard << "matching lnN\t" <<  matchingSystSignal.first << "/" << matchingSystSignal.second << "\t-" << std::endl;
 
   datacard.close();
 
