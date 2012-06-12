@@ -167,16 +167,16 @@ int main(int argc, char* argv[]) {
   datacard << "pu       lnN\t1.03   \t\t-     \t\t1.03   \t\t-     \t\t1.03   \t\t-     \t\t1.03   \t\t-   " << std::endl; //taken from SMP-12-008
 
   std::pair< float, float >  matchingSystBG = getSyst( "matching", selection, "BG" );
-  datacard << "matching lnN\t" <<  matchingSystBG.first << "/" << matchingSystBG.second << "\t" << matchingSystBG.first << "/" << matchingSystBG.second; //eee
-  datacard <<             "\t" <<  matchingSystBG.first << "/" << matchingSystBG.second << "\t" << matchingSystBG.first << "/" << matchingSystBG.second; //eem
-  datacard <<             "\t" <<  matchingSystBG.first << "/" << matchingSystBG.second << "\t" << matchingSystBG.first << "/" << matchingSystBG.second; //mme
-  datacard <<             "\t" <<  matchingSystBG.first << "/" << matchingSystBG.second << "\t" << matchingSystBG.first << "/" << matchingSystBG.second << std::endl; //mmm
+  datacard << "matching lnN\t" <<  matchingSystBG.first << "/" << matchingSystBG.second << "\t-     "; //eee
+  datacard <<             "\t\t" <<  matchingSystBG.first << "/" << matchingSystBG.second << "\t-     "; //eem
+  datacard <<             "\t\t" <<  matchingSystBG.first << "/" << matchingSystBG.second << "\t-     "; //mme
+  datacard <<             "\t\t" <<  matchingSystBG.first << "/" << matchingSystBG.second << "\t-     " << std::endl; //mmm
 
   std::pair< float, float >  scaleSystBG = getSyst( "scale", selection, "BG" );
-  datacard << "scale    lnN\t" <<  scaleSystBG.first << "/" << scaleSystBG.second << "\t" << scaleSystBG.first << "/" << scaleSystBG.second; //eee
-  datacard <<             "\t" <<  scaleSystBG.first << "/" << scaleSystBG.second << "\t" << scaleSystBG.first << "/" << scaleSystBG.second; //eem
-  datacard <<             "\t" <<  scaleSystBG.first << "/" << scaleSystBG.second << "\t" << scaleSystBG.first << "/" << scaleSystBG.second; //mme
-  datacard <<             "\t" <<  scaleSystBG.first << "/" << scaleSystBG.second << "\t" << scaleSystBG.first << "/" << scaleSystBG.second << std::endl; //mmm
+  datacard << "scale    lnN\t" <<  scaleSystBG.first << "/" << scaleSystBG.second << "\t-     "; //eee
+  datacard <<             "\t\t" <<  scaleSystBG.first << "/" << scaleSystBG.second << "\t-     "; //eem
+  datacard <<             "\t\t" <<  scaleSystBG.first << "/" << scaleSystBG.second << "\t-     "; //mme
+  datacard <<             "\t\t" <<  scaleSystBG.first << "/" << scaleSystBG.second << "\t-     " << std::endl; //mmm
 
   datacard.close();
 
