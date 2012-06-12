@@ -33,6 +33,9 @@ int main( int argc, char* argv[] ) {
   drawSingleSyst( db, "JES" , selection, "Signal" );
   drawSingleSyst( db, "JER" , selection, "Signal" );
 
+  drawSingleSyst( db, "matching" , selection, "BG" );
+  drawSingleSyst( db, "scale" , selection, "BG" );
+
   return 0;
 
 }
@@ -49,9 +52,23 @@ void drawSingleSyst( DrawBase* db, const std::string& syst, const std::string& s
 
   std::string dataset = (bg_signal=="BG") ? bg_signal : "TTZ_TuneZ2_7TeV-madgraphCMSSW42xPUv3_spadhi";
   
-  std::string systFile = "TTZTrilepton_" + dataset + "_" + sel + "_TCHE_ALL.root";
-  std::string systFileUP = "TTZTrilepton_" + dataset + "_" + sel + "_TCHE_ALL_" + syst + "UP.root";
-  std::string systFileDOWN = "TTZTrilepton_" + dataset + "_" + sel + "_TCHE_ALL_" + syst + "DOWN.root";
+  std::string systFile;
+  std::string systFileUP;
+  std::string systFileDOWN;
+
+  if( syst=="matching" || syst=="scale" ) {
+
+    systFile     = "TTZTrilepton_TTJets_TuneZ2_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v2_" + sel + "_TCHE_ALL.root";
+    systFileUP   = "TTZTrilepton_TTjets_TuneZ2_" + syst + "up_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1_" + sel + "_TCHE_ALL.root";
+    systFileDOWN = "TTZTrilepton_TTjets_TuneZ2_" + syst + "down_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1_" + sel + "_TCHE_ALL.root";
+
+  } else {
+
+    systFile = "TTZTrilepton_" + dataset + "_" + sel + "_TCHE_ALL.root";
+    systFileUP = "TTZTrilepton_" + dataset + "_" + sel + "_TCHE_ALL_" + syst + "UP.root";
+    systFileDOWN = "TTZTrilepton_" + dataset + "_" + sel + "_TCHE_ALL_" + syst + "DOWN.root";
+ 
+  }
 
   TFile* file_systFile = TFile::Open( systFile.c_str() );
   TFile* file_systFileUP = TFile::Open( systFileUP.c_str() );
@@ -77,6 +94,7 @@ void drawSingleSyst( DrawBase* db, const std::string& syst, const std::string& s
   std::string instanceName = (bg_signal=="BG") ? "Background" : bg_signal; 
   instanceName = instanceName + " Events";
   newdb->set_xAxisMin(2.5);
+  newdb->drawHisto( "nJets_prepresel", "Jet Multiplicity", "", instanceName );
   newdb->drawHisto( "nJets_presel", "Jet Multiplicity", "", instanceName );
   newdb->drawHisto( "nJets", "Jet Multiplicity", "", instanceName );
   newdb->reset();
