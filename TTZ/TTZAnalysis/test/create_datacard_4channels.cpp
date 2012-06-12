@@ -166,6 +166,18 @@ int main(int argc, char* argv[]) {
   datacard <<             "\t\t" <<  jerSystSignal.second << "\t\t" << jerSystBG.second << std::endl; //mmm
   datacard << "pu       lnN\t1.03   \t\t-     \t\t1.03   \t\t-     \t\t1.03   \t\t-     \t\t1.03   \t\t-   " << std::endl; //taken from SMP-12-008
 
+  std::pair< float, float >  matchingSystBG = getSyst( "matching", selection, "BG" );
+  datacard << "matching lnN\t" <<  matchingSystBG.first << "/" << matchingSystBG.second << "\t" << matchingSystBG.first << "/" << matchingSystBG.second; //eee
+  datacard <<             "\t" <<  matchingSystBG.first << "/" << matchingSystBG.second << "\t" << matchingSystBG.first << "/" << matchingSystBG.second; //eem
+  datacard <<             "\t" <<  matchingSystBG.first << "/" << matchingSystBG.second << "\t" << matchingSystBG.first << "/" << matchingSystBG.second; //mme
+  datacard <<             "\t" <<  matchingSystBG.first << "/" << matchingSystBG.second << "\t" << matchingSystBG.first << "/" << matchingSystBG.second << std::endl; //mmm
+
+  std::pair< float, float >  scaleSystBG = getSyst( "scale", selection, "BG" );
+  datacard << "scale    lnN\t" <<  scaleSystBG.first << "/" << scaleSystBG.second << "\t" << scaleSystBG.first << "/" << scaleSystBG.second; //eee
+  datacard <<             "\t" <<  scaleSystBG.first << "/" << scaleSystBG.second << "\t" << scaleSystBG.first << "/" << scaleSystBG.second; //eem
+  datacard <<             "\t" <<  scaleSystBG.first << "/" << scaleSystBG.second << "\t" << scaleSystBG.first << "/" << scaleSystBG.second; //mme
+  datacard <<             "\t" <<  scaleSystBG.first << "/" << scaleSystBG.second << "\t" << scaleSystBG.first << "/" << scaleSystBG.second << std::endl; //mmm
+
   datacard.close();
 
   std::cout << "-> Created datacard: " << datacardName << std::endl;
@@ -186,38 +198,62 @@ std::pair<float, float>  getSyst( const std::string& syst, const std::string& se
   }
 
   std::string dataset = (bg_signal=="BG") ? bg_signal : "TTZ_TuneZ2_7TeV-madgraphCMSSW42xPUv3_spadhi";
+
+  std::string systFile;
+  std::string systFileUP;
+  std::string systFileDOWN;
+  std::string histName;
+
+  if( syst!="matching" && syst!="scale" ) {
   
-  if( bg_signal=="BG" ) {
+    if( bg_signal=="BG" ) {
 
-    std::string suffix = "";
+      std::string suffix = "";
 
-    std::string hadd_command = "hadd -f ";
-    hadd_command += getFileName( "BG", sel, suffix );
-    hadd_command += " ";
-    hadd_command += getFileName( "VV_Summer11", sel, suffix );
-    hadd_command += " ";
-    hadd_command += getFileName( "TTJ_Fall11_highstat", sel, suffix );
-    hadd_command += " ";
-    hadd_command += getFileName( "DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Fall11", sel, suffix );
-    hadd_command += " ";
-    hadd_command += getFileName( "GVJets_7TeV-madgraph_Fall11", sel, suffix );
-    hadd_command += " ";
+      std::string hadd_command = "hadd -f ";
+      hadd_command += getFileName( "BG", sel, suffix );
+      hadd_command += " ";
+      hadd_command += getFileName( "VV_Summer11", sel, suffix );
+      hadd_command += " ";
+      hadd_command += getFileName( "TTJ_Fall11_highstat", sel, suffix );
+      hadd_command += " ";
+      hadd_command += getFileName( "DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Fall11", sel, suffix );
+      hadd_command += " ";
+      hadd_command += getFileName( "GVJets_7TeV-madgraph_Fall11", sel, suffix );
+      hadd_command += " ";
 
-    system( hadd_command.c_str() );
+      system( hadd_command.c_str() );
+
+    }
+
+    systFile     = "TTZTrilepton_" + dataset + "_" + sel + "_TCHE_ALL.root";
+    systFileUP   = "TTZTrilepton_" + dataset + "_" + sel + "_TCHE_ALL_" + syst + "UP.root";
+    systFileDOWN = "TTZTrilepton_" + dataset + "_" + sel + "_TCHE_ALL_" + syst + "DOWN.root";
+
+    histName = "channelYields";
+
+  } else { //for scale and matching assume syst is identical for signal and BG:
+
+    std::string sel_tmp = sel;
+    sel_tmp = "presel_plusZ";
+
+    //systFile     = "TTZTrilepton_TTJ_Fall11_highstat_" + sel_tmp + "_TCHE_ALL.root";
+    systFile     = "TTZTrilepton_TTJets_TuneZ2_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v2_" + sel_tmp + "_TCHE_ALL.root";
+    systFileUP   = "TTZTrilepton_TTjets_TuneZ2_" + syst + "up_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1_" + sel_tmp + "_TCHE_ALL.root";
+    systFileDOWN = "TTZTrilepton_TTjets_TuneZ2_" + syst + "down_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1_" + sel_tmp + "_TCHE_ALL.root";
+
+    histName = "mZll_prepresel";
 
   }
-
-  std::string systFile = "TTZTrilepton_" + dataset + "_" + sel + "_TCHE_ALL.root";
-  std::string systFileUP = "TTZTrilepton_" + dataset + "_" + sel + "_TCHE_ALL_" + syst + "UP.root";
-  std::string systFileDOWN = "TTZTrilepton_" + dataset + "_" + sel + "_TCHE_ALL_" + syst + "DOWN.root";
+  
 
   TFile* file_systFile = TFile::Open( systFile.c_str() );
   TFile* file_systFileUP = TFile::Open( systFileUP.c_str() );
   TFile* file_systFileDOWN = TFile::Open( systFileDOWN.c_str() );
 
-  TH1D* h1_mean = (TH1D*)file_systFile->Get("channelYields");
-  TH1D* h1_systUP = (TH1D*)file_systFileUP->Get("channelYields");
-  TH1D* h1_systDOWN = (file_systFileDOWN!=0) ? (TH1D*)file_systFileDOWN->Get("channelYields") : 0;
+  TH1D* h1_mean = (TH1D*)file_systFile->Get(histName.c_str());
+  TH1D* h1_systUP = (TH1D*)file_systFileUP->Get(histName.c_str());
+  TH1D* h1_systDOWN = (file_systFileDOWN!=0) ? (TH1D*)file_systFileDOWN->Get(histName.c_str()) : 0;
 
   float int_mean = h1_mean->Integral();
   float int_systUP = h1_systUP->Integral();
