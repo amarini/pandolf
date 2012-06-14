@@ -151,8 +151,8 @@ int main() {
   TGraphAsymmErrors* gr_ssdl = new TGraphAsymmErrors();
   TGraphAsymmErrors* gr_combined = new TGraphAsymmErrors();
 
-  gr_trilept->SetPoint(0, 0.565937, 2.5);
-  gr_trilept->SetPointError(0, 0.285454, 0.390798, 0., 0.);
+  gr_trilept->SetPoint(0, 0.576608, 2.5);
+  gr_trilept->SetPointError(0, 0.290895, 0.398259, 0., 0.);
   gr_trilept->SetMarkerStyle(22);
   gr_trilept->SetMarkerSize(2.);
   gr_trilept->SetMarkerColor(38);
