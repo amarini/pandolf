@@ -215,6 +215,8 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   h1_mZll_presel->Sumw2();
   TH1D* h1_mZll_presel_antibtag = new TH1D("mZll_presel_antibtag", "", 220, 50., 160.);
   h1_mZll_presel_antibtag->Sumw2();
+  TH1D* h1_mZll_NM1 = new TH1D("mZll_NM1", "", 220, 50., 160.);
+  h1_mZll_NM1->Sumw2();
   TH1D* h1_mZll = new TH1D("mZll", "", 220, 50., 160.);
   h1_mZll->Sumw2();
 
@@ -287,6 +289,9 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   TH1D* h1_deltaRbb = new TH1D("deltaRbb", "", 500, 0., 5.);
   h1_deltaRbb->Sumw2();
   
+  TH1D* h1_m3 = new TH1D("m3", "", 1000., 0., 1000.);
+  h1_m3->Sumw2();
+
   TH1D* h1_mb1jj = new TH1D("mb1jj", "", 1000., 0., 1000.);
   h1_mb1jj->Sumw2();
   TH1D* h1_mb2jj = new TH1D("mb2jj", "", 1000., 0., 1000.);
@@ -976,6 +981,11 @@ ofstream ofs("run_event.txt");
     jetB1.SetPtEtaPhiE( 0., 0., 0., 0. );
     jetB2.SetPtEtaPhiE( 0., 0., 0., 0. );
   
+    AnalysisJet jetLead, jetLead2, jetLead3;
+    jetLead.SetPtEtaPhiE( 0., 0., 0., 0. );
+    jetLead2.SetPtEtaPhiE( 0., 0., 0., 0. );
+    jetLead3.SetPtEtaPhiE( 0., 0., 0., 0. );
+  
     TLorentzVector pfMet_vector;
     pfMet_vector.SetPtEtaPhiE( pfMet, 0., phiMet, pfMet );
 
@@ -987,6 +997,7 @@ ofstream ofs("run_event.txt");
 
       // JES syst:
       float ptJet_corr = ptJet[iJet] + (float)jes_*ptUncertJet[iJet]*ptJet[iJet];
+
 
       // JER syst:
       if( jer_ ) {
@@ -1003,14 +1014,26 @@ ofstream ofs("run_event.txt");
       }
       
 
-      if( ptJet_corr > ptJetMax_t ) ptJetMax_t = ptJet_corr;
+      AnalysisJet thisJet;
+      thisJet.SetPtEtaPhiE( ptJet_corr, etaJet[iJet], phiJet[iJet], eJet[iJet]);
+
+
+      if( ptJet_corr > jetLead.Pt() ) {
+        jetLead3 = jetLead2;
+        jetLead2 = jetLead;
+        jetLead  = thisJet;
+      } else if( ptJet_corr > jetLead2.Pt() ) {
+        jetLead3 = jetLead2;
+        jetLead2 = thisJet;
+      } else if( ptJet_corr > jetLead3.Pt() ) {
+        jetLead3 = thisJet;
+      }
+
+        
       if( ptJet_corr < ptJet_thresh_ ) continue;
       if( fabs(etaJet[iJet]) > etaJet_thresh_ ) continue;
 
       ht += ptJet_corr;
-
-      AnalysisJet thisJet;
-      thisJet.SetPtEtaPhiE( ptJet_corr, etaJet[iJet], phiJet[iJet], eJet[iJet]);
 
       // MET syst:
       AnalysisJet thisJet_uncorr;
@@ -1097,11 +1120,10 @@ ofstream ofs("run_event.txt");
 
     } // for jets
 
+    ptJetMax_t = jetLead.Pt();
 
     if( njets < njets_thresh_ ) continue;
     if( ptJetMax_t < ptJetMax_thresh_ ) continue;
-    //if( nBjets_loose < nBjets_loose_thresh_ ) continue;
-    //if( nBjets_medium < nBjets_medium_thresh_ ) continue;
 
     passed_btag = (nBjets_loose >= nBjets_loose_thresh_) && ( nBjets_medium >= nBjets_medium_thresh_ );
 
@@ -1109,6 +1131,28 @@ ofstream ofs("run_event.txt");
       std::cout << "JetB1/B2 are not defined. There must be a problem." << std::endl;
       exit(33);
     }
+
+
+    // define m3:
+    float triJetPtMax=0.;
+    float m3=0.;
+    for( unsigned i=0; i<selectedJets.size(); ++i ) {
+      for( unsigned j=i+1; j<selectedJets.size(); ++j ) {
+        for( unsigned k=j+1; k<selectedJets.size(); ++k ) {
+          TLorentzVector triJet = selectedJets[i]+selectedJets[j]+selectedJets[k];
+          if( triJet.Pt() > triJetPtMax ) {
+            triJetPtMax=triJet.Pt();
+            m3 = triJet.M();
+          }
+        }
+      }
+    }
+
+    if( m3==0. ) 
+      std::cout << "m3 is 0, there must be a problem." << std::endl;
+    
+
+
 
     AnalysisJet jet3, jet4;
     jet3.SetPtEtaPhiE( 0., 0., 0., 0. );
@@ -1363,12 +1407,14 @@ ofstream ofs("run_event.txt");
 
       // fill histograms:
       
-      h1_mZll->Fill( diLepton.M(), eventWeight );
+      h1_mZll_NM1->Fill( diLepton.M(), eventWeight );
 
 
       if( isMZllSignalRegion ) {
 
         ofs << run << " " << LS << " " << event << std::endl;
+
+        h1_mZll->Fill( diLepton.M(), eventWeight );
 
         h1_nJets->Fill( njets , eventWeight );
         h1_nBJets_loose->Fill( nBjets_loose , eventWeight );
@@ -1432,6 +1478,8 @@ ofstream ofs("run_event.txt");
 
         h1_mTW->Fill( W.Mt() , eventWeight );
 
+        h1_m3->Fill( m3, eventWeight );
+        
         h1_mb1jj->Fill( mb1jj, eventWeight );
         h1_mb2jj->Fill( mb2jj, eventWeight );
 
@@ -1594,6 +1642,7 @@ ofstream ofs("run_event.txt");
   h1_mZll_OF_presel->Write();
   h1_mZll_presel->Write();
   h1_mZll_presel_antibtag->Write();
+  h1_mZll_NM1->Write();
   h1_mZll->Write();
 
 
@@ -1636,6 +1685,8 @@ ofstream ofs("run_event.txt");
 
 
   h1_deltaRbb->Write();
+  
+  h1_m3->Write();
   
   h1_mb1jj->Write();
   h1_mb2jj->Write();
