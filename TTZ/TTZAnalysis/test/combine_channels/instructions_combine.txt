@@ -1,0 +1,17 @@
+crab -cfg crab_combine_trilepton_4channels.cfg -create -submit
+crab -status
+crab -get
+./unpack [crab_dir_name]
+mv mergedToys_[crab_dir_name].root mergedToys_trilepton_4channels.root
+root -l mergedToys_trilepton_4channels.root
+ .L hypoTestResultTree.cxx
+ hypoTestResultTree("q_mergedToys_trilepton_4channels.root", 120, 0)
+combine -M HybridNew --testStat LHC --signif --readHybridResult --toysFile=mergedToys_trilepton_4channels.root -n Final datacard_trilepton_4channels.txt
+
+
+
+repeat above replacing "trilepton_4channels" with "ssdl_3channels" and "7channels"
+
+
+./drawLogLikelihood
+
