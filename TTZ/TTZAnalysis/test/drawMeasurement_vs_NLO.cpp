@@ -174,12 +174,12 @@ int main() {
   line_nlo->SetLineWidth(2);
   line_nlo->SetLineColor(46);
 
-  TLine* line_nlo_plus = new TLine(0.308+0.062, 0., 0.308+0.062, 3.);
+  TLine* line_nlo_plus = new TLine(0.308+0.029, 0., 0.308+0.029, 3.);
   line_nlo_plus->SetLineStyle(2);
   line_nlo_plus->SetLineWidth(2);
   line_nlo_plus->SetLineColor(14);
 
-  TLine* line_nlo_minus = new TLine(0.308-0.062, 0., 0.308-0.062, 3.);
+  TLine* line_nlo_minus = new TLine(0.308-0.051, 0., 0.308-0.051, 3.);
   line_nlo_minus->SetLineStyle(2);
   line_nlo_minus->SetLineWidth(2);
   line_nlo_minus->SetLineColor(14);
