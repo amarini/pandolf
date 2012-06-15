@@ -163,8 +163,8 @@ int main() {
   gr_ssdl->SetMarkerSize(2.);
   gr_ssdl->SetMarkerColor(39);
 
-  gr_combined->SetPoint(0, 0.386399224, 0.5);
-  gr_combined->SetPointError(0, 0.180300611, 0.180300611, 0., 0.);
+  gr_combined->SetPoint(0, 0.384, 0.5);
+  gr_combined->SetPointError(0, 0.161, 0.191, 0., 0.);
   gr_combined->SetMarkerStyle(20);
   gr_combined->SetMarkerSize(2.);
   gr_combined->SetMarkerColor(1);
