@@ -38,7 +38,6 @@ int main( int argc, char* argv[] ) {
   float ttZ = 2.245;
   float ttW = 5.164;
   float s = ttW+ttZ;
-  float b_pred = 8.488;
   float b_pred_err = 2.451;
    
   float b_fake=0.;
@@ -194,6 +193,8 @@ int main( int argc, char* argv[] ) {
   totalSignalSystUP = sqrt(totalSignalSystUP);
 
 
+  float b_pred = b_fake + b_cmid + b_wz + b_rare;
+
 
   // stat error on observed:
   double obs_plus, obs_minus;
@@ -218,12 +219,15 @@ int main( int argc, char* argv[] ) {
   //float n_passed_ttZ = nTotal_ttZ*ttZ/(crossSection_ttZ*lumi_pb);
   //float eff_ttZ = n_passed_ttZ/nTotal_ttZ;
   float eff_ttZ = ttZ/(crossSection_ttZ*lumi_pb);
+std::cout << "eff_ttZ: " << 100.*eff_ttZ << "%" << std::endl;
 
   //float n_passed_ttW = nTotal_ttW*ttW/(crossSection_ttW*lumi_pb);
   //float eff_ttW = n_passed_ttW/nTotal_ttW;
   float eff_ttW = ttW/(crossSection_ttW*lumi_pb);
+std::cout << "eff_ttW: " << 100.*eff_ttW << "%" << std::endl;
 
   float eff_ttV = ( crossSection_ttZ*eff_ttZ + crossSection_ttW*eff_ttW ) / ( crossSection_ttZ + crossSection_ttW );
+std::cout << "eff_ttV: " << 100.*eff_ttV << "%" << std::endl;
 
   float crossSectionObs_ttZ = obs_ttV / ( lumi_pb*eff_ttZ );
   float crossSectionObs_ttV = obs_ttV / ( lumi_pb*eff_ttV );
