@@ -207,6 +207,7 @@ int main( int argc, char* argv[] ) {
   float ZBi_obs = StatTools::computeZBi( obs, b_pred, b_pred_err );
 
   float obs_ttV = obs - b_pred;
+  float obs_ttW = obs_ttV - ttZ;
 
   //float nTotal_ttZ = 1467136.;
   //float nTotal_ttW = 1089608.;
@@ -229,11 +230,15 @@ std::cout << "eff_ttW: " << 100.*eff_ttW << "%" << std::endl;
   float eff_ttV = ( crossSection_ttZ*eff_ttZ + crossSection_ttW*eff_ttW ) / ( crossSection_ttZ + crossSection_ttW );
 std::cout << "eff_ttV: " << 100.*eff_ttV << "%" << std::endl;
 
-  float crossSectionObs_ttZ = obs_ttV / ( lumi_pb*eff_ttZ );
+  //float crossSectionObs_ttZ = obs_ttV / ( lumi_pb*eff_ttZ );
+  float crossSectionObs_ttW = obs_ttW / ( lumi_pb*eff_ttW );
   float crossSectionObs_ttV = obs_ttV / ( lumi_pb*eff_ttV );
 
-  float xsecErr_ttZ_stat_plus  = obs_errPlus /  ( lumi_pb*eff_ttZ );
-  float xsecErr_ttZ_stat_minus = obs_errMinus / ( lumi_pb*eff_ttZ );
+  //float xsecErr_ttZ_stat_plus  = obs_errPlus /  ( lumi_pb*eff_ttZ );
+  //float xsecErr_ttZ_stat_minus = obs_errMinus / ( lumi_pb*eff_ttZ );
+
+  float xsecErr_ttW_stat_plus  = obs_errPlus /  ( lumi_pb*eff_ttW );
+  float xsecErr_ttW_stat_minus = obs_errMinus / ( lumi_pb*eff_ttW );
 
   float xsecErr_ttV_stat_plus  = obs_errPlus /  ( lumi_pb*eff_ttV );
   float xsecErr_ttV_stat_minus = obs_errMinus / ( lumi_pb*eff_ttV );
@@ -246,8 +251,11 @@ std::cout << "eff_ttV: " << 100.*eff_ttV << "%" << std::endl;
   // so err(lumi) -> err(xsec) = obs_ttV/( lumi*lumi*eff ) * err(lumi) = xsec*err(lumi)/lumi
   // total error is xsec*(quadrature sum of all relative errors)
   
+  float xsecErr_ttW_systSignal_plus  = crossSection_ttW*(totalSignalSystUP);
+  float xsecErr_ttW_systSignal_minus = crossSection_ttW*(totalSignalSystDOWN);
+
   float xsecErr_ttV_systSignal_plus  = crossSection_ttV*(totalSignalSystUP);
-  float xsecErr_ttV_systSignal_minus = crossSection_ttV* (totalSignalSystDOWN);
+  float xsecErr_ttV_systSignal_minus = crossSection_ttV*(totalSignalSystDOWN);
 
   
   // background systematics instead affect the numerator:
@@ -257,13 +265,22 @@ std::cout << "eff_ttV: " << 100.*eff_ttV << "%" << std::endl;
   //float xsecErr_ttV_systBG_plus  = (totalBG_fake_SystUP*b_fake + totalBG_cmid_SystUP*b_cmid + totalBG_wz_SystUP*b_wz + totalBG_rare_SystUP*b_rare) / ( lumi_pb*eff_ttV );
   //float xsecErr_ttV_systBG_minus  = (totalBG_fake_SystDOWN*b_fake + totalBG_cmid_SystDOWN*b_cmid + totalBG_wz_SystDOWN*b_wz + totalBG_rare_SystDOWN*b_rare) / ( lumi_pb*eff_ttV );
 
-  float xsecErr_ttV_systBG_plus  = totalBG_SystUP / ( lumi_pb*eff_ttV );
+  float xsecErr_ttW_systBG_plus   = totalBG_SystUP   / ( lumi_pb*eff_ttW );
+  float xsecErr_ttW_systBG_minus  = totalBG_SystDOWN / ( lumi_pb*eff_ttW );
+
+  float xsecErr_ttV_systBG_plus   = totalBG_SystUP   / ( lumi_pb*eff_ttV );
   float xsecErr_ttV_systBG_minus  = totalBG_SystDOWN / ( lumi_pb*eff_ttV );
 
+
+  float xsecErr_ttW_syst_plus  = sqrt( xsecErr_ttW_systSignal_plus *xsecErr_ttW_systSignal_plus  + xsecErr_ttW_systBG_plus *xsecErr_ttW_systBG_plus );
+  float xsecErr_ttW_syst_minus = sqrt( xsecErr_ttW_systSignal_minus*xsecErr_ttW_systSignal_minus + xsecErr_ttW_systBG_minus*xsecErr_ttW_systBG_minus );
 
   float xsecErr_ttV_syst_plus  = sqrt( xsecErr_ttV_systSignal_plus *xsecErr_ttV_systSignal_plus  + xsecErr_ttV_systBG_plus *xsecErr_ttV_systBG_plus );
   float xsecErr_ttV_syst_minus = sqrt( xsecErr_ttV_systSignal_minus*xsecErr_ttV_systSignal_minus + xsecErr_ttV_systBG_minus*xsecErr_ttV_systBG_minus );
 
+
+  float xsecErr_ttW_tot_plus  = sqrt( xsecErr_ttW_stat_plus *xsecErr_ttW_stat_plus  + xsecErr_ttW_syst_plus *xsecErr_ttW_syst_plus );
+  float xsecErr_ttW_tot_minus = sqrt( xsecErr_ttW_stat_minus*xsecErr_ttW_stat_minus + xsecErr_ttW_syst_minus*xsecErr_ttW_syst_minus );
 
   float xsecErr_ttV_tot_plus  = sqrt( xsecErr_ttV_stat_plus *xsecErr_ttV_stat_plus  + xsecErr_ttV_syst_plus *xsecErr_ttV_syst_plus );
   float xsecErr_ttV_tot_minus = sqrt( xsecErr_ttV_stat_minus*xsecErr_ttV_stat_minus + xsecErr_ttV_syst_minus*xsecErr_ttV_syst_minus );
@@ -275,10 +292,13 @@ std::cout << "eff_ttV: " << 100.*eff_ttV << "%" << std::endl;
   std::cout << " Expected BG: " << b_pred << " +- " << b_pred_err << std::endl;
   std::cout << " Expected Signal: " << s << std::endl;
   std::cout << " Expected B+S: " << s+b_pred << std::endl;
-  std::cout << " ZBi (expected): " << ZBi << std::endl;
-  std::cout << " Observed Events: " << obs << std::endl;
-  std::cout << " ZBi (observed): " << ZBi_obs << std::endl;
-  std::cout << " Observed Signal (BG subtracted): " << obs_ttV << std::endl;
+  std::cout << " Observed: " << obs << std::endl;
+  std::cout << " Observed ttW Signal (BG subtracted): " << obs_ttW << std::endl;
+  std::cout << " Expected ttW Cross Section: " << crossSection_ttW << " pb" << std::endl;
+  std::cout << " Measured ttW Cross Section: " << std::endl;
+  std::cout << " " <<  crossSectionObs_ttW << "  +" << xsecErr_ttW_stat_plus << "/-" << xsecErr_ttW_stat_minus << " (stat)   +" << xsecErr_ttW_syst_plus << "/-" << xsecErr_ttW_syst_minus << " (syst)  pb" << std::endl;
+  std::cout << " " <<  crossSectionObs_ttW << "  +" << xsecErr_ttW_tot_plus << "/-" << xsecErr_ttW_tot_minus << " pb" << std::endl;
+  std::cout << " Observed ttV Signal (BG subtracted): " << obs_ttV << std::endl;
   std::cout << " Expected ttV Cross Section: " << crossSection_ttV << " pb" << std::endl;
   std::cout << " Measured ttV Cross Section: " << std::endl;
   std::cout << " " <<  crossSectionObs_ttV << "  +" << xsecErr_ttV_stat_plus << "/-" << xsecErr_ttV_stat_minus << " (stat)   +" << xsecErr_ttV_syst_plus << "/-" << xsecErr_ttV_syst_minus << " (syst)  pb" << std::endl;
