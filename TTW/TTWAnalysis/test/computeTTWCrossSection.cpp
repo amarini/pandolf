@@ -293,6 +293,7 @@ std::cout << "eff_ttV: " << 100.*eff_ttV << "%" << std::endl;
   std::cout << " Expected Signal: " << s << std::endl;
   std::cout << " Expected B+S: " << s+b_pred << std::endl;
   std::cout << " Observed: " << obs << std::endl;
+  std::cout << " Observed Poisson Interval: " << obs_minus << "-" << obs_plus << std::endl;
   std::cout << " Observed ttW Signal (BG subtracted): " << obs_ttW << std::endl;
   std::cout << " Expected ttW Cross Section: " << crossSection_ttW << " pb" << std::endl;
   std::cout << " Measured ttW Cross Section: " << std::endl;
