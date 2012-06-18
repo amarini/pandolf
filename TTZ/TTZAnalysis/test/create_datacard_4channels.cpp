@@ -132,10 +132,10 @@ int main(int argc, char* argv[]) {
 
   datacard << "#syst" << std::endl;
   datacard << "lumi     lnN\t1.022  \t\t1.022  \t\t1.022  \t\t1.022  \t\t1.022  \t\t1.022  \t\t1.022  \t\t1.022" << std::endl; //taken from SMP-12-008
-  datacard << "bgUncert lnN\t-      \t\t" << 1. + b_pred_eee_err/b_pred_eee;
-  datacard <<        "   \t\t-      \t\t" << 1. + b_pred_eem_err/b_pred_eem;
-  datacard <<        "   \t\t-      \t\t" << 1. + b_pred_mme_err/b_pred_mme;
-  datacard <<        "   \t\t-      \t\t" << 1. + b_pred_mmm_err/b_pred_mmm << std::endl;
+  datacard << "bgUnc_eee lnN\t-      \t\t" << 1. + b_pred_eee_err/b_pred_eee << "\t\t-      \t\t-      \t\t-      \t\t-      \t\t-      \t\t-         " << std::endl;
+  datacard << "bgUnc_eem lnN\t-      \t\t-       \t\t-      \t\t" << 1. + b_pred_eem_err/b_pred_eem << "  \t\t-      \t\t-      \t\t-      \t\t-          " << std::endl;
+  datacard << "bgUnc_mme lnN\t-      \t\t-       \t\t-      \t\t-     \t\t-         \t\t" << 1. + b_pred_mme_err/b_pred_mme << "  \t\t-      \t\t-      " << std::endl;
+  datacard << "bgUnc_mmm lnN\t-      \t\t-       \t\t-      \t\t-     \t\t-         \t\t-     \t\t-         \t\t" << 1. + b_pred_mmm_err/b_pred_mmm << std::endl;
 
   std::pair< float, float >  leptSystBG = getSyst( "Lept", selection, "BG" );
   std::pair< float, float >  leptSystSignal = getSyst( "Lept", selection, "Signal" );
