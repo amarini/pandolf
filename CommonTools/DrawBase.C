@@ -190,7 +190,7 @@ DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType
   yAxisMaxScale_ = 1.4;
   yAxisMaxScaleLog_ = 5.;
 
-  markerSize_ = 1.6;
+  markerSize_ = 1.3;
   getBinLabels_ = false;
   legendTitle_ = "";
   legendTextSize_ = 0.038;
@@ -203,7 +203,7 @@ DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType
   noStack_ = false;
 
   isCMSArticle_ = false;
-  lumiOnRightSide_ = true;
+  lumiOnRightSide_ = false;
 
   additionalLabel_ = 0;
 
@@ -1269,6 +1269,7 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
     for( unsigned iData=0; iData<dataHistos.size(); ++iData ) {
       dataHistos[iData]->Rebin(rebin_);
       dataHistos[iData]->Scale(dataFiles_[iData].weight);
+      dataHistos[iData]->SetMarkerSize( markerSize_ );
 
       if( dataFiles_[iData].markerStyle!=-1 )
         dataHistos[iData]->SetMarkerStyle(dataFiles_[iData].markerStyle);
@@ -1281,7 +1282,6 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
         dataHistos[iData]->SetMarkerColor(markerColor_default++); // make it change at every histo
 
       if( dataFiles_[iData].fillStyle!=-1 ) {
-        dataHistos[iData]->SetMarkerSize( 0 );
         dataHistos[iData]->SetFillStyle( dataFiles_[iData].fillStyle );
         dataHistos[iData]->SetFillColor( dataFiles_[iData].fillColor );
         if( dataFiles_[iData].fillStyle==1001 ) {
@@ -1477,6 +1477,7 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
     TLegend* legend = new TLegend(lb.xMin, lb.yMin, lb.xMax, lb.yMax, legendTitle_.c_str());
     legend->SetFillColor(kWhite);
     legend->SetTextSize(legendTextSize_);
+    legend->SetTextFont(42);
     for( unsigned i=0; i<dataHistos.size(); ++i ) 
       if( dataFiles_[i].fillStyle!=-1 )
         legend->AddEntry(dataHistos[i], (dataFiles_[i].legendName).c_str(), "F");
@@ -1526,6 +1527,7 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
         graph_data_poisson->SetMarkerStyle(dataFiles_[0].markerStyle);
       else 
         graph_data_poisson->SetMarkerStyle(20);
+      graph_data_poisson->SetMarkerSize(markerSize_);
     }
 
 
@@ -3020,10 +3022,10 @@ TPaveText* DrawBase::get_labelCMS( int legendQuadrant ) const {
     x2 = 0.42;
     y2 = 0.24;
   } else if( legendQuadrant==0 ) {
-    x1 = 0.14;
+    x1 = 0.1425;
     //x1 = (lumiOnRightSide_) ? 0.14 : 0.145;
     y1 = 0.953;
-    x2 = 0.6;
+    x2 = 0.4;
     y2 = 0.975;
   }
 
@@ -3050,21 +3052,24 @@ TPaveText* DrawBase::get_labelCMS( int legendQuadrant ) const {
     } else {
       std::string leftText;
       if( dataFiles_.size()==0 ) {
-        leftText = "CMS Simulation 2011";
+        leftText = "CMS Simulation";
       } else {
         if( isCMSArticle_ )
-          leftText = "CMS 2011";
+          leftText = "CMS";
         else
-          leftText = "CMS Preliminary 2011";
+          leftText = "CMS Preliminary";
       }
-      if (lumi_ > 0.) {
-        cmslabel->SetTextAlign(11); // align left
-        std::string lumiText = this->get_lumiText();
-        cmslabel->AddText(Form("%s, %s", leftText.c_str(), lumiText.c_str()));
-      } else {
-        cmslabel->SetTextAlign(11); // align left
-        cmslabel->AddText(Form("%s", leftText.c_str()));
-      }
+
+      cmslabel->SetTextAlign(11); // align left
+      cmslabel->AddText(Form("%s", leftText.c_str()));
+
+      //if (lumi_ > 0.) {
+      //  cmslabel->SetTextAlign(11); // align left
+      //  std::string lumiText = this->get_lumiText();
+      //  cmslabel->AddText(Form("%s, %s", leftText.c_str(), lumiText.c_str()));
+      //} else {
+      //  cmslabel->SetTextAlign(11); // align left
+      //}
 
     } 
 
@@ -3104,7 +3109,7 @@ TPaveText* DrawBase::get_labelSqrt( int legendQuadrant ) const {
   } else if( legendQuadrant==0 ) {
     x1 = (lumiOnRightSide_) ? 0.4 : 0.7;
     y1 = 0.953;
-    x2 = 0.975;
+    x2 = 0.96;
     y2 = 0.975;
   }
 
@@ -3112,13 +3117,14 @@ TPaveText* DrawBase::get_labelSqrt( int legendQuadrant ) const {
   TPaveText* label_sqrt = new TPaveText(x1,y1,x2,y2, "brNDC");
   label_sqrt->SetFillColor(kWhite);
   label_sqrt->SetTextSize(0.038);
-  label_sqrt->SetTextFont(62);
+  //label_sqrt->SetTextFont(62);
   std::string label_sqrt_text = this->get_sqrtText();
 
 
   if( legendQuadrant!=0 ) {
     label_sqrt->AddText(label_sqrt_text.c_str());
   } else {
+    std::string lumiText = this->get_lumiText();
     label_sqrt->SetTextAlign(31); // align right
     if( lumiOnRightSide_ ) {
       label_sqrt->SetTextFont(62);
@@ -3131,14 +3137,14 @@ TPaveText* DrawBase::get_labelSqrt( int legendQuadrant ) const {
         else
           cmsText = "CMS Preliminary";
       }
-      std::string lumiText = this->get_lumiText();
       if( scaleFactor_>=0. ) {
         label_sqrt->AddText(Form("%s, L = %s at  #sqrt{s} = 7 TeV", cmsText.c_str(), lumiText.c_str()));
       } else {
         label_sqrt->AddText(Form("%s,  #sqrt{s} = 7 TeV", cmsText.c_str()) );
       }
     } else { //if lumiOnRightSide
-      label_sqrt->AddText("#sqrt{s} = 7 TeV");
+      label_sqrt->SetTextFont(42);
+      label_sqrt->AddText(Form("L = %s at  #sqrt{s} = 7 TeV", lumiText.c_str()));
     }
   }
 
