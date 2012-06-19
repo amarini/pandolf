@@ -159,7 +159,8 @@ int main( int argc, char* argv[] ) {
 
   float lumi_pb = 4980.;
   float crossSection_ttZ = 0.139;
-  float crossSection_ttW = 0.1633;
+  float crossSection_ttW = 0.169;
+  //float crossSection_ttW = 0.1633;
   float crossSection_ttV = crossSection_ttZ+crossSection_ttW;
 
   float n_passed_ttZ = nTotal_ttZ*ttZ/(crossSection_ttZ*lumi_pb);
@@ -169,9 +170,9 @@ int main( int argc, char* argv[] ) {
   float eff_ttW = n_passed_ttW/nTotal_ttW;
 
   float eff_ttV = ( crossSection_ttZ*eff_ttZ + crossSection_ttW*eff_ttW ) / ( crossSection_ttZ + crossSection_ttW );
-std::cout << "n_passed_ttZ: " << n_passed_ttZ << " (" << eff_ttZ*100./(2.*0.22*0.67*0.06) << ")" << std::endl;
-std::cout << "n_passed_ttW: " << n_passed_ttW << " (" << eff_ttW*100./(0.22*0.22*0.67) << ")" << std::endl;
-std::cout << "eff_ttV: " << eff_ttV << std::endl;
+std::cout << "n_passed_ttZ: " << n_passed_ttZ << " (eff: " << eff_ttZ*100. << "%   /BR: " << eff_ttZ*100./(2.*0.22*0.67*0.06) << "%)" << std::endl;
+std::cout << "n_passed_ttW: " << n_passed_ttW << " (eff: " << eff_ttW*100. << "%   /BR: " << eff_ttW*100./(0.22*0.22*0.67) << "%)" << std::endl;
+std::cout << "eff_ttV: " << eff_ttV*100. << " %" << std::endl;
 
   float crossSectionObs_ttZ = obs_ttV / ( lumi_pb*eff_ttZ );
   float crossSectionObs_ttV = obs_ttV / ( lumi_pb*eff_ttV );
