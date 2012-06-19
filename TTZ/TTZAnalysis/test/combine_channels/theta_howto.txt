@@ -1,0 +1,43 @@
+check out and compile theta:
+
+svn co https://ekptrac.physik.uni-karlsruhe.de/public/theta/tags/testing theta
+cd theta
+make
+cd ..
+
+(check that the svn version is 258 or greater)
+
+
+
+
+#trilepton channel:
+(choose in analysis_trilepton.py whether you want to use the 4channels or integrated datacard)
+cp analysis_trilepton.py analysis.py
+
+#dilepton channel:
+(choose in analysis_ssdl.py whether you want to use the 3channels or integrated datacard)
+cp analysis_ssdl.py analysis.py
+
+#combined:
+(choose in analysis_combined.py whether you want to use the 7channels or integrated datacard)
+cp analysis_combined.py analysis.py
+
+
+
+theta/utils2/theta-auto.py
+
+the output will be something like:
+
+[INFO]  executing script analysis.py
+[INFO]  Running 'theta /cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/TTZ/TTZAnalysis/test/combine_channels/analysis/pli-data-ttZ-07fe5b3da6.cfg'
+progress:      1 / 1      [100.0%]   errors:      0 [  0.0%]
+profile likelihood interval of the signal strength parameter: 2.136   +1.064  -0.831
+[INFO]  Running 'theta /cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/TTZ/TTZAnalysis/test/combine_channels/analysis/dnll-data-ttZ-362f2e2e9a.cfg'
+progress:      1 / 1      [100.0%]   errors:      0 [  0.0%]
+approximate Z-value: 3.483
+[INFO]  workdir is /cmsrm/pc25/pandolf/CMSSW_4_2_8_patch7/src/TTZ/TTZAnalysis/test/combine_channels/analysis
+
+
+
+so your significance is 3.483 sigma and your cross section measurement is  2.136 +1.064/-0.831  times the predicted one. 
+in the case of ttZ it's therefore (2.136 +1.064/-0.831) * 0.1387 pb = 0.30 +0.15/-0.11 pb
