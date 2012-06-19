@@ -65,7 +65,9 @@ int main(int argc, char* argv[]) {
 
   DrawBase* db = new DrawBase("TTZTrilepton");
 
-  db->set_lumiOnRightSide(true);
+  //db->set_markerSize(4.);
+
+  //db->set_lumiOnRightSide(true);
 
   std::string outputdir_str = "TTZTrileptonPlots_" + data_dataset + "_" + selType + "_" + bTaggerType + "_" + leptType;
   if( use_powhegDY ) outputdir_str += "_powhegDY";
@@ -100,7 +102,7 @@ int main(int argc, char* argv[]) {
   mcTTWFileName += "_" + leptType;
   mcTTWFileName += ".root";
   TFile* mcTTWFile = TFile::Open(mcTTWFileName.c_str());
-  db->add_mcFile( mcTTWFile, "ttW", "t#bar{t} + W", 33, 0);
+  db->add_mcFile( mcTTWFile, "ttW", "t#bar{t} + W", 44, 0);
 
 
   //std::string mcZJetsFileName = "TTZTrilepton_DYJetsToLL_TuneZ2_7TeV-madgraph-tauola_Fall11";
@@ -132,7 +134,7 @@ int main(int argc, char* argv[]) {
   mcVVFileName += "_" + leptType;
   mcVVFileName += ".root";
   TFile* mcVVFile = TFile::Open(mcVVFileName.c_str());
-  db->add_mcFile( mcVVFile, "VV_Summer11", "Diboson", 38, 0);
+//db->add_mcFile( mcVVFile, "VV_Summer11", "Diboson", 38, 0);
 
   std::string mcVGFileName = "TTZTrilepton_GVJets_7TeV-madgraph_Fall11";
   mcVGFileName += "_" + selType;
@@ -141,7 +143,19 @@ int main(int argc, char* argv[]) {
   mcVGFileName += "_" + leptType;
   mcVGFileName += ".root";
   TFile* mcVGFile = TFile::Open(mcVGFileName.c_str());
-  db->add_mcFile( mcVGFile, "VG_Summer11", "V#gamma", 30, 0);
+//db->add_mcFile( mcVGFile, "VG_Summer11", "V#gamma", 30, 0);
+
+  std::string mcVVVGFileName = "TTZTrilepton_VV_Summer11_plus_VG_Fall11";
+  mcVVVGFileName += "_" + selType;
+  mcVVVGFileName += "_" + bTaggerType;
+  mcVVVGFileName += "_" + leptType;
+  mcVVVGFileName += ".root";
+
+  std::string hadd_command = "hadd -f " + mcVVVGFileName + " " + mcVVFileName + " " + mcVGFileName;
+  std::cout << hadd_command << std::endl;
+  system(hadd_command.c_str());
+  TFile* mcVVVGFile = TFile::Open(mcVVVGFileName.c_str());
+  db->add_mcFile( mcVVVGFile, "VVVG", "Diboson", 38, 0);
 
 //std::string mcZZFileName = "TTZTrilepton_ZZ_TuneZ2_7TeV_pythia6_tauola_Summer11-PU_S4_START42_V11-v1";
 //mcZZFileName += "_" + selType;
@@ -236,8 +250,8 @@ int main(int argc, char* argv[]) {
   //db->drawHisto_fromTree("tree_passedEvents", "mZll", "eventWeight*(ptJetMax>50. && nBjets_medium==0)", 220, 50., 160., "mZll_preselprova", "Dilepton Invariant Mass", "GeV", "Events");
   ValueAndError DYWZSF = get_DYWZSF( *db, xMin_mZll );
   db->set_mcWeight( "ZJets", DYWZSF.val );
-  db->set_mcWeight( "VV_Summer11", DYWZSF.val );
-  db->set_mcWeight( "VG_Summer11", DYWZSF.val );
+  db->set_mcWeight( "VVVG", DYWZSF.val );
+  //db->set_mcWeight( "VG_Summer11", DYWZSF.val );
 
   db->set_xAxisMin(50.);
   db->set_xAxisMax(130.);
@@ -371,16 +385,18 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
   h1_yields_data->SetBinContent( 5, tot_data );
   
 
-  TGraphAsymmErrors* gr_data = fitTools::getGraphPoissonErrors(h1_yields_data);
+  TGraphAsymmErrors* gr_data = fitTools::getGraphPoissonErrors(h1_yields_data, true, "0");
   gr_data->SetMarkerStyle(20);
-  gr_data->SetMarkerSize(1.4);
+  gr_data->SetMarkerSize(2.);
+  gr_data->SetLineWidth(2.);
 
 
   //TLegend* legend = new TLegend( 0.6, 0.57, 0.92, 0.9 );
   //TLegend* legend = new TLegend( 0.2, 0.57, 0.52, 0.9 );
-  TLegend* legend = new TLegend( 0.2, 0.5, 0.52, 0.9 );
+  TLegend* legend = new TLegend( 0.2, 0.54, 0.52, 0.9 );
   legend->SetFillColor(0);
-  legend->SetTextSize(0.042);
+  legend->SetTextSize(0.038);
+  legend->SetTextFont(42);
   legend->AddEntry( gr_data, "Data", "P" );
 
 
@@ -439,7 +455,7 @@ std::cout << "dataset: " << db->get_mcFile(iMC).datasetName << std::endl;
       scaling *= ttbarSF.val;
       scaling_err = ttbarSF.err;
     }
-    if( db->get_mcFile(iMC).datasetName=="ZJets" || db->get_mcFile(iMC).datasetName=="VV_Summer11" || db->get_mcFile(iMC).datasetName=="VG_Summer11" ) {
+    if( db->get_mcFile(iMC).datasetName=="ZJets" || db->get_mcFile(iMC).datasetName=="VVVG" ) {
       scaling *= DYWZSF.val;
       scaling_err = DYWZSF.err;
     }
@@ -547,15 +563,15 @@ std::cout << "dataset: " << db->get_mcFile(iMC).datasetName << std::endl;
 
   
 
-  h1_yields_mc_totBG->SetFillStyle( 3005 );
+  h1_yields_mc_totBG->SetFillStyle( 3004 );
   h1_yields_mc_totBG->SetFillColor( 12 );
-  h1_yields_mc_totBG->SetLineWidth( 1 );
+  h1_yields_mc_totBG->SetLineWidth( 3 );
 
 
   float yMaxData = h1_yields_data->GetMaximum();
   float yMaxMC = stackMC->GetMaximum();
   float yMax = TMath::Max(yMaxData, yMaxMC);
-  yMax *= 1.4;
+  yMax *= 1.5;
 
   TH2D* h2_axes = new TH2D("axes", "", 5, 0., 5., 10, 0., yMax);
   h2_axes->GetXaxis()->SetLabelSize(0.085);
@@ -565,17 +581,22 @@ std::cout << "dataset: " << db->get_mcFile(iMC).datasetName << std::endl;
   h2_axes->GetXaxis()->SetBinLabel(4, "(#mu#mu)#mu");
   h2_axes->GetXaxis()->SetBinLabel(5, "Total" );
   h2_axes->SetYTitle("Events");
+  h2_axes->GetYaxis()->SetTitleOffset(1.25);
 
 
   TPaveText* label_sqrt = db->get_labelSqrt();
+  TPaveText* label_cms = db->get_labelCMS();
 
   TCanvas* c1 = new TCanvas("c1", "", 600, 600);
   c1->cd();
   h2_axes->Draw();
   stackMC->Draw("histo same");
-  h1_yields_mc_totBG->Draw("0 E2 same");
+  h1_yields_mc_totBG->DrawCopy("0 E2 same");
+  h1_yields_mc_totBG->SetFillStyle(0);
+  h1_yields_mc_totBG->DrawCopy("hist same");
   legend->Draw("same");
   gr_data->Draw("P same");
+  label_cms->Draw("same");
   label_sqrt->Draw("same");
 
   gPad->RedrawAxis();
