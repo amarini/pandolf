@@ -148,26 +148,38 @@ int main() {
 
 
   TGraphAsymmErrors* gr_trilept = new TGraphAsymmErrors();
+  TGraphAsymmErrors* gr_trilept_stat = new TGraphAsymmErrors();
   TGraphAsymmErrors* gr_ssdl = new TGraphAsymmErrors();
+  TGraphAsymmErrors* gr_ssdl_stat = new TGraphAsymmErrors();
   TGraphAsymmErrors* gr_combined = new TGraphAsymmErrors();
+  TGraphAsymmErrors* gr_combined_stat = new TGraphAsymmErrors();
 
-  gr_trilept->SetPoint(0, 0.576608, 2.5);
-  gr_trilept->SetPointError(0, 0.290895, 0.398259, 0., 0.);
+  gr_trilept->SetPoint(0, 0.657888, 2.5);
+  gr_trilept->SetPointError(0, 0.255948, 0.327712, 0., 0.);
   gr_trilept->SetMarkerStyle(22);
   gr_trilept->SetMarkerSize(2.);
   gr_trilept->SetMarkerColor(38);
 
-  gr_ssdl->SetPoint(0, 0.270711, 1.5);
-  gr_ssdl->SetPointError(0, 0.189347, 0.2302, 0., 0.);
+  gr_trilept_stat->SetPoint(0, 0.657888, 2.5);
+  gr_trilept_stat->SetPointError(0, 0.251636, 0.316008, 0., 0.);
+
+  gr_ssdl->SetPoint(0, 0.429044, 1.5);
+  gr_ssdl->SetPointError(0, 0.154308, 0.182952, 0., 0.);
   gr_ssdl->SetMarkerStyle(21);
   gr_ssdl->SetMarkerSize(2.);
   gr_ssdl->SetMarkerColor(39);
 
-  gr_combined->SetPoint(0, 0.384, 0.5);
-  gr_combined->SetPointError(0, 0.161, 0.191, 0., 0.);
+  gr_ssdl_stat->SetPoint(0, 0.429044, 1.5);
+  gr_ssdl_stat->SetPointError(0, 0.146608, 0.175252, 0., 0.);
+
+  gr_combined->SetPoint(0, 0.501116, 0.5);
+  gr_combined->SetPointError(0, 0.135828, 0.157696, 0., 0.);
   gr_combined->SetMarkerStyle(20);
   gr_combined->SetMarkerSize(2.);
   gr_combined->SetMarkerColor(1);
+
+  gr_combined_stat->SetPoint(0, 0.501116, 0.5);
+  gr_combined_stat->SetPointError(0, 0.131208, 0.151228, 0., 0.);
 
 
   TLine* line_nlo = new TLine(0.308, 0., 0.308, 3.);
@@ -184,38 +196,51 @@ int main() {
   line_nlo_minus->SetLineWidth(2);
   line_nlo_minus->SetLineColor(14);
 
-  TLegend* legend = new TLegend(0.45, 0.2, 0.82, 0.5);
+  TLegend* legend = new TLegend(0.37, 0.2, 0.82, 0.5);
   legend->SetFillColor(0);
-  legend->SetTextSize(0.04);
-  legend->AddEntry( gr_trilept, "Trilepton Channel", "P" );
-  legend->AddEntry( gr_ssdl, "Dilepton Channel", "P" );
+  legend->SetTextSize(0.038);
+  legend->SetTextFont(42);
+  legend->AddEntry( gr_trilept, "Trilepton (scaled from #sigma_{ttZ})", "P" );
+  legend->AddEntry( gr_ssdl, "Dilepton (direct measure)", "P" );
   legend->AddEntry( gr_combined, "Combination", "P" );
   legend->AddEntry( line_nlo, "NLO Calculation", "L" );
 
-  //TPaveText* label_sqrt = db->get_labelSqrt();
-  TPaveText* label_sqrt = new TPaveText( 0.32, 0.953, 0.93, 0.975, "brNDC");
+  TPaveText* label_sqrt = new TPaveText( 0.32, 0.953, 0.928, 0.975, "brNDC");
   label_sqrt->SetTextSize(0.038);
   label_sqrt->SetFillColor(0);
-  label_sqrt->SetTextFont(62);
+  label_sqrt->SetTextFont(42);
   label_sqrt->SetTextAlign(31);
-  label_sqrt->AddText("CMS Preliminary, L = 4.98 fb ^{-1} at  #sqrt{s} = 7 TeV");
+  label_sqrt->AddText("L = 4.98 fb ^{-1} at  #sqrt{s} = 7 TeV");
   
-  TH2D* h2_axes = new TH2D("axes", "", 10, 0., 1.7, 1, 0., 3.);
+  TPaveText* label_cms = new TPaveText( 0.09, 0.953, 0.45, 0.975, "brNDC");
+  label_cms->SetTextSize(0.038);
+  label_cms->SetFillColor(0);
+  label_cms->SetTextFont(62);
+  label_cms->SetTextAlign(11);
+  label_cms->AddText("CMS Preliminary");
+  
+  TH2D* h2_axes = new TH2D("axes", "", 10, 0., 2.6, 1, 0., 3.);
   h2_axes->GetYaxis()->SetBinLabel(1, "");
-  h2_axes->SetXTitle("Cross Section [pb]");
+  h2_axes->SetXTitle("tt+V Cross Section [pb]");
 
 
   TCanvas* c1 = new TCanvas("c1", "", 600, 600);
 
   h2_axes->Draw();
   line_nlo->Draw("same");
-  line_nlo_plus->Draw("same");
-  line_nlo_minus->Draw("same");
+  //line_nlo_plus->Draw("same");
+  //line_nlo_minus->Draw("same");
+  gr_trilept_stat->Draw("P same");
   gr_trilept->Draw("P same");
+  gr_ssdl_stat->Draw("P same");
   gr_ssdl->Draw("P same");
+  gr_combined_stat->Draw("P same");
   gr_combined->Draw("P same");
   legend->Draw("same");
   label_sqrt->Draw("same");
+  label_cms->Draw("same");
+
+  gPad->RedrawAxis();
 
   c1->SaveAs("measurement_vs_NLO.eps");
 
