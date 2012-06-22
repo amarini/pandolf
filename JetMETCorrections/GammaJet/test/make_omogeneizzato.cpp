@@ -22,6 +22,7 @@ Float_t rmsCandJet0_out;
 Float_t betaStarJet0_out;
 Float_t QGLikelihoodJet0_out;
 Bool_t matchedToGenJet_out;
+Float_t deltaPhi_jet_out;
 
 
 struct DummyJet {
@@ -36,6 +37,7 @@ struct DummyJet {
   float betaStar;
   float QGLikelihood;
   bool matchedToGenJet;
+  float deltaPhi_jet;
 
 };
 
@@ -47,14 +49,13 @@ bool fillFromTrigger( TTree* tree, bool passedHLT, float HLTvar, float HLTvar_th
 
 int main( int argc, char* argv[] ) {
 
-  if( argc!=2 && argc!=3 ) {
-    std::cout << "Usage: ./make_omogeneizzato [DiJet/MultiJet/PhotonJet] [dataset]" << std::endl;
+  if( argc!=3 && argc!=4 ) {
+    std::cout << "Usage: ./make_omogeneizzato [DiJet/MultiJet/PhotonJet] [dataset] [photonID=\"medium\"]" << std::endl;
     exit(11);
   }
 
 
   std::string controlSample(argv[1]);
-
   if( controlSample!="DiJet" && controlSample!="PhotonJet" && controlSample!="MultiJet" ) {
     std::cout << "Only Dijet, MultiJet and PhotonJet analyzer types supported." << std::endl;
     exit(13);
@@ -72,7 +73,15 @@ int main( int argc, char* argv[] ) {
     dataset = (controlSample=="PhotonJet") ? "Photon_Run2011_FULL" : "HT_Run2011_FULL";
   }
 
+  std::string photonID = "medium";
+  if( argc>3 ) {
+    std::string photonID_tmp(argv[3]);
+    photonID=photonID_tmp;
+  }
+
+
   std::string infileName = analyzerType + "_" + dataset;
+  if( photonID!="medium" ) infileName = infileName + "_" + photonID;
   infileName = infileName + ".root";
   TFile* infile = TFile::Open(infileName.c_str());
   TTree* chain = (TTree*)infile->Get("tree_passedEvents");
@@ -213,6 +222,12 @@ int main( int argc, char* argv[] ) {
   Float_t ptPhot;
   if( controlSample=="PhotonJet" )
     chain->SetBranchAddress( "ptPhot", &ptPhot );
+  Bool_t passed_Photon30_CaloIdVL;
+  if( controlSample=="PhotonJet" )
+    chain->SetBranchAddress( "passed_Photon30_CaloIdVL", &passed_Photon30_CaloIdVL);
+  Bool_t passed_Photon30_CaloIdVL_IsoL;
+  if( controlSample=="PhotonJet" )
+    chain->SetBranchAddress( "passed_Photon30_CaloIdVL_IsoL", &passed_Photon30_CaloIdVL_IsoL);
   Bool_t passed_Photon50_CaloIdVL;
   if( controlSample=="PhotonJet" )
     chain->SetBranchAddress( "passed_Photon50_CaloIdVL", &passed_Photon50_CaloIdVL);
@@ -234,16 +249,27 @@ int main( int argc, char* argv[] ) {
   Bool_t btagged;
   if( controlSample=="PhotonJet" )
     chain->SetBranchAddress( "btagged", &btagged);
+  Float_t deltaPhi_jet;
+  if( controlSample=="PhotonJet" )
+    chain->SetBranchAddress( "deltaPhi_jet", &deltaPhi_jet);
   Bool_t matchedToGenJet;
   chain->SetBranchAddress( "matchedToGenJet", &matchedToGenJet);
 
 
-  std::string puFileName_Photon50 = "pileup_nvertex_QGStudies_pt50_100.root";
+  std::string puFileName_Photon30 = "pileup_nvertex_QGStudies_Run2012_pt30_50.root";
+  //std::string puFileName_Photon30 = "pileup_nvertex_QGStudies_pt30_50.root";
+  TFile* filePU_Photon30 = TFile::Open(puFileName_Photon30.c_str());
+  TH1F* h1_nPU_data_Photon30 = (TH1F*)filePU_Photon30->Get("pileupdata");
+  TH1F* h1_nPU_mc_Photon30 = (TH1F*)filePU_Photon30->Get("pileupmc");
+
+  std::string puFileName_Photon50 = "pileup_nvertex_QGStudies_Run2012_pt50_100.root";
+  //std::string puFileName_Photon50 = "pileup_nvertex_QGStudies_pt50_100.root";
   TFile* filePU_Photon50 = TFile::Open(puFileName_Photon50.c_str());
   TH1F* h1_nPU_data_Photon50 = (TH1F*)filePU_Photon50->Get("pileupdata");
   TH1F* h1_nPU_mc_Photon50 = (TH1F*)filePU_Photon50->Get("pileupmc");
 
-  std::string puFileName_Photon90 = "pileup_nvertex_QGStudies_pt100_150.root";
+  std::string puFileName_Photon90 = "pileup_nvertex_QGStudies_Run2012_pt100_150.root";
+  //std::string puFileName_Photon90 = "pileup_nvertex_QGStudies_pt100_150.root";
   TFile* filePU_Photon90 = TFile::Open(puFileName_Photon90.c_str());
   TH1F* h1_nPU_data_Photon90 = (TH1F*)filePU_Photon90->Get("pileupdata");
   TH1F* h1_nPU_mc_Photon90 = (TH1F*)filePU_Photon90->Get("pileupmc");
@@ -251,7 +277,9 @@ int main( int argc, char* argv[] ) {
   
 
 
-  std::string outfileName = "Omog_" + analyzerType + "_" + dataset + ".root";
+  std::string outfileName = "Omog_" + analyzerType + "_" + dataset;
+  if( analyzerType=="QGStudies" && dataset!="medium" ) outfileName = outfileName + "_" + photonID;
+  outfileName = outfileName + ".root";
   TFile* outfile = TFile::Open( outfileName.c_str(), "RECREATE" );
   outfile->cd();
 
@@ -273,7 +301,8 @@ int main( int argc, char* argv[] ) {
   tree_omogeneizzato->Branch( "rmsCandJet0", &rmsCandJet0_out, "rmsCandJet0_out/F" );
   tree_omogeneizzato->Branch( "betaStarJet0", &betaStarJet0_out, "betaStarJet0_out/F" );
   tree_omogeneizzato->Branch( "QGLikelihoodJet0", &QGLikelihoodJet0_out, "QGLikelihoodJet0_out/F" );
-  tree_omogeneizzato->Branch( "matchedToGenJet", &matchedToGenJet_out, "matchedToGenJet_out/F" );
+  tree_omogeneizzato->Branch( "matchedToGenJet", &matchedToGenJet_out, "matchedToGenJet_out/O" );
+  tree_omogeneizzato->Branch( "deltaPhi_jet", &deltaPhi_jet_out, "deltaPhi_jet_out/F" );
 
   
   int nEntries = chain->GetEntries();
@@ -310,6 +339,13 @@ int main( int argc, char* argv[] ) {
         float puweight = (mc_binvalue>0.) ? data_binvalue/mc_binvalue : 0.;
         eventWeight *= puweight;
 
+      } else if( ptJet0>=30. && ptJet0<50. ) {
+
+        float mc_binvalue = h1_nPU_mc_Photon30->GetBinContent(nvertex+1);
+        float data_binvalue = h1_nPU_data_Photon30->GetBinContent(nvertex+1);
+        float puweight = (mc_binvalue>0.) ? data_binvalue/mc_binvalue : 0.;
+        eventWeight *= puweight;
+
       }
 
     }
@@ -326,6 +362,7 @@ int main( int argc, char* argv[] ) {
     jet0.QGLikelihood = QGLikelihoodJet0;
     jet0.pdgId = pdgIdJet0;
     jet0.matchedToGenJet = matchedToGenJet;
+    jet0.deltaPhi_jet = deltaPhi_jet;
 
     std::vector<DummyJet> jets;
     //if( fabs(jet0.eta)<2.4 ) 
@@ -361,6 +398,7 @@ int main( int argc, char* argv[] ) {
 
     } else { //photonjet
 
+      if( fillFromTrigger( tree_omogeneizzato, passed_Photon30_CaloIdVL || passed_Photon30_CaloIdVL_IsoL || run<5, ptPhot, 32., eventWeight, jets, 30., 50.) ) continue;
       if( fillFromTrigger( tree_omogeneizzato, passed_Photon50_CaloIdVL || passed_Photon50_CaloIdVL_IsoL || run<5, ptPhot, 53., eventWeight, jets, 50., 100.) ) continue;
       if( fillFromTrigger( tree_omogeneizzato, passed_Photon90_CaloIdVL || passed_Photon90_CaloIdVL_IsoL || run<5, ptPhot, 95., eventWeight, jets, 100., 150.) ) continue;
       if( fillFromTrigger( tree_omogeneizzato, passed_Photon135 || run<5, ptPhot, 145., eventWeight, jets, 150., 3500.) ) continue;
@@ -410,6 +448,7 @@ bool fillFromTrigger( TTree* tree, bool passedHLT, float HLTvar, float HLTvar_th
     pdgIdJet0_out = jets[i].pdgId;
     QGLikelihoodJet0_out = jets[i].QGLikelihood;
     matchedToGenJet_out = jets[i].matchedToGenJet;
+    deltaPhi_jet_out = jets[i].deltaPhi_jet;
 
     tree->Fill();
 
