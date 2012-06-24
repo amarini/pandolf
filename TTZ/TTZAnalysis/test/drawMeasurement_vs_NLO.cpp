@@ -163,22 +163,22 @@ int main() {
   gr_trilept_stat->SetPoint(0, 0.657888, 2.5);
   gr_trilept_stat->SetPointError(0, 0.251636, 0.316008, 0., 0.);
 
-  gr_ssdl->SetPoint(0, 0.429044, 1.5);
-  gr_ssdl->SetPointError(0, 0.154308, 0.182952, 0., 0.);
+  gr_ssdl->SetPoint(0, 0.447216, 1.5);
+  gr_ssdl->SetPointError(0, 0.156464, 0.183876, 0., 0.);
   gr_ssdl->SetMarkerStyle(21);
   gr_ssdl->SetMarkerSize(2.);
   gr_ssdl->SetMarkerColor(39);
 
-  gr_ssdl_stat->SetPoint(0, 0.429044, 1.5);
-  gr_ssdl_stat->SetPointError(0, 0.146608, 0.175252, 0., 0.);
+  gr_ssdl_stat->SetPoint(0, 0.447216, 1.5);
+  gr_ssdl_stat->SetPointError(0, 0.147532, 0.175252, 0., 0.);
 
-  gr_combined->SetPoint(0, 0.501116, 0.5);
-  gr_combined->SetPointError(0, 0.135828, 0.157696, 0., 0.);
+  gr_combined->SetPoint(0, 0.51282, 0.5);
+  gr_combined->SetPointError(0, 0.137368, 0.159544, 0., 0.);
   gr_combined->SetMarkerStyle(20);
   gr_combined->SetMarkerSize(2.);
   gr_combined->SetMarkerColor(1);
 
-  gr_combined_stat->SetPoint(0, 0.501116, 0.5);
+  gr_combined_stat->SetPoint(0, 0.51282, 0.5);
   gr_combined_stat->SetPointError(0, 0.131208, 0.151228, 0., 0.);
 
 
@@ -196,12 +196,17 @@ int main() {
   line_nlo_minus->SetLineWidth(2);
   line_nlo_minus->SetLineColor(14);
 
-  TLegend* legend = new TLegend(0.37, 0.2, 0.82, 0.5);
+  TGraphAsymmErrors* gr_dummy = new TGraphAsymmErrors();
+  gr_dummy->SetMarkerColor(0);
+
+  TLegend* legend = new TLegend(0.46, 0.2, 0.82, 0.55);
   legend->SetFillColor(0);
   legend->SetTextSize(0.038);
   legend->SetTextFont(42);
-  legend->AddEntry( gr_trilept, "Trilepton (scaled from #sigma_{ttZ})", "P" );
-  legend->AddEntry( gr_ssdl, "Dilepton (direct measure)", "P" );
+  legend->AddEntry( gr_trilept, "Trilepton Analysis", "P" );
+  legend->AddEntry( gr_dummy, "(scaled from #sigma_{ttZ})", "P" );
+  legend->AddEntry( gr_ssdl, "Dilepton Analysis", "P" );
+  legend->AddEntry( gr_dummy, "(direct measurement)", "P" );
   legend->AddEntry( gr_combined, "Combination", "P" );
   legend->AddEntry( line_nlo, "NLO Calculation", "L" );
 
@@ -219,7 +224,7 @@ int main() {
   label_cms->SetTextAlign(11);
   label_cms->AddText("CMS Preliminary");
   
-  TH2D* h2_axes = new TH2D("axes", "", 10, 0., 2.6, 1, 0., 3.);
+  TH2D* h2_axes = new TH2D("axes", "", 10, 0., 1.9, 1, 0., 3.);
   h2_axes->GetYaxis()->SetBinLabel(1, "");
   h2_axes->SetXTitle("tt+V Cross Section [pb]");
 
