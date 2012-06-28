@@ -28,6 +28,7 @@ class QuarkGluonTagger : public edm::EDProducer {
       // ----------member data --------------------------
       edm::InputTag src_,srcRho_;
       std::string jecService_;
+      bool isPatJet_;
       QGLikelihoodCalculator *qglikeli_;
       const JetCorrector *JEC_;           
 };
