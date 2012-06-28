@@ -1,19 +1,23 @@
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "../interface/QGLikelihoodCalculator.h"
 
-
-
+using namespace std;
 
 QGLikelihoodCalculator::QGLikelihoodCalculator( const std::string& fileName_nCharged, const std::string& fileName_nNeutral, const std::string& fileName_ptD ) {
 
 
-  jcp_nCharged_quark_ = new JetCorrectorParameters(fileName_nCharged, "quark");
-  jcp_nCharged_gluon_ = new JetCorrectorParameters(fileName_nCharged, "gluon");
+  std::string path_nCharged = edm::FileInPath ( fileName_nCharged.c_str() ).fullPath();
+  std::string path_nNeutral = edm::FileInPath ( fileName_nNeutral.c_str() ).fullPath();
+  std::string path_ptD = edm::FileInPath ( fileName_ptD.c_str() ).fullPath();
 
-  jcp_nNeutral_quark_ = new JetCorrectorParameters(fileName_nNeutral, "quark");
-  jcp_nNeutral_gluon_ = new JetCorrectorParameters(fileName_nNeutral, "gluon");
+  jcp_nCharged_quark_ = new JetCorrectorParameters(path_nCharged, "quark");
+  jcp_nCharged_gluon_ = new JetCorrectorParameters(path_nCharged, "gluon");
 
-  jcp_ptD_quark_ = new JetCorrectorParameters(fileName_ptD, "quark");
-  jcp_ptD_gluon_ = new JetCorrectorParameters(fileName_ptD, "gluon");
+  jcp_nNeutral_quark_ = new JetCorrectorParameters(path_nNeutral, "quark");
+  jcp_nNeutral_gluon_ = new JetCorrectorParameters(path_nNeutral, "gluon");
+
+  jcp_ptD_quark_ = new JetCorrectorParameters(path_ptD, "quark");
+  jcp_ptD_gluon_ = new JetCorrectorParameters(path_ptD, "gluon");
 
  
   //check that provided files are for correct variables:
@@ -91,12 +95,10 @@ float QGLikelihoodCalculator::computeQGLikelihood( float pt, float rhoPF, int nC
   float quarkProb_ptD = sjc_ptD_quark_->correction(v_pt_rho, v_ptD);
   float gluonProb_ptD = sjc_ptD_gluon_->correction(v_pt_rho, v_ptD);
 
-
   float quarkProb = quarkProb_nCharged*quarkProb_nNeutral*quarkProb_ptD;
   float gluonProb = gluonProb_nCharged*gluonProb_nNeutral*gluonProb_ptD;
 
   float QGLikelihood = (gluonProb+quarkProb>0.) ? quarkProb / (gluonProb + quarkProb ) : -1.;
-
 
   return QGLikelihood;
 

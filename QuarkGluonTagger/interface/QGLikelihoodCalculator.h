@@ -20,7 +20,7 @@ class QGLikelihoodCalculator {
 
  public:
 
-  QGLikelihoodCalculator( const std::string& fileName_nCharged="QGTaggerConfig_nCharged_AK5PF.txt", const std::string& fileName_nNeutral="QGTaggerConfig_nNeutral_AK5PF.txt", const std::string& fileName_ptD="QGTaggerConfig_ptD_AK5PF.txt");
+  QGLikelihoodCalculator( const std::string& fileName_nCharged="pandolf/QuarkGluonTagger/data/QGTaggerConfig_nCharged_AK5PF.txt", const std::string& fileName_nNeutral="pandolf/QuarkGluonTagger/data/QGTaggerConfig_nNeutral_AK5PF.txt", const std::string& fileName_ptD="pandolf/QuarkGluonTagger/data/QGTaggerConfig_ptD_AK5PF.txt");
    ~QGLikelihoodCalculator();
 
 
