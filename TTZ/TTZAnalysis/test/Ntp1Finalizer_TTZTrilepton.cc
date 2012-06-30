@@ -11,8 +11,6 @@
 #include "TRandom3.h"
 
 #include "QGLikelihood/QGLikelihoodCalculator.h"
-#include "HelicityLikelihoodDiscriminant/HelicityLikelihoodDiscriminant.h"
-#include "KinematicFit/DiJetKinFitter.h"
 #include "BTagSFUtil/interface/BTagSFUtil.h"
 
 #include "PUWeight.h"
