@@ -8,6 +8,7 @@ def filter_chan(channel):
 
 # a "signal process group" is a list of process names to be scaled *together* by the signal strength parameter "beta_signal"
 signal_process_groups = {'ttZttWZ': ['ttW']}
+#model = higgs_datacard.build_model('datacard_TTWZ_sep_3channels_ttW.txt', filter_channel = filter_chan)
 model = higgs_datacard.build_model('datacard_ssdl_3channels_ttW.txt', filter_channel = filter_chan)
 model.signal_process_groups = signal_process_groups
 

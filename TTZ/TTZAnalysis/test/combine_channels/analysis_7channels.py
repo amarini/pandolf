@@ -11,7 +11,6 @@ signal_process_groups = {'ttZttWZ': ['ttZ', 'ttWZ']}
 model = higgs_datacard.build_model('datacard_7channels.txt', filter_channel = filter_chan)
 model.signal_process_groups = signal_process_groups
 
-
 # calculate profile likelihood interval on data:
 res = pl_interval(model, 'data', 1)['ttZttWZ']
 #print res
@@ -25,8 +24,12 @@ print "approximate Z-value: %.3f" % zvalues[0]
 res = pl_interval(model, 'data', 1)['ttZttWZ']
 print "complete pl interval for beta_signal: %.3f   +%.3f  -%.3f" % (res[0.0][0], -res[0.0][0] + res[cl_1sigma][0][1], res[0.0][0] - res[cl_1sigma][0][0])
 
+options = Options()
+options.set('minimizer', 'strategy', 'robust')
 
-res = mle(model, 'data', 1)['ttZttWZ']
+
+#res = mle(model, 'data', 1)['ttZttWZ']
+res = mle(model, 'data', 1, options = options, with_error = False)['ttZttWZ']
 values = {}
 for p in model.get_parameters(signal_process_groups['ttZttWZ']): values[p] = res[p][0][0]
 fix_nuisance_pars = get_fixed_dist_at_values(values)
