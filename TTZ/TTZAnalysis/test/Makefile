@@ -35,17 +35,17 @@ create_datacard: create_datacard.cpp
 
 
 
-finalize_TTZTrilepton: Ntp1Finalizer.o Ntp1Finalizer_TTZTrilepton.o finalize_TTZTrilepton.cpp  QGLikelihoodCalculator.o AnalysisJet.o BTagSFUtil.o PUWeight.o SFlightFuncs.o MistagFuncs.o
-	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/ -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -I$(CMSSW_BASE)/src/UserCode/pandolf/QGLikelihood -o finalize_TTZTrilepton finalize_TTZTrilepton.cpp Ntp1Finalizer.o Ntp1Finalizer_TTZTrilepton.o QGLikelihoodCalculator.o AnalysisJet.o BTagSFUtil.o PUWeight.o SFlightFuncs.o MistagFuncs.o $(ROOTFLAG) $(EXTRALIBS)
+finalize_TTZTrilepton: Ntp1Finalizer.o Ntp1Finalizer_TTZTrilepton.o finalize_TTZTrilepton.cpp  AnalysisJet.o BTagSFUtil.o PUWeight.o SFlightFuncs.o MistagFuncs.o
+	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/ -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o finalize_TTZTrilepton finalize_TTZTrilepton.cpp Ntp1Finalizer.o Ntp1Finalizer_TTZTrilepton.o AnalysisJet.o BTagSFUtil.o PUWeight.o SFlightFuncs.o MistagFuncs.o $(ROOTFLAG) $(EXTRALIBS)
 
-finalize_TTZTrilepton_SignalSyst: Ntp1Finalizer.o Ntp1Finalizer_TTZTrilepton.o finalize_TTZTrilepton_SignalSyst.cpp  QGLikelihoodCalculator.o AnalysisJet.o BTagSFUtil.o PUWeight.o SFlightFuncs.o MistagFuncs.o
-	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/ -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -I$(CMSSW_BASE)/src/UserCode/pandolf/QGLikelihood -o finalize_TTZTrilepton_SignalSyst finalize_TTZTrilepton_SignalSyst.cpp Ntp1Finalizer.o Ntp1Finalizer_TTZTrilepton.o QGLikelihoodCalculator.o AnalysisJet.o BTagSFUtil.o PUWeight.o SFlightFuncs.o MistagFuncs.o $(ROOTFLAG) $(EXTRALIBS)
+finalize_TTZTrilepton_SignalSyst: Ntp1Finalizer.o Ntp1Finalizer_TTZTrilepton.o finalize_TTZTrilepton_SignalSyst.cpp  AnalysisJet.o BTagSFUtil.o PUWeight.o SFlightFuncs.o MistagFuncs.o
+	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/ -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o finalize_TTZTrilepton_SignalSyst finalize_TTZTrilepton_SignalSyst.cpp Ntp1Finalizer.o Ntp1Finalizer_TTZTrilepton.o AnalysisJet.o BTagSFUtil.o PUWeight.o SFlightFuncs.o MistagFuncs.o $(ROOTFLAG) $(EXTRALIBS)
 
-finalize_TTZTrilepton_Syst: Ntp1Finalizer.o Ntp1Finalizer_TTZTrilepton.o finalize_TTZTrilepton_Syst.cpp  QGLikelihoodCalculator.o AnalysisJet.o BTagSFUtil.o PUWeight.o SFlightFuncs.o MistagFuncs.o
-	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/ -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -I$(CMSSW_BASE)/src/UserCode/pandolf/QGLikelihood -o finalize_TTZTrilepton_Syst finalize_TTZTrilepton_Syst.cpp Ntp1Finalizer.o Ntp1Finalizer_TTZTrilepton.o QGLikelihoodCalculator.o AnalysisJet.o BTagSFUtil.o PUWeight.o SFlightFuncs.o MistagFuncs.o $(ROOTFLAG) $(EXTRALIBS)
+finalize_TTZTrilepton_Syst: Ntp1Finalizer.o Ntp1Finalizer_TTZTrilepton.o finalize_TTZTrilepton_Syst.cpp  AnalysisJet.o BTagSFUtil.o PUWeight.o SFlightFuncs.o MistagFuncs.o
+	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/ -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o finalize_TTZTrilepton_Syst finalize_TTZTrilepton_Syst.cpp Ntp1Finalizer.o Ntp1Finalizer_TTZTrilepton.o AnalysisJet.o BTagSFUtil.o PUWeight.o SFlightFuncs.o MistagFuncs.o $(ROOTFLAG) $(EXTRALIBS)
 
-finalize_TTZDilepton: Ntp1Finalizer.o Ntp1Finalizer_TTZDilepton.o finalize_TTZDilepton.cpp  QGLikelihoodCalculator.o AnalysisJet.o BTagSFUtil.o PUWeight.o
-	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/ -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -I$(CMSSW_BASE)/src/UserCode/pandolf/QGLikelihood -o finalize_TTZDilepton finalize_TTZDilepton.cpp Ntp1Finalizer.o Ntp1Finalizer_TTZDilepton.o QGLikelihoodCalculator.o AnalysisJet.o BTagSFUtil.o PUWeight.o $(ROOTFLAG) $(EXTRALIBS)
+finalize_TTZDilepton: Ntp1Finalizer.o Ntp1Finalizer_TTZDilepton.o finalize_TTZDilepton.cpp  AnalysisJet.o BTagSFUtil.o PUWeight.o
+	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/ -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o finalize_TTZDilepton finalize_TTZDilepton.cpp Ntp1Finalizer.o Ntp1Finalizer_TTZDilepton.o  AnalysisJet.o BTagSFUtil.o PUWeight.o $(ROOTFLAG) $(EXTRALIBS)
 
 
 drawTTZTrilepton: DrawBase.o fitTools.o drawTTZTrilepton.cpp
