@@ -211,8 +211,16 @@ void Ntp1Finalizer_TTZTrilepton::finalize( ) {
   h1_mZll_OF_presel->Sumw2();
   TH1D* h1_mZll_presel = new TH1D("mZll_presel", "", 220, 50., 160.);
   h1_mZll_presel->Sumw2();
+  TH1D* h1_mZll_presel_MU = new TH1D("mZll_presel_MU", "", 220, 50., 160.);
+  h1_mZll_presel_MU->Sumw2();
+  TH1D* h1_mZll_presel_ELE = new TH1D("mZll_presel_ELE", "", 220, 50., 160.);
+  h1_mZll_presel_ELE->Sumw2();
   TH1D* h1_mZll_presel_antibtag = new TH1D("mZll_presel_antibtag", "", 220, 50., 160.);
   h1_mZll_presel_antibtag->Sumw2();
+  TH1D* h1_mZll_presel_antibtag_MU = new TH1D("mZll_presel_antibtag_MU", "", 220, 50., 160.);
+  h1_mZll_presel_antibtag_MU->Sumw2();
+  TH1D* h1_mZll_presel_antibtag_ELE = new TH1D("mZll_presel_antibtag_ELE", "", 220, 50., 160.);
+  h1_mZll_presel_antibtag_ELE->Sumw2();
   TH1D* h1_mZll_NM1 = new TH1D("mZll_NM1", "", 220, 50., 160.);
   h1_mZll_NM1->Sumw2();
   TH1D* h1_mZll = new TH1D("mZll", "", 220, 50., 160.);
@@ -1238,8 +1246,13 @@ ofstream ofs("run_event.txt");
     if( nBjets_medium == 0 ) {
     //if( !passed_btag ) {
       h1_mZll_prepresel_antibtag->Fill( diLepton.M(), eventWeight );
-      if( passed_thirdLept )
+      if( passed_thirdLept ) {
         h1_mZll_presel_antibtag->Fill( diLepton.M(), eventWeight );
+        if( leptType==0 )
+          h1_mZll_presel_antibtag_MU->Fill( diLepton.M(), eventWeight );
+        else if( leptType==1 )
+          h1_mZll_presel_antibtag_ELE->Fill( diLepton.M(), eventWeight );
+      }
     }
 
     
@@ -1277,8 +1290,9 @@ ofstream ofs("run_event.txt");
     h1_combinedIsoRelLept3_presel->Fill( combinedIsoRelLept[0], eventWeight );
 
 
-    if( lept3.Pt() < ptLept3_thresh_ ) continue;
-    if( combinedIsoRelLept[0] > combinedIsoRelLept3_thresh_ ) continue;
+    //if( lept3.Pt() < ptLept3_thresh_ ) continue;
+    //if( combinedIsoRelLept[0] > combinedIsoRelLept3_thresh_ ) continue;
+    if( !passed_thirdLept ) continue;
 
 
  
@@ -1289,6 +1303,11 @@ ofstream ofs("run_event.txt");
     // ----------------------------
 
     h1_mZll_presel->Fill( diLepton.M(), eventWeight );
+    if( leptType==0 )
+      h1_mZll_presel_MU->Fill( diLepton.M(), eventWeight );
+    else if( leptType==1 )
+      h1_mZll_presel_ELE->Fill( diLepton.M(), eventWeight );
+    
 
 
     if( leptZ1.Pt() < ptLeptZ1_thresh_ ) continue;
@@ -1639,7 +1658,11 @@ ofstream ofs("run_event.txt");
   h1_mZll_OF3_prepresel->Write();
   h1_mZll_OF_presel->Write();
   h1_mZll_presel->Write();
+  h1_mZll_presel_MU->Write();
+  h1_mZll_presel_ELE->Write();
   h1_mZll_presel_antibtag->Write();
+  h1_mZll_presel_antibtag_ELE->Write();
+  h1_mZll_presel_antibtag_MU->Write();
   h1_mZll_NM1->Write();
   h1_mZll->Write();
 
