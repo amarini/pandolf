@@ -11,7 +11,7 @@ mv TTZTrileptonPlots_DATA_Run2011_FULL_presel_plusZ_TCHE_ALL/nBJets_loose.pdf /a
 epstopdf TTZTrileptonPlots_DATA_Run2011_FULL_presel_plusZ_TCHE_ALL/nBJets_medium.eps
 mv TTZTrileptonPlots_DATA_Run2011_FULL_presel_plusZ_TCHE_ALL/nBJets_medium.pdf /afs/cern.ch/user/p/pandolf/tdr2/notes/AN-12-184/trunk/figures/trilepton/kinematics/data/
 epstopdf TTZTrileptonPlots_DATA_Run2011_FULL_presel_plusZ_TCHE_ALL/channelYields_noScaling.eps
-mv TTZTrileptonPlots_DATA_Run2011_FULL_presel_plusZ_TCHE_ALL/channelYields_noScaling.pdf /afs/cern.ch/user/p/pandolf/tdr2/notes/AN-12-184/trunk/figures/trilepton/bg_rescaling/
+mv TTZTrileptonPlots_DATA_Run2011_FULL_presel_plusZ_TCHE_ALL/channelYields_noScaling.pdf /afs/cern.ch/user/p/pandolf/tdr2/notes/AN-12-184/trunk/figures/trilepton/bg_rescaling/channelYields_noscaling.pdf
 epstopdf TTZTrileptonPlots_DATA_Run2011_FULL_presel_plusZ_TCHE_ALL/channelYields.eps
 mv TTZTrileptonPlots_DATA_Run2011_FULL_presel_plusZ_TCHE_ALL/channelYields.pdf /afs/cern.ch/user/p/pandolf/tdr2/notes/AN-12-184/trunk/figures/trilepton/bg_rescaling/
 
@@ -52,6 +52,16 @@ epstopdf TTZTrileptonPlots_DATA_Run2011_FULL_optsel3_TCHE_ALL/channelYields_Sign
 mv TTZTrileptonPlots_DATA_Run2011_FULL_optsel3_TCHE_ALL/channelYields_SignalOnlyBTagSyst.pdf /afs/cern.ch/user/p/pandolf/tdr2/notes/AN-12-184/trunk/figures/trilepton/syst
 epstopdf TTZTrileptonPlots_DATA_Run2011_FULL_optsel3_TCHE_ALL/channelYields_SignalOnlyLeptSyst.eps
 mv TTZTrileptonPlots_DATA_Run2011_FULL_optsel3_TCHE_ALL/channelYields_SignalOnlyLeptSyst.pdf /afs/cern.ch/user/p/pandolf/tdr2/notes/AN-12-184/trunk/figures/trilepton/syst
+epstopdf TTZTrileptonPlots_DATA_Run2011_FULL_optsel3_TCHE_ALL/nJets_prepresel_BGOnlyscaleSyst.eps
+mv TTZTrileptonPlots_DATA_Run2011_FULL_optsel3_TCHE_ALL/nJets_prepresel_BGOnlyscaleSyst.pdf /afs/cern.ch/user/p/pandolf/tdr2/notes/AN-12-184/trunk/figures/trilepton/syst
+epstopdf TTZTrileptonPlots_DATA_Run2011_FULL_optsel3_TCHE_ALL/nJets_prepresel_BGOnlymatchingSyst.eps
+mv TTZTrileptonPlots_DATA_Run2011_FULL_optsel3_TCHE_ALL/nJets_prepresel_BGOnlymatchingSyst.pdf /afs/cern.ch/user/p/pandolf/tdr2/notes/AN-12-184/trunk/figures/trilepton/syst
 
 epstopdf measurement_vs_NLO.eps
-mv measurement_vs_NLO.eps /afs/cern.ch/user/p/pandolf/tdr2/notes/AN-12-184/trunk/figures/
+mv measurement_vs_NLO.pdf /afs/cern.ch/user/p/pandolf/tdr2/notes/AN-12-184/trunk/figures/
+
+epstopdf TTZTrileptonPlots_DATA_vs_Signal_and_BG/m3.eps
+mv TTZTrileptonPlots_DATA_vs_Signal_and_BG/m3.pdf /afs/cern.ch/user/p/pandolf/tdr2/notes/AN-12-184/trunk/figures/appendix/m3_data.pdf
+epstopdf TTZTrileptonPlots_MConly_presel_plusZ_TCHE_ALL/m3.eps
+mv TTZTrileptonPlots_MConly_presel_plusZ_TCHE_ALL/m3.pdf /afs/cern.ch/user/p/pandolf/tdr2/notes/AN-12-184/trunk/figures/appendix/m3.pdf
+
