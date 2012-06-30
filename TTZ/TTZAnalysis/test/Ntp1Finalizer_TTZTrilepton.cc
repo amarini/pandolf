@@ -10,7 +10,7 @@
 #include "TRegexp.h"
 #include "TRandom3.h"
 
-#include "QGLikelihood/QGLikelihoodCalculator.h"
+//#include "QGLikelihood/QGLikelihoodCalculator.h"
 #include "BTagSFUtil/interface/BTagSFUtil.h"
 
 #include "PUWeight.h"
