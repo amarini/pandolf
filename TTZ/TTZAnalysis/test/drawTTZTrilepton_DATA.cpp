@@ -4,6 +4,7 @@
 #include <string>
 #include "CommonTools/DrawBase.h"
 #include "CommonTools/fitTools.h"
+#include "TLatex.h"
 
 
 bool use_powhegDY=false;
@@ -393,7 +394,8 @@ void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char select
 
   //TLegend* legend = new TLegend( 0.6, 0.57, 0.92, 0.9 );
   //TLegend* legend = new TLegend( 0.2, 0.57, 0.52, 0.9 );
-  TLegend* legend = new TLegend( 0.2, 0.54, 0.52, 0.9 );
+  //TLegend* legend = new TLegend( 0.2, 0.54, 0.52, 0.9 );
+  TLegend* legend = new TLegend(0.16,0.49,0.48,0.85);
   legend->SetFillColor(0);
   legend->SetTextSize(0.038);
   legend->SetTextFont(42);
@@ -583,12 +585,24 @@ std::cout << "dataset: " << db->get_mcFile(iMC).datasetName << std::endl;
   h2_axes->SetYTitle("Events");
   h2_axes->GetYaxis()->SetTitleOffset(1.25);
 
+  h2_axes->GetXaxis()->SetLabelOffset(0.01);
+  h2_axes->GetXaxis()->SetLabelFont(42);
+  h2_axes->GetXaxis()->SetLabelSize(0.08);
+  h2_axes->GetYaxis()->SetLabelSize(0.045);
+  h2_axes->GetYaxis()->SetTitle("Events");
+  h2_axes->GetYaxis()->SetTitleOffset(1.25);
+  h2_axes->GetYaxis()->SetTitleSize(0.045);
+
 
   TPaveText* label_sqrt = db->get_labelSqrt();
   TPaveText* label_cms = db->get_labelCMS();
 
-  TCanvas* c1 = new TCanvas("c1", "", 600, 600);
+  TCanvas* c1 = new TCanvas("c1", "", 0,0, 600, 600);
   c1->cd();
+  c1->SetLeftMargin  (0.12);
+  c1->SetRightMargin (0.04);
+  c1->SetTopMargin   (0.09);
+  c1->SetBottomMargin(0.07);
   h2_axes->Draw();
   stackMC->Draw("histo same");
   h1_yields_mc_totBG->DrawCopy("0 E2 same");
@@ -596,8 +610,20 @@ std::cout << "dataset: " << db->get_mcFile(iMC).datasetName << std::endl;
   h1_yields_mc_totBG->DrawCopy("hist same");
   legend->Draw("same");
   gr_data->Draw("P same");
-  label_cms->Draw("same");
-  label_sqrt->Draw("same");
+  //label_cms->Draw("same");
+  //label_sqrt->Draw("same");
+
+  TLatex* fLatex = new TLatex();
+  fLatex->SetNDC(kTRUE);
+  fLatex->SetTextColor(kBlack);
+  fLatex->SetTextFont(62);
+  fLatex->SetTextSize(0.045);
+  fLatex->DrawLatex(0.13 ,0.925, "CMS");
+  //fLatex->DrawLatex(0.13 ,0.925, "CMS Preliminary");
+  fLatex->SetTextFont(42);
+  fLatex->SetTextSize(0.045);
+  fLatex->SetTextAlign(11);
+  fLatex->DrawLatex(0.51, 0.925, Form("L = %4.1f fb^{-1} at #sqrt{s} = 7 TeV", lumi_fb));
 
   gPad->RedrawAxis();
   
@@ -606,6 +632,12 @@ std::cout << "dataset: " << db->get_mcFile(iMC).datasetName << std::endl;
     sprintf( canvasName, "%s/channelYields_%s.eps", db->get_outputdir().c_str(), selName.c_str() );
   else
     sprintf( canvasName, "%s/channelYields.eps", db->get_outputdir().c_str() );
+  c1->SaveAs(canvasName);
+
+  if( selName!="" )
+    sprintf( canvasName, "%s/channelYields_%s.pdf", db->get_outputdir().c_str(), selName.c_str() );
+  else
+    sprintf( canvasName, "%s/channelYields.pdf", db->get_outputdir().c_str() );
   c1->SaveAs(canvasName);
 
   
