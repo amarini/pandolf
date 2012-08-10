@@ -2871,7 +2871,7 @@ std::string DrawBase::get_lumiText() const {
   }
 
   char lumiText[200];
-  if( lumi_==4980. ) { // CMS policy
+  if( lumi_==4980. && !isCMSArticle_ ) { // CMS policy
     sprintf( lumiText, "%.2f %s", lumi4Text, units.c_str());
   } else {
     if( onlyOneDecimal )
