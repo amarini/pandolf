@@ -49,10 +49,11 @@ int main() {
   float ZPL_SSDL_tot  = StatTools::computeZPL( obs_SSDL_tot, b_SSDL_tot, b_err_SSDL_tot );
   float ZPL_SSDL_comb  = StatTools::computeZPL( channels_SSDL );
 
-  std::cout <<  "ZPL_SSDL_ee :" <<  ZPL_SSDL_ee << std::endl;
-  std::cout <<  "ZPL_SSDL_em :" <<  ZPL_SSDL_em << std::endl;
-  std::cout <<  "ZPL_SSDL_mm :" <<  ZPL_SSDL_mm << std::endl;
-  std::cout <<  "ZPL_SSDL_tot:" <<  ZPL_SSDL_tot<< std::endl;
+  std::cout <<  "obs_SSDL_ee  : " <<  obs_SSDL_ee <<  "  \tb_SSDL_ee  : " <<  b_SSDL_ee <<  " +- " <<  b_err_SSDL_ee <<  "   \tZPL_SSDL_ee  : " <<  ZPL_SSDL_ee << std::endl;
+  std::cout <<  "obs_SSDL_em  : " <<  obs_SSDL_em <<  "  \tb_SSDL_em  : " <<  b_SSDL_em <<  " +- " <<  b_err_SSDL_em <<  "   \tZPL_SSDL_em  : " <<  ZPL_SSDL_em << std::endl;
+  std::cout <<  "obs_SSDL_mm  : " <<  obs_SSDL_mm <<  "  \tb_SSDL_mm  : " <<  b_SSDL_mm <<  " +- " <<  b_err_SSDL_mm <<  "   \tZPL_SSDL_mm  : " <<  ZPL_SSDL_mm << std::endl;
+  std::cout <<  "obs_SSDL_tot : " <<  obs_SSDL_tot<<  "  \tb_SSDL_tot : " <<  b_SSDL_tot<<  " +- " <<  b_err_SSDL_tot<<  "   \tZPL_SSDL_tot : " <<  ZPL_SSDL_tot<< std::endl;
+  std::cout <<  "ZPL_SSDL_comb: " <<  ZPL_SSDL_comb<< std::endl;
 
   float ZPL_TTZTL = StatTools::computeZPL( obs_TTZTL, b_TTZTL, b_err_TTZTL );
 

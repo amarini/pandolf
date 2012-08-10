@@ -33,6 +33,9 @@ computeTTZCrossSection: computeTTZCrossSection.cpp StatTools.o
 create_datacard: create_datacard.cpp 
 	$(CC) -Wall $(INCLUDES) -o create_datacard create_datacard.cpp $(ROOTFLAG) $(EXTRALIBS)
 
+create_datacard_4channels: create_datacard_4channels.cpp 
+	$(CC) -Wall $(INCLUDES) -o create_datacard_4channels create_datacard_4channels.cpp $(ROOTFLAG) $(EXTRALIBS)
+
 
 
 finalize_TTZTrilepton: Ntp1Finalizer.o Ntp1Finalizer_TTZTrilepton.o finalize_TTZTrilepton.cpp  AnalysisJet.o BTagSFUtil.o PUWeight.o SFlightFuncs.o MistagFuncs.o
@@ -54,11 +57,17 @@ drawTTZTrilepton: DrawBase.o fitTools.o drawTTZTrilepton.cpp
 drawTTZTrilepton_DATA: DrawBase.o fitTools.o drawTTZTrilepton_DATA.cpp
 	$(CC) -Wall $(INCLUDES) -o drawTTZTrilepton_DATA drawTTZTrilepton_DATA.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
 
+drawSignalCompatibility: DrawBase.o fitTools.o drawSignalCompatibility.cpp
+	$(CC) -Wall $(INCLUDES) -o drawSignalCompatibility drawSignalCompatibility.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
+
 drawSyst: DrawBase.o fitTools.o drawSyst.cpp
 	$(CC) -Wall $(INCLUDES) -o drawSyst drawSyst.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
 
 drawMeasurement_vs_NLO: DrawBase.o fitTools.o drawMeasurement_vs_NLO.cpp
 	$(CC) -Wall $(INCLUDES) -o drawMeasurement_vs_NLO drawMeasurement_vs_NLO.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
+
+drawDataMCRatio: DrawBase.o fitTools.o drawDataMCRatio.cpp
+	$(CC) -Wall $(INCLUDES) -o drawDataMCRatio drawDataMCRatio.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
 
 
 

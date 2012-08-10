@@ -122,6 +122,10 @@ int main(int argc, char* argv[]) {
   db->drawHisto("mZll_prepresel", "Dilepton mass", "GeV", "Events");
   db->drawHisto("mZll", "Dilepton mass", "GeV", "Events");
 
+  db->set_xAxisMax(700);
+  db->set_rebin(40);
+  db->drawHisto("m3", "M3", "GeV", "Events");
+
 
   db->set_rebin(10); 
   db->set_xAxisMax(200.); 
