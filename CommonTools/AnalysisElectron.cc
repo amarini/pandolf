@@ -340,6 +340,7 @@ bool AnalysisElectron::electronID2012_CutsLoose() {
   double hOverE_thresh;
   double dxy_thresh;
   double dz_thresh;
+  double EpInverseDiff_thresh;
 
   if( fabs(this->Eta())<1.4442 ) {
     sigmaIetaIeta_thresh = 0.01;
@@ -348,6 +349,7 @@ bool AnalysisElectron::electronID2012_CutsLoose() {
     hOverE_thresh = 0.12; 
     dxy_thresh = 0.02; 
     dz_thresh = 0.2; 
+    EpInverseDiff_thresh = 0.05;
   } else {
     sigmaIetaIeta_thresh = 0.03;
     deltaPhiAtVtx_thresh = 0.7; 
@@ -355,14 +357,21 @@ bool AnalysisElectron::electronID2012_CutsLoose() {
     hOverE_thresh = 100.; //no cut
     dxy_thresh = 0.04; 
     dz_thresh = 0.2; 
+    EpInverseDiff_thresh = 0.05;
   }
 
+
+  double p_inv = 1./pAtVertex;
+  double ecalEnergy = pAtVertex*eOverP;
+  double E_inv = 1./ecalEnergy;
+  double EpInverseDiff = fabs( E_inv-p_inv );
 
   bool eleID = (sigmaIetaIeta < sigmaIetaIeta_thresh) &&
                    (fabs(deltaPhiAtVtx) < deltaPhiAtVtx_thresh) &&
                    (fabs(deltaEtaAtVtx) < deltaEtaAtVtx_thresh) &&
                    (dxy < dxy_thresh) &&
                    (dz < dz_thresh) &&
+                   (EpInverseDiff < EpInverseDiff_thresh) &&
                    (hOverE < hOverE_thresh);
 
   return eleID;

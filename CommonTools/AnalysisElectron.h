@@ -77,6 +77,7 @@ class AnalysisElectron : public AnalysisLepton {
   double hOverE; 
   double fBrem; 
   double eOverP; 
+  double pAtVertex; 
   double mvaidtrigEle;
 
   // conversion rejection:
