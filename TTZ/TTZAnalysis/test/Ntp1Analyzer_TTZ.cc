@@ -650,6 +650,8 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        thisEle.deltaPhiAtVtx = deltaPhiAtVtxEle[iEle];
        thisEle.deltaEtaAtVtx = deltaEtaAtVtxEle[iEle];
        thisEle.hOverE = hOverEEle[iEle];
+       thisEle.eOverP = eSuperClusterOverPEle[iEle];
+       thisEle.pAtVertex = sqrt( pxGsfTrack[gsf]*pxGsfTrack[gsf] + pyGsfTrack[gsf]*pyGsfTrack[gsf] + pzGsfTrack[gsf]*pzGsfTrack[gsf] );
 
        // conversion rejection
        thisEle.expInnerLayersGsfTrack = expInnerLayersGsfTrack[gsf];
