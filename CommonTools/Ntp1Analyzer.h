@@ -23,6 +23,7 @@
 #include "TFile.h"
 #include "TH1F.h"
 #include "TRandom.h"
+#include "TVector3.h"
 #include <iostream>
 
 
@@ -54,6 +55,7 @@ public :
    Int_t           bunchCrossing;
    Int_t           orbitNumber;
    Float_t         rhoFastjet;
+   Float_t         rhoJetsFastjet;
    Int_t           nBX;
    Int_t           nPU[3];   //[nBX]
    Int_t           bxPU[3];   //[nBX]
@@ -105,6 +107,7 @@ public :
    Float_t         convDcotEle[150];   //[nEle]
    Float_t         convRadiusEle[150];   //[nEle]
    Int_t           convTrackIndexEle[150];   //[nEle]
+   Bool_t          hasMatchedConversionEle[150];   //[nEle]
    Float_t         convXEle[150];   //[nEle]
    Float_t         convYEle[150];   //[nEle]
    Float_t         convZEle[150];   //[nEle]
@@ -130,8 +133,12 @@ public :
    Float_t         dr04HcalTowerSumEtEle[150];   //[nEle]
    Float_t         scBasedEcalSum03Ele[150];   //[nEle]
    Float_t         scBasedEcalSum04Ele[150];   //[nEle]
+   Float_t         pfCandChargedIso04Ele[150];   //[nEle]
+   Float_t         pfCandNeutralIso04Ele[150];   //[nEle]
+   Float_t         pfCandPhotonIso04Ele[150];   //[nEle]
    Float_t         eleIdLikelihoodEle[150];   //[nEle]
    Float_t         pflowMVAEle[150];   //[nEle]
+   Float_t         mvaidtrigEle[150];   //[nEle]
    Int_t           nSC;
    Int_t           nBCSC[200];   //[nSC]
    Int_t           nCrystalsSC[200];   //[nSC]
@@ -420,6 +427,7 @@ public :
    Float_t         hoS9Muon[150];   //[nMuon]
    Float_t         CaloCompMuon[150];   //[nMuon]
    Int_t           numberOfMatchesMuon[150];   //[nMuon]
+   Float_t         mvaisoMuon[150];   //[nMuon]
    Int_t           nMet;
    Int_t           chargeMet[1];   //[nMet]
    Float_t         energyMet[1];   //[nMet]
@@ -664,6 +672,7 @@ public :
    TBranch        *b_bunchCrossing;   //!
    TBranch        *b_orbitNumber;   //!
    TBranch        *b_rhoFastjet;   //!
+   TBranch        *b_rhoJetsFastjet;   //!
    TBranch        *b_nBX;   //!
    TBranch        *b_nPU;   //!
    TBranch        *b_bxPU;   //!
@@ -715,6 +724,7 @@ public :
    TBranch        *b_convDcotEle;   //!
    TBranch        *b_convRadiusEle;   //!
    TBranch        *b_convTrackIndexEle;   //!
+   TBranch        *b_hasMatchedConversionEle;   //!
    TBranch        *b_convXEle;   //!
    TBranch        *b_convYEle;   //!
    TBranch        *b_convZEle;   //!
@@ -740,8 +750,12 @@ public :
    TBranch        *b_dr04HcalTowerSumEtEle;   //!
    TBranch        *b_scBasedEcalSum03Ele;   //!
    TBranch        *b_scBasedEcalSum04Ele;   //!
+   TBranch        *b_pfCandChargedIso04Ele;   //!
+   TBranch        *b_pfCandNeutralIso04Ele;   //!
+   TBranch        *b_pfCandPhotonIso04Ele;   //!
    TBranch        *b_eleIdLikelihoodEle;   //!
    TBranch        *b_pflowMVAEle;   //!
+   TBranch        *b_mvaidtrigEle;   //!
    TBranch        *b_nPFEle;   //!
    TBranch        *b_chargePFEle;   //!
    TBranch        *b_energyPFEle;   //!
@@ -1072,6 +1086,7 @@ public :
    TBranch        *b_hoS9Muon;   //!
    TBranch        *b_CaloCompMuon;   //!
    TBranch        *b_numberOfMatchesMuon;   //!
+   TBranch        *b_mvaisoMuon;   //!
    TBranch        *b_nMet;   //!
    TBranch        *b_chargeMet;   //!
    TBranch        *b_energyMet;   //!
@@ -1272,6 +1287,9 @@ public :
    virtual bool     isGoodEvent( int iEntry );
    double           trackDxyPV(float PVx, float PVy, float PVz, float eleVx, float eleVy, float eleVz, float elePx, float elePy, float elePz);
 
+   double               eleDzPV(int iele, int iPV);
+   double               muonDzPV(int imu, int iPV);
+   double               trackDzPV(TVector3 PVPos, TVector3 trackVPos, TVector3 trackMom);
 
    //virtual void BookStuff()=0;
 
