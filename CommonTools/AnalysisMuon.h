@@ -24,9 +24,12 @@ class AnalysisMuon : public AnalysisLepton {
 
   bool passedMuonID();
   bool isIsolated();
-  bool passedVBTF();
-
+  bool isIsolated2012();
   virtual float combinedIsoRel();
+
+  bool passedVBTF();
+  bool isGoodMuon2012();
+
 
   // public data members:
 
@@ -45,6 +48,7 @@ class AnalysisMuon : public AnalysisLepton {
   double sumPt03;
   double emEt03;
   double hadEt03;
+  double mvaisoMuon;
 
 };
 
