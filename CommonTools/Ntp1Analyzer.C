@@ -489,6 +489,7 @@ void Ntp1Analyzer::Init(TTree *tree)
    fChain->SetBranchAddress("bunchCrossing", &bunchCrossing, &b_bunchCrossing);
    fChain->SetBranchAddress("orbitNumber", &orbitNumber, &b_orbitNumber);
    fChain->SetBranchAddress("rhoFastjet", &rhoFastjet, &b_rhoFastjet);
+   fChain->SetBranchAddress("rhoJetsFastjet", &rhoJetsFastjet, &b_rhoJetsFastjet);
    if( isMC_ ) {
      fChain->SetBranchAddress("nBX", &nBX, &b_nBX);
      fChain->SetBranchAddress("nPU", nPU, &b_nPU);
@@ -542,6 +543,7 @@ void Ntp1Analyzer::Init(TTree *tree)
    fChain->SetBranchAddress("convDcotEle", convDcotEle, &b_convDcotEle);
    fChain->SetBranchAddress("convRadiusEle", convRadiusEle, &b_convRadiusEle);
    fChain->SetBranchAddress("convTrackIndexEle", convTrackIndexEle, &b_convTrackIndexEle);
+   fChain->SetBranchAddress("hasMatchedConversionEle", hasMatchedConversionEle, &b_hasMatchedConversionEle);
    //fChain->SetBranchAddress("convXEle", convXEle, &b_convXEle);
    //fChain->SetBranchAddress("convYEle", convYEle, &b_convYEle);
    //fChain->SetBranchAddress("convZEle", convZEle, &b_convZEle);
@@ -567,8 +569,12 @@ void Ntp1Analyzer::Init(TTree *tree)
    fChain->SetBranchAddress("dr04HcalTowerSumEtEle", dr04HcalTowerSumEtEle, &b_dr04HcalTowerSumEtEle);
    fChain->SetBranchAddress("scBasedEcalSum03Ele", scBasedEcalSum03Ele, &b_scBasedEcalSum03Ele);
    fChain->SetBranchAddress("scBasedEcalSum04Ele", scBasedEcalSum04Ele, &b_scBasedEcalSum04Ele);
+   fChain->SetBranchAddress("pfCandChargedIso04Ele", pfCandChargedIso04Ele, &b_pfCandChargedIso04Ele);
+   fChain->SetBranchAddress("pfCandNeutralIso04Ele", pfCandNeutralIso04Ele, &b_pfCandNeutralIso04Ele);
+   fChain->SetBranchAddress("pfCandPhotonIso04Ele", pfCandPhotonIso04Ele, &b_pfCandPhotonIso04Ele);
    fChain->SetBranchAddress("eleIdLikelihoodEle", eleIdLikelihoodEle, &b_eleIdLikelihoodEle);
    fChain->SetBranchAddress("pflowMVAEle", pflowMVAEle, &b_pflowMVAEle);
+   fChain->SetBranchAddress("mvaidtrigEle", mvaidtrigEle, &b_mvaidtrigEle);
    fChain->SetBranchAddress("nSC", &nSC, &b_nSC);
    fChain->SetBranchAddress("nBCSC", nBCSC, &b_nBCSC);
    fChain->SetBranchAddress("nCrystalsSC", nCrystalsSC, &b_nCrystalsSC);
@@ -857,6 +863,7 @@ void Ntp1Analyzer::Init(TTree *tree)
    fChain->SetBranchAddress("hoS9Muon", hoS9Muon, &b_hoS9Muon);
    fChain->SetBranchAddress("CaloCompMuon", CaloCompMuon, &b_CaloCompMuon);
    fChain->SetBranchAddress("numberOfMatchesMuon", numberOfMatchesMuon, &b_numberOfMatchesMuon);
+   fChain->SetBranchAddress("mvaisoMuon", mvaisoMuon, &b_mvaisoMuon);
    fChain->SetBranchAddress("nMet", &nMet, &b_nMet);
    fChain->SetBranchAddress("chargeMet", chargeMet, &b_chargeMet);
    fChain->SetBranchAddress("energyMet", energyMet, &b_energyMet);
@@ -1192,3 +1199,26 @@ double Ntp1Analyzer::trackDxyPV(float PVx, float PVy, float PVz, float eleVx, fl
 
 
 
+double Ntp1Analyzer::eleDzPV(int iele, int iPV) {
+  TVector3 PVPos(PVxPV[iPV],PVyPV[iPV],PVzPV[iPV]);
+  int gsfTrack = gsfTrackIndexEle[iele];
+  TVector3 lepVPos(trackVxGsfTrack[gsfTrack],trackVyGsfTrack[gsfTrack],trackVzGsfTrack[gsfTrack]);
+  TVector3 lepMom(pxEle[iele],pyEle[iele],pzEle[iele]);
+  return trackDzPV(PVPos,lepVPos,lepMom);
+}
+
+
+double Ntp1Analyzer::muonDzPV(int imu, int iPV) {
+  TVector3 PVPos(PVxPV[iPV],PVyPV[iPV],PVzPV[iPV]);
+  int ctfMuon   = trackIndexMuon[imu];
+  TVector3 lepVPos(trackVxTrack[ctfMuon],trackVyTrack[ctfMuon],trackVzTrack[ctfMuon]);
+  TVector3 lepMom(pxMuon[imu],pyMuon[imu],pzMuon[imu]);
+  return trackDzPV(PVPos,lepVPos,lepMom);
+}
+
+
+/// dz parameter with respect to PV for tracks
+double Ntp1Analyzer::trackDzPV(TVector3 PVPos, TVector3 trackVPos, TVector3 trackMom) {
+  float trackPt = trackMom.Pt();
+  return (trackVPos.Z()-PVPos.Z()) - ((trackVPos.X()-PVPos.X())*trackMom.X()+(trackVPos.Y()-PVPos.Y())*trackMom.Y())/trackPt *trackMom.Pz()/trackPt;
+}
