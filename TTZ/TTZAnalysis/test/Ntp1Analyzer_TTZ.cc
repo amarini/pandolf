@@ -24,7 +24,7 @@ int DEBUG_EVENTNUMBER = 157480550;
 float mZ = 91.1876;
 
 
-double trackDxyPV(float PVx, float PVy, float PVz, float eleVx, float eleVy, float eleVz, float elePx, float elePy, float elePz);
+
 float getWeightPU(Int_t nPU);
 std::vector<AnalysisLepton> getBestZMassPair( const std::vector<AnalysisLepton>& leptPlus, const std::vector<AnalysisLepton>& leptMinus );
 
@@ -41,7 +41,6 @@ Ntp1Analyzer_TTZ::Ntp1Analyzer_TTZ( const std::string& dataset, const std::strin
 
   h1_nCounter_Zee_ = new TH1D("nCounter_Zee", "", 1, 0., 1.);
   h1_nCounter_Zmumu_ = new TH1D("nCounter_Zmumu", "", 1, 0., 1.);
-
 
 } //constructor
 
@@ -247,16 +246,19 @@ void Ntp1Analyzer_TTZ::Loop()
      puType = "Summer11_S4";
      puType_ave = "Summer11_S4_ave";
    }
-   PUWeight* fPUWeight = new PUWeight(-1, "2011A", puType);
-   PUWeight* fPUWeight_ave = new PUWeight(-1, "2011A", puType_ave);
-   //PUWeight* fPUWeight = new PUWeight(1089.2, "2011A", puType);
-   TFile* filePU = TFile::Open("Pileup_2011_to_173692_LPLumiScale_68mb.root");
-   TH1F* h1_nPU_data = (TH1F*)filePU->Get("pileup");
-   fPUWeight->SetDataHistogram(h1_nPU_data);
-   fPUWeight_ave->SetDataHistogram(h1_nPU_data);
+   //PUWeight* fPUWeight = new PUWeight(-1, "2011A", puType);
+   //PUWeight* fPUWeight_ave = new PUWeight(-1, "2011A", puType_ave);
+   ////PUWeight* fPUWeight = new PUWeight(1089.2, "2011A", puType);
+   //TFile* filePU = TFile::Open("Pileup_2011_to_173692_LPLumiScale_68mb.root");
+   //TH1F* h1_nPU_data = (TH1F*)filePU->Get("pileup");
+   //fPUWeight->SetDataHistogram(h1_nPU_data);
+   //fPUWeight_ave->SetDataHistogram(h1_nPU_data);
 
 
-   JetCorrectionUncertainty *fJetCorrUnc = new JetCorrectionUncertainty("AK5PF_Uncertainty_GR_R_42_V19.txt");
+   
+   // this file is obtained with the instructions found in: https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections#GetTxtFiles
+   //JetCorrectionUncertainty *fJetCorrUnc = new JetCorrectionUncertainty("AK5PF_Uncertainty_GR_R_42_V19.txt");
+   JetCorrectionUncertainty *fJetCorrUnc = new JetCorrectionUncertainty("GR_R_52_V9_Uncertainty_AK5PF.txt");
 
 
 
@@ -296,7 +298,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
      if( nPV==0 ) continue;
      bool goodVertex = (ndofPV[0] >= 4.0 && sqrt(PVxPV[0]*PVxPV[0]+PVyPV[0]*PVyPV[0]) < 2. && fabs(PVzPV[0]) < 24. );
-     if( !goodVertex ) continue;
+     //if( !goodVertex ) continue;
   
      nPU_ave_ = 0.;
      for( unsigned iBX=0; iBX<nBX; ++iBX ) {
@@ -307,10 +309,10 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      // PU reweighting:
      eventWeightPU_=1.;
      eventWeightPU_ave_=1.;
-     if( isMC_ ) {
-       eventWeightPU_ = fPUWeight->GetWeight(nPU_);
-       eventWeightPU_ave_ = fPUWeight_ave->GetWeight(nPU_ave_);
-     }
+     //if( isMC_ ) {
+     //  eventWeightPU_ = fPUWeight->GetWeight(nPU_);
+     //  eventWeightPU_ave_ = fPUWeight_ave->GetWeight(nPU_ave_);
+     //}
      nCounterPU += eventWeightPU_;
      nCounterPU_ave += eventWeightPU_ave_;
 
@@ -556,35 +558,15 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        }
 
 
-       // to compute dxy, look for primary vertex:
-       int hardestPV = -1;
-       float sumPtMax = 0.0;
-       for(int v=0; v<nPV; v++) {
-         if(SumPtPV[v] > sumPtMax) {
-           sumPtMax = SumPtPV[v];
-           hardestPV = v;
-         }
-       }  
-   
-       float dxy;
-       if( hardestPV==-1 ) {
-         dxy = 0.;
-       } else {
-         dxy = fabs(trackDxyPV(PVxPV[hardestPV], PVyPV[hardestPV], PVzPV[hardestPV],
-                              trackVxTrack[trackIndexMuon[iMuon]], trackVyTrack[trackIndexMuon[iMuon]], trackVzTrack[trackIndexMuon[iMuon]],
-                              pxTrack[trackIndexMuon[iMuon]], pyTrack[trackIndexMuon[iMuon]], pzTrack[trackIndexMuon[iMuon]]));
-       }
-
-
-       float dz = fabs(trackVzTrack[trackIndexMuon[iMuon]]-PVzPV[hardestPV]);
-
-       thisMuon.dxy = dxy;
-       thisMuon.dz = dz;
+       int ctfMuon = trackIndexMuon[iMuon]; 
+       thisMuon.dxy = transvImpactParTrack[ctfMuon];
+       thisMuon.dz = muonDzPV(iMuon,0);
 
        thisMuon.sumPt03 = sumPt03Muon[iMuon];
        thisMuon.emEt03  = emEt03Muon[iMuon];
        thisMuon.hadEt03 = hadEt03Muon[iMuon];
        thisMuon.isolation = thisMuon.combinedIsoRel();
+       thisMuon.mvaisoMuon = mvaisoMuon[iMuon];
 
        if( event_==DEBUG_EVENTNUMBER ) {
          std::cout << "thisMuon.dxy: " << thisMuon.dxy << std::endl;
@@ -594,7 +576,8 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
          std::cout << "thisMuon.hadEt03: " << thisMuon.hadEt03 << std::endl;
        }
 
-       if( !thisMuon.passedVBTF() ) continue;
+       //if( !thisMuon.passedVBTF() ) continue;
+       if( !thisMuon.isGoodMuon2012() ) continue;
 
        if( event_==DEBUG_EVENTNUMBER ) {
          std::cout << "PASSED VBTF. ";
@@ -647,12 +630,20 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        if( fabs(scEta)>1.4442 && fabs(scEta)<1.566 ) continue; //crack region vetoed with SC eta
        if( fabs(thisEle.Eta()) > 2.5 ) continue; //acceptance cut with electron eta
 
+       
+       int gsf = gsfTrackIndexEle[iEle];
+       thisEle.dxy = transvImpactParGsfTrack[gsf];
+       thisEle.dz = eleDzPV(iEle,0);
 
        // isolation
        thisEle.dr03TkSumPt = dr03TkSumPtEle[iEle];
        thisEle.dr03EcalRecHitSumEt = dr03EcalRecHitSumEtEle[iEle];
        thisEle.dr03HcalTowerSumEt = dr03HcalTowerSumEtEle[iEle];
        thisEle.isolation = thisEle.combinedIsoRel();
+       thisEle.pfCandChargedIso04 = pfCandChargedIso04Ele[iEle];
+       thisEle.pfCandNeutralIso04 = pfCandNeutralIso04Ele[iEle];
+       thisEle.pfCandPhotonIso04 = pfCandPhotonIso04Ele[iEle];
+       thisEle.rhoJetsFastJet = rhoJetsFastjet;
 
        // electron ID
        thisEle.sigmaIetaIeta = (superClusterIndexEle[iEle]>=0) ? sqrt(covIEtaIEtaSC[superClusterIndexEle[iEle]]) : sqrt(covIEtaIEtaPFSC[PFsuperClusterIndexEle[iEle]]);
@@ -661,9 +652,14 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        thisEle.hOverE = hOverEEle[iEle];
 
        // conversion rejection
-       thisEle.expInnerLayersGsfTrack = expInnerLayersGsfTrack[gsfTrackIndexEle[iEle]];
+       thisEle.expInnerLayersGsfTrack = expInnerLayersGsfTrack[gsf];
        thisEle.convDist = convDistEle[iEle];
        thisEle.convDcot = convDcotEle[iEle];
+       thisEle.hasMatchedConversion = hasMatchedConversionEle[iEle];
+
+       // electron ID mva:
+       thisEle.mvaidtrigEle = mvaidtrigEle[iEle];
+
 
        if( event_==DEBUG_EVENTNUMBER ) {
          std::cout << "thisEle.dr03TkSumPt: " << thisEle.dr03TkSumPt << std::endl;
@@ -679,23 +675,23 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        }
 
 
-       bool passed_VBTF95 = thisEle.passedVBTF95();
-       bool passed_VBTF80 = thisEle.passedVBTF80();
 
 
-       if( !passed_VBTF95 ) continue;
-       //if( !passed_VBTF80 ) continue;
+       bool passed = thisEle.isGoodElectron2012_CutsLoose();
+       if( !passed ) continue;
 
-       if( event_==DEBUG_EVENTNUMBER ) std::cout << "Passed VBTF95." << std::endl;
 
-       // additional ID to be as tight as trigger (HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL):
-       if( fabs(scEta)<1.4442 ) { //barrel
-         if( fabs(thisEle.deltaPhiAtVtx) > 0.15 ) continue;
-         if( thisEle.hOverE > 0.12 ) continue; //conforming to SSDL analysis
-       } else { //endcaps
-         if( fabs(thisEle.deltaPhiAtVtx) > 0.1 ) continue;
-         if( thisEle.hOverE > 0.15 ) continue; // looks like (from ntuples) there's a cut at 0.15 at hlt, not 0.075 as CaloIdT says
-       }
+
+       if( event_==DEBUG_EVENTNUMBER ) std::cout << "Is good electron (2012)." << std::endl;
+
+//     // additional ID to be as tight as trigger (HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL):
+//     if( fabs(scEta)<1.4442 ) { //barrel
+//       if( fabs(thisEle.deltaPhiAtVtx) > 0.15 ) continue;
+//       if( thisEle.hOverE > 0.12 ) continue; //conforming to SSDL analysis
+//     } else { //endcaps
+//       if( fabs(thisEle.deltaPhiAtVtx) > 0.1 ) continue;
+//       if( thisEle.hOverE > 0.15 ) continue; // looks like (from ntuples) there's a cut at 0.15 at hlt, not 0.075 as CaloIdT says
+//     }
 
        if( event_==DEBUG_EVENTNUMBER ) std::cout << "Passed additional eleID cuts (HLT)." << std::endl;
 
@@ -1344,3 +1340,5 @@ std::vector<AnalysisLepton> getBestZMassPair( const std::vector<AnalysisLepton>&
   return returnLeptons;
 
 }
+
+
