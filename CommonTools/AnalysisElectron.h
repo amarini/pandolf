@@ -24,18 +24,27 @@ class AnalysisElectron : public AnalysisLepton {
 
   bool isIsolatedVBTF80();
   bool isIsolatedVBTF95();
+  bool isIsolated2012_MVAWP95();
+  bool isIsolated2012_CutsLoose();
   bool separatedIsoRel();//
 
   bool electronIDVBTF80();
   bool electronIDVBTF95();
+  bool electronID2012_MVA();
+  bool electronID2012_CutsLoose();
   bool separatedIDVBTF80();//
+  bool passedHLT2012();
 
   bool conversionRejectionVBTF80();
   bool conversionRejectionVBTF95();
+  bool conversionRejection2012_CutsLoose();
 
   bool passedVBTF80();
   bool passedVBTF95();
   bool passedTrigger80();//
+
+  bool isGoodElectron2012_CutsLoose();
+  bool isGoodElectron2012_MVA();
 
   bool passedAdditionalCuts();
 
@@ -46,10 +55,20 @@ class AnalysisElectron : public AnalysisLepton {
 
   double etaSC; //supercluster eta
 
+
+  // impact parameter:
+  double dxy;
+  double dz;
+
   // isolation:
   double dr03TkSumPt;
   double dr03EcalRecHitSumEt;
   double dr03HcalTowerSumEt;
+
+  double pfCandChargedIso04;
+  double pfCandNeutralIso04;
+  double pfCandPhotonIso04;
+  double rhoJetsFastJet;
 
   // electron ID:
   double sigmaIetaIeta; 
@@ -58,11 +77,13 @@ class AnalysisElectron : public AnalysisLepton {
   double hOverE; 
   double fBrem; 
   double eOverP; 
+  double mvaidtrigEle;
 
   // conversion rejection:
   int expInnerLayersGsfTrack;
   double convDist;
   double convDcot;
+  bool hasMatchedConversion;
 
 };
 

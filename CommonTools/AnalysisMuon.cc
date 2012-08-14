@@ -24,6 +24,31 @@ bool AnalysisMuon::isIsolated() {
 }
 
 
+bool AnalysisMuon::isIsolated2012() {
+
+  float abseta = fabs(this->Eta());
+  float pt = this->Pt();
+  float bdtiso = mvaisoMuon;
+
+  bool isIsolated = (
+                             ( pt <= 20 && abseta >= 0.000 && abseta < 0.479 && bdtiso > 0.86 ) ||
+                             ( pt <= 20 && abseta >= 0.479 && abseta < 2.400 && bdtiso > 0.82 ) ||
+                             ( pt >  20 && abseta >= 0.000 && abseta < 0.479 && bdtiso > 0.82 ) ||
+                             ( pt >  20 && abseta >= 0.479 && abseta < 2.400 && bdtiso > 0.86 )
+                             );
+
+
+  return isIsolated;
+
+}
+
+
+
+float AnalysisMuon::combinedIsoRel() {
+
+ return (sumPt03 + emEt03 + hadEt03)/this->Pt();
+
+}
 
 
 bool AnalysisMuon::passedVBTF() {
@@ -36,8 +61,12 @@ bool AnalysisMuon::passedVBTF() {
 }
 
 
-float AnalysisMuon::combinedIsoRel() {
+bool AnalysisMuon::isGoodMuon2012() {
 
- return (sumPt03 + emEt03 + hadEt03)/this->Pt();
+  bool isIsolated = this->isIsolated2012();
+  bool passedMuonID = this->passedMuonID();
+
+  return ( isIsolated && passedMuonID );
 
 }
+
