@@ -412,6 +412,8 @@ float getWeight( const std::string& dataset, int nEvents ) {
       xSection = 23.6402;
     } else if( dataset_tstr.Contains("WGToLNuG_TuneZ2star_8TeV-madgraph-tauola") ) {
       xSection = 553.92;
+    } else if( dataset_tstr.Contains("ZGToLLG_8TeV-madgraph") ) {
+      xSection = 132.6;
     } else if( dataset_tstr.Contains("TTWJets_8TeV-madgraph") ) {
       xSection = 0.232;
     } else if( dataset_tstr.Contains("TTZJets_8TeV-madgraph") ) {
