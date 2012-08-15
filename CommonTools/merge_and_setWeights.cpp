@@ -382,7 +382,46 @@ float getWeight( const std::string& dataset, int nEvents ) {
 
   if( dataset_tstr.Contains("8TeV" ) ) { 
 
-
+    if( dataset_tstr.Contains("DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph") ) {
+      xSection = 3532.81; 
+    } else if( dataset_tstr.Contains("T_tW-channel-DR_TuneZ2star_8TeV-powheg-tauola") ) {
+      xSection = 11.1773;
+    } else if( dataset_tstr.Contains("Tbar_tW-channel-DR_TuneZ2star_8TeV-powheg-tauola") ) {
+      xSection = 11.1773;
+    } else if( dataset_tstr.Contains("TTJets_TuneZ2star_8TeV-madgraph-tauola") ) {
+      xSection = 225.1967;
+    } else if( dataset_tstr.Contains("WJetsToLNu_TuneZ2Star_8TeV-madgraph") ) {
+      xSection = 37509.;
+    } else if( dataset_tstr.Contains("WWJetsTo2L2Nu_TuneZ2star_8TeV-madgraph-tauola") || dataset_tstr.Contains("WWTo2L2Nu_TuneZ2star_8TeV_pythia6_tauola") ) {
+      xSection = 5.8123;
+    } else if( dataset_tstr.Contains("WZ_TuneZ2star_8TeV_pythia6_tauola") ) {
+      xSection = 22.4486;
+    } else if( dataset_tstr.Contains("WZTo3LNu_TuneZ2star_8TeV_pythia6_tauola") ) {
+      xSection = 0.7346;
+    } else if( dataset_tstr.Contains("ZZ_TuneZ2star_8TeV_pythia6_tauola") ) {
+      xSection = 9.0314;
+    } else if( dataset_tstr.Contains("ZZJetsTo2L2Nu_TuneZ2star_8TeV-madgraph-tauola") ) {
+      xSection = 0.3649;
+    } else if( dataset_tstr.Contains("ZZJetsTo2L2Q_TuneZ2star_8TeV-madgraph-tauola") ) {
+      xSection = 1.2752;
+    } else if( dataset_tstr.Contains("ZZJetsTo4L_TuneZ2star_8TeV-madgraph-tauola") ) {
+      xSection = 0.0921;
+    } else if( dataset_tstr.Contains("WZJetsTo3LNu_TuneZ2_8TeV-madgraph-tauola") ) {
+      xSection = 1.0575;
+    } else if( dataset_tstr.Contains("TTTo2L2Nu2B_8TeV-powheg-pythia6") ) {
+      xSection = 23.6402;
+    } else if( dataset_tstr.Contains("WGToLNuG_TuneZ2star_8TeV-madgraph-tauola") ) {
+      xSection = 553.92;
+    } else if( dataset_tstr.Contains("TTWJets_8TeV-madgraph") ) {
+      xSection = 0.232;
+    } else if( dataset_tstr.Contains("TTZJets_8TeV-madgraph") ) {
+      xSection = 0.208;
+    } else {
+      std::cout << std::endl << std::endl;
+      std::cout << "-> WARNING!! Dataset: '" << dataset << "' not present in database. Cross section unknown." << std::endl;
+      std::cout << "-> Will set unitary weights." << std::endl;
+      return 1.;
+    }
 
 
   } else {
