@@ -41,7 +41,9 @@ diskoutputdir = "/cmsrm/pc22_2/pandolf/MC/Summer11/"+dataset
 match_Spring11 = re.search( r'Spring11', dataset, re.M|re.I)
 match_Fall11 = re.search( r'Fall11', dataset, re.M|re.I)
 match_Summer12 = re.search( r'Summer12', dataset, re.M|re.I)
-isData = re.search( r'Run2011', dataset, re.M|re.I)
+isData2011 = re.search( r'Run2011', dataset, re.M|re.I)
+isData2012 = re.search( r'Run2012', dataset, re.M|re.I)
+isData = isData2011 or isData2012
 if isData:
     diskoutputdir = "/cmsrm/pc22_2/pandolf/DATA/"+dataset
 else:
@@ -109,6 +111,7 @@ while (len(inputfiles) > 0):
     outputfile.write('cp '+pwd+'/QG_QCD_Pt_15to3000_TuneZ2_Flat*.root $WORKDIR\n')
     outputfile.write('cp '+pwd+'/Pileup*.root $WORKDIR\n')
     outputfile.write('cp '+pwd+'/SF_*.txt $WORKDIR\n')
+    outputfile.write('cp '+pwd+'/Cert_*.txt $WORKDIR\n')
     outputfile.write('cp '+pwd+'/AK5PF_Uncertainty*.txt $WORKDIR\n')
     outputfile.write('cd $WORKDIR\n')
     #outputfile.write(pwd+'/'+application+" "+dataset+" "+inputfilename+" _"+str(ijob)+"\n")
@@ -121,5 +124,5 @@ while (len(inputfiles) > 0):
     os.system("echo bsub -q "+queue+" -o "+dir+"/log/"+dataset+"_"+str(ijob)+".log source "+pwd+"/"+outputname)
     os.system("bsub -q "+queue+" -o "+dir+"/log/"+dataset+"_"+str(ijob)+".log source "+pwd+"/"+outputname+" -copyInput="+dataset+"_"+str(ijob))
     ijob = ijob+1
-    time.sleep(3.)
+    time.sleep(2.)
     continue
