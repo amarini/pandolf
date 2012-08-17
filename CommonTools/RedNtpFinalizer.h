@@ -41,7 +41,8 @@ class RedNtpFinalizer {
 
   void set_outFile( const std::string& fileName="", const std::string& suffix="" );
   void set_dataset( const std::string& dataset ) { dataset_ = dataset; };
-  void set_inputAnalyzerType( const std::string& analyzerType ) { inputAnalyzerType_ = analyzerType; };
+  //void set_inputAnalyzerType( const std::string& analyzerType ) { inputAnalyzerType_ = analyzerType; };
+  void set_redNtpDir( const std::string& redNtpDir ) { redNtpDir_ = redNtpDir; };
   void set_flags( const std::string& flags ) { flags_ = flags; };
   void set_DEBUG( bool DEBUG ) { DEBUG_ = DEBUG; };
 
@@ -57,6 +58,7 @@ class RedNtpFinalizer {
 
   std::string analyzerType_;
   //std::string inputAnalyzerType_;
+  std::string redNtpDir_;
   std::string dataset_;
   std::string flags_;
 

@@ -1,6 +1,6 @@
-#include "RedNtpFinalizer.h"
 #include <iostream>
-#include "TROOT.h"
+#include "TString.h"
+#include "RedNtpFinalizer.h"
 
 
 
@@ -12,7 +12,8 @@ RedNtpFinalizer::RedNtpFinalizer( const std::string& analyzerType, const std::st
   tree_ = new TChain("AnaTree");
 
   analyzerType_ = analyzerType;
-  inputAnalyzerType_ = analyzerType;
+  //inputAnalyzerType_ = analyzerType;
+  redNtpDir_ = "";
   dataset_ = dataset;
   flags_ = flags;
 
@@ -97,7 +98,7 @@ void RedNtpFinalizer::addFile(const std::string& dataset, const std::string& sel
   TH1F* h1_nGenEvents = (TH1F*)infile->Get("ptphotgen1");
   //h1_nPU_gen_->Add((TH1F*)infile->Get("nPU_gen"));
   if( h1_nGenEvents!= 0 ) {
-    nGenEvents_ += h1_nGenEvents->GetEntries(1);
+    nGenEvents_ += h1_nGenEvents->GetEntries();
   } else {
     std::cout << std::endl << std::endl << "WARNING!! Dataset '" << dataset << "' has no nGenEvents information!!!" << std::endl;
   }
@@ -147,10 +148,10 @@ int RedNtpFinalizer::get_nBTags( const AnalysisJet& jet1, const AnalysisJet& jet
 }
 
 
-float RedNtpFinalizer::get_crossSection(const std::string& dataset) {
+float RedNtpFinalizer::get_crossSection(const std::string& dataset) const {
 
 
-  TString* dataset_tstr(dataset);
+  TString dataset_tstr(dataset);
 
 
   // k factors - same scale factors for 7 TeV and 8 TeV
