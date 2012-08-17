@@ -120,7 +120,10 @@ void Ntp1Analyzer::LoadInputFromFile( const std::string& fileName ) {
    while( fscanf(iff, "%s", singleLine) !=EOF ) {
    
      std::string singleLine_str(singleLine);
+     TString singleLine_tstr(singleLine);
      std::string treeName_str = singleLine_str + "/ntp1";
+     if( singleLine_tstr.BeginsWith("/eos/") )
+       treeName_str = "root://eoscms//" + treeName_str;
      std::cout << "-> Adding " << treeName_str << std::endl;
      chain->Add(treeName_str.c_str());
      if( isFirstFile ) {
