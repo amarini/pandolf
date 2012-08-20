@@ -231,7 +231,12 @@ float RedNtpFinalizer::get_crossSection(const std::string& dataset) const {
     xSection = 0.002175 * 2.365e+07 * kfactorqcd;
   } else if( dataset_tstr.Contains("QCD_Pt-30to40_doubleEMEnriched_TuneZ2star_8TeV-pythia6") ) {
     xSection = 0.002175 * 2.365e+07 * kfactorqcd;
-
+  } else if( dataset_tstr.Contains("WH_ZH_HToGG_M-125_8TeV-pythia6") ) {
+    xSection = (0.6966 + 0.3943)*8.57E-02;
+  } else if( dataset_tstr.Contains("VBF_HToGG_M-125_8TeV-powheg-pythia6") ) {
+    xSection = (1.578)*8.57E-02;
+  } else if( dataset_tstr.Contains("GluGluToHToGG_M-125_8TeV-powheg-pythia6") ) {
+    xSection = (19.52)*8.57E-02;
   } else {
     std::cout << std::endl << std::endl;
     std::cout << "-> WARNING!! Dataset: '" << dataset << "' not present in database. Cross section unknown." << std::endl;
