@@ -696,7 +696,7 @@ TH1F* PUWeight::IdealMCHistogram( const std::string& puType) {
     idealpu[51] =  6.864E-05,
     idealpu[52] =  3.054E-05,
     idealpu[53] =  1.282E-05,
-    idealpu[54] =  5.081E-06
+    idealpu[54] =  5.081E-06;
     //idealpu[55] =  1.898E-06,
     //idealpu[56] =  6.688E-07,
     //idealpu[57] =  2.221E-07,
