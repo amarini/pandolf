@@ -179,6 +179,8 @@ float RedNtpFinalizer::get_crossSection(const std::string& dataset) const {
 
   if( dataset_tstr.Contains("DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph") ) {
     xSection = 3532.81; 
+  } else if( dataset_tstr.Contains("DYJetsToLL_M-10To50filter_8TeV-madgraph") ) {
+    xSection = 860.5013;
   } else if( dataset_tstr.Contains("T_tW-channel-DR_TuneZ2star_8TeV-powheg-tauola") ) {
     xSection = 11.1773;
   } else if( dataset_tstr.Contains("Tbar_tW-channel-DR_TuneZ2star_8TeV-powheg-tauola") ) {
@@ -215,6 +217,8 @@ float RedNtpFinalizer::get_crossSection(const std::string& dataset) const {
     xSection = 0.232;
   } else if( dataset_tstr.Contains("TTZJets_8TeV-madgraph") ) {
     xSection = 0.208;
+  } else if( dataset_tstr.Contains("TTGJets_8TeV-madgraph") ) {
+    xSection = 1.444; //LO from PREP
   } else if( dataset_tstr.Contains("DiPhotonBox_Pt-10To25_8TeV-pythia6") ) {
     xSection = 424.8 * kfactordiphot;                
   } else if( dataset_tstr.Contains("DiPhotonBox_Pt-25To250_8TeV-pythia6") ) {
@@ -225,7 +229,7 @@ float RedNtpFinalizer::get_crossSection(const std::string& dataset) const {
     xSection = 81. * kfactordiphot;  
   } else if( dataset_tstr.Contains("GJet_Pt-20to40_doubleEMEnriched_TuneZ2star_8TeV-pythia6") ) {
     xSection = 0.001835 * 81930.0 * kfactorgamjet; 
-  } else if( dataset_tstr.Contains("GJet_Pt-40_doubleEMEnriched_TuneZ2star_8TeV-pythia6") ) {
+  } else if( dataset_tstr.Contains("GJet_Pt40_doubleEMEnriched_TuneZ2star_8TeV-pythia6") ) {
     xSection = 0.05387 * 8884.0 * kfactorgamjet;
   } else if( dataset_tstr.Contains("QCD_Pt-40_doubleEMEnriched_TuneZ2star_8TeV-pythia6") ) {
     xSection = 0.000235 * 5.195e+07 * kfactorqcd;
@@ -239,7 +243,7 @@ float RedNtpFinalizer::get_crossSection(const std::string& dataset) const {
     xSection = (1.578)*8.57E-02;
   } else if( dataset_tstr.Contains("GluGluToHToGG_M-125_8TeV-powheg-pythia6") ) {
     xSection = (19.52)*8.57E-02;
-  } else if( dataset_tstr.BeginsWith("ZGG_") ) {
+  } else if( dataset_tstr.BeginsWith("ZGG") ) {
     xSection = 0.068 * kfactorzgg;        // Z+gg  - da AN FP
   } else if( dataset_tstr.BeginsWith("TTbarGG") ) {
     xSection = 0.001316 * kfactorttgg;    // tt+gg - da AN FP
