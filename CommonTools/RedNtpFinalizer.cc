@@ -187,6 +187,8 @@ float RedNtpFinalizer::get_crossSection(const std::string& dataset) const {
     xSection = 225.1967;
   } else if( dataset_tstr.Contains("WJetsToLNu_TuneZ2Star_8TeV-madgraph") ) {
     xSection = 37509.;
+  } else if( dataset_tstr.Contains("WW_TuneZ2star_8TeV_pythia6_tauola") ) {
+    xSection = 5.8123/(2.*0.108*2.*0.108);
   } else if( dataset_tstr.Contains("WWJetsTo2L2Nu_TuneZ2star_8TeV-madgraph-tauola") || dataset_tstr.Contains("WWTo2L2Nu_TuneZ2star_8TeV_pythia6_tauola") ) {
     xSection = 5.8123;
   } else if( dataset_tstr.Contains("WZ_TuneZ2star_8TeV_pythia6_tauola") ) {
@@ -237,6 +239,14 @@ float RedNtpFinalizer::get_crossSection(const std::string& dataset) const {
     xSection = (1.578)*8.57E-02;
   } else if( dataset_tstr.Contains("GluGluToHToGG_M-125_8TeV-powheg-pythia6") ) {
     xSection = (19.52)*8.57E-02;
+  } else if( dataset_tstr.BeginsWith("ZGG_") ) {
+    xSection = 0.068 * kfactorzgg;        // Z+gg  - da AN FP
+  } else if( dataset_tstr.BeginsWith("TTbarGG") ) {
+    xSection = 0.001316 * kfactorttgg;    // tt+gg - da AN FP
+  } else if( dataset_tstr.BeginsWith("WmGG") ) {
+    xSection = 0.0504 * kfactorwmgg;      // W-gg  - da AN FP
+  } else if( dataset_tstr.BeginsWith("WpGG") ) {
+    xSection = 0.0667 * kfactorwpgg;      // W+gg  - da AN FP
   } else {
     std::cout << std::endl << std::endl;
     std::cout << "-> WARNING!! Dataset: '" << dataset << "' not present in database. Cross section unknown." << std::endl;
