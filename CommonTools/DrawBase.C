@@ -1304,6 +1304,7 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
         mcHistos[0]->SetFillColor( fillColor_default++ ); //so that it changes at every histo
       else
         mcHistos[0]->SetFillColor( mcFiles_[0].fillColor );
+      mcHistos[0]->SetLineColor(kBlack);
       if( noStack_ ) {
         if( mcFiles_[0].fillStyle!= 1001 ) {
           mcHistos[0]->SetLineColor( mcFiles_[0].fillColor );
@@ -1338,6 +1339,7 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
             mcHistos[i]->SetFillColor( fillColor_default++ ); //so that it changes at every histo
           else
             mcHistos[i]->SetFillColor( mcFiles_[i].fillColor );
+          mcHistos[i]->SetLineColor(kBlack);
           if( noStack_ ) {
             if( mcFiles_[i].fillStyle!= 1001 ) {
               mcHistos[i]->SetLineColor( mcFiles_[i].fillColor );
