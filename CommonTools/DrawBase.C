@@ -174,6 +174,7 @@ DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType
   jetAlgo_ = jetAlgo;
 
   lumi_ = 0.;
+  is7TeV_ = false;
   flags_ = flags;
 
   //dataFiles_.file = 0;
@@ -2893,14 +2894,16 @@ std::string DrawBase::get_sqrtText() const {
 
   std::string lumiText = this->get_lumiText();
 
+  int sqrts = (is7TeV_) ? 7 : 8;
+
   char label_sqrt_text[150];
-  if( isCMSArticle_ )
-    sprintf( label_sqrt_text, "#sqrt{s} = 7 TeV");
+  if( isCMSArticle_ ) 
+    sprintf( label_sqrt_text, "#sqrt{s} = %d TeV", sqrts);
   else {
     if( lumi_==0. )
-      sprintf( label_sqrt_text, "#sqrt{s} = 7 TeV" );
+      sprintf( label_sqrt_text, "#sqrt{s} = %d TeV", sqrts );
     else
-      sprintf( label_sqrt_text, "#sqrt{s} = 7 TeV, L = %s", lumiText.c_str());
+      sprintf( label_sqrt_text, "#sqrt{s} = %d TeV, L = %s", sqrts, lumiText.c_str());
   }
 
   std::string returnString(label_sqrt_text);
@@ -3122,6 +3125,7 @@ TPaveText* DrawBase::get_labelSqrt( int legendQuadrant ) const {
   //label_sqrt->SetTextFont(62);
   std::string label_sqrt_text = this->get_sqrtText();
 
+  int sqrts = (is7TeV_) ? 7 : 8;
 
   if( legendQuadrant!=0 ) {
     label_sqrt->AddText(label_sqrt_text.c_str());
@@ -3140,13 +3144,13 @@ TPaveText* DrawBase::get_labelSqrt( int legendQuadrant ) const {
           cmsText = "CMS Preliminary";
       }
       if( scaleFactor_>=0. ) {
-        label_sqrt->AddText(Form("%s, L = %s at  #sqrt{s} = 7 TeV", cmsText.c_str(), lumiText.c_str()));
+        label_sqrt->AddText(Form("%s, L = %s at  #sqrt{s} = %d TeV", cmsText.c_str(), lumiText.c_str(), sqrts));
       } else {
-        label_sqrt->AddText(Form("%s,  #sqrt{s} = 7 TeV", cmsText.c_str()) );
+        label_sqrt->AddText(Form("%s,  #sqrt{s} = %d TeV", cmsText.c_str(), sqrts) );
       }
     } else { //if lumiOnRightSide
       label_sqrt->SetTextFont(42);
-      label_sqrt->AddText(Form("L = %s at  #sqrt{s} = 7 TeV", lumiText.c_str()));
+      label_sqrt->AddText(Form("L = %s at  #sqrt{s} = %d TeV", lumiText.c_str(), sqrts) );
     }
   }
 
