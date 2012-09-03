@@ -548,9 +548,9 @@ public :
    Float_t         axis2_QCAK5PFPUcorrJet[300];
    Float_t         pull_QCAK5PFPUcorrJet[300];
    Float_t         tana_QCAK5PFPUcorrJet[300];
-   Float_t         nChg_ptCutAK5PFPUcorrJet[300];
-   Float_t         nChg_QCAK5PFPUcorrJet[300];
-   Float_t         nChg_ptCut_QCAK5PFPUcorrJet[300];
+   Int_t           nChg_ptCutAK5PFPUcorrJet[300];
+   Int_t           nChg_QCAK5PFPUcorrJet[300];
+   Int_t           nChg_ptCut_QCAK5PFPUcorrJet[300];
    Float_t         nNeutral_ptCutAK5PFPUcorrJet[300];
    Float_t         Rchg_QCAK5PFPUcorrJet[300];
    Float_t         RneutralAK5PFPUcorrJet[300];
@@ -617,9 +617,9 @@ public :
    Float_t         axis2_QCAK5PFNoPUJet[300];
    Float_t         pull_QCAK5PFNoPUJet[300];
    Float_t         tana_QCAK5PFNoPUJet[300];
-   Float_t         nChg_ptCutAK5PFNoPUJet[300];
-   Float_t         nChg_QCAK5PFNoPUJet[300];
-   Float_t         nChg_ptCut_QCAK5PFNoPUJet[300];
+   Int_t           nChg_ptCutAK5PFNoPUJet[300];
+   Int_t           nChg_QCAK5PFNoPUJet[300];
+   Int_t           nChg_ptCut_QCAK5PFNoPUJet[300];
    Float_t         nNeutral_ptCutAK5PFNoPUJet[300];
    Float_t         RchgAK5PFNoPUJet[300];
    Float_t         RneutralAK5PFNoPUJet[300];
