@@ -551,7 +551,7 @@ public :
    Int_t           nChg_ptCutAK5PFPUcorrJet[300];
    Int_t           nChg_QCAK5PFPUcorrJet[300];
    Int_t           nChg_ptCut_QCAK5PFPUcorrJet[300];
-   Float_t         nNeutral_ptCutAK5PFPUcorrJet[300];
+   Int_t           nNeutral_ptCutAK5PFPUcorrJet[300];
    Float_t         Rchg_QCAK5PFPUcorrJet[300];
    Float_t         RneutralAK5PFPUcorrJet[300];
    Float_t         RAK5PFPUcorrJet[300];
@@ -620,7 +620,7 @@ public :
    Int_t           nChg_ptCutAK5PFNoPUJet[300];
    Int_t           nChg_QCAK5PFNoPUJet[300];
    Int_t           nChg_ptCut_QCAK5PFNoPUJet[300];
-   Float_t         nNeutral_ptCutAK5PFNoPUJet[300];
+   Int_t           nNeutral_ptCutAK5PFNoPUJet[300];
    Float_t         RchgAK5PFNoPUJet[300];
    Float_t         RneutralAK5PFNoPUJet[300];
    Float_t         RAK5PFNoPUJet[300];
