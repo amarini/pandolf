@@ -992,7 +992,7 @@ void Ntp1Analyzer::Init(TTree *tree)
    fChain->SetBranchAddress("nChg_ptCutAK5PFPUcorrJet", nChg_ptCutAK5PFPUcorrJet, &b_nChg_ptCutAK5PFPUcorrJet);
    fChain->SetBranchAddress("nChg_QCAK5PFPUcorrJet", nChg_QCAK5PFPUcorrJet, &b_nChg_QCAK5PFPUcorrJet);
    fChain->SetBranchAddress("nChg_ptCut_QCAK5PFPUcorrJet", nChg_ptCut_QCAK5PFPUcorrJet, &b_nChg_ptCut_QCAK5PFPUcorrJet);
-   fChain->SetBranchAddress("nNeutralAK5PFPUcorrJet", nNeutralAK5PFPUcorrJet, &b_nNeutralAK5PFPUcorrJet);
+   fChain->SetBranchAddress("nNeutral_ptCutAK5PFPUcorrJet", nNeutral_ptCutAK5PFPUcorrJet, &b_nNeutral_ptCutAK5PFPUcorrJet);
    fChain->SetBranchAddress("RchgAK5PFPUcorrJet", RchgAK5PFPUcorrJet, &b_RchgAK5PFPUcorrJet);
    fChain->SetBranchAddress("RneutralAK5PFPUcorrJet", RneutralAK5PFPUcorrJet, &b_RneutralAK5PFPUcorrJet);
    fChain->SetBranchAddress("RAK5PFPUcorrJet", RAK5PFPUcorrJet, &b_RAK5PFPUcorrJet);
@@ -1060,7 +1060,7 @@ void Ntp1Analyzer::Init(TTree *tree)
    fChain->SetBranchAddress("nChg_ptCutAK5PFNoPUJet", nChg_ptCutAK5PFNoPUJet, &b_nChg_ptCutAK5PFNoPUJet);
    fChain->SetBranchAddress("nChg_QCAK5PFNoPUJet", nChg_QCAK5PFNoPUJet, &b_nChg_QCAK5PFNoPUJet);
    fChain->SetBranchAddress("nChg_ptCut_QCAK5PFNoPUJet", nChg_ptCut_QCAK5PFNoPUJet, &b_nChg_ptCut_QCAK5PFNoPUJet);
-   fChain->SetBranchAddress("nNeutralAK5PFNoPUJet", nNeutralAK5PFNoPUJet, &b_nNeutralAK5PFNoPUJet);
+   fChain->SetBranchAddress("nNeutral_ptCutAK5PFNoPUJet", nNeutral_ptCutAK5PFNoPUJet, &b_nNeutral_ptCutAK5PFNoPUJet);
    fChain->SetBranchAddress("RchgAK5PFNoPUJet", RchgAK5PFNoPUJet, &b_RchgAK5PFNoPUJet);
    fChain->SetBranchAddress("RneutralAK5PFNoPUJet", RneutralAK5PFNoPUJet, &b_RneutralAK5PFNoPUJet);
    fChain->SetBranchAddress("RAK5PFNoPUJet", RAK5PFNoPUJet, &b_RAK5PFNoPUJet);
