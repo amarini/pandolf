@@ -139,6 +139,93 @@ public :
    Float_t         eleIdLikelihoodEle[150];   //[nEle]
    Float_t         pflowMVAEle[150];   //[nEle]
    Float_t         mvaidtrigEle[150];   //[nEle]
+   Int_t           nPho;
+   Int_t           nPerPVPho;
+   Int_t           chargePho[150];   //[nPho]
+   Float_t         energyPho[150];   //[nPho]
+   Float_t         thetaPho[150];   //[nPho]
+   Float_t         etaPho[150];   //[nPho]
+   Float_t         phiPho[150];   //[nPho]
+   Float_t         pxPho[150];   //[nPho]
+   Float_t         pyPho[150];   //[nPho]
+   Float_t         pzPho[150];   //[nPho]
+   Float_t         vertexXPho[150];   //[nPho]
+   Float_t         vertexYPho[150];   //[nPho]
+   Float_t         vertexZPho[150];   //[nPho]
+   Int_t           fiducialFlagsPho[150];   //[nPho]
+   Int_t           recoFlagsPho[150];   //[nPho]
+   Int_t           superClusterIndexPho[150];   //[nPho]
+   Int_t           PFsuperClusterIndexPho[150];   //[nPho]
+   Float_t         hOverEPho[150];   //[nPho]
+   Float_t         hTowOverEPho[150];   //[nPho]
+   Float_t         dr03TkSumPtPho[150];   //[nPho]
+   Float_t         dr03HollowTkSumPtPho[150];   //[nPho]
+   Float_t         dr03EcalRecHitSumEtPho[150];   //[nPho]
+   Float_t         dr03HcalTowerSumEtPho[150];   //[nPho]
+   Float_t         dr04TkSumPtPho[150];   //[nPho]
+   Float_t         dr04HollowTkSumPtPho[150];   //[nPho]
+   Float_t         dr04EcalRecHitSumEtPho[150];   //[nPho]
+   Float_t         dr04HcalTowerSumEtPho[150];   //[nPho]
+   Float_t         chargedHadronIsoPho[150];   //[nPho]
+   Float_t         neutralHadronIsoPho[150];   //[nPho]
+   Float_t         photonIsoPho[150];   //[nPho]
+   Int_t           hasPixelSeedPho[150];   //[nPho]
+   Bool_t          hasMatchedConversionPho[150];   //[nPho]
+   Float_t         dr01NeutralHadronPFIsoPho[150];   //[nPho]
+   Float_t         dr01PhotonPFIsoPho[150];   //[nPho]
+   Float_t         dr02NeutralHadronPFIsoPho[150];   //[nPho]
+   Float_t         dr02PhotonPFIsoPho[150];   //[nPho]
+   Float_t         dr03NeutralHadronPFIsoPho[150];   //[nPho]
+   Float_t         dr03PhotonPFIsoPho[150];   //[nPho]
+   Float_t         dr04NeutralHadronPFIsoPho[150];   //[nPho]
+   Float_t         dr04PhotonPFIsoPho[150];   //[nPho]
+   Float_t         dr05NeutralHadronPFIsoPho[150];   //[nPho]
+   Float_t         dr05PhotonPFIsoPho[150];   //[nPho]
+   Float_t         dr06NeutralHadronPFIsoPho[150];   //[nPho]
+   Float_t         dr06PhotonPFIsoPho[150];   //[nPho]
+   Float_t         dr01ChargedHadronPFIsoPho[200];   //[nPerPVPho]
+   Float_t         dr02ChargedHadronPFIsoPho[200];   //[nPerPVPho]
+   Float_t         dr03ChargedHadronPFIsoPho[200];   //[nPerPVPho]
+   Float_t         dr04ChargedHadronPFIsoPho[200];   //[nPerPVPho]
+   Float_t         dr05ChargedHadronPFIsoPho[200];   //[nPerPVPho]
+   Float_t         dr06ChargedHadronPFIsoPho[200];   //[nPerPVPho]
+   Int_t           nConv;
+   Float_t         pxPairConv[200];   //[nConv]
+   Float_t         pyPairConv[200];   //[nConv]
+   Float_t         pzPairConv[200];   //[nConv]
+   Float_t         pxRefittedPairConv[200];   //[nConv]
+   Float_t         pyRefittedPairConv[200];   //[nConv]
+   Float_t         pzRefittedPairConv[200];   //[nConv]
+   Float_t         etaRefittedPairConv[200];   //[nConv]
+   Float_t         phiRefittedPairConv[200];   //[nConv]
+   Float_t         ptRefittedPairConv[200];   //[nConv]
+   Float_t         energyRefittedPairConv[200];   //[nConv]
+   Float_t         eOverPRefittedPairConv[200];   //[nConv]
+   Float_t         zOfPVFromTracksConv[200];   //[nConv]
+   Float_t         xVtxConv[200];   //[nConv]
+   Float_t         yVtxConv[200];   //[nConv]
+   Float_t         zVtxConv[200];   //[nConv]
+   Float_t         chi2VtxConv[200];   //[nConv]
+   Float_t         chi2ProbVtxConv[200];   //[nConv]
+   Int_t           isValidVtxConv[200];   //[nConv]
+   Int_t           nTracksVtxConv[200];   //[nConv]
+   Float_t         mvaOutVtxConv[200];   //[nConv]
+   Float_t         trk1DzConv[200];   //[nConv]
+   Float_t         trk1DzErrorConv[200];   //[nConv]
+   Float_t         trk1ChargeConv[200];   //[nConv]
+   Float_t         trk1AlgoConv[200];   //[nConv]
+   Float_t         trk1PtConv[200];   //[nConv]
+   Float_t         trk1D0Conv[200];   //[nConv]
+   Float_t         trk1PoutConv[200];   //[nConv]
+   Float_t         trk1PinConv[200];   //[nConv]
+   Float_t         trk2DzConv[200];   //[nConv]
+   Float_t         trk2DzErrorConv[200];   //[nConv]
+   Float_t         trk2ChargeConv[200];   //[nConv]
+   Float_t         trk2AlgoConv[200];   //[nConv]
+   Float_t         trk2PtConv[200];   //[nConv]
+   Float_t         trk2D0Conv[200];   //[nConv]
+   Float_t         trk2PoutConv[200];   //[nConv]
+   Float_t         trk2PinConv[200];   //[nConv]
    Int_t           nSC;
    Int_t           nBCSC[200];   //[nSC]
    Int_t           nCrystalsSC[200];   //[nSC]
@@ -561,6 +648,7 @@ public :
    Float_t         pTMaxNeutralAK5PFPUcorrJet[300];
    Float_t         pTMaxChg_QCAK5PFPUcorrJet[300];
    Float_t         betastarAK5PFPUcorrJet[300];
+   Float_t         rmsCandsHandAK5PFPUcorrJet[300];
 
    Int_t           nAK5PFNoPUJet;
    Int_t           chargeAK5PFNoPUJet[300];   //[nAK5PFNoPUJet]
@@ -630,6 +718,8 @@ public :
    Float_t         pTMaxNeutralAK5PFNoPUJet[300];
    Float_t         pTMaxChg_QCAK5PFNoPUJet[300];
    Float_t         betastarAK5PFNoPUJet[300];
+   Float_t         rmsCandsHandAK5PFNoPUJet[300];
+
    Int_t           nAK5GenJet;
    Int_t           chargeAK5GenJet[300];   //[nAK5GenJet]
    Float_t         energyAK5GenJet[300];   //[nAK5GenJet]
@@ -845,6 +935,93 @@ public :
    TBranch        *b_phIso03noVetoPFEle;   //!
    TBranch        *b_phIso04noVetoPFEle;   //!
    TBranch        *b_phIso05noVetoPFEle;   //!
+   TBranch        *b_nPho;   //!
+   TBranch        *b_nPerPVPho;   //!
+   TBranch        *b_chargePho;   //!
+   TBranch        *b_energyPho;   //!
+   TBranch        *b_thetaPho;   //!
+   TBranch        *b_etaPho;   //!
+   TBranch        *b_phiPho;   //!
+   TBranch        *b_pxPho;   //!
+   TBranch        *b_pyPho;   //!
+   TBranch        *b_pzPho;   //!
+   TBranch        *b_vertexXPho;   //!
+   TBranch        *b_vertexYPho;   //!
+   TBranch        *b_vertexZPho;   //!
+   TBranch        *b_fiducialFlagsPho;   //!
+   TBranch        *b_recoFlagsPho;   //!
+   TBranch        *b_superClusterIndexPho;   //!
+   TBranch        *b_PFsuperClusterIndexPho;   //!
+   TBranch        *b_hOverEPho;   //!
+   TBranch        *b_hTowOverEPho;   //!
+   TBranch        *b_dr03TkSumPtPho;   //!
+   TBranch        *b_dr03HollowTkSumPtPho;   //!
+   TBranch        *b_dr03EcalRecHitSumEtPho;   //!
+   TBranch        *b_dr03HcalTowerSumEtPho;   //!
+   TBranch        *b_dr04TkSumPtPho;   //!
+   TBranch        *b_dr04HollowTkSumPtPho;   //!
+   TBranch        *b_dr04EcalRecHitSumEtPho;   //!
+   TBranch        *b_dr04HcalTowerSumEtPho;   //!
+   TBranch        *b_chargedHadronIsoPho;   //!
+   TBranch        *b_neutralHadronIsoPho;   //!
+   TBranch        *b_photonIsoPho;   //!
+   TBranch        *b_hasPixelSeedPho;   //!
+   TBranch        *b_hasMatchedConversionPho;   //!
+   TBranch        *b_dr01NeutralHadronPFIsoPho;   //!
+   TBranch        *b_dr01PhotonPFIsoPho;   //!
+   TBranch        *b_dr02NeutralHadronPFIsoPho;   //!
+   TBranch        *b_dr02PhotonPFIsoPho;   //!
+   TBranch        *b_dr03NeutralHadronPFIsoPho;   //!
+   TBranch        *b_dr03PhotonPFIsoPho;   //!
+   TBranch        *b_dr04NeutralHadronPFIsoPho;   //!
+   TBranch        *b_dr04PhotonPFIsoPho;   //!
+   TBranch        *b_dr05NeutralHadronPFIsoPho;   //!
+   TBranch        *b_dr05PhotonPFIsoPho;   //!
+   TBranch        *b_dr06NeutralHadronPFIsoPho;   //!
+   TBranch        *b_dr06PhotonPFIsoPho;   //!
+   TBranch        *b_dr01ChargedHadronPFIsoPho;   //!
+   TBranch        *b_dr02ChargedHadronPFIsoPho;   //!
+   TBranch        *b_dr03ChargedHadronPFIsoPho;   //!
+   TBranch        *b_dr04ChargedHadronPFIsoPho;   //!
+   TBranch        *b_dr05ChargedHadronPFIsoPho;   //!
+   TBranch        *b_dr06ChargedHadronPFIsoPho;   //!
+   TBranch        *b_nConv;   //!
+   TBranch        *b_pxPairConv;   //!
+   TBranch        *b_pyPairConv;   //!
+   TBranch        *b_pzPairConv;   //!
+   TBranch        *b_pxRefittedPairConv;   //!
+   TBranch        *b_pyRefittedPairConv;   //!
+   TBranch        *b_pzRefittedPairConv;   //!
+   TBranch        *b_etaRefittedPairConv;   //!
+   TBranch        *b_phiRefittedPairConv;   //!
+   TBranch        *b_ptRefittedPairConv;   //!
+   TBranch        *b_energyRefittedPairConv;   //!
+   TBranch        *b_eOverPRefittedPairConv;   //!
+   TBranch        *b_zOfPVFromTracksConv;   //!
+   TBranch        *b_xVtxConv;   //!
+   TBranch        *b_yVtxConv;   //!
+   TBranch        *b_zVtxConv;   //!
+   TBranch        *b_chi2VtxConv;   //!
+   TBranch        *b_chi2ProbVtxConv;   //!
+   TBranch        *b_isValidVtxConv;   //!
+   TBranch        *b_nTracksVtxConv;   //!
+   TBranch        *b_mvaOutVtxConv;   //!
+   TBranch        *b_trk1DzConv;   //!
+   TBranch        *b_trk1DzErrorConv;   //!
+   TBranch        *b_trk1ChargeConv;   //!
+   TBranch        *b_trk1AlgoConv;   //!
+   TBranch        *b_trk1PtConv;   //!
+   TBranch        *b_trk1D0Conv;   //!
+   TBranch        *b_trk1PoutConv;   //!
+   TBranch        *b_trk1PinConv;   //!
+   TBranch        *b_trk2DzConv;   //!
+   TBranch        *b_trk2DzErrorConv;   //!
+   TBranch        *b_trk2ChargeConv;   //!
+   TBranch        *b_trk2AlgoConv;   //!
+   TBranch        *b_trk2PtConv;   //!
+   TBranch        *b_trk2D0Conv;   //!
+   TBranch        *b_trk2PoutConv;   //!
+   TBranch        *b_trk2PinConv;   //!
    TBranch        *b_nSC;   //!
    TBranch        *b_nBCSC;   //!
    TBranch        *b_nCrystalsSC;   //!
@@ -1267,6 +1444,7 @@ public :
    TBranch        *b_pTMaxNeutralAK5PFPUcorrJet;
    TBranch        *b_pTMaxChg_QCAK5PFPUcorrJet;
    TBranch        *b_betastarAK5PFPUcorrJet;
+   TBranch        *b_rmsCandsHandAK5PFPUcorrJet;
    TBranch        *b_nAK5PFNoPUJet;   //!
    TBranch        *b_chargeAK5PFNoPUJet;   //!
    TBranch        *b_energyAK5PFNoPUJet;   //!
@@ -1335,6 +1513,7 @@ public :
    TBranch        *b_pTMaxNeutralAK5PFNoPUJet;
    TBranch        *b_pTMaxChg_QCAK5PFNoPUJet;
    TBranch        *b_betastarAK5PFNoPUJet;
+   TBranch        *b_rmsCandsHandAK5PFNoPUJet;
    TBranch        *b_nAK5GenJet;   //!
    TBranch        *b_chargeAK5GenJet;   //!
    TBranch        *b_energyAK5GenJet;   //!
@@ -1356,6 +1535,7 @@ public :
    Ntp1Analyzer( const std::string& analyzerType, const std::string& dataset, const std::string& flags="", TTree *tree=0);
    virtual ~Ntp1Analyzer();
 
+   virtual std::string GetFlags( ) const { return flags_; };
    virtual void SetFlags( const std::string& flags ) { flags_ = flags; };
    virtual void SetRequiredTriggers( const std::vector<TriggerMask>& reqTrigz ) { requiredTriggers_ = reqTrigz; };
    virtual void AddRequiredTrigger( const std::string& trigger, int runMin=-1, int runMax=-1 );
