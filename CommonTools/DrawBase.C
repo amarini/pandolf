@@ -351,6 +351,8 @@ void DrawBase::reset() {
   yAxisMaxScale_ = 1.4;
   yAxisMaxScaleLog_ = 5.;
 
+  flags_ = "";
+
 }
 
 
