@@ -80,8 +80,8 @@ class DrawBase {
   void drawProfile( const std::string& yVar, const std::string& xVar, int legendQuadrant=1);
   void drawStack(const std::string& varY, const std::string& varX, const std::string& RECO_GEN, bool isData) const { this->drawStack( varY, varX, "", RECO_GEN, isData); };
   void drawStack(const std::string& varY, const std::string& varX, const std::string& etaRegion, const std::string& RECO_GEN, bool isData) const;
-  void compareDifferentHistos( const std::vector< HistoAndName > histosandnames, const std::string saveVarName, const std::string xAxisName, const std::string& units="", const std::string& instanceName="Entries", bool stacked=false, int legendQuadrant=1 );
-  void compareDifferentHistos_singleFile( InputFile file, const std::vector< HistoAndName > histosandnames, const std::string saveVarName, const std::string xAxisName, const std::string& units="", const std::string& instanceName="Entries", bool stacked=false, int legendQuadrant=1 );
+  void compareDifferentHistos( const std::vector< HistoAndName > histosandnames, const std::string saveVarName, const std::string xAxisName="", const std::string& units="", const std::string& instanceName="Entries", bool stacked=false, int legendQuadrant=1 );
+  void compareDifferentHistos_singleFile( InputFile file, const std::vector< HistoAndName > histosandnames, const std::string saveVarName, const std::string xAxisName="", const std::string& units="", const std::string& instanceName="Entries", bool stacked=false, int legendQuadrant=1 );
   void drawObjects( const std::vector< TObject* > objects, const std::string& name, 
                    const std::string& xAxisName, float xMin, float xMax, 
                    const std::string& yAxisName, float yMin, float yMax, 
@@ -129,7 +129,7 @@ class DrawBase {
   void set_legendTitle( const std::string& title ) { legendTitle_ = title; };
   void set_mcWeight( int iFile, float weight );
   void set_mcWeight( const std::string& datasetName, float weight );
-
+  void set_is7TeV( bool is7TeV ) { is7TeV_ = is7TeV; };
   void add_label( const std::string& text, float xmin=0.23, float ymin=0.87, float xmax=0.36, float ymax=0.9, float textSize=0.035 );
   void delete_label();
 
@@ -206,6 +206,7 @@ class DrawBase {
 
   Float_t markerSize_;
   Float_t lumi_;
+  bool is7TeV_;
 
   Int_t rebin_;
 

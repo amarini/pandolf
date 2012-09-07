@@ -2418,7 +2418,7 @@ void DrawBase::compareDifferentHistos_singleFile( InputFile infile, const std::v
   if( xAxisMax_ != 9999. ) xMax = xAxisMax_;
 
   TH2D* h2_axes = new TH2D("axes", "", 10, xMin, xMax, 10, yMin, yMax);
-  std::string xAxisName_full(xAxisName);
+  std::string xAxisName_full = (xAxisName=="") ? saveVarName : xAxisName;
   if( units!="" )
     xAxisName_full += " ["+units+"]";
   h2_axes->SetXTitle( xAxisName_full.c_str() );
