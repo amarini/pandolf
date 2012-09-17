@@ -20,6 +20,9 @@ merge_and_setWeights: $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/merge_and_s
 do2ndLevel_TTZ: Ntp1Analyzer.o Ntp1Analyzer_TTZ.o AnalysisElectron.o AnalysisMuon.o AnalysisJet.o PUWeight.o do2ndLevel_TTZ.cpp
 	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o do2ndLevel_TTZ do2ndLevel_TTZ.cpp Ntp1Analyzer.o PUWeight.o Ntp1Analyzer_TTZ.o AnalysisElectron.o AnalysisMuon.o AnalysisJet.o $(ROOTFLAG) $(EXTRALIBS) -lCondFormatsJetMETObjects
 
+do2ndLevel_TTZgen: Ntp1Analyzer.o Ntp1Analyzer_TTZgen.o AnalysisElectron.o AnalysisMuon.o AnalysisJet.o PUWeight.o do2ndLevel_TTZgen.cpp
+	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o do2ndLevel_TTZgengen do2ndLevel_TTZgen.cpp Ntp1Analyzer.o PUWeight.o Ntp1Analyzer_TTZgen.o AnalysisElectron.o AnalysisMuon.o AnalysisJet.o $(ROOTFLAG) $(EXTRALIBS) -lCondFormatsJetMETObjects
+
 do2ndLevel_TTZ_DATA: Ntp1Analyzer.o Ntp1Analyzer_TTZ.o AnalysisElectron.o AnalysisMuon.o AnalysisJet.o PUWeight.o do2ndLevel_TTZ_DATA.cpp
 	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o do2ndLevel_TTZ_DATA do2ndLevel_TTZ_DATA.cpp Ntp1Analyzer.o Ntp1Analyzer_TTZ.o AnalysisElectron.o AnalysisMuon.o AnalysisJet.o PUWeight.o $(ROOTFLAG)
 
@@ -77,6 +80,9 @@ Ntp1Analyzer.o: $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/Ntp1Analyzer.C
 
 Ntp1Analyzer_TTZ.o: Ntp1Analyzer_TTZ.cc
 	$(CC) $(CFLAGS) $(INCLUDES) -I$(CMSSW_BASE)/src/UserCode/emanuele/CommonTools Ntp1Analyzer_TTZ.cc $(ROOTFLAG)
+
+Ntp1Analyzer_TTZgen.o: Ntp1Analyzer_TTZgen.cc
+	$(CC) $(CFLAGS) $(INCLUDES) -I$(CMSSW_BASE)/src/UserCode/emanuele/CommonTools Ntp1Analyzer_TTZgen.cc $(ROOTFLAG)
 
 
 Ntp1Finalizer.o: $(CMSSW_BASE)/src/UserCode/pandolf/CommonTools/Ntp1Finalizer.C
