@@ -18,6 +18,7 @@ RedNtpFinalizer::RedNtpFinalizer( const std::string& analyzerType, const std::st
   flags_ = flags;
 
   outFile_ = 0;
+  outputDir_ = "";
 
   nGenEvents_ = 0.;
   xSection_ = get_crossSection(dataset);
@@ -60,6 +61,12 @@ void RedNtpFinalizer::createOutputFile( const std::string& additionalFlags ) {
      outfileName = outfileName + "_" + additionalFlags;
 
    outfileName = outfileName + ".root";
+
+   if( outputDir_!="" ) {
+     outfileName = outputDir_ + "/" + outfileName + ".root";
+     std::string mkdir_command = "mkdir -p " + outputDir_;
+     system( mkdir_command.c_str() );
+   }
 
    outFile_ = TFile::Open(outfileName.c_str(), "RECREATE");
    
@@ -212,7 +219,9 @@ float RedNtpFinalizer::get_crossSection(const std::string& dataset) const {
   } else if( dataset_tstr.Contains("WGToLNuG_TuneZ2star_8TeV-madgraph-tauola") ) {
     xSection = 553.92;
   } else if( dataset_tstr.Contains("ZGToLLG_8TeV-madgraph") ) {
-    xSection = 132.6;
+    xSection = 181.338*0.06;
+  } else if( dataset_tstr.Contains("ZG_Inclusive_8TeV-madgraph") ) {
+    xSection = 181.338;
   } else if( dataset_tstr.Contains("TTWJets_8TeV-madgraph") ) {
     xSection = 0.232;
   } else if( dataset_tstr.Contains("TTZJets_8TeV-madgraph") ) {
