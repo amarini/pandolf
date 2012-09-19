@@ -1438,7 +1438,7 @@ public :
    TBranch        *b_RchgAK5PFPUcorrJet;
    TBranch        *b_RneutralAK5PFPUcorrJet;
    TBranch        *b_RAK5PFPUcorrJet;
-   TBranch        *b_Rchg_QGAK5PFPUcorrJet;
+   TBranch        *b_Rchg_QCAK5PFPUcorrJet;
    TBranch        *b_pTMaxAK5PFPUcorrJet;
    TBranch        *b_pTMaxChgAK5PFPUcorrJet;
    TBranch        *b_pTMaxNeutralAK5PFPUcorrJet;
