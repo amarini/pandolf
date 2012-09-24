@@ -492,7 +492,7 @@ void Ntp1Analyzer::Init(TTree *tree)
    fChain->SetBranchAddress("bunchCrossing", &bunchCrossing, &b_bunchCrossing);
    fChain->SetBranchAddress("orbitNumber", &orbitNumber, &b_orbitNumber);
    fChain->SetBranchAddress("rhoFastjet", &rhoFastjet, &b_rhoFastjet);
-   fChain->SetBranchAddress("rhoJetsFastjet", &rhoJetsFastjet, &b_rhoJetsFastjet);
+   fChain->SetBranchAddress("rhoJetsFastJet", &rhoJetsFastjet, &b_rhoJetsFastjet); //CAPITAL J in fastJet - different in line above
    if( isMC_ ) {
      fChain->SetBranchAddress("nBX", &nBX, &b_nBX);
      fChain->SetBranchAddress("nPU", nPU, &b_nPU);

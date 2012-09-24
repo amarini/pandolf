@@ -787,6 +787,7 @@ public :
    Int_t nPU_ave_; //average of intime and out of time
    Int_t nvertex_;
    Float_t rhoPF_;
+   Float_t rhoJetPF_;
    Int_t event_;
    Float_t ptHat_;
    Float_t ptHatMin_;
