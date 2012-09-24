@@ -1090,6 +1090,7 @@ void Ntp1Analyzer::Init(TTree *tree)
    fChain->SetBranchAddress("pTMaxChgAK5PFPUcorrJet", pTMaxChgAK5PFPUcorrJet, &b_pTMaxChgAK5PFPUcorrJet);
    fChain->SetBranchAddress("pTMaxNeutralAK5PFPUcorrJet", pTMaxNeutralAK5PFPUcorrJet, &b_pTMaxNeutralAK5PFPUcorrJet);
    fChain->SetBranchAddress("pTMaxChg_QCAK5PFPUcorrJet", pTMaxChg_QCAK5PFPUcorrJet, &b_pTMaxChg_QCAK5PFPUcorrJet);
+   fChain->SetBranchAddress("betaAK5PFPUcorrJet", betaAK5PFPUcorrJet, &b_betaAK5PFPUcorrJet);
    fChain->SetBranchAddress("betastarAK5PFPUcorrJet", betastarAK5PFPUcorrJet, &b_betastarAK5PFPUcorrJet);
    fChain->SetBranchAddress("rmsCandsHandAK5PFPUcorrJet", rmsCandsHandAK5PFPUcorrJet, &b_rmsCandsHandAK5PFPUcorrJet);
    fChain->SetBranchAddress("nAK5PFNoPUJet", &nAK5PFNoPUJet, &b_nAK5PFNoPUJet);
@@ -1159,6 +1160,7 @@ void Ntp1Analyzer::Init(TTree *tree)
    fChain->SetBranchAddress("pTMaxChgAK5PFNoPUJet", pTMaxChgAK5PFNoPUJet, &b_pTMaxChgAK5PFNoPUJet);
    fChain->SetBranchAddress("pTMaxNeutralAK5PFNoPUJet", pTMaxNeutralAK5PFNoPUJet, &b_pTMaxNeutralAK5PFNoPUJet);
    fChain->SetBranchAddress("pTMaxChg_QCAK5PFNoPUJet", pTMaxChg_QCAK5PFNoPUJet, &b_pTMaxChg_QCAK5PFNoPUJet);
+   fChain->SetBranchAddress("betaAK5PFNoPUJet", betaAK5PFNoPUJet, &b_betaAK5PFNoPUJet);
    fChain->SetBranchAddress("betastarAK5PFNoPUJet", betastarAK5PFNoPUJet, &b_betastarAK5PFNoPUJet);
    fChain->SetBranchAddress("rmsCandsHandAK5PFNoPUJet", rmsCandsHandAK5PFNoPUJet, &b_rmsCandsHandAK5PFNoPUJet);
    if( isMC_ ) {

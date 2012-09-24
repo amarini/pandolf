@@ -77,6 +77,9 @@ class AnalysisJet : public TLorentzVector {
   float jetBProbabilityBJetTag;
   float jetProbabilityBJetTag;
 
+  float beta;
+  float betaStar;
+
 };
 
 
