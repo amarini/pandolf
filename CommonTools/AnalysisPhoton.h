@@ -12,6 +12,8 @@ class AnalysisPhoton : public TLorentzVector {
     pt=0.;
     e=0.;
   };
+  AnalysisPhoton(float px, float py, float pz, float e) : TLorentzVector(px, py, pz, e) {
+  };
   ~AnalysisPhoton(){};
 
   bool passedPhotonID( const std::string& tightness ) const;
