@@ -1,3 +1,8 @@
+#ifndef RedNtpFinalizer_h
+#define RedNtpFinalizer_h
+
+
+
 // ------------------------------------------------------------
 //  
 //    RedNtpFinalizer - Base class for finalizing the analysis
@@ -40,6 +45,7 @@ class RedNtpFinalizer {
   void clear();
 
   void set_outFile( const std::string& fileName="", const std::string& suffix="" );
+  void set_outputDir( const std::string& outputDir ) { outputDir_ =  outputDir; };
   void set_dataset( const std::string& dataset ) { dataset_ = dataset; };
   //void set_inputAnalyzerType( const std::string& analyzerType ) { inputAnalyzerType_ = analyzerType; };
   void set_redNtpDir( const std::string& redNtpDir ) { redNtpDir_ = redNtpDir; };
@@ -58,6 +64,7 @@ class RedNtpFinalizer {
 
   std::string analyzerType_;
   //std::string inputAnalyzerType_;
+  std::string outputDir_;
   std::string redNtpDir_;
   std::string dataset_;
   std::string flags_;
@@ -69,3 +76,6 @@ class RedNtpFinalizer {
  private:
 
 };
+
+
+#endif
