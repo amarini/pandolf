@@ -580,6 +580,15 @@ public :
    Float_t         vertexZPFCand[600];   //[nPFCand]
    Int_t           particleTypePFCand[600];   //[nPFCand]
    Int_t           iPFJetPFCand[600];   //[nPFCand]
+   Int_t           nAK5Jet;
+   Int_t           chargeAK5Jet[300];   //[nAK5Jet]
+   Float_t         energyAK5Jet[300];   //[nAK5Jet]
+   Float_t         thetaAK5Jet[300];   //[nAK5Jet]
+   Float_t         etaAK5Jet[300];   //[nAK5Jet]
+   Float_t         phiAK5Jet[300];   //[nAK5Jet]
+   Float_t         pxAK5Jet[300];   //[nAK5Jet]
+   Float_t         pyAK5Jet[300];   //[nAK5Jet]
+   Float_t         pzAK5Jet[300];   //[nAK5Jet]
    Int_t           nAK5PFPUcorrJet;
    Int_t           chargeAK5PFPUcorrJet[300];   //[nAK5PFPUcorrJet]
    Float_t         energyAK5PFPUcorrJet[300];   //[nAK5PFPUcorrJet]
@@ -1379,6 +1388,15 @@ public :
    TBranch        *b_vertexZPFCand;   //!
    TBranch        *b_particleTypePFCand;   //!
    TBranch        *b_iPFJetPFCand;   //!
+   TBranch        *b_nAK5Jet;   //!
+   TBranch        *b_chargeAK5Jet;   //!
+   TBranch        *b_energyAK5Jet;   //!
+   TBranch        *b_thetaAK5Jet;   //!
+   TBranch        *b_etaAK5Jet;   //!
+   TBranch        *b_phiAK5Jet;   //!
+   TBranch        *b_pxAK5Jet;   //!
+   TBranch        *b_pyAK5Jet;   //!
+   TBranch        *b_pzAK5Jet;   //!
    TBranch        *b_nAK5PFPUcorrJet;   //!
    TBranch        *b_chargeAK5PFPUcorrJet;   //!
    TBranch        *b_energyAK5PFPUcorrJet;   //!
