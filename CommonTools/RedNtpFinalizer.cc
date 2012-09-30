@@ -63,7 +63,7 @@ void RedNtpFinalizer::createOutputFile( const std::string& additionalFlags ) {
    outfileName = outfileName + ".root";
 
    if( outputDir_!="" ) {
-     outfileName = outputDir_ + "/" + outfileName + ".root";
+     outfileName = outputDir_ + "/" + outfileName;
      std::string mkdir_command = "mkdir -p " + outputDir_;
      system( mkdir_command.c_str() );
    }
