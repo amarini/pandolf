@@ -12,6 +12,7 @@
 
 Ntp1Analyzer::Ntp1Analyzer(const std::string& analyzerType, const std::string& dataset, const std::string& flags, TTree* tree)
 {
+std::cout << "cazzo" << std::endl;
 
    dataset_ = dataset;
 
@@ -112,13 +113,13 @@ void Ntp1Analyzer::LoadInputFromFile( const std::string& fileName ) {
 
    TChain * chain = new TChain("ntp1","");
 
-   char singleLine[500];
+   char singleLine[3000];
    bool isFirstFile=true;
 
    TFile* firstFile = 0;
 
    while( fscanf(iff, "%s", singleLine) !=EOF ) {
-   
+  
      std::string singleLine_str(singleLine);
      TString singleLine_tstr(singleLine);
      std::string treeName_str = singleLine_str + "/ntp1";
@@ -127,7 +128,7 @@ void Ntp1Analyzer::LoadInputFromFile( const std::string& fileName ) {
      std::cout << "-> Adding " << treeName_str << std::endl;
      chain->Add(treeName_str.c_str());
      if( isFirstFile ) {
-       firstFile = TFile::Open(singleLine_str.c_str(), "read");
+       firstFile = TFile::Open(treeName_str.c_str(), "read");
        isFirstFile=false;
      }
 
