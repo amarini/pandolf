@@ -8,7 +8,7 @@
 int main( int argc, char* argv[]) {
 
   if( argc!=2 && argc!=3 && argc!=4 ) {
-    std::cout << "USAGE: ./do2ndLevel_TTZ [dataset] [inputfile=""] [flags=""]" << std::endl;
+    std::cout << "USAGE: ./do2ndLevel_TTZ [dataset] [inputfile=\"\"] [flags=\"\"]" << std::endl;
     exit(31);
   }
 
@@ -64,7 +64,9 @@ int main( int argc, char* argv[]) {
 
 
   if( argc==2 ) {
-    na->LoadInput();
+    std::string fileName = "files_" + dataset + ".txt";
+    na->LoadInputFromFile(fileName.c_str());
+    //na->LoadInput();
   } else {
     std::string inputfile(argv[2]);
     na->LoadInputFromFile(inputfile.c_str());
