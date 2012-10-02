@@ -5,7 +5,7 @@
 
 
 
-TreeFinalizer::TreeFinalizer( const std::string& analyzerType, const std::string& dataset, const std::string& flags, const std::string& recoType, const std::string& jetAlgo ) {
+TreeFinalizer::TreeFinalizer( const std::string& analyzerType, const std::string& dataset, const std::string& flags ) {
 
   DEBUG_ = false;
 
@@ -17,9 +17,6 @@ TreeFinalizer::TreeFinalizer( const std::string& analyzerType, const std::string
   inputFileDir_ = "";
   dataset_ = dataset;
   flags_ = flags;
-
-  recoType_ = recoType;
-  jetAlgo_ = jetAlgo;
 
   outFile_ = 0;
 
@@ -60,7 +57,7 @@ void TreeFinalizer::createOutputFile( const std::string& additionalFlags ) {
    if( additionalFlags!="" )
      outfileName = outfileName + "_" + additionalFlags;
 
-   outfileName = outfileName + "_" + this->getJetType();
+   outfileName = outfileName ;
    outfileName = outfileName + ".root";
 
    outFile_ = TFile::Open(outfileName.c_str(), "RECREATE");
@@ -76,7 +73,7 @@ void TreeFinalizer::createOutputFile( const std::string& additionalFlags ) {
 
 void TreeFinalizer::addInput( const std::string& dataset ) {
 
-    std::string infileName = inputAnalyzerType_ + "_2ndLevelTreeW_" + dataset + "_" + this->getJetType();
+    std::string infileName = inputAnalyzerType_ + "_2ndLevelTreeW_" + dataset;
     if( inputFileDir_ != "" )
       infileName = inputFileDir_ + "/" + infileName;
     infileName += ".root";
@@ -131,8 +128,3 @@ void TreeFinalizer::writeResponseHistos( TFile* file, std::vector<TH1F*> h1_resp
 
 
 
-std::string TreeFinalizer::getJetType() const {
-
-  return (recoType_ + jetAlgo_);
-
-}
