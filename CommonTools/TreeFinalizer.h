@@ -23,7 +23,7 @@ class TreeFinalizer {
 
  public:
 
-  TreeFinalizer( const std::string& analyzerType, const std::string& dataset, const std::string& flags="", const std::string& recoType="pf", const std::string& jetAlgo="akt5" );
+  TreeFinalizer( const std::string& analyzerType, const std::string& dataset, const std::string& flags="" );
   virtual ~TreeFinalizer();
 
   void createOutputFile( const std::string& additionalFlags="" );
@@ -59,8 +59,6 @@ class TreeFinalizer {
   std::string dataset_;
   std::string flags_;
 
-  std::string recoType_;
-  std::string jetAlgo_;
 
   TFile* outFile_;
 
