@@ -12,7 +12,6 @@
 
 Ntp1Analyzer::Ntp1Analyzer(const std::string& analyzerType, const std::string& dataset, const std::string& flags, TTree* tree)
 {
-std::cout << "cazzo" << std::endl;
 
    dataset_ = dataset;
 
