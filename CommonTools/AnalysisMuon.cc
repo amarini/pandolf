@@ -21,7 +21,7 @@ bool AnalysisMuon::passedMuonID_tight2012() {
                 && pixelHits>0 && trackerHits>5 
                 && nValidMuonHits > 0
                 && nMatchedStations>=2
-                && (dxy<0.02) && (dz<0.1) ); //tighter than recommendation to align to smurfs
+                && (dxy<0.02) && (dz<0.5) ); 
 
   return passed;
 
