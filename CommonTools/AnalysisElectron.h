@@ -27,6 +27,7 @@ class AnalysisElectron : public AnalysisLepton {
   bool isIsolated2012_MVAWP95();
   bool isIsolated2012_CutsLoose();
   bool separatedIsoRel();//
+  float getPfIso_rhoCorrected();
 
   bool electronIDVBTF80();
   bool electronIDVBTF95();
@@ -85,6 +86,9 @@ class AnalysisElectron : public AnalysisLepton {
   double convDist;
   double convDcot;
   bool hasMatchedConversion;
+
+
+  bool matchedToGen;
 
 };
 
