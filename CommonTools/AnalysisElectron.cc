@@ -46,22 +46,7 @@ bool AnalysisElectron::isIsolatedVBTF95() {
 // Cut based ID taken from https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaCutBasedIdentification
 bool AnalysisElectron::isIsolated2012_CutsLoose() {
 
-  float abseta = fabs(this->Eta());
-
-  // calculate the PU subtracted isolation
-  ElectronEffectiveArea::ElectronEffectiveAreaTarget effAreaTarget_ = ElectronEffectiveArea::kEleEAData2012;
-  ElectronEffectiveArea::ElectronEffectiveAreaType effAreaGamma_   = ElectronEffectiveArea::kEleGammaIso04;
-  ElectronEffectiveArea::ElectronEffectiveAreaType effAreaNeutralHad_ = ElectronEffectiveArea::kEleNeutralHadronIso04;
-  ElectronEffectiveArea::ElectronEffectiveAreaType effAreaGammaAndNeutralHad_ = ElectronEffectiveArea::kEleGammaAndNeutralHadronIso04;
-
-  float eff_area_ga  = ElectronEffectiveArea::GetElectronEffectiveArea(effAreaGamma_, abseta, effAreaTarget_);
-  float eff_area_nh  = ElectronEffectiveArea::GetElectronEffectiveArea(effAreaNeutralHad_, abseta, effAreaTarget_);
-  float eff_area_ganh = ElectronEffectiveArea::GetElectronEffectiveArea(effAreaGammaAndNeutralHad_, abseta, effAreaTarget_);
-
-  float iso = pfCandChargedIso04;
-  //  iso += max<float>(0.,pfCandNeutralIso04Ele[eleIndex]-eff_area_nh*rhoJetsFastJet + pfCandPhotonIso04Ele[eleIndex]-eff_area_ga*rhoJetsFastJet);
-  iso += TMath::Max(0.,pfCandNeutralIso04+pfCandPhotonIso04-eff_area_ganh*rhoJetsFastJet);
-
+  float iso = this->getPfIso_rhoCorrected();
 
   bool isIsolated = (  iso/this->Pt() < 0.15 );
 
@@ -73,22 +58,9 @@ bool AnalysisElectron::isIsolated2012_CutsLoose() {
 
 bool AnalysisElectron::isIsolated2012_MVAWP95() {
 
+  float iso = this->getPfIso_rhoCorrected();
+
   float abseta = fabs(this->Eta());
-
-  // calculate the PU subtracted isolation
-  ElectronEffectiveArea::ElectronEffectiveAreaTarget effAreaTarget_ = ElectronEffectiveArea::kEleEAData2012;
-  ElectronEffectiveArea::ElectronEffectiveAreaType effAreaGamma_   = ElectronEffectiveArea::kEleGammaIso04;
-  ElectronEffectiveArea::ElectronEffectiveAreaType effAreaNeutralHad_ = ElectronEffectiveArea::kEleNeutralHadronIso04;
-  ElectronEffectiveArea::ElectronEffectiveAreaType effAreaGammaAndNeutralHad_ = ElectronEffectiveArea::kEleGammaAndNeutralHadronIso04;
-
-  float eff_area_ga  = ElectronEffectiveArea::GetElectronEffectiveArea(effAreaGamma_, abseta, effAreaTarget_);
-  float eff_area_nh  = ElectronEffectiveArea::GetElectronEffectiveArea(effAreaNeutralHad_, abseta, effAreaTarget_);
-  float eff_area_ganh = ElectronEffectiveArea::GetElectronEffectiveArea(effAreaGammaAndNeutralHad_, abseta, effAreaTarget_);
-
-  float iso = pfCandChargedIso04;
-  //  iso += max<float>(0.,pfCandNeutralIso04Ele[eleIndex]-eff_area_nh*rhoJetsFastJet + pfCandPhotonIso04Ele[eleIndex]-eff_area_ga*rhoJetsFastJet);
-  iso += TMath::Max(0.,pfCandNeutralIso04+pfCandPhotonIso04-eff_area_ganh*rhoJetsFastJet);
-
 
   // WP95 taken from https://twiki.cern.ch/twiki/bin/view/Main/HVVElectronId2012#Triggering_electrons_MVA
   bool isIsolated = (  ( this->Pt()<20.  && abseta>=0.0   && abseta<0.8   && iso/this->Pt() < 0.408 ) || 
@@ -105,6 +77,28 @@ bool AnalysisElectron::isIsolated2012_MVAWP95() {
 
 }
 
+
+float AnalysisElectron::getPfIso_rhoCorrected() {
+
+  float abseta = fabs(this->Eta());
+
+  // calculate the PU subtracted isolation
+  ElectronEffectiveArea::ElectronEffectiveAreaTarget effAreaTarget_ = ElectronEffectiveArea::kEleEAData2012;
+  ElectronEffectiveArea::ElectronEffectiveAreaType effAreaGamma_   = ElectronEffectiveArea::kEleGammaIso04;
+  ElectronEffectiveArea::ElectronEffectiveAreaType effAreaNeutralHad_ = ElectronEffectiveArea::kEleNeutralHadronIso04;
+  ElectronEffectiveArea::ElectronEffectiveAreaType effAreaGammaAndNeutralHad_ = ElectronEffectiveArea::kEleGammaAndNeutralHadronIso04;
+
+  float eff_area_ga  = ElectronEffectiveArea::GetElectronEffectiveArea(effAreaGamma_, abseta, effAreaTarget_);
+  float eff_area_nh  = ElectronEffectiveArea::GetElectronEffectiveArea(effAreaNeutralHad_, abseta, effAreaTarget_);
+  float eff_area_ganh = ElectronEffectiveArea::GetElectronEffectiveArea(effAreaGammaAndNeutralHad_, abseta, effAreaTarget_);
+
+  float iso = pfCandChargedIso04;
+  //  iso += max<float>(0.,pfCandNeutralIso04Ele[eleIndex]-eff_area_nh*rhoJetsFastJet + pfCandPhotonIso04Ele[eleIndex]-eff_area_ga*rhoJetsFastJet);
+  iso += TMath::Max(0.,pfCandNeutralIso04+pfCandPhotonIso04-eff_area_ganh*rhoJetsFastJet);
+
+  return iso;
+
+}
 
 
 
