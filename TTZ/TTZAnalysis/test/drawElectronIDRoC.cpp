@@ -255,7 +255,10 @@ void drawSingleRoC( DrawBase* db, TTree* tree_signal, TTree* tree_bg, const std:
   gr_susyTight->Draw("P same");
   gr_passedHLT->Draw("P same");
 
-  TLegend* legend = new TLegend( 0.2, 0.2, 0.5, 0.5 );
+  float xMin_legend = (additionalCuts=="") ? 0.2 : 0.55;
+  float xMax_legend = xMin_legend + 0.3;
+
+  TLegend* legend = new TLegend( xMin_legend, 0.2, xMax_legend, 0.5 );
   legend->SetTextSize(0.04);
   legend->SetFillColor(0);
   legend->AddEntry( gr_passedHLT, "Passed HLT", "P" );
