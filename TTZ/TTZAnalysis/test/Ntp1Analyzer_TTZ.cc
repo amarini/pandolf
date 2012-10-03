@@ -541,13 +541,20 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        if( thisMuon.Pt() < 10. ) continue;
        if( fabs(thisMuon.Eta()) > 2.4 ) continue;
 
+       thisMuon.isGlobalMuon = (muonIdMuon[iMuon]>>13)&1;
        thisMuon.isGlobalMuonPromptTight = (muonIdMuon[iMuon]>>8)&1;
        thisMuon.isAllTrackerMuon = (muonIdMuon[iMuon]>>11)&1;
+       thisMuon.isPFMuon = pfmuonIdMuon[iMuon];
 
        thisMuon.pixelHits = numberOfValidPixelBarrelHitsTrack[trackIndexMuon[iMuon]]+numberOfValidPixelEndcapHitsTrack[trackIndexMuon[iMuon]];
        thisMuon.trackerHits = trackValidHitsTrack[trackIndexMuon[iMuon]];
 
        thisMuon.nMatchedStations = numberOfMatchesMuon[iMuon];
+
+       int globalMuonTrack = combinedTrackIndexMuon[iMuon];
+       thisMuon.normChiSquare = (thisMuon.isGlobalMuon) ? trackNormalizedChi2GlobalMuonTrack[globalMuonTrack] : -1;
+       thisMuon.nValidMuonHits = (thisMuon.isGlobalMuon) ? numberOfValidMuonHitsGlobalMuonTrack[globalMuonTrack] : -1;
+
 
        if( event_==DEBUG_EVENTNUMBER ) {
          std::cout << "thisMuon.isGlobalMuonPromptTight: " << thisMuon.isGlobalMuonPromptTight << std::endl;
@@ -577,7 +584,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        }
 
        //if( !thisMuon.passedVBTF() ) continue;
-       if( !thisMuon.isGoodMuon2012() ) continue;
+       if( !thisMuon.isTightMuon2012() ) continue;
 
        if( event_==DEBUG_EVENTNUMBER ) {
          std::cout << "PASSED VBTF. ";
@@ -585,8 +592,10 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
          else std::cout << "Adding to collection of negative muons." << std::endl;
        }
 
+
        if( thisMuon.charge > 0 ) muonsPlus.push_back(thisMuon);
        else muonsMinus.push_back(thisMuon);
+
 
      } //for muons
 
