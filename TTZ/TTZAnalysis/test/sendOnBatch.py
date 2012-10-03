@@ -37,7 +37,7 @@ afsdir = "/afs/cern.ch/user/p/pandolf/scratch0/NTUPLES/"+dataset
 # to write on local disks
 ################################################
 #diskoutputdir = "/cmsrm/pc21_2/pandolf/MC/"+dataset
-diskoutputdir = "/cmsrm/pc22_2/pandolf/MC/Summer11/"+dataset
+diskoutputdir = "/cmsrm/pc24_2/pandolf/MC/Summer11/"+dataset
 match_Spring11 = re.search( r'Spring11', dataset, re.M|re.I)
 match_Fall11 = re.search( r'Fall11', dataset, re.M|re.I)
 match_Summer12 = re.search( r'Summer12', dataset, re.M|re.I)
@@ -45,15 +45,15 @@ isData2011 = re.search( r'Run2011', dataset, re.M|re.I)
 isData2012 = re.search( r'Run2012', dataset, re.M|re.I)
 isData = isData2011 or isData2012
 if isData:
-    diskoutputdir = "/cmsrm/pc22_2/pandolf/DATA/"+dataset
+    diskoutputdir = "/cmsrm/pc24_2/pandolf/DATA/"+dataset
 else:
   if match_Spring11:
-      diskoutputdir = "/cmsrm/pc22_2/pandolf/MC/Spring11_v2/"+dataset
+      diskoutputdir = "/cmsrm/pc24_2/pandolf/MC/Spring11_v2/"+dataset
   if match_Fall11:
-      diskoutputdir = "/cmsrm/pc22_2/pandolf/MC/Fall11/"+dataset
+      diskoutputdir = "/cmsrm/pc24_2/pandolf/MC/Fall11/"+dataset
   if match_Summer12:
-      diskoutputdir = "/cmsrm/pc22_2/pandolf/MC/Summer12/"+dataset
-#diskoutputdir = "/cmsrm/pc22_2/pandolf/MC/Summer11/"+dataset
+      diskoutputdir = "/cmsrm/pc24_2/pandolf/MC/Summer12/"+dataset
+#diskoutputdir = "/cmsrm/pc24_2/pandolf/MC/Summer11/"+dataset
 #diskoutputmain2 = castordir
 #diskoutputmain2 = pnfsdir
 diskoutputmain2 = afsdir
@@ -75,7 +75,7 @@ os.system("mkdir -p "+dir+"/src/")
 #else: os.system("mkdir -p "+outputroot)
 
 if diskoutputdir != "none": 
-    os.system("ssh -o BatchMode=yes -o StrictHostKeyChecking=no pccmsrm22 mkdir -p "+diskoutputmain)
+    os.system("ssh -o BatchMode=yes -o StrictHostKeyChecking=no pccmsrm24 mkdir -p "+diskoutputmain)
 
 #look for the current directory
 #######################################
@@ -103,8 +103,6 @@ while (len(inputfiles) > 0):
     outputname = dir+"/src/submit_"+str(ijob)+".src"
     outputfile = open(outputname,'w')
     outputfile.write('#!/bin/bash\n')
-    outputfile.write('export STAGE_HOST=castorcms\n')
-    outputfile.write('export SCRAM_ARCH=slc5_amd64_gcc434\n')
     outputfile.write('export LANGUAGE=C\n')
     outputfile.write('export LC_ALL=C\n')
     outputfile.write('cd /afs/cern.ch/work/p/pandolf/CMSSW_5_2_5/src/; eval `scramv1 runtime -sh` ; cd -\n')
@@ -119,7 +117,7 @@ while (len(inputfiles) > 0):
     outputfile.write(pwd+'/'+application+" "+dataset+" "+inputfilename+" "+str(ijob)+"\n")
     outputfile.write('rm QG_QCD_Pt_15to3000_TuneZ2_Flat*.root\n')
     outputfile.write('rm Pileup*.root\n')
-    outputfile.write('ls *.root | xargs -i scp -o BatchMode=yes -o StrictHostKeyChecking=no {} pccmsrm22:'+diskoutputmain+'/{}\n') 
+    outputfile.write('ls *.root | xargs -i scp -o BatchMode=yes -o StrictHostKeyChecking=no {} pccmsrm24:'+diskoutputmain+'/{}\n') 
     #outputfile.write('cp *.root '+diskoutputmain2+'\n') 
     outputfile.close
     os.system("echo bsub -q "+queue+" -o "+dir+"/log/"+dataset+"_"+str(ijob)+".log source "+pwd+"/"+outputname)
