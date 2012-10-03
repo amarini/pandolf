@@ -160,9 +160,15 @@ void drawSingleRoC( DrawBase* db, TTree* tree_signal, TTree* tree_bg, const std:
   TH1D* h1_mva_nonprompt = new TH1D("mva_nonprompt", "", 100, -1., 1.0001);
   h1_mva_nonprompt->Sumw2();
 
+  std::string promptCondition = "matchedToGenEle";
+  std::string nonpromptCondition = "!matchedToGenEle";
+  if( additionalCuts != "" ) {
+    promptCondition = promptCondition + " && " + additionalCuts;
+    nonpromptCondition = nonpromptCondition + " && " + additionalCuts;
+  }
 
-  tree_signal->Project("mva_prompt", "mvaidtrigEle", "matchedToGenEle");
-  tree_bg->Project("mva_nonprompt", "mvaidtrigEle", "!matchedToGenEle");
+  tree_signal->Project("mva_prompt", "mvaidtrigEle", promptCondition.c_str());
+  tree_bg->Project("mva_nonprompt", "mvaidtrigEle", nonpromptCondition.c_str());
 
   TGraph* gr_mvaRoC = getRoC( h1_mva_prompt, h1_mva_nonprompt );
   gr_mvaRoC->SetMarkerSize(1.6);
