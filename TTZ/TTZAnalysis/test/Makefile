@@ -24,7 +24,7 @@ do2ndLevel_TTZgen: Ntp1Analyzer.o Ntp1Analyzer_TTZgen.o AnalysisElectron.o Analy
 	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o do2ndLevel_TTZgen do2ndLevel_TTZgen.cpp Ntp1Analyzer.o PUWeight.o Ntp1Analyzer_TTZgen.o AnalysisElectron.o AnalysisMuon.o AnalysisJet.o $(ROOTFLAG) $(EXTRALIBS)
 
 do2ndLevel_LeptonStudies: Ntp1Analyzer.o Ntp1Analyzer_LeptonStudies.o AnalysisElectron.o AnalysisMuon.o AnalysisJet.o PUWeight.o do2ndLevel_LeptonStudies.cpp
-	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o do2ndLevel_LeptonStudies do2ndLevel_LeptonStudies.cpp Ntp1Analyzer.o PUWeight.o Ntp1Analyzer_LeptonStudies.o AnalysisElectron.o AnalysisMuon.o AnalysisJet.o $(ROOTFLAG) $(EXTRALIBS) -lCondFormatsJetMETObjects
+	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o do2ndLevel_LeptonStudies do2ndLevel_LeptonStudies.cpp Ntp1Analyzer.o PUWeight.o Ntp1Analyzer_LeptonStudies.o AnalysisElectron.o AnalysisMuon.o AnalysisJet.o $(ROOTFLAG) $(EXTRALIBS) 
 
 do2ndLevel_TTZ_DATA: Ntp1Analyzer.o Ntp1Analyzer_TTZ.o AnalysisElectron.o AnalysisMuon.o AnalysisJet.o PUWeight.o do2ndLevel_TTZ_DATA.cpp
 	$(CC) -Wall -I$(CMSSW_BASE)/src/UserCode/pandolf/CommonTools -o do2ndLevel_TTZ_DATA do2ndLevel_TTZ_DATA.cpp Ntp1Analyzer.o Ntp1Analyzer_TTZ.o AnalysisElectron.o AnalysisMuon.o AnalysisJet.o PUWeight.o $(ROOTFLAG)
@@ -74,6 +74,9 @@ drawMeasurement_vs_NLO: DrawBase.o fitTools.o drawMeasurement_vs_NLO.cpp
 
 drawDataMCRatio: DrawBase.o fitTools.o drawDataMCRatio.cpp
 	$(CC) -Wall $(INCLUDES) -o drawDataMCRatio drawDataMCRatio.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
+
+drawElectronIDRoC: DrawBase.o fitTools.o drawElectronIDRoC.cpp
+	$(CC) -Wall $(INCLUDES) -o drawElectronIDRoC drawElectronIDRoC.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
 
 
 
