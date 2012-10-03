@@ -23,23 +23,30 @@ class AnalysisMuon : public AnalysisLepton {
   AnalysisMuon( const TLorentzVector &v) : AnalysisLepton( v ) {};
 
   bool passedMuonID();
+  bool passedMuonID_tight2012();
+
   bool isIsolated();
   bool isIsolated2012();
   virtual float combinedIsoRel();
 
   bool passedVBTF();
-  bool isGoodMuon2012();
+  bool isTightMuon2012();
 
 
   // public data members:
 
+  bool isGlobalMuon;
+  bool isPFMuon;
   bool isGlobalMuonPromptTight;
   bool isAllTrackerMuon;
+
+  float normChiSquare;
 
   int pixelHits;
   int trackerHits;
 
   int nMatchedStations;
+  int nValidMuonHits;
 
   double dxy;
   double dz;

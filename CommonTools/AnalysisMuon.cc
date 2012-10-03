@@ -14,6 +14,20 @@ bool AnalysisMuon::passedMuonID() {
 }
 
 
+bool AnalysisMuon::passedMuonID_tight2012() {
+
+  bool passed = ( isGlobalMuon && isPFMuon 
+                && normChiSquare < 10.
+                && pixelHits>0 && trackerHits>5 
+                && nValidMuonHits > 0
+                && nMatchedStations>=2
+                && (dxy<0.02) && (dz<0.1) ); //tighter than recommendation to align to smurfs
+
+  return passed;
+
+}
+
+
 
 bool AnalysisMuon::isIsolated() {
 
@@ -61,10 +75,10 @@ bool AnalysisMuon::passedVBTF() {
 }
 
 
-bool AnalysisMuon::isGoodMuon2012() {
+bool AnalysisMuon::isTightMuon2012() {
 
   bool isIsolated = this->isIsolated2012();
-  bool passedMuonID = this->passedMuonID();
+  bool passedMuonID = this->passedMuonID_tight2012();
 
   return ( isIsolated && passedMuonID );
 

@@ -428,6 +428,7 @@ public :
    Int_t           numberOfValidStripTIDHitsGlobalMuonTrack[20];   //[nGlobalMuonTrack]
    Int_t           numberOfValidStripTOBHitsGlobalMuonTrack[20];   //[nGlobalMuonTrack]
    Int_t           numberOfValidStripTECHitsGlobalMuonTrack[20];   //[nGlobalMuonTrack]
+   Int_t           numberOfValidMuonHitsGlobalMuonTrack[20];   //[nGlobalMuonTrack]
    Int_t           nSTAMuonTrack;
    Float_t         pxSTAMuonTrack[20];   //[nSTAMuonTrack]
    Float_t         pySTAMuonTrack[20];   //[nSTAMuonTrack]
@@ -515,6 +516,7 @@ public :
    Float_t         CaloCompMuon[150];   //[nMuon]
    Int_t           numberOfMatchesMuon[150];   //[nMuon]
    Float_t         mvaisoMuon[150];   //[nMuon]
+   Bool_t          pfmuonIdMuon[150];   //[nMuon]
    Int_t           nMet;
    Int_t           chargeMet[1];   //[nMet]
    Float_t         energyMet[1];   //[nMet]
@@ -1236,6 +1238,7 @@ public :
    TBranch        *b_numberOfValidStripTIDHitsGlobalMuonTrack;   //!
    TBranch        *b_numberOfValidStripTOBHitsGlobalMuonTrack;   //!
    TBranch        *b_numberOfValidStripTECHitsGlobalMuonTrack;   //!
+   TBranch        *b_numberOfValidMuonHitsGlobalMuonTrack;   //!
    TBranch        *b_nSTAMuonTrack;   //!
    TBranch        *b_pxSTAMuonTrack;   //!
    TBranch        *b_pySTAMuonTrack;   //!
@@ -1323,6 +1326,7 @@ public :
    TBranch        *b_CaloCompMuon;   //!
    TBranch        *b_numberOfMatchesMuon;   //!
    TBranch        *b_mvaisoMuon;   //!
+   TBranch        *b_pfmuonIdMuon;   //!
    TBranch        *b_nMet;   //!
    TBranch        *b_chargeMet;   //!
    TBranch        *b_energyMet;   //!
