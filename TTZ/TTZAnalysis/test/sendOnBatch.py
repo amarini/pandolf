@@ -125,5 +125,5 @@ while (len(inputfiles) > 0):
     os.system("echo bsub -q "+queue+" -o "+dir+"/log/"+dataset+"_"+str(ijob)+".log source "+pwd+"/"+outputname)
     os.system("bsub -q "+queue+" -o "+dir+"/log/"+dataset+"_"+str(ijob)+".log source "+pwd+"/"+outputname+" -copyInput="+dataset+"_"+str(ijob))
     ijob = ijob+1
-    time.sleep(2.)
+    #time.sleep(2.)
     continue
