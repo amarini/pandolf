@@ -14,7 +14,6 @@
 
 #include "PUWeight.h"
 
-#include "JetCorrectionUncertainty.h"
 
 
 //#include "fitTools.h"
@@ -67,6 +66,7 @@ void Ntp1Analyzer_LeptonStudies::CreateOutputFile() {
   reducedTree_->Branch("isNotConversionEle",isNotConversionEle_,"isNotConversionEle_[nEle_]/O");
   reducedTree_->Branch("passedHLTEle",passedHLTEle_,"passedHLTEle_[nEle_]/O");
   reducedTree_->Branch("mvaidtrigEle",mvaidtrigEle_,"mvaidtrigEle_[nEle_]/F");
+  reducedTree_->Branch("mvaidnontrigEle",mvaidnontrigEle_,"mvaidnontrigEle_[nEle_]/F");
   reducedTree_->Branch("matchedToGenEle",matchedToGenEle_,"matchedToGenEle_[nEle_]/O");
   
 
@@ -122,7 +122,6 @@ void Ntp1Analyzer_LeptonStudies::Loop()
    
    // this file is obtained with the instructions found in: https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections#GetTxtFiles
    //JetCorrectionUncertainty *fJetCorrUnc = new JetCorrectionUncertainty("AK5PF_Uncertainty_GR_R_42_V19.txt");
-   JetCorrectionUncertainty *fJetCorrUnc = new JetCorrectionUncertainty("GR_R_52_V9_Uncertainty_AK5PF.txt");
 
 
 
@@ -534,6 +533,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
        // electron ID mva:
        thisEle.mvaidtrigEle = mvaidtrigEle[iEle];
+       thisEle.mvaidnontrigEle = mvaidnontrigEle[iEle];
 
 
        if( event_==DEBUG_EVENTNUMBER || DEBUG_VERBOSE_ ) {
@@ -621,6 +621,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        isNotConversionEle_[nEle_] = thisEle.conversionRejection2012_CutsLoose();
        passedHLTEle_[nEle_] = thisEle.passedHLT2012();
        mvaidtrigEle_[nEle_] = thisEle.mvaidtrigEle;
+       mvaidnontrigEle_[nEle_] = thisEle.mvaidnontrigEle;
        matchedToGenEle_[nEle_] = thisEle.matchedToGen;
 
        nEle_++;
