@@ -38,6 +38,7 @@ class Ntp1Analyzer_LeptonStudies : public Ntp1Analyzer {
    bool  isNotConversionEle_[10];
    bool  passedHLTEle_[10];
    float mvaidtrigEle_[10];
+   float mvaidnontrigEle_[10];
    bool  matchedToGenEle_[10];
 
 
