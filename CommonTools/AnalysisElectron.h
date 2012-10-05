@@ -22,6 +22,7 @@ class AnalysisElectron : public AnalysisLepton {
 
   AnalysisElectron( const TLorentzVector &v) : AnalysisLepton( v ) {};
 
+
   bool isIsolatedVBTF80();
   bool isIsolatedVBTF95();
   bool isIsolated2012_MVAWP95();
@@ -33,6 +34,9 @@ class AnalysisElectron : public AnalysisLepton {
   bool electronIDVBTF95();
   bool electronID2012_MVA();
   bool electronID2012_CutsLoose();
+  bool electronID2012_CutsMedium();
+  bool electronID2012_SUSYloose();
+  bool electronID2012_SUSYtight();
   bool separatedIDVBTF80();//
   bool passedHLT2012();
 
@@ -50,9 +54,13 @@ class AnalysisElectron : public AnalysisLepton {
   bool passedAdditionalCuts();
 
   double combinedIsoRel();
+  double EpInverseDiff();
+
 
 
   // public data members:
+
+  bool tripleChargeConsist;
 
   double etaSC; //supercluster eta
 
@@ -80,6 +88,7 @@ class AnalysisElectron : public AnalysisLepton {
   double eOverP; 
   double pAtVertex; 
   double mvaidtrigEle;
+  double mvaidnontrigEle;
 
   // conversion rejection:
   int expInnerLayersGsfTrack;

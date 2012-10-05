@@ -578,6 +578,7 @@ void Ntp1Analyzer::Init(TTree *tree)
    fChain->SetBranchAddress("eleIdLikelihoodEle", eleIdLikelihoodEle, &b_eleIdLikelihoodEle);
    fChain->SetBranchAddress("pflowMVAEle", pflowMVAEle, &b_pflowMVAEle);
    fChain->SetBranchAddress("mvaidtrigEle", mvaidtrigEle, &b_mvaidtrigEle);
+   fChain->SetBranchAddress("mvaidnontrigEle", mvaidnontrigEle, &b_mvaidnontrigEle);
    fChain->SetBranchAddress("nPho", &nPho, &b_nPho);
    fChain->SetBranchAddress("nPerPVPho", &nPerPVPho, &b_nPerPVPho);
    fChain->SetBranchAddress("chargePho", chargePho, &b_chargePho);

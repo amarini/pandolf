@@ -139,6 +139,7 @@ public :
    Float_t         eleIdLikelihoodEle[150];   //[nEle]
    Float_t         pflowMVAEle[150];   //[nEle]
    Float_t         mvaidtrigEle[150];   //[nEle]
+   Float_t         mvaidnontrigEle[150];   //[nEle]
    Int_t           nPho;
    Int_t           nPerPVPho;
    Int_t           chargePho[150];   //[nPho]
@@ -907,6 +908,7 @@ public :
    TBranch        *b_eleIdLikelihoodEle;   //!
    TBranch        *b_pflowMVAEle;   //!
    TBranch        *b_mvaidtrigEle;   //!
+   TBranch        *b_mvaidnontrigEle;   //!
    TBranch        *b_nPFEle;   //!
    TBranch        *b_chargePFEle;   //!
    TBranch        *b_energyPFEle;   //!
