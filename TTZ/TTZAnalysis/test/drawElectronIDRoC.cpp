@@ -6,7 +6,7 @@
 #include "TFile.h"
 
 
-void drawSingleRoC( DrawBase* db, TTree* tree_sig, TTree* tree_bg, const std::string& suffix, const std::string& additionalCuts );
+void drawSingleRoC( DrawBase* db, TTree* tree_sig, TTree* tree_bg, const std::string& suffix, const std::string& additionalCuts, float ptMin=10., float ptMax=5000. );
 TGraph* getRoC( TH1D* h1_signal, TH1D* h1_bg );
 
 
@@ -20,24 +20,101 @@ int main() {
   system("mkdir -p LeptonStudiesPlots");
 
 
-  TFile* file_ttZ = TFile::Open("LeptonStudies_2ndLevelTree_TTZ_prova.root");
+  TFile* file_ttZ = TFile::Open("LeptonStudies_2ndLevelTree_TTZJets_8TeV-madgraph_v2_Summer12_DR53X-PU_S10_START53_V7A-v1.root");
   TFile* file_tt  = TFile::Open("LeptonStudies_2ndLevelTree_TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola.root");
   TFile* file_dy  = TFile::Open("LeptonStudies_2ndLevelTree_DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball.root");
+
+  db->add_mcFile(file_ttZ, "ttZ", "tt+Z", kOrange+1);
+  db->add_mcFile(file_tt, "tt", "Top", 38);
+  db->add_mcFile(file_dy, "dy", "DY", 46);
+
+  db->set_outputdir("LeptonStudiesPlots");
+//db->drawHisto_fromTree( "reducedTree", "ptEle", "matchedToGenEle", 50, 0., 120., "ptEle_prompt", "Electron p_{T}", "GeV");
+
+//TH1D* h1_prompt_signal;
+//std::vector<TH1D*> vh1_lastHistos_prompt = db->get_lastHistos_mc();
+//for(unsigned i=0; i<vh1_lastHistos_prompt.size(); ++i ) {
+//  if( db->get_mcFile(i).datasetName=="ttZ" ) {
+//    h1_prompt_signal = new TH1D( *(vh1_lastHistos_prompt[i]) );
+//  }
+//}
+
+
+//db->drawHisto_fromTree( "reducedTree", "ptEle", "!matchedToGenEle", 50, 0., 120., "ptEle_nonprompt", "Electron p_{T}", "GeV");
+//TH1D* h1_nonprompt_dy;
+//TH1D* h1_nonprompt_tt;
+//std::vector<TH1D*> vh1_lastHistos_nonprompt = db->get_lastHistos_mc();
+//for(unsigned i=0; i<vh1_lastHistos_nonprompt.size(); ++i ) {
+//  if( db->get_mcFile(i).datasetName=="dy" ) {
+//    h1_nonprompt_dy = new TH1D( *(vh1_lastHistos_nonprompt[i]) );
+//  }
+//  if( db->get_mcFile(i).datasetName=="tt" ) {
+//    h1_nonprompt_tt = new TH1D( *(vh1_lastHistos_nonprompt[i]) );
+//  }
+//}
+
+
+//TCanvas* c_pt = new TCanvas("c_pt", "", 600, 600);
+//c_pt->cd();
+
+//float xMin = h1_nonprompt_tt->GetXaxis()->GetXmin();
+//float xMax = h1_nonprompt_tt->GetXaxis()->GetXmax();
+//float yMin = 0.;
+//float yMax = h1_nonprompt_dy->GetMaximum()*1.4;
+
+//TH2D* h2_axes_pt = new TH2D("axes_pt", "", 10, xMin, xMax, 10, yMin, yMax);
+//h2_axes_pt->SetXTitle("Electron p_{T} [GeV]");
+//h2_axes_pt->SetYTitle("Normalized to Unity");
+
+
+//h2_axes_pt->Draw();
+//h1_nonprompt_tt->Draw("same");
+//h1_nonprompt_dy->Draw("same");
+//h1_prompt_signal->Draw("same");
+
+//TLegend* legend_pt = new TLegend( 0.5, 0.6, 0.88, 0.88 );
+//legend_pt->SetTextSize(0.04);
+//legend_pt->SetFillColor(0);
+//legend_pt->AddEntry( h1_prompt_signal, "tt+Z (prompt)", "F");
+//legend_pt->AddEntry( h1_nonprompt_tt, "Top (non-prompt)", "F");
+//legend_pt->AddEntry( h1_nonprompt_dy, "DY (non-prompt)", "F");
+
+//legend_pt->Draw("same");
+
+//TPaveText* label = db->get_labelSqrt();
+//label->Draw("same");
+
+//gPad->RedrawAxis();
+//
+//std::string canvasName_pt = db->get_outputdir() + "/ptEle.eps";
+//c_pt->SaveAs(canvasName_pt.c_str()); 
+
+
 
   TTree* tree_ttZ = (TTree*)file_ttZ->Get("reducedTree");
   TTree* tree_tt  = (TTree*)file_tt->Get("reducedTree");
   TTree* tree_dy  = (TTree*)file_dy->Get("reducedTree");
 
 
-  drawSingleRoC( db, tree_ttZ, tree_tt, "tt", "" );
-  drawSingleRoC( db, tree_ttZ, tree_tt, "tt_iso", "pfIsoEle/ptEle < 0.15" );
-  drawSingleRoC( db, tree_ttZ, tree_tt, "tt_passedHLT", "passedHLTEle" );
-  drawSingleRoC( db, tree_ttZ, tree_tt, "tt_passedHLT_iso", "passedHLTEle && pfIsoEle/ptEle < 0.15" );
+  drawSingleRoC( db, tree_ttZ, tree_tt, "tt", "", 10., 20. );
+  drawSingleRoC( db, tree_ttZ, tree_tt, "tt_iso", "pfIsoEle/ptEle < 0.15", 10., 20. );
+  drawSingleRoC( db, tree_ttZ, tree_tt, "tt_passedHLT", "passedHLTEle", 10., 20. );
+  drawSingleRoC( db, tree_ttZ, tree_tt, "tt_passedHLT_iso", "passedHLTEle && pfIsoEle/ptEle < 0.15", 10., 20. );
 
-  drawSingleRoC( db, tree_ttZ, tree_dy, "dy", "" );
-  drawSingleRoC( db, tree_ttZ, tree_dy, "dy_iso", "pfIsoEle/ptEle < 0.15" );
-  drawSingleRoC( db, tree_ttZ, tree_dy, "dy_passedHLT", "passedHLTEle" );
-  drawSingleRoC( db, tree_ttZ, tree_dy, "dy_passedHLT_iso", "passedHLTEle && pfIsoEle/ptEle < 0.15" );
+  drawSingleRoC( db, tree_ttZ, tree_tt, "tt", "", 20., 5000. );
+  drawSingleRoC( db, tree_ttZ, tree_tt, "tt_iso", "pfIsoEle/ptEle < 0.15", 20., 5000.);
+  drawSingleRoC( db, tree_ttZ, tree_tt, "tt_passedHLT", "passedHLTEle", 20., 5000. );
+  drawSingleRoC( db, tree_ttZ, tree_tt, "tt_passedHLT_iso", "passedHLTEle && pfIsoEle/ptEle < 0.15", 20., 5000. );
+
+  drawSingleRoC( db, tree_ttZ, tree_dy, "dy", "", 10., 20.);
+  drawSingleRoC( db, tree_ttZ, tree_dy, "dy_iso", "pfIsoEle/ptEle < 0.15", 10., 20.);
+  drawSingleRoC( db, tree_ttZ, tree_dy, "dy_passedHLT", "passedHLTEle", 10., 20.);
+  drawSingleRoC( db, tree_ttZ, tree_dy, "dy_passedHLT_iso", "passedHLTEle && pfIsoEle/ptEle < 0.15", 10., 20.);
+
+  drawSingleRoC( db, tree_ttZ, tree_dy, "dy", "", 20., 5000. );
+  drawSingleRoC( db, tree_ttZ, tree_dy, "dy_iso", "pfIsoEle/ptEle < 0.15", 20., 5000.);
+  drawSingleRoC( db, tree_ttZ, tree_dy, "dy_passedHLT", "passedHLTEle", 20., 5000. );
+  drawSingleRoC( db, tree_ttZ, tree_dy, "dy_passedHLT_iso", "passedHLTEle && pfIsoEle/ptEle < 0.15", 20., 5000. );
 
   return 0;
 
@@ -45,7 +122,7 @@ int main() {
 
 
 
-void drawSingleRoC( DrawBase* db, TTree* tree_signal, TTree* tree_bg, const std::string& suffix, const std::string& additionalCuts ) {
+void drawSingleRoC( DrawBase* db, TTree* tree_signal, TTree* tree_bg, const std::string& suffix, const std::string& additionalCuts, float ptMin, float ptMax ) {
 
   TPaveText* label = db->get_labelSqrt();
 
@@ -82,11 +159,17 @@ void drawSingleRoC( DrawBase* db, TTree* tree_signal, TTree* tree_bg, const std:
   h1_effNP_denom_passedHLT_pt->Sumw2();
 
 
+
+  char ptCondition_char[300];
+  sprintf( ptCondition_char, "ptEle > %f && ptEle < %f", ptMin, ptMax );
+  std::string ptCondition(ptCondition_char);
+
+
   std::string numCondition, denomCondition;
 
   // susy loose
-  numCondition = "isLooseSUSYElectronEle && matchedToGenEle";
-  denomCondition = "matchedToGenEle";
+  numCondition = "isLooseSUSYElectronEle && matchedToGenEle && " + ptCondition;
+  denomCondition = "matchedToGenEle && " + ptCondition;
   if( additionalCuts != "" ) {
     numCondition = numCondition + " && " + additionalCuts;
     denomCondition = denomCondition + " && " + additionalCuts;
@@ -96,8 +179,8 @@ void drawSingleRoC( DrawBase* db, TTree* tree_signal, TTree* tree_bg, const std:
   tree_signal->Project("effP_denom_susyLoose_pt", "ptEle", denomCondition.c_str() );
 
 
-  numCondition = "isLooseSUSYElectronEle && !matchedToGenEle";
-  denomCondition = "!matchedToGenEle";
+  numCondition = "isLooseSUSYElectronEle && !matchedToGenEle && " + ptCondition;
+  denomCondition = "!matchedToGenEle && " + ptCondition;
   if( additionalCuts != "" ) {
     numCondition = numCondition + " && " + additionalCuts;
     denomCondition = denomCondition + " && " + additionalCuts;
@@ -107,8 +190,8 @@ void drawSingleRoC( DrawBase* db, TTree* tree_signal, TTree* tree_bg, const std:
 
 
   // susy Tight
-  numCondition = "isTightSUSYElectronEle && matchedToGenEle";
-  denomCondition = "matchedToGenEle";
+  numCondition = "isTightSUSYElectronEle && matchedToGenEle && " + ptCondition;
+  denomCondition = "matchedToGenEle && " + ptCondition;
   if( additionalCuts != "" ) {
     numCondition = numCondition + " && " + additionalCuts;
     denomCondition = denomCondition + " && " + additionalCuts;
@@ -118,8 +201,8 @@ void drawSingleRoC( DrawBase* db, TTree* tree_signal, TTree* tree_bg, const std:
   tree_signal->Project("effP_denom_susyTight_pt", "ptEle", denomCondition.c_str() );
 
 
-  numCondition = "isTightSUSYElectronEle && !matchedToGenEle";
-  denomCondition = "!matchedToGenEle";
+  numCondition = "isTightSUSYElectronEle && !matchedToGenEle && " + ptCondition;
+  denomCondition = "!matchedToGenEle && " + ptCondition;
   if( additionalCuts != "" ) {
     numCondition = numCondition + " && " + additionalCuts;
     denomCondition = denomCondition + " && " + additionalCuts;
@@ -129,8 +212,8 @@ void drawSingleRoC( DrawBase* db, TTree* tree_signal, TTree* tree_bg, const std:
 
 
   // HLT only
-  numCondition = "passedHLTEle && matchedToGenEle";
-  denomCondition = "matchedToGenEle";
+  numCondition = "passedHLTEle && matchedToGenEle && " + ptCondition;
+  denomCondition = "matchedToGenEle && " + ptCondition;
   if( additionalCuts != "" ) {
     numCondition = numCondition + " && " + additionalCuts;
     denomCondition = denomCondition + " && " + additionalCuts;
@@ -140,8 +223,8 @@ void drawSingleRoC( DrawBase* db, TTree* tree_signal, TTree* tree_bg, const std:
   tree_signal->Project("effP_denom_passedHLT_pt", "ptEle", denomCondition.c_str() );
 
 
-  numCondition = "passedHLTEle && !matchedToGenEle";
-  denomCondition = "!matchedToGenEle";
+  numCondition = "passedHLTEle && !matchedToGenEle && " + ptCondition;
+  denomCondition = "!matchedToGenEle && " + ptCondition;
   if( additionalCuts != "" ) {
     numCondition = numCondition + " && " + additionalCuts;
     denomCondition = denomCondition + " && " + additionalCuts;
@@ -153,22 +236,33 @@ void drawSingleRoC( DrawBase* db, TTree* tree_signal, TTree* tree_bg, const std:
 
 
 
+  int nBins = (ptMax<100.) ? 250 : 500;
 
-
-  TH1D* h1_mva_prompt = new TH1D("mva_prompt", "", 100, -1., 1.0001);
+  TH1D* h1_mva_prompt = new TH1D("mva_prompt", "", nBins, -1., 1.0001);
   h1_mva_prompt->Sumw2();
-  TH1D* h1_mva_nonprompt = new TH1D("mva_nonprompt", "", 100, -1., 1.0001);
+  TH1D* h1_mva_nonprompt = new TH1D("mva_nonprompt", "", nBins, -1., 1.0001);
   h1_mva_nonprompt->Sumw2();
 
-  std::string promptCondition = "matchedToGenEle";
-  std::string nonpromptCondition = "!matchedToGenEle";
+  std::string promptCondition = "matchedToGenEle && " + ptCondition;
+  std::string nonpromptCondition = "!matchedToGenEle && " + ptCondition;
   if( additionalCuts != "" ) {
     promptCondition = promptCondition + " && " + additionalCuts;
     nonpromptCondition = nonpromptCondition + " && " + additionalCuts;
   }
 
-  tree_signal->Project("mva_prompt", "mvaidtrigEle", promptCondition.c_str());
-  tree_bg->Project("mva_nonprompt", "mvaidtrigEle", nonpromptCondition.c_str());
+
+
+  TString additionalCuts_tstr(additionalCuts);
+  bool has_passedHLT = additionalCuts_tstr.Contains("passedHLTEle");
+
+  if( has_passedHLT ) {
+    tree_signal->Project("mva_prompt", "mvaidtrigEle", promptCondition.c_str() );
+    tree_bg->Project("mva_nonprompt", "mvaidtrigEle", nonpromptCondition.c_str() );
+  } else {
+    tree_signal->Project("mva_prompt", "mvaidnontrigEle", promptCondition.c_str() );
+    tree_bg->Project("mva_nonprompt", "mvaidnontrigEle", nonpromptCondition.c_str() );
+  }
+
 
   TGraph* gr_mvaRoC = getRoC( h1_mva_prompt, h1_mva_nonprompt );
   gr_mvaRoC->SetMarkerSize(1.6);
@@ -205,12 +299,23 @@ void drawSingleRoC( DrawBase* db, TTree* tree_signal, TTree* tree_bg, const std:
   legend0->Draw("same");
   gPad->RedrawAxis();
 
-  std::string canvasName = "LeptonStudiesPlots/mvaDistrib_" + suffix + ".eps";
-  c0->SaveAs(canvasName.c_str());
+  char canvasName[1000];
+  sprintf( canvasName, "LeptonStudiesPlots/mvaDistrib_%s_pt%.0f_%.0f.eps", suffix.c_str(), ptMin , ptMax);
+  c0->SaveAs(canvasName);
 
 
 
 
+  //std::cout << " effPrompt_susyLoose = " << h1_effP_num_susyLoose_pt->Integral() << " / " << h1_effP_denom_susyLoose_pt->Integral() << std::endl;
+  //std::cout << " effNonPrompt_susyLoose = " << h1_effNP_num_susyLoose_pt->Integral() << " / " << h1_effNP_denom_susyLoose_pt->Integral() << std::endl;
+
+  //std::cout << " effPrompt_susyTight = " << h1_effP_num_susyTight_pt->Integral() << " / " << h1_effP_denom_susyTight_pt->Integral() << std::endl;
+  //std::cout << " effNonPrompt_susyTight = " << h1_effNP_num_susyTight_pt->Integral() << " / " << h1_effNP_denom_susyTight_pt->Integral() << std::endl;
+
+  //std::cout << " effPrompt_passedHLT = " << h1_effP_num_passedHLT_pt->Integral() << " / " << h1_effP_denom_passedHLT_pt->Integral() << std::endl;
+  //std::cout << " effNonPrompt_passedHLT = " << h1_effNP_num_passedHLT_pt->Integral() << " / " << h1_effNP_denom_passedHLT_pt->Integral() << std::endl;
+
+  
   float effPrompt_susyLoose = (h1_effP_num_susyLoose_pt->Integral() / h1_effP_denom_susyLoose_pt->Integral());
   float effNonPrompt_susyLoose = (h1_effNP_num_susyLoose_pt->Integral() / h1_effNP_denom_susyLoose_pt->Integral());
   
@@ -244,35 +349,60 @@ void drawSingleRoC( DrawBase* db, TTree* tree_signal, TTree* tree_bg, const std:
   c1->cd();
 
 
-  TH2D* h2_axes = new TH2D("axes", "", 10, 0., 1.00001, 10, 0.7, 1.00001);
+  float xMax = (additionalCuts=="") ? 1.0001 : 0.5;
+  float yMin = (ptMax<100.) ? 0.4 : 0.7;
+
+  TH2D* h2_axes = new TH2D("axes", "", 10, 0., xMax, 10, yMin, 1.00001);
   h2_axes->SetXTitle("Non-Prompt Lepton Rejection");
   h2_axes->SetYTitle("Prompt Lepton Efficiency");
 
 
   h2_axes->Draw();
-  gr_mvaRoC->Draw("P same");
-  gr_susyLoose->Draw("P same");
-  gr_susyTight->Draw("P same");
-  gr_passedHLT->Draw("P same");
-
-  float xMin_legend = (additionalCuts=="") ? 0.2 : 0.55;
+  float xMin_legend = (additionalCuts=="") ? 0.2 : 0.6;
   float xMax_legend = xMin_legend + 0.3;
+  float yMin_legend = (additionalCuts!="" && ptMin>15.) ? 0.55 : 0.2;
+  float yMax_legend = yMin_legend + 0.3;
 
-  TLegend* legend = new TLegend( xMin_legend, 0.2, xMax_legend, 0.5 );
+
+  TLegend* legend;
+
+  if( ptMin != 10. || ptMax != 5000. ) {
+
+    char legendTitle[500];
+    if( ptMax==5000. )
+      sprintf( legendTitle, "p_{T} > %.0f GeV", ptMin );
+    else
+      sprintf( legendTitle, "%.0f < p_{T} < %.0f GeV", ptMin, ptMax );
+
+    legend = new TLegend( xMin_legend, yMin_legend, xMax_legend, yMax_legend, legendTitle );
+
+  } else {
+
+    legend = new TLegend( xMin_legend, yMax_legend, xMax_legend, yMax_legend );
+
+  }
   legend->SetTextSize(0.04);
   legend->SetFillColor(0);
-  legend->AddEntry( gr_passedHLT, "Passed HLT", "P" );
+  if( !has_passedHLT )
+    legend->AddEntry( gr_passedHLT, "Passed HLT", "P" );
   legend->AddEntry( gr_susyLoose, "SUSY Loose", "P" );
   legend->AddEntry( gr_susyTight, "SUSY Tight", "P" );
   legend->AddEntry( gr_mvaRoC, "MVA ID", "P" );
   legend->Draw("same");
   
   label->Draw("same");
+
+  gr_mvaRoC->Draw("P same");
+  gr_susyLoose->Draw("P same");
+  gr_susyTight->Draw("P same");
+  if( !has_passedHLT )
+    gr_passedHLT->Draw("P same");
+
   
   gPad->RedrawAxis();
 
-  canvasName = "LeptonStudiesPlots/RoC_" + suffix + ".eps";
-  c1->SaveAs(canvasName.c_str());
+  sprintf( canvasName, "LeptonStudiesPlots/RoC_%s_pt%.0f_%.0f.eps", suffix.c_str(), ptMin , ptMax);
+  c1->SaveAs(canvasName);
 
   delete c0;
   delete c1;
