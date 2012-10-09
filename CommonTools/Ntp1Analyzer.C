@@ -957,6 +957,8 @@ void Ntp1Analyzer::Init(TTree *tree)
    fChain->SetBranchAddress("numberOfMatchesMuon", numberOfMatchesMuon, &b_numberOfMatchesMuon);
    fChain->SetBranchAddress("mvaisoMuon", mvaisoMuon, &b_mvaisoMuon);
    fChain->SetBranchAddress("pfmuonIdMuon", pfmuonIdMuon, &b_pfmuonIdMuon);
+   fChain->SetBranchAddress("pfIsolationSumPUPtR03Muon", pfIsolationSumPUPtR03Muon, &b_pfIsolationSumPUPtR03Muon);
+   fChain->SetBranchAddress("pfIsolationSumPUPtR04Muon", pfIsolationSumPUPtR04Muon, &b_pfIsolationSumPUPtR04Muon);
    fChain->SetBranchAddress("nMet", &nMet, &b_nMet);
    fChain->SetBranchAddress("chargeMet", chargeMet, &b_chargeMet);
    fChain->SetBranchAddress("energyMet", energyMet, &b_energyMet);
