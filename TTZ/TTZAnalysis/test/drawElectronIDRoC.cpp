@@ -40,7 +40,7 @@ int main() {
   }
 
 
-  db->drawHisto_fromTree( "reducedTree", "ptEle", "!matchedToGenEle", 50, 0., 120., "ptEle_nonprompt", "Electron p_{T}", "GeV");
+  db->drawHisto_fromTree( "reducedTree", "ptEle", "isFakeEle", 50, 0., 120., "ptEle_nonprompt", "Electron p_{T}", "GeV");
   TH1D* h1_nonprompt_dy;
   TH1D* h1_nonprompt_tt;
   std::vector<TH1D*> vh1_lastHistos_nonprompt = db->get_lastHistos_mc();
@@ -183,8 +183,8 @@ void drawSingleRoC( DrawBase* db, TTree* tree_signal, TTree* tree_bg, const std:
   tree_signal->Project("effP_denom_susyLoose_pt", "ptEle", denomCondition.c_str() );
 
 
-  numCondition = "isLooseSUSYElectronEle && !matchedToGenEle && " + ptCondition;
-  denomCondition = "!matchedToGenEle && " + ptCondition;
+  numCondition = "isLooseSUSYElectronEle && isFakeEle && " + ptCondition;
+  denomCondition = "isFakeEle && " + ptCondition;
   if( additionalCuts != "" ) {
     numCondition = numCondition + " && " + additionalCuts;
     denomCondition = denomCondition + " && " + additionalCuts;
@@ -205,8 +205,8 @@ void drawSingleRoC( DrawBase* db, TTree* tree_signal, TTree* tree_bg, const std:
   tree_signal->Project("effP_denom_susyTight_pt", "ptEle", denomCondition.c_str() );
 
 
-  numCondition = "isTightSUSYElectronEle && !matchedToGenEle && " + ptCondition;
-  denomCondition = "!matchedToGenEle && " + ptCondition;
+  numCondition = "isTightSUSYElectronEle && isFakeEle && " + ptCondition;
+  denomCondition = "isFakeEle && " + ptCondition;
   if( additionalCuts != "" ) {
     numCondition = numCondition + " && " + additionalCuts;
     denomCondition = denomCondition + " && " + additionalCuts;
@@ -227,8 +227,8 @@ void drawSingleRoC( DrawBase* db, TTree* tree_signal, TTree* tree_bg, const std:
   tree_signal->Project("effP_denom_passedHLT_pt", "ptEle", denomCondition.c_str() );
 
 
-  numCondition = "passedHLTEle && !matchedToGenEle && " + ptCondition;
-  denomCondition = "!matchedToGenEle && " + ptCondition;
+  numCondition = "passedHLTEle && isFakeEle && " + ptCondition;
+  denomCondition = "isFakeEle && " + ptCondition;
   if( additionalCuts != "" ) {
     numCondition = numCondition + " && " + additionalCuts;
     denomCondition = denomCondition + " && " + additionalCuts;
@@ -247,8 +247,10 @@ void drawSingleRoC( DrawBase* db, TTree* tree_signal, TTree* tree_bg, const std:
   TH1D* h1_mva_nonprompt = new TH1D("mva_nonprompt", "", nBins, -1., 1.0001);
   h1_mva_nonprompt->Sumw2();
 
+  //std::string promptCondition = "matchedToGenEle && " + ptCondition;
+  //std::string nonpromptCondition = "isFakeEle && " + ptCondition;
   std::string promptCondition = "matchedToGenEle && isNotConversionEle && " + ptCondition;
-  std::string nonpromptCondition = "!isFakeEle && isNotConversionEle &&" + ptCondition;
+  std::string nonpromptCondition = "isFakeEle && isNotConversionEle &&" + ptCondition;
   if( additionalCuts != "" ) {
     promptCondition = promptCondition + " && " + additionalCuts;
     nonpromptCondition = nonpromptCondition + " && " + additionalCuts;
