@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <cstdlib>
 #include "DrawBase.h"
 
@@ -280,7 +281,7 @@ void drawSingleRoC( DrawBase* db, TTree* tree_signal, TTree* tree_bg, const std:
   h1_mva_prompt->SetLineColor( 46 );
   h1_mva_prompt->SetLineWidth( 2 );
   h1_mva_prompt->SetFillStyle( 3004 );
-  h1_mva_prompt->Rebin( 2 );
+  //h1_mva_prompt->Rebin( 2 );
   h1_mva_prompt->SetYTitle( "Normalized to Unity" );
   h1_mva_prompt->SetXTitle( "Electron ID MVA" );
 
@@ -288,7 +289,7 @@ void drawSingleRoC( DrawBase* db, TTree* tree_signal, TTree* tree_bg, const std:
   h1_mva_nonprompt->SetLineColor( 38 );
   h1_mva_nonprompt->SetLineWidth( 2 );
   h1_mva_nonprompt->SetFillStyle( 3005 );
-  h1_mva_nonprompt->Rebin( 2 );
+  //h1_mva_nonprompt->Rebin( 2 );
 
   TLegend* legend0 = new TLegend( 0.25, 0.62, 0.6, 0.82 );
   legend0->SetTextSize(0.04);
@@ -421,6 +422,38 @@ void drawSingleRoC( DrawBase* db, TTree* tree_signal, TTree* tree_bg, const std:
 
   sprintf( canvasName, "LeptonStudiesPlots/RoC_%s_pt%.0f_%.0f.eps", suffix.c_str(), ptMin , ptMax);
   c1->SaveAs(canvasName);
+
+
+  // find thresholds:
+  float thresh_loose = -999.;
+  float thresh_tight = -999.;
+
+  for( unsigned iPoint=0; iPoint<gr_mvaRoC->GetN()-1; ++iPoint ) {
+
+    Double_t x_point, y_point;
+    gr_mvaRoC->GetPoint( iPoint, x_point, y_point );
+    Double_t x_point_next, y_point_next;
+    gr_mvaRoC->GetPoint( iPoint+1, x_point_next, y_point_next );
+
+    if( y_point > effPrompt_susyLoose && y_point_next <= effPrompt_susyLoose ) {
+      thresh_loose = h1_mva_prompt->GetBinCenter(iPoint);
+    }
+
+    if( y_point > effPrompt_susyTight && y_point_next <= effPrompt_susyTight ) {
+      thresh_tight = h1_mva_prompt->GetBinCenter(iPoint);
+    }
+
+  }
+
+
+  char ofsName[1000];
+  sprintf( ofsName, "LeptonStudiesPlots/thresh_%s_pt%.0f_%.0f.txt", suffix.c_str(), ptMin , ptMax);
+  ofstream ofs(ofsName);
+
+  ofs << "Loose: " << thresh_loose << std::endl;
+  ofs << "Tight: " << thresh_tight << std::endl;
+  ofs.close();
+
 
   delete c0;
   delete c1;
