@@ -68,6 +68,7 @@ void Ntp1Analyzer_LeptonStudies::CreateOutputFile() {
   reducedTree_->Branch("mvaidtrigEle",mvaidtrigEle_,"mvaidtrigEle_[nEle_]/F");
   reducedTree_->Branch("mvaidnontrigEle",mvaidnontrigEle_,"mvaidnontrigEle_[nEle_]/F");
   reducedTree_->Branch("matchedToGenEle",matchedToGenEle_,"matchedToGenEle_[nEle_]/O");
+  reducedTree_->Branch("isFakeEle",isFakeEle_,"isFakeEle_[nEle_]/O");
   
 
 } 
@@ -615,7 +616,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
        ptEle_[nEle_] = thisEle.Pt();
        etaEle_[nEle_] = thisEle.Eta();
-       pfIsoEle_[nEle_] = thisEle.getPfIso_rhoCorrected();
+       pfIsoEle_[nEle_] = thisEle.getPfIso04_rhoCorrected();
        isLooseSUSYElectronEle_[nEle_] = thisEle.electronID2012_SUSYloose();
        isTightSUSYElectronEle_[nEle_] = thisEle.electronID2012_SUSYtight();
        isNotConversionEle_[nEle_] = thisEle.conversionRejection2012_CutsLoose();
@@ -623,6 +624,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
        mvaidtrigEle_[nEle_] = thisEle.mvaidtrigEle;
        mvaidnontrigEle_[nEle_] = thisEle.mvaidnontrigEle;
        matchedToGenEle_[nEle_] = thisEle.matchedToGen;
+       isFakeEle_[nEle_] = (deltaRmin_Ele>0.3); 
 
        nEle_++;
 
