@@ -136,6 +136,61 @@ bool AnalysisElectron::electronIDVBTF80() {
 
 
 
+bool AnalysisElectron::electronID2012_SUSYloose() {
+
+  if( !(this->conversionRejection2012_CutsLoose() ) ) return false;
+
+  double sigmaIetaIeta_thresh;
+  double deltaPhiAtVtx_thresh;
+  double deltaEtaAtVtx_thresh;
+  double hOverE_thresh;
+  double dxy_thresh;
+  double dz_thresh;
+  double EpInverseDiff_thresh;
+
+  if( fabs(this->Eta())<1.4442 ) {
+    sigmaIetaIeta_thresh = 0.01;
+    deltaPhiAtVtx_thresh = 0.15;
+    deltaEtaAtVtx_thresh = 0.007;
+    hOverE_thresh = 0.12;
+  } else {
+    sigmaIetaIeta_thresh = 0.03;
+    deltaPhiAtVtx_thresh = 0.1; 
+    deltaEtaAtVtx_thresh = 0.009;
+    hOverE_thresh = 0.10;
+  }
+
+  EpInverseDiff_thresh = 0.05;
+  dxy_thresh = 0.02;
+  dz_thresh = 0.2;
+
+  bool eleID = (sigmaIetaIeta < sigmaIetaIeta_thresh) &&
+               (fabs(deltaPhiAtVtx) < deltaPhiAtVtx_thresh) &&
+               (fabs(deltaEtaAtVtx) < deltaEtaAtVtx_thresh) &&
+               (dxy < dxy_thresh) &&
+               (dz < dz_thresh) &&
+               (this->EpInverseDiff() < EpInverseDiff_thresh) &&
+               (hOverE < hOverE_thresh);
+
+  return eleID;
+
+}
+
+  
+
+bool AnalysisElectron::electronID2012_SUSYtight() {
+
+  bool pass = this->electronID2012_CutsMedium() 
+           //&& this->tripleChargeConsist 
+           && this->conversionRejection2012_CutsLoose()
+           && this->expInnerLayersGsfTrack == 0;
+
+  return pass;
+
+}
+  
+
+
 bool AnalysisElectron::passedAdditionalCuts() {
 
   bool passedAC = ( fBrem>0.15 || (fabs(etaSC)<1. && eOverP>0.95) );
@@ -355,21 +410,56 @@ bool AnalysisElectron::electronID2012_CutsLoose() {
   }
 
 
-  double p_inv = 1./pAtVertex;
-  double ecalEnergy = pAtVertex*eOverP;
-  double E_inv = 1./ecalEnergy;
-  double EpInverseDiff = fabs( E_inv-p_inv );
 
   bool eleID = (sigmaIetaIeta < sigmaIetaIeta_thresh) &&
                    (fabs(deltaPhiAtVtx) < deltaPhiAtVtx_thresh) &&
                    (fabs(deltaEtaAtVtx) < deltaEtaAtVtx_thresh) &&
                    (dxy < dxy_thresh) &&
                    (dz < dz_thresh) &&
-                   (EpInverseDiff < EpInverseDiff_thresh) &&
+                   (this->EpInverseDiff() < EpInverseDiff_thresh) &&
                    (hOverE < hOverE_thresh);
 
   return eleID;
 
+
+}
+
+
+bool AnalysisElectron::electronID2012_CutsMedium() {
+
+  double sigmaIetaIeta_thresh;
+  double deltaPhiAtVtx_thresh;
+  double deltaEtaAtVtx_thresh;
+  double hOverE_thresh;
+  double dxy_thresh;
+  double dz_thresh;
+  double EpInverseDiff_thresh;
+
+  if( fabs(this->Eta())<1.4442 ) {
+    sigmaIetaIeta_thresh = 0.01;
+    deltaPhiAtVtx_thresh = 0.06;
+    deltaEtaAtVtx_thresh = 0.004;
+    hOverE_thresh = 0.12;
+  } else {
+    sigmaIetaIeta_thresh = 0.03;
+    deltaPhiAtVtx_thresh = 0.03; 
+    deltaEtaAtVtx_thresh = 0.007;
+    hOverE_thresh = 0.10;
+  }
+
+  EpInverseDiff_thresh = 0.05;
+  dxy_thresh = 0.02;
+  dz_thresh = 0.1;
+
+  bool eleID = (sigmaIetaIeta < sigmaIetaIeta_thresh) &&
+               (fabs(deltaPhiAtVtx) < deltaPhiAtVtx_thresh) &&
+               (fabs(deltaEtaAtVtx) < deltaEtaAtVtx_thresh) &&
+               (dxy < dxy_thresh) &&
+               (dz < dz_thresh) &&
+               (this->EpInverseDiff() < EpInverseDiff_thresh) &&
+               (hOverE < hOverE_thresh);
+
+  return eleID;
 
 }
 
@@ -536,3 +626,15 @@ bool AnalysisElectron::separatedIsoRel() {
 
 }
 
+
+
+double AnalysisElectron::EpInverseDiff() {
+
+  double p_inv = 1./pAtVertex;
+  double ecalEnergy = pAtVertex*eOverP;
+  double E_inv = 1./ecalEnergy;
+  double EpInverseDiff = fabs( E_inv-p_inv );
+
+  return EpInverseDiff;
+
+}
