@@ -29,67 +29,71 @@ int main() {
   db->add_mcFile(file_dy, "dy", "DY", 46);
 
   db->set_outputdir("LeptonStudiesPlots");
-//db->drawHisto_fromTree( "reducedTree", "ptEle", "matchedToGenEle", 50, 0., 120., "ptEle_prompt", "Electron p_{T}", "GeV");
+  db->drawHisto_fromTree( "reducedTree", "ptEle", "matchedToGenEle", 50, 0., 120., "ptEle_prompt", "Electron p_{T}", "GeV");
 
-//TH1D* h1_prompt_signal;
-//std::vector<TH1D*> vh1_lastHistos_prompt = db->get_lastHistos_mc();
-//for(unsigned i=0; i<vh1_lastHistos_prompt.size(); ++i ) {
-//  if( db->get_mcFile(i).datasetName=="ttZ" ) {
-//    h1_prompt_signal = new TH1D( *(vh1_lastHistos_prompt[i]) );
-//  }
-//}
-
-
-//db->drawHisto_fromTree( "reducedTree", "ptEle", "!matchedToGenEle", 50, 0., 120., "ptEle_nonprompt", "Electron p_{T}", "GeV");
-//TH1D* h1_nonprompt_dy;
-//TH1D* h1_nonprompt_tt;
-//std::vector<TH1D*> vh1_lastHistos_nonprompt = db->get_lastHistos_mc();
-//for(unsigned i=0; i<vh1_lastHistos_nonprompt.size(); ++i ) {
-//  if( db->get_mcFile(i).datasetName=="dy" ) {
-//    h1_nonprompt_dy = new TH1D( *(vh1_lastHistos_nonprompt[i]) );
-//  }
-//  if( db->get_mcFile(i).datasetName=="tt" ) {
-//    h1_nonprompt_tt = new TH1D( *(vh1_lastHistos_nonprompt[i]) );
-//  }
-//}
+  TH1D* h1_prompt_signal;
+  std::vector<TH1D*> vh1_lastHistos_prompt = db->get_lastHistos_mc();
+  for(unsigned i=0; i<vh1_lastHistos_prompt.size(); ++i ) {
+    if( db->get_mcFile(i).datasetName=="ttZ" ) {
+      h1_prompt_signal = new TH1D( *(vh1_lastHistos_prompt[i]) );
+    }
+  }
 
 
-//TCanvas* c_pt = new TCanvas("c_pt", "", 600, 600);
-//c_pt->cd();
-
-//float xMin = h1_nonprompt_tt->GetXaxis()->GetXmin();
-//float xMax = h1_nonprompt_tt->GetXaxis()->GetXmax();
-//float yMin = 0.;
-//float yMax = h1_nonprompt_dy->GetMaximum()*1.4;
-
-//TH2D* h2_axes_pt = new TH2D("axes_pt", "", 10, xMin, xMax, 10, yMin, yMax);
-//h2_axes_pt->SetXTitle("Electron p_{T} [GeV]");
-//h2_axes_pt->SetYTitle("Normalized to Unity");
-
-
-//h2_axes_pt->Draw();
-//h1_nonprompt_tt->Draw("same");
-//h1_nonprompt_dy->Draw("same");
-//h1_prompt_signal->Draw("same");
-
-//TLegend* legend_pt = new TLegend( 0.5, 0.6, 0.88, 0.88 );
-//legend_pt->SetTextSize(0.04);
-//legend_pt->SetFillColor(0);
-//legend_pt->AddEntry( h1_prompt_signal, "tt+Z (prompt)", "F");
-//legend_pt->AddEntry( h1_nonprompt_tt, "Top (non-prompt)", "F");
-//legend_pt->AddEntry( h1_nonprompt_dy, "DY (non-prompt)", "F");
-
-//legend_pt->Draw("same");
-
-//TPaveText* label = db->get_labelSqrt();
-//label->Draw("same");
-
-//gPad->RedrawAxis();
-//
-//std::string canvasName_pt = db->get_outputdir() + "/ptEle.eps";
-//c_pt->SaveAs(canvasName_pt.c_str()); 
+  db->drawHisto_fromTree( "reducedTree", "ptEle", "!matchedToGenEle", 50, 0., 120., "ptEle_nonprompt", "Electron p_{T}", "GeV");
+  TH1D* h1_nonprompt_dy;
+  TH1D* h1_nonprompt_tt;
+  std::vector<TH1D*> vh1_lastHistos_nonprompt = db->get_lastHistos_mc();
+  for(unsigned i=0; i<vh1_lastHistos_nonprompt.size(); ++i ) {
+    if( db->get_mcFile(i).datasetName=="dy" ) {
+      h1_nonprompt_dy = new TH1D( *(vh1_lastHistos_nonprompt[i]) );
+    }
+    if( db->get_mcFile(i).datasetName=="tt" ) {
+      h1_nonprompt_tt = new TH1D( *(vh1_lastHistos_nonprompt[i]) );
+    }
+  }
 
 
+  TCanvas* c_pt = new TCanvas("c_pt", "", 600, 600);
+  c_pt->cd();
+
+  float xMin = h1_nonprompt_tt->GetXaxis()->GetXmin();
+  float xMax = h1_nonprompt_tt->GetXaxis()->GetXmax();
+  float yMin = 0.;
+  float yMax = h1_nonprompt_dy->GetMaximum()*1.4;
+
+  TH2D* h2_axes_pt = new TH2D("axes_pt", "", 10, xMin, xMax, 10, yMin, yMax);
+  h2_axes_pt->SetXTitle("Electron p_{T} [GeV]");
+  h2_axes_pt->SetYTitle("Normalized to Unity");
+
+
+  h2_axes_pt->Draw();
+  h1_nonprompt_tt->Draw("same");
+  h1_nonprompt_dy->Draw("same");
+  h1_prompt_signal->Draw("same");
+
+  TLegend* legend_pt = new TLegend( 0.5, 0.6, 0.88, 0.88 );
+  legend_pt->SetTextSize(0.04);
+  legend_pt->SetFillColor(0);
+  legend_pt->AddEntry( h1_prompt_signal, "tt+Z (prompt)", "F");
+  legend_pt->AddEntry( h1_nonprompt_tt, "Top (non-prompt)", "F");
+  legend_pt->AddEntry( h1_nonprompt_dy, "DY (non-prompt)", "F");
+
+  legend_pt->Draw("same");
+
+  TPaveText* label = db->get_labelSqrt();
+  label->Draw("same");
+
+  gPad->RedrawAxis();
+  
+  std::string canvasName_pt = db->get_outputdir() + "/ptEle.eps";
+  c_pt->SaveAs(canvasName_pt.c_str()); 
+
+  delete h1_prompt_signal;
+  delete h1_nonprompt_dy;
+  delete h1_nonprompt_tt;
+
+  TH1F::AddDirectory(kTRUE);
 
   TTree* tree_ttZ = (TTree*)file_ttZ->Get("reducedTree");
   TTree* tree_tt  = (TTree*)file_tt->Get("reducedTree");
@@ -236,15 +240,15 @@ void drawSingleRoC( DrawBase* db, TTree* tree_signal, TTree* tree_bg, const std:
 
 
 
-  int nBins = (ptMax<100.) ? 250 : 500;
+  int nBins = (ptMax<100.) ? 250 : 1200;
 
   TH1D* h1_mva_prompt = new TH1D("mva_prompt", "", nBins, -1., 1.0001);
   h1_mva_prompt->Sumw2();
   TH1D* h1_mva_nonprompt = new TH1D("mva_nonprompt", "", nBins, -1., 1.0001);
   h1_mva_nonprompt->Sumw2();
 
-  std::string promptCondition = "matchedToGenEle && " + ptCondition;
-  std::string nonpromptCondition = "!matchedToGenEle && " + ptCondition;
+  std::string promptCondition = "matchedToGenEle && isNotConversionEle && " + ptCondition;
+  std::string nonpromptCondition = "!isFakeEle && isNotConversionEle &&" + ptCondition;
   if( additionalCuts != "" ) {
     promptCondition = promptCondition + " && " + additionalCuts;
     nonpromptCondition = nonpromptCondition + " && " + additionalCuts;
@@ -349,19 +353,31 @@ void drawSingleRoC( DrawBase* db, TTree* tree_signal, TTree* tree_bg, const std:
   c1->cd();
 
 
-  float xMax = (additionalCuts=="") ? 1.0001 : 0.5;
-  float yMin = (ptMax<100.) ? 0.4 : 0.7;
+  float xMax = (additionalCuts=="") ? 1.0001 : 0.6;
+  float yMin = (ptMax<100. && additionalCuts=="") ? 0.4 : 0.75;
 
   TH2D* h2_axes = new TH2D("axes", "", 10, 0., xMax, 10, yMin, 1.00001);
   h2_axes->SetXTitle("Non-Prompt Lepton Rejection");
   h2_axes->SetYTitle("Prompt Lepton Efficiency");
 
 
+  TString suffix_tstr(suffix);
+
+  bool moveLegendRight = additionalCuts_tstr.Contains("passedHLT") && suffix_tstr.BeginsWith("tt");
+  bool moveLegendUp = additionalCuts_tstr.Contains("passedHLT") && suffix_tstr.BeginsWith("tt") && ptMin < 15.;
+
+  
+
   h2_axes->Draw();
-  float xMin_legend = (additionalCuts=="") ? 0.2 : 0.6;
+  float xMin_legend = (moveLegendRight) ? 0.6 : 0.2;
   float xMax_legend = xMin_legend + 0.3;
-  float yMin_legend = (additionalCuts!="" && ptMin>15.) ? 0.55 : 0.2;
+  float yMin_legend = (moveLegendUp) ? 0.55 : 0.2;
   float yMax_legend = yMin_legend + 0.3;
+
+  //float xMin_legend = (additionalCuts=="") ? 0.2 : 0.6;
+  //float xMax_legend = xMin_legend + 0.3;
+  //float yMin_legend = (xMax<1.) ? 0.2 : 0.55;
+  //float yMax_legend = yMin_legend + 0.3;
 
 
   TLegend* legend;
