@@ -518,6 +518,8 @@ public :
    Int_t           numberOfMatchesMuon[150];   //[nMuon]
    Float_t         mvaisoMuon[150];   //[nMuon]
    Bool_t          pfmuonIdMuon[150];   //[nMuon]
+   Float_t         pfIsolationSumPUPtR03Muon[150];   //[nMuon]
+   Float_t         pfIsolationSumPUPtR04Muon[150];   //[nMuon]
    Int_t           nMet;
    Int_t           chargeMet[1];   //[nMet]
    Float_t         energyMet[1];   //[nMet]
@@ -1329,6 +1331,8 @@ public :
    TBranch        *b_numberOfMatchesMuon;   //!
    TBranch        *b_mvaisoMuon;   //!
    TBranch        *b_pfmuonIdMuon;   //!
+   TBranch        *b_pfIsolationSumPUPtR03Muon;   //!
+   TBranch        *b_pfIsolationSumPUPtR04Muon;   //!
    TBranch        *b_nMet;   //!
    TBranch        *b_chargeMet;   //!
    TBranch        *b_energyMet;   //!
