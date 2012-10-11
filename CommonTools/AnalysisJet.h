@@ -2,11 +2,15 @@
 #define AnalysisJet_h
 
 #include "TLorentzVector.h"
+#include <string>
+
+using namespace std;
 
 class AnalysisJet : public TLorentzVector {
 
  public:
 
+// ---- Constructor & Destructor ----------------------------------------------------------------------------
   AnalysisJet( float x=0., float y=0., float z=0., float t=0.) : TLorentzVector( x, y, z, t ) {
     rmsCand=0.;
     ptD=0.;
@@ -20,13 +24,41 @@ class AnalysisJet : public TLorentzVector {
     nCharged=0;
     nNeutral=0;
   }
+  
+  virtual ~AnalysisJet(){}
+// ---- Member functions ------------------------------------------------------------------------
+   Bool_t passedJetID( const std::string& strength ) const;
 
+// ---- Data Members ----------------------------------------------------------------------------
   float rmsCand;
   float ptD;
-  int nCharged;
-  int nNeutral;
+  int nCharged; //DON'T USE
+  int nNeutral; //DON'T USE
   float QGLikelihood;
   float QGLikelihoodNoPU;
+  
+  //extra QGL variables
+  float axis1;
+  float axis2;
+  float pull;
+  float tana;
+
+  float ptD_QC;
+  float rmsCand_QC;
+  float axis1_QC;
+  float axis2_QC;
+  float pull_QC;
+  float tana_QC;
+
+  float nChg_ptCut;
+  float nChg_QC;
+  float nChg_ptCut_QC;
+  float nNeutral_ptCut;
+  float Rchg;
+  float Rneutral;
+  float R;
+  float Rchg_QC;
+  //
 
   float eChargedHadrons;
   float ePhotons;
@@ -80,6 +112,9 @@ class AnalysisJet : public TLorentzVector {
   float beta;
   float betaStar;
 
+
+private:
+  int nConstituents() const {return nChargedHadrons+nPhotons+nNeutralHadrons+nElectrons+nMuons+nHFHadrons+nHFEM ;}
 };
 
 
