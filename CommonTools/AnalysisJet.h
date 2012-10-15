@@ -91,6 +91,8 @@ class AnalysisJet : public TLorentzVector {
   float phiPart;
   float ePart;
   int pdgIdPart;
+  int pdgIdPartMom;
+  int pdgIdPartMomMom;
 
   float ptPart_status2;
   float etaPart_status2;
