@@ -426,7 +426,7 @@ float getWeight( const std::string& dataset, int nEvents ) {
     }
 
 
-  } else {
+  } else {  // 7 TeV
 
     // all cross sections in pb-1:
     if( dataset=="ZJets_madgraph" || dataset_tstr.Contains("DYJetsToLL_TuneZ2_M-50_7TeV-madgraph") ) {
@@ -712,6 +712,80 @@ float getWeight( const std::string& dataset, int nEvents ) {
       xSection = 1.151e+05;
     } else if( dataset=="QCD_Pt_170to300_TuneZ2_7TeV_pythia6" ) {
       xSection = 2.426e+04;
+    } else if( dataset_tstr.BeginsWith("G_Pt_15to30") || dataset_tstr.BeginsWith("G_Pt-15to30") ) {
+      xSection = 1.717e+05;
+    } else if( dataset_tstr.BeginsWith("G_Pt_30to50") || dataset_tstr.BeginsWith("G_Pt-30to50") ) {
+      xSection = 1.669e+04;
+    } else if( dataset_tstr.BeginsWith("G_Pt_50to80") || dataset_tstr.BeginsWith("G_Pt-50to80") ) {
+      xSection = 2.722e+03;
+    } else if( dataset_tstr.BeginsWith("G_Pt_80to120") || dataset_tstr.BeginsWith("G_Pt-80to120") ) {
+      xSection = 4.472e+02;
+    } else if( dataset_tstr.BeginsWith("G_Pt_120to170") || dataset_tstr.BeginsWith("G_Pt-120to170") ) {
+      xSection = 8.417e+01;
+    } else if( dataset_tstr.BeginsWith("G_Pt_170to300") || dataset_tstr.BeginsWith("G_Pt-170to300") ) {
+      xSection = 2.264e+01;
+    } else if( dataset_tstr.BeginsWith("G_Pt_300to470") || dataset_tstr.BeginsWith("G_Pt-300to470") ) {
+      xSection = 1.493e+00;
+    } else if( dataset_tstr.BeginsWith("G_Pt_470to800") || dataset_tstr.BeginsWith("G_Pt-470to800") ) {
+      xSection = 1.323e-01;
+    } else if( dataset_tstr.BeginsWith("G_Pt_800to1400") || dataset_tstr.BeginsWith("G_Pt-800to1400") ) {
+      xSection = 3.481e-03;
+    } else if( dataset_tstr.BeginsWith("G_Pt_1400to1800") || dataset_tstr.BeginsWith("G_Pt-1400to1800") ) {
+      xSection = 1.270e-05;
+    } else if( dataset_tstr.BeginsWith("G_Pt_1800") || dataset_tstr.BeginsWith("G_Pt-1800") ) {
+      xSection = 2.936e-07;
+    } else if( dataset_tstr.BeginsWith("QCD_Pt_15to30") || dataset_tstr.BeginsWith("QCD_Pt-15to30") ) {
+      xSection = 8.159e+08;
+    } else if( dataset_tstr.BeginsWith("QCD_Pt_30to50") || dataset_tstr.BeginsWith("QCD_Pt-30to50")) {
+      xSection = 5.312e+07;
+    } else if( dataset_tstr.BeginsWith("QCD_Pt_50to80") || dataset_tstr.BeginsWith("QCD_Pt-50to80")) {
+      xSection = 6.359e+06;
+    } else if( dataset_tstr.BeginsWith("QCD_Pt_80to120") || dataset_tstr.BeginsWith("QCD_Pt-80to120")) {
+      xSection = 7.843e+05;
+    } else if( dataset_tstr.BeginsWith("QCD_Pt_120to170") || dataset_tstr.BeginsWith("QCD_Pt-120to170")) {
+      xSection = 1.151e+05;
+    } else if( dataset_tstr.BeginsWith("QCD_Pt_170to300") || dataset_tstr.BeginsWith("QCD_Pt-170to300")) {
+      xSection = 2.426e+04;
+    } else if( dataset_tstr.BeginsWith("QCD_Pt_300to470") || dataset_tstr.BeginsWith("QCD_Pt-300to470")) {
+      xSection = 1.168e+03;
+    } else if( dataset_tstr.BeginsWith("QCD_Pt_470to600") || dataset_tstr.BeginsWith("QCD_Pt-470to600")) {
+      xSection = 7.022e+01;
+    } else if( dataset_tstr.BeginsWith("QCD_Pt_600to800") || dataset_tstr.BeginsWith("QCD_Pt-600to800")) {
+      xSection = 1.555e+01;
+    } else if( dataset_tstr.BeginsWith("QCD_Pt_800to1000") || dataset_tstr.BeginsWith("QCD_Pt-800to1000")) {
+      xSection = 1.844e+00;
+    } else if( dataset_tstr.BeginsWith("QCD_Pt_1000to1400") || dataset_tstr.BeginsWith("QCD_Pt-1000to1400")) {
+      xSection = 3.321e-01;
+    } else if( dataset_tstr.BeginsWith("QCD_Pt_1400to1800") || dataset_tstr.BeginsWith("QCD_Pt-1400to1800")) {
+      xSection = 1.087e-02;
+    } else if( dataset_tstr.BeginsWith("QCD_Pt1800") || dataset_tstr.BeginsWith("QCD_Pt-1800")) {
+      xSection = 3.575e-04;
+    } else if( dataset_tstr.BeginsWith("QCD") && dataset_tstr.Contains("HT-100To250_7TeV") ) {
+      xSection = 4194000.0;
+    } else if( dataset_tstr.BeginsWith("QCD") && dataset_tstr.Contains("HT-250To500_7TeV") ) {
+      xSection = 198500.;
+    } else if( dataset_tstr.BeginsWith("QCD") && dataset_tstr.Contains("HT-500To1000_7TeV") ) {
+      xSection = 5856.;
+    } else if( dataset_tstr.BeginsWith("QCD") && dataset_tstr.Contains("HT-1000_7TeV") ) {
+      xSection = 122.6;
+    } else if( dataset_tstr.BeginsWith("QCD_Pt-20to30_BCtoE") ) {
+      xSection = 236000000.*0.00056;
+    } else if( dataset_tstr.BeginsWith("QCD_Pt-20to30_EMEnriched") ) {
+      xSection = 236000000.*0.0104;
+    } else if( dataset_tstr.BeginsWith("QCD_Pt-30to80_BCtoE") ) {
+      xSection = 59480000.*0.00230;
+    } else if( dataset_tstr.BeginsWith("QCD_Pt-30to80_EMEnriched") ) {
+      xSection = 59480000.*0.065;
+    } else if( dataset_tstr.BeginsWith("QCD_Pt-80to170_BCtoE") ) {
+      xSection = 900000.*0.0104;
+    } else if( dataset_tstr.BeginsWith("QCD_Pt-80to170_EMEnriched") ) {
+      xSection = 900000.*0.155;
+    } else if( dataset_tstr.BeginsWith("QCD_Pt-170to250_EMEnriched") ) {
+      xSection = 22140.0*0.1474;
+    } else if( dataset_tstr.BeginsWith("QCD_Pt-250to350_EMEnriched") ) {
+      xSection = 2900.0*0.1269;
+    } else if( dataset_tstr.BeginsWith("QCD_Pt-350_EMEnriched") ) {
+      xSection = 520.0*0.1058;
     } else if( dataset=="WW200" ) {//##
       xSection = 1.1202;//##
     } else if( dataset=="WW300" ) {//##
