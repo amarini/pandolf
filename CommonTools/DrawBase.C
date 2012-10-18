@@ -204,7 +204,7 @@ DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType
   noStack_ = false;
 
   isCMSArticle_ = false;
-  lumiOnRightSide_ = false;
+  lumiOnRightSide_ = true;
 
   additionalLabel_ = 0;
 
@@ -1140,6 +1140,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
 
 
 } //drawhisto
+
 
 
 
