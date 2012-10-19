@@ -10,9 +10,8 @@
 #include "TRegexp.h"
 #include "TGraphAsymmErrors.h"
 
-#include "QGLikelihood/QGLikelihoodCalculator.h"
+#include "QGLikelihood/interface/QGLikelihoodCalculator.h"
 #include "HelicityLikelihoodDiscriminant/HelicityLikelihoodDiscriminant.h"
-#include "KinematicFit/DiJetKinFitter.h"
 
 #include "PUWeight.h"
 
@@ -24,18 +23,27 @@ bool USE_MC_MASS=false;
 int DEBUG_EVENTNUMBER = 675033372;
 
 
+std::vector<int> getJets( const std::string& choice, std::vector< AnalysisJet > jets );
+std::vector<int> getSingleJetPair( const std::string& choice, std::vector<AnalysisJet> jets, std::vector<int> *vetoIndexes=0 );
+bool matchedToVeto( int iJet, std::vector<int> *vetoIndexes );
 
+
+bool isMatchedPair( AnalysisJet *jet1, AnalysisJet *jet2 );
+bool isMatchedToPart( AnalysisJet jet );
+bool isSignalJet( AnalysisJet jet );
 
 
 
 // constructor:
 
-Ntp1Finalizer_TTW::Ntp1Finalizer_TTW( const std::string& dataset, const std::string& selectionType, const std::string& bTaggerType ) : Ntp1Finalizer( "TTW", dataset, "ALL" ) {
+Ntp1Finalizer_TTW::Ntp1Finalizer_TTW( const std::string& dataset, const std::string& selectionType, const std::string& jetChoice, const std::string& bTaggerType ) : Ntp1Finalizer( "TTW", dataset ) {
 
-  if( bTaggerType!="SSVHE" && bTaggerType!="TCHE" ) {
+  if( bTaggerType!="SSVHE" && bTaggerType!="TCHE"&& bTaggerType!="JP" ) {
     std::cout << "b-Tagger type '" << bTaggerType << "' currently not supported. Exiting." << std::endl;
     exit(9179);
   }
+
+  jetChoice_ = jetChoice;
 
   bTaggerType_ = bTaggerType;
 
@@ -55,6 +63,7 @@ void Ntp1Finalizer_TTW::finalize() {
   tree_->GetEntry(0);
   bool isMC = (run < 160000);
   std::string fullFlags = selectionType_;
+  fullFlags = fullFlags + "_" + jetChoice_;
   if( bTaggerType_!="TCHE" ) fullFlags = fullFlags + "_" + bTaggerType_;
   this->set_flags(fullFlags); //this is for the outfile name
   this->createOutputFile();
@@ -80,6 +89,12 @@ void Ntp1Finalizer_TTW::finalize() {
   TH1D* h1_nvertex_PUW_ave = new TH1D("nvertex_PUW_ave", "", 36, -0.5, 35.5);
   h1_nvertex_PUW_ave->Sumw2();
 
+  TH1D* h1_rhoPF_presel = new TH1D("rhoPF_presel", "", 50, 0., 20.);
+  h1_rhoPF_presel->Sumw2();
+  TH1D* h1_rhoPF = new TH1D("rhoPF", "", 50, 0., 20.);
+  h1_rhoPF->Sumw2();
+
+
   TH1D* h1_leptType = new TH1D("leptType", "", 3, -0.5, 2.5 );
   h1_leptType->Sumw2();
   //h1_leptType->GetXaxis()->SetLabelSize(0.1);
@@ -90,15 +105,25 @@ void Ntp1Finalizer_TTW::finalize() {
   TH1D* h1_pfMet = new TH1D("pfMet", "", 500, 0., 500.);
   h1_pfMet->Sumw2();
 
-  TH1D* h1_metSignificance= new TH1D("metSignificance", "", 80, 0., 40.);
-  h1_metSignificance->Sumw2();
+  TH1D* h1_nJets = new TH1D("nJets", "", 11, -0.5, 10.5);
+  h1_nJets->Sumw2();
+  TH1D* h1_nBJets = new TH1D("nBJets", "", 11, -0.5, 10.5);
+  h1_nBJets->Sumw2();
+  TH1D* h1_nSignalJets = new TH1D("nSignalJets", "", 11, -0.5, 10.5);
+  h1_nSignalJets->Sumw2();
+  
 
+  TH1D* h1_mjj0 = new TH1D("mjj0", "", 100, 0., 1000.);
+  h1_mjj0->Sumw2();
+  TH1D* h1_mjj1 = new TH1D("mjj1", "", 100, 0., 1000.);
+  h1_mjj1->Sumw2();
 
-  TH1D* h1_rhoPF_presel = new TH1D("rhoPF_presel", "", 50, 0., 20.);
-  h1_rhoPF_presel->Sumw2();
-  TH1D* h1_rhoPF = new TH1D("rhoPF", "", 50, 0., 20.);
-  h1_rhoPF->Sumw2();
+  TH1D* h1_mjjSum = new TH1D("mjjSum", "", 100, 0., 1000.);
+  h1_mjjSum->Sumw2();
+  TH1D* h1_mjjDiff = new TH1D("mjjDiff", "", 100, 0., 1000.);
+  h1_mjjDiff->Sumw2();
 
+  
 
   TH1D* h1_ptLept1 = new TH1D("ptLept1", "", 500, 20., 520.);
   h1_ptLept1->Sumw2();
@@ -132,9 +157,6 @@ void Ntp1Finalizer_TTW::finalize() {
   TH1D* h1_mTMax = new TH1D("mTMax", "", 400, 0., 400.);
   h1_mTMax->Sumw2();
 
-
-  TH1D* h1_nJets = new TH1D("nJets", "", 9, 3.5, 12.5);
-  h1_nJets->Sumw2();
 
 
   TH1D* h1_bTagJet1 = new TH1D("bTagJet1", "", 420, -1., 20.);
@@ -220,6 +242,27 @@ void Ntp1Finalizer_TTW::finalize() {
   tree_->SetBranchAddress("event", &event);
   Float_t eventWeight;
   tree_->SetBranchAddress("eventWeight", &eventWeight);
+
+  bool is_ttHWWEvent;
+  tree_->SetBranchAddress("is_ttHWWEvent", &is_ttHWWEvent);
+  bool is_ttHBBEvent;
+  tree_->SetBranchAddress("is_ttHBBEvent", &is_ttHBBEvent);
+  bool is_ttHZZEvent;
+  tree_->SetBranchAddress("is_ttHZZEvent", &is_ttHZZEvent);
+  bool is_ttHTauTauEvent;
+  tree_->SetBranchAddress("is_ttHTauTauEvent", &is_ttHTauTauEvent);
+  bool is_ttHWW4QEvent;
+  tree_->SetBranchAddress("is_ttHWW4QEvent", &is_ttHWW4QEvent);
+  bool is_ttHWW4QEvent_reco;
+  tree_->SetBranchAddress("is_ttHWW4QEvent_reco", &is_ttHWW4QEvent_reco);
+  bool is_ssdlEvent;
+  tree_->SetBranchAddress("is_ssdlEvent", &is_ssdlEvent);
+  bool is_ssdlEvent_reco;
+  tree_->SetBranchAddress("is_ssdlEvent_reco", &is_ssdlEvent_reco);
+  bool is_ssdl_ttHWW4QEvent;
+  tree_->SetBranchAddress("is_ssdl_ttHWW4QEvent", &is_ssdl_ttHWW4QEvent);
+  bool is_ssdl_ttHWW4QEvent_reco;
+  tree_->SetBranchAddress("is_ssdl_ttHWW4QEvent_reco", &is_ssdl_ttHWW4QEvent);
 
   Float_t ptHat;
   tree_->SetBranchAddress("ptHat", &ptHat);
@@ -328,6 +371,20 @@ void Ntp1Finalizer_TTW::finalize() {
   tree_->SetBranchAddress("jetProbabilityBJetTagJet", jetProbabilityBJetTagJet);
   Float_t QGLikelihoodJet[50];
   tree_->SetBranchAddress("QGLikelihoodJet", QGLikelihoodJet);
+  Float_t ePartJet[50];
+  tree_->SetBranchAddress("ePartJet", ePartJet);
+  Float_t ptPartJet[50];
+  tree_->SetBranchAddress("ptPartJet", ptPartJet);
+  Float_t etaPartJet[50];
+  tree_->SetBranchAddress("etaPartJet", etaPartJet);
+  Float_t phiPartJet[50];
+  tree_->SetBranchAddress("phiPartJet", phiPartJet);
+  Int_t pdgIdPartJet[50];
+  tree_->SetBranchAddress("pdgIdPartJet", pdgIdPartJet);
+  Int_t pdgIdPartMomJet[50];
+  tree_->SetBranchAddress("pdgIdPartMomJet", pdgIdPartMomJet);
+  Int_t pdgIdPartMomMomJet[50];
+  tree_->SetBranchAddress("pdgIdPartMomMomJet", pdgIdPartMomMomJet);
 
 
 
@@ -412,18 +469,25 @@ void Ntp1Finalizer_TTW::finalize() {
 
 
 
+  int leptType;
+  float HLTSF;
+  int nbjets, nbjetsmed, nnbjets, nnbjetsmed;
   float ptLept1_t, ptLept2_t, etaLept1_t, etaLept2_t;
   float ptJet1_t, ptJet2_t, ptJet3_t, ptJet4_t;
+  float ptbjet_t[20], etabjet_t[20];
   float etaJet1_t, etaJet2_t, etaJet3_t, etaJet4_t;
   float QGLikelihoodJet1_t, QGLikelihoodJet2_t, QGLikelihoodJet3_t, QGLikelihoodJet4_t;
   float bTagJet1_t, bTagJet2_t;
   float mll, deltaRll;
-  float HLTSF;
-  int leptType;
+  float mjj1_t, mjj2_t;
+  float ht;
 
   tree_passedEvents->Branch( "run", &run, "run/I" );
   tree_passedEvents->Branch( "LS", &LS, "LS/I" );
   tree_passedEvents->Branch( "event", &event, "event/I" );
+  tree_passedEvents->Branch( "eventWeight", &eventWeight, "eventWeight/F" );
+  tree_passedEvents->Branch( "HLTSF", &HLTSF, "HLTSF/F" );
+
   tree_passedEvents->Branch( "leptType", &leptType, "leptType/I" );
   tree_passedEvents->Branch( "ptLept1", &ptLept1_t, "ptLept1_t/F" );
   tree_passedEvents->Branch( "ptLept2", &ptLept2_t, "ptLept2_t/F" );
@@ -432,22 +496,32 @@ void Ntp1Finalizer_TTW::finalize() {
   tree_passedEvents->Branch( "mll", &mll, "mll/F" );
   tree_passedEvents->Branch( "deltaRll", &deltaRll, "deltaRll/F" );
   tree_passedEvents->Branch( "pfMet", &pfMet, "pfMet/F" );
+  tree_passedEvents->Branch( "ht", &ht, "ht/F" );
+  tree_passedEvents->Branch( "nbjetsmed", &nbjetsmed, "nbjetsmed/I" );
+  tree_passedEvents->Branch( "nbjets", &nbjets, "nbjets/I" );
+  tree_passedEvents->Branch( "ptbjet", ptbjet_t, "ptbjet_t[nbjets]/F" );
+  tree_passedEvents->Branch( "etabjet", etabjet_t, "etabjet_t[nbjets]/F" );
+
+  tree_passedEvents->Branch( "nnbjets", &nnbjets, "nnbjets/I" ); // non btagged jets
+  tree_passedEvents->Branch( "nnbjetsmed", &nnbjetsmed, "nnbjetsmed/I" ); // non btagged jets
+
   tree_passedEvents->Branch( "ptJet1", &ptJet1_t, "ptJet1_t/F" );
   tree_passedEvents->Branch( "ptJet2", &ptJet2_t, "ptJet2_t/F" );
-  tree_passedEvents->Branch( "bTagJet1", &bTagJet1_t, "bTagJet1_t/F" );
-  tree_passedEvents->Branch( "bTagJet2", &bTagJet2_t, "bTagJet2_t/F" );
   tree_passedEvents->Branch( "ptJet3", &ptJet3_t, "ptJet3_t/F" );
   tree_passedEvents->Branch( "ptJet4", &ptJet4_t, "ptJet4_t/F" );
   tree_passedEvents->Branch( "etaJet1", &etaJet1_t, "etaJet1_t/F" );
   tree_passedEvents->Branch( "etaJet2", &etaJet2_t, "etaJet2_t/F" );
   tree_passedEvents->Branch( "etaJet3", &etaJet3_t, "etaJet3_t/F" );
   tree_passedEvents->Branch( "etaJet4", &etaJet4_t, "etaJet4_t/F" );
-  tree_passedEvents->Branch( "QGLikelihoodJet1", &QGLikelihoodJet1_t, "QGLikelihoodJet1_t/F" );
-  tree_passedEvents->Branch( "QGLikelihoodJet2", &QGLikelihoodJet2_t, "QGLikelihoodJet2_t/F" );
-  tree_passedEvents->Branch( "QGLikelihoodJet3", &QGLikelihoodJet3_t, "QGLikelihoodJet3_t/F" );
-  tree_passedEvents->Branch( "QGLikelihoodJet4", &QGLikelihoodJet4_t, "QGLikelihoodJet4_t/F" );
-  tree_passedEvents->Branch( "eventWeight", &eventWeight, "eventWeight/F" );
-  tree_passedEvents->Branch( "HLTSF", &HLTSF, "HLTSF/F" );
+
+  tree_passedEvents->Branch( "mjj1", &mjj1_t, "mjj1_t/F" );
+  tree_passedEvents->Branch( "mjj2", &mjj2_t, "mjj2_t/F" );
+
+  tree_passedEvents->Branch( "is_ttHWWEvent", &is_ttHWWEvent, "is_ttHWWEvent/O" );
+  tree_passedEvents->Branch( "is_ttHBBEvent", &is_ttHBBEvent, "is_ttHBBEvent/O" );
+  tree_passedEvents->Branch( "is_ttHTauTauEvent", &is_ttHTauTauEvent, "is_ttHTauTauEvent/O" );
+  tree_passedEvents->Branch( "is_ttHZZEvent", &is_ttHZZEvent, "is_ttHZZEvent/O" );
+  tree_passedEvents->Branch( "is_ttHWW4QEvent_reco", &is_ttHWW4QEvent_reco, "is_ttHWW4QEvent_reco/O" );
 
 
 
@@ -455,16 +529,26 @@ void Ntp1Finalizer_TTW::finalize() {
 ofstream ofs("run_event.txt");
 
 
-  DiJetKinFitter* fitter_jets = new DiJetKinFitter( "fitter_jets", "fitter_jets", Wmass );
 
 
   std::cout << std::endl << std::endl;
   std::cout << "+++ BEGINNING ANALYSIS LOOP" << std::endl;
   std::cout << "----> DATASET: " << dataset_ << std::endl;
   std::cout << "----> SELECTION: " << selectionType_ << std::endl;
+  std::cout << "----> JET CHOICE: " << jetChoice_ << std::endl;
   std::cout << "----> B-TAGGER: " << bTaggerType_ << std::endl;
   std::cout << std::endl << std::endl;
 
+
+  int nPairsTot0 = 0;
+  int nPairsTot1 = 0;
+  int foundCorrectJetPair0 = 0;
+  int foundCorrectJetPair1 = 0;
+
+  int nPairsTot0_matched = 0;
+  int nPairsTot1_matched = 0;
+  int foundCorrectJetPair0_matched = 0;
+  int foundCorrectJetPair1_matched = 0;
 
 
   for(int iEntry=0; iEntry<nEntries; ++iEntry) {
@@ -481,6 +565,7 @@ ofstream ofs("run_event.txt");
     h1_nvertex->Fill(nvertex, eventWeight);
 
     if( isMC ) {
+
 
 //    // scale factor for double mu triggers:
 //    if( leptType==0 ) {
@@ -648,8 +733,8 @@ ofstream ofs("run_event.txt");
     if( Lept2.Pt() < ptLept2_thresh_ ) continue;
     if( fabs(Lept1.Eta()) > etaLept1_thresh_ ) continue;
     if( fabs(Lept2.Eta()) > etaLept2_thresh_ ) continue;
-    if( combinedIsoRelLept1 > combRelIsoLept1_thresh_ ) continue;
-    if( combinedIsoRelLept2 > combRelIsoLept2_thresh_ ) continue;
+    if( combinedIsoRelLept1 > 0.05 ) continue;
+    if( combinedIsoRelLept2 > 0.05 ) continue;
     if( mll < mll_thresh_ ) continue;
 
 
@@ -664,8 +749,6 @@ ofstream ofs("run_event.txt");
       std::cout << "-> TOTAL NUMBER OF JETS IN EVENT: " << nJets << std::endl;
     }
     
-    if( nJets<4 ) continue;
-
     if( event==DEBUG_EVENTNUMBER ) {
       std::cout << std::endl << std::endl << "----------------------------------" << std::endl;
       std::cout << "-> FIRST: LOOK FOR BEST B-TAGGED ONES" << std::endl;
@@ -688,32 +771,19 @@ ofstream ofs("run_event.txt");
 
 
 
-    float bestBtag=-9999.;
-    float bestBtag2=-9999.;
-    int i_bestBtag=-1;
-    int i_bestBtag2=-1;
+    std::vector<AnalysisJet> btaggedJets;
+    std::vector<AnalysisJet> nonBtaggedJets;
 
-    float ht = 0.;
+    std::vector<AnalysisJet> btaggedMedJets;
+    std::vector<AnalysisJet> nonBtaggedMedJets;
+
+    int nSignalJets=0;
+    ht = 0.;
 
     for( unsigned iJet=0; iJet<nJets; ++iJet) {
 
       AnalysisJet thisJet;
       thisJet.SetPtEtaPhiE( ptJet[iJet], etaJet[iJet], phiJet[iJet], eJet[iJet]);
-
-      if( event==DEBUG_EVENTNUMBER ) {
-        std::cout << std::endl << "Jet N." << iJet << " Pt: " << ptJet[iJet] << " \tEta: " << etaJet[iJet];
-      }
-
-      if( thisJet.Pt()<ptJet_thresh_ ) {
-        if( event==DEBUG_EVENTNUMBER ) std::cout << "\t (didn't pass pt cut)";
-        continue;
-      }
-      if( fabs(thisJet.Eta())>etaJet_thresh_ ) {
-        if( event==DEBUG_EVENTNUMBER ) std::cout << "\t (didn't pass eta cut)";
-        continue;
-      }
-
-      ht += thisJet.Pt();
 
       thisJet.rmsCand = rmsCandJet[iJet];
       thisJet.ptD = ptDJet[iJet];
@@ -736,6 +806,49 @@ ofstream ofs("run_event.txt");
       thisJet.phiGen = phiGenJet[iJet];
       thisJet.eGen = eGenJet[iJet];
 
+      thisJet.ptPart = ptPartJet[iJet];
+      thisJet.etaPart = etaPartJet[iJet];
+      thisJet.phiPart = phiPartJet[iJet];
+      thisJet.ePart = ePartJet[iJet];
+      thisJet.pdgIdPart = pdgIdPartJet[iJet];
+      thisJet.pdgIdPartMom = pdgIdPartMomJet[iJet];
+      thisJet.pdgIdPartMomMom = pdgIdPartMomMomJet[iJet];
+
+
+
+      if( isSignalJet(thisJet) ) nSignalJets++;
+
+      if( event==DEBUG_EVENTNUMBER ) {
+        std::cout << std::endl << "Jet N." << iJet << " Pt: " << ptJet[iJet] << " \tEta: " << etaJet[iJet];
+      }
+
+      if( thisJet.Pt()<ptJet_thresh_ ) {
+        if( event==DEBUG_EVENTNUMBER ) std::cout << "\t (didn't pass pt cut)";
+        continue;
+      }
+      if( fabs(thisJet.Eta())>etaJet_thresh_ ) {
+        if( event==DEBUG_EVENTNUMBER ) std::cout << "\t (didn't pass eta cut)";
+        continue;
+      }
+
+      ht += thisJet.Pt();
+
+
+
+      if( thisJet.jetProbabilityBJetTag > 0.275 ) { // is btagged loose (JP)
+        btaggedJets.push_back(thisJet);
+      } else {
+        nonBtaggedJets.push_back(thisJet);
+      }
+
+      if( thisJet.jetProbabilityBJetTag > 0.545 ) { // is btagged medium (JP)
+        btaggedMedJets.push_back(thisJet);
+      } else {
+        nonBtaggedMedJets.push_back(thisJet);
+      }
+
+
+
       ////match to parton:
       //int partFlavor=0;
       //float deltaRmin=999.;
@@ -752,145 +865,196 @@ ofstream ofs("run_event.txt");
       //thisJet.pdgIdPart = partFlavor;
 
 
-      float thisBtag;
-      if( bTaggerType_=="TCHE" )
-        thisBtag = thisJet.trackCountingHighEffBJetTag;
-      else if( bTaggerType_=="SSVHE" ) 
-        thisBtag = thisJet.simpleSecondaryVertexHighEffBJetTag;
+      //float thisBtag;
+      //if( bTaggerType_=="TCHE" )
+      //  thisBtag = thisJet.trackCountingHighEffBJetTag;
+      //else if( bTaggerType_=="SSVHE" ) 
+      //  thisBtag = thisJet.simpleSecondaryVertexHighEffBJetTag;
 
-      if( event==DEBUG_EVENTNUMBER ) {
-        std::cout << " \tbtag: " << thisBtag;
-      }
+      //if( event==DEBUG_EVENTNUMBER ) {
+      //  std::cout << " \tbtag: " << thisBtag;
+      //}
 
 
-      if( thisBtag > bestBtag ) {
+      //if( thisBtag > bestBtag ) {
 
-        if( event==DEBUG_EVENTNUMBER ) {
-          std::cout << "\t <--- THIS IS NEW LEADING BTAG JET IN EVENT";
-        }
-        
-        bestBtag2 = bestBtag;
-        bestBtag = thisBtag;
-        i_bestBtag2 = i_bestBtag;
-        i_bestBtag = iJet;
+      //  if( event==DEBUG_EVENTNUMBER ) {
+      //    std::cout << "\t <--- THIS IS NEW LEADING BTAG JET IN EVENT";
+      //  }
+      //  
+      //  bestBtag2 = bestBtag;
+      //  bestBtag = thisBtag;
+      //  i_bestBtag2 = i_bestBtag;
+      //  i_bestBtag = iJet;
 
-        if( jets.size()==0 ) {
-          AnalysisJet* newJet = new AnalysisJet(thisJet);
-          jets.push_back(*newJet);
-        } else if( jets.size()==1 ) {
-          AnalysisJet oldJet = jets[0];
-          AnalysisJet* newJet = new AnalysisJet(thisJet);
-          jets.push_back(*newJet);
-          jets[0] = *newJet;
-          jets[1] = oldJet;
-        } else if( jets.size()==2 ) {
-          jets[1] = jets[0];
-          jets[0] = thisJet;
-        }
+      //  if( jets.size()==0 ) {
+      //    AnalysisJet* newJet = new AnalysisJet(thisJet);
+      //    jets.push_back(*newJet);
+      //  } else if( jets.size()==1 ) {
+      //    AnalysisJet oldJet = jets[0];
+      //    AnalysisJet* newJet = new AnalysisJet(thisJet);
+      //    jets.push_back(*newJet);
+      //    jets[0] = *newJet;
+      //    jets[1] = oldJet;
+      //  } else if( jets.size()==2 ) {
+      //    jets[1] = jets[0];
+      //    jets[0] = thisJet;
+      //  }
 
-      } else if( thisBtag > bestBtag2 ) { //means that at least one jet was found
+      //} else if( thisBtag > bestBtag2 ) { //means that at least one jet was found
 
-        bestBtag2 = thisBtag;
-        i_bestBtag2 = iJet;
+      //  bestBtag2 = thisBtag;
+      //  i_bestBtag2 = iJet;
 
-        if( event==DEBUG_EVENTNUMBER ) {
-          std::cout << "\t <--- THIS IS NEW SUBLEADING BTAG JET IN EVENT";
-        }
-        
-        if( jets.size()==1 ) {
-          AnalysisJet* newJet = new AnalysisJet(thisJet);
-          jets.push_back(*newJet);
-        } else if( jets.size()==2 ) {
-          jets[1] = thisJet;
-        }
+      //  if( event==DEBUG_EVENTNUMBER ) {
+      //    std::cout << "\t <--- THIS IS NEW SUBLEADING BTAG JET IN EVENT";
+      //  }
+      //  
+      //  if( jets.size()==1 ) {
+      //    AnalysisJet* newJet = new AnalysisJet(thisJet);
+      //    jets.push_back(*newJet);
+      //  } else if( jets.size()==2 ) {
+      //    jets[1] = thisJet;
+      //  }
   
-      }
+      //}
       
     } // for jets
+
+
+    if( is_ttHWWEvent ) 
+      h1_nSignalJets->Fill( nSignalJets, eventWeight );
 
     
     if( event==DEBUG_EVENTNUMBER ) 
       std::cout << std::endl << std::endl << std::endl << "-> Event HT: " << ht << "   (thresh is " << ht_thresh_ << ")" << std::endl;
 
+
+    nbjetsmed = btaggedMedJets.size();
+    nnbjetsmed = nonBtaggedMedJets.size();
+
+    nbjets = btaggedJets.size();
+    nnbjets = nonBtaggedJets.size();
+
+    int njets  = nbjets + nnbjets;
+
+    if( nbjets < nbjets_thresh_ ) continue;
+    if( njets  < njets_thresh_ ) continue;
     
     if( ht < ht_thresh_ ) continue;
 
-    if( event==DEBUG_EVENTNUMBER ) {
-      std::cout << std::endl << std::endl << std::endl << "-> So here are two best-btag jets: " << std::endl;
-      std::cout << "[1]  Pt: " << jets[0].Pt() << " \tEta: " << jets[0].Eta() << " btag: " << bestBtag << std::endl;
-      std::cout << "[2]  Pt: " << jets[1].Pt() << " \tEta: " << jets[1].Eta() << " btag: " << bestBtag2 << std::endl;
-      std::cout << std::endl << "NOW ADDING OTHER JETS (ORDERED IN PT)" << std::endl;
-    }
+
+    ptJet1_t = -1.;
+    ptJet2_t = -1.;
+    ptJet3_t = -1.;
+    ptJet4_t = -1.;
+
+    etaJet1_t = -20.;
+    etaJet2_t = -20.;
+    etaJet3_t = -20.;
+    etaJet4_t = -20.;
+
+    mjj1_t = -1.;
+    mjj2_t = -1.;
+
+
+    // if at least 4 jets, try to find the two hadronic W's
+    if( nonBtaggedJets.size() >= 2 ) {
+
+      //std::vector<int> indexJets = getJets( jetChoice_, nonBtaggedJets );
+
+      std::vector<int> firstPair  = getSingleJetPair( jetChoice_, nonBtaggedJets );
+
+      AnalysisJet dijetpair0_0 = nonBtaggedJets[firstPair[0]];
+      AnalysisJet dijetpair0_1 = nonBtaggedJets[firstPair[1]];
+
+      bool correctJetPair0 = isMatchedPair( &dijetpair0_0, &dijetpair0_1 );
+
+      TLorentzVector dijet0 = dijetpair0_0 + dijetpair0_1;
+
+      ptJet1_t = dijetpair0_0.Pt();
+      ptJet2_t = dijetpair0_1.Pt();
+
+      etaJet1_t = dijetpair0_0.Eta();
+      etaJet2_t = dijetpair0_1.Eta();
+
+      mjj1_t = dijet0.M();
+
+
+      if( is_ttHWWEvent ) nPairsTot0_matched += 1;
+      if( is_ttHWWEvent && correctJetPair0 ) foundCorrectJetPair0_matched += 1;
+
+      nPairsTot0 += 1;
+      if( correctJetPair0 ) foundCorrectJetPair0 += 1;
+
+      // fill histos
+      h1_mjj0->Fill( dijet0.M(), eventWeight );
+
+      if( nonBtaggedJets.size() >= 4 ) {
+
+        std::vector<int> secondPair = getSingleJetPair( jetChoice_, nonBtaggedJets, &firstPair );
+
+        AnalysisJet dijetpair1_0 = nonBtaggedJets[secondPair[0]];
+        AnalysisJet dijetpair1_1 = nonBtaggedJets[secondPair[1]];
+
+        bool correctJetPair1 = isMatchedPair( &dijetpair1_0, &dijetpair1_1 );
+
+        //if( is_ssdl_ttHWW4QEvent_reco ) nPairsTot_matched += 1;
+        //if( is_ssdl_ttHWW4QEvent_reco && correctJetPair0 ) foundCorrectJetPair0_matched += 1;
+        //if( is_ssdl_ttHWW4QEvent_reco && correctJetPair1 ) foundCorrectJetPair1_matched += 1;
+
+        if( is_ttHWWEvent ) nPairsTot1_matched += 1;
+        if( is_ttHWWEvent && correctJetPair1 ) foundCorrectJetPair1_matched += 1;
+
+        nPairsTot1 += 1;
+        if( correctJetPair1 ) foundCorrectJetPair1 += 1;
+
+        TLorentzVector dijet1 = dijetpair1_0 + dijetpair1_1;
+
+        ptJet3_t = dijetpair1_0.Pt();
+        ptJet4_t = dijetpair1_1.Pt();
+
+        etaJet3_t = dijetpair1_0.Eta();
+        etaJet4_t = dijetpair1_1.Eta();
+
+        mjj2_t = dijet1.M();
+
+
+        // fill histos
+        h1_mjj1->Fill( dijet1.M(), eventWeight );
+  
+        h1_mjjDiff->Fill( dijet0.M()-dijet1.M(), eventWeight );
+        h1_mjjSum->Fill( dijet0.M()+dijet1.M(), eventWeight );
+
+      } // if 4 jets
+
+    }  // if 2 jets
+
+
+    h1_nJets->Fill( njets, eventWeight );
+    h1_nBJets->Fill( nbjets, eventWeight );
+
+
+ // if( event==DEBUG_EVENTNUMBER ) {
+ //   std::cout << std::endl << std::endl << std::endl << "-> So here are two best-btag jets: " << std::endl;
+ //   std::cout << "[1]  Pt: " << jets[0].Pt() << " \tEta: " << jets[0].Eta() << " btag: " << bestBtag << std::endl;
+ //   std::cout << "[2]  Pt: " << jets[1].Pt() << " \tEta: " << jets[1].Eta() << " btag: " << bestBtag2 << std::endl;
+ //   std::cout << std::endl << "NOW ADDING OTHER JETS (ORDERED IN PT)" << std::endl;
+ // }
 
 
 
-    // now add other jets ordered in pt:
-    for( unsigned iJet=0; iJet<nJets; ++iJet) {
-
-      if( iJet==i_bestBtag || iJet==i_bestBtag2 ) continue;
-
-      AnalysisJet thisJet;
-      thisJet.SetPtEtaPhiE( ptJet[iJet], etaJet[iJet], phiJet[iJet], eJet[iJet]);
-
-      if( thisJet.Pt()<ptJet_thresh_ ) continue;
-      if( fabs(thisJet.Eta())>etaJet_thresh_ ) continue;
-
-      thisJet.rmsCand = rmsCandJet[iJet];
-      thisJet.ptD = ptDJet[iJet];
-      thisJet.nCharged = nChargedJet[iJet];
-      thisJet.nNeutral = nNeutralJet[iJet];
-      thisJet.eMuons = eMuonsJet[iJet]/thisJet.Energy();
-      thisJet.eElectrons = eElectronsJet[iJet]/thisJet.Energy();
-
-      thisJet.trackCountingHighEffBJetTag = trackCountingHighEffBJetTagJet[iJet];
-      thisJet.trackCountingHighPurBJetTag = trackCountingHighPurBJetTagJet[iJet];
-      thisJet.simpleSecondaryVertexHighEffBJetTag = simpleSecondaryVertexHighEffBJetTagJet[iJet];
-      thisJet.simpleSecondaryVertexHighPurBJetTag = simpleSecondaryVertexHighPurBJetTagJet[iJet];
-      thisJet.jetBProbabilityBJetTag              = jetBProbabilityBJetTagJet[iJet];
-      thisJet.jetProbabilityBJetTag               = jetProbabilityBJetTagJet[iJet];
-
-      thisJet.QGLikelihood               = QGLikelihoodJet[iJet];
-
-      thisJet.ptGen = ptGenJet[iJet];
-      thisJet.etaGen = etaGenJet[iJet];
-      thisJet.phiGen = phiGenJet[iJet];
-      thisJet.eGen = eGenJet[iJet];
-
-      //match to parton:
-      int partFlavor=0;
-      float deltaRmin=999.;
-      for(unsigned iPart=0; iPart<nPart; ++iPart ) {
-        if( !( fabs(pdgIdPart[iPart])<6 || pdgIdPart[iPart]==21) ) continue;
-        if( statusPart[iPart]!=2 ) continue;
-        TLorentzVector thisPart;
-        thisPart.SetPtEtaPhiE( ptPart[iPart], etaPart[iPart], phiPart[iPart], ePart[iPart] );
-        float thisDeltaR = thisJet.DeltaR(thisPart);
-        if( thisDeltaR<deltaRmin ) {
-          partFlavor = pdgIdPart[iPart];
-          deltaRmin = thisDeltaR;
-        }
-      }
-      thisJet.pdgIdPart = partFlavor;
 
 
-      AnalysisJet* newJet = new AnalysisJet(thisJet);
-      jets.push_back(*newJet);
-
-    } //for additional jets
-
-
-    if( event==DEBUG_EVENTNUMBER ) {
-      std::cout << std::endl << std::endl << "----------------------------------" << std::endl;
-      std::cout << "-> JETS PASSING REQUIREMENTS: " << std::endl;
-      for( unsigned ijet=0; ijet<jets.size(); ++ijet ) 
-        std::cout << ijet << "  Pt: " << jets[ijet].Pt() << " \tEta: " << jets[ijet].Eta() << std::endl;
-    }
+//  if( event==DEBUG_EVENTNUMBER ) {
+//    std::cout << std::endl << std::endl << "----------------------------------" << std::endl;
+//    std::cout << "-> JETS PASSING REQUIREMENTS: " << std::endl;
+//    for( unsigned ijet=0; ijet<jets.size(); ++ijet ) 
+//      std::cout << ijet << "  Pt: " << jets[ijet].Pt() << " \tEta: " << jets[ijet].Eta() << std::endl;
+//  }
     
  
         
-    if( jets.size()<4 ) continue;
-
-
 
 
     // -------------------------
@@ -909,150 +1073,150 @@ ofstream ofs("run_event.txt");
 
 
 
-    // -------------
-    // KINEMATIC FIT
-    // -------------
-  
-    std::pair<TLorentzVector,TLorentzVector> jets_kinfit = fitter_jets->fit(jets[2], jets[3]);
+//  // -------------
+//  // KINEMATIC FIT
+//  // -------------
+//
+//  std::pair<TLorentzVector,TLorentzVector> jets_kinfit = fitter_jets->fit(jets[2], jets[3]);
 
-    float chiSquareProb = TMath::Prob(fitter_jets->getS(), fitter_jets->getNDF());
-    h1_kinfit_chiSquare->Fill( fitter_jets->getS()/fitter_jets->getNDF(), eventWeight ); 
-    h1_kinfit_chiSquareProb->Fill( chiSquareProb, eventWeight );
-
-
-    
-    float bTaggerJet1, bTaggerJet2;
-    if( bTaggerType_=="TCHE" ) {
-      bTaggerJet1 = jets[0].trackCountingHighEffBJetTag;
-      bTaggerJet2 = jets[1].trackCountingHighEffBJetTag;
-    } else if( bTaggerType_=="SSVHE" ) {
-      bTaggerJet1 = jets[0].simpleSecondaryVertexHighEffBJetTag;
-      bTaggerJet2 = jets[1].simpleSecondaryVertexHighEffBJetTag;
-    }
-
-    if( event==DEBUG_EVENTNUMBER ) {
-      std::cout << std::endl << "-- FOUND JETS: " << std::endl;
-      std::cout << "jet1: \tpt:" << jets[0].Pt() << " \teta: " << jets[0].Eta() << "\tbtag: " << bTaggerJet1 << std::endl;
-      std::cout << "jet2: \tpt:" << jets[1].Pt() << " \teta: " << jets[1].Eta() << "\tbtag: " << bTaggerJet2 << std::endl;
-      std::cout << "jet3: \tpt:" << jets[2].Pt() << " \teta: " << jets[2].Eta() << std::endl;
-      std::cout << "jet4: \tpt:" << jets[3].Pt() << " \teta: " << jets[3].Eta() << std::endl;
-    }
+//  float chiSquareProb = TMath::Prob(fitter_jets->getS(), fitter_jets->getNDF());
+//  h1_kinfit_chiSquare->Fill( fitter_jets->getS()/fitter_jets->getNDF(), eventWeight ); 
+//  h1_kinfit_chiSquareProb->Fill( chiSquareProb, eventWeight );
 
 
-    h1_bTagJet1->Fill( bTaggerJet1, eventWeight );
-    h1_bTagJet2->Fill( bTaggerJet2, eventWeight );
+//  
+//  float bTaggerJet1, bTaggerJet2;
+//  if( bTaggerType_=="TCHE" ) {
+//    bTaggerJet1 = jets[0].trackCountingHighEffBJetTag;
+//    bTaggerJet2 = jets[1].trackCountingHighEffBJetTag;
+//  } else if( bTaggerType_=="SSVHE" ) {
+//    bTaggerJet1 = jets[0].simpleSecondaryVertexHighEffBJetTag;
+//    bTaggerJet2 = jets[1].simpleSecondaryVertexHighEffBJetTag;
+//  }
 
-    if( !(this->passedBTag( bTaggerJet1, bTaggerJet2, bTaggerType_ ) ) ) continue;
-    //if( bTaggerJet1<btag_threshold && bTaggerJet2<btag_threshold ) continue;
-
-
-    h1_leptType->Fill( leptType, eventWeight );
-
-    h1_ptLept1->Fill( Lept1.Pt(), eventWeight );
-    h1_ptLept2->Fill( Lept2.Pt(), eventWeight );
-    h1_etaLept1->Fill( Lept1.Eta(), eventWeight );
-    h1_etaLept2->Fill( Lept2.Eta(), eventWeight );
-    if( leptTypeLept1==0 ) {
-      h1_etaMu->Fill( Lept1.Eta(), eventWeight );
-    } else {
-      h1_etaEle->Fill( Lept1.Eta(), eventWeight );
-    }
-    if( leptTypeLept2==0 ) {
-      h1_etaMu->Fill( Lept2.Eta(), eventWeight );
-    } else {
-      h1_etaEle->Fill( Lept2.Eta(), eventWeight );
-    }
-    h1_combinedIsoRelLept1->Fill( combinedIsoRelLept1, eventWeight );
-    h1_combinedIsoRelLept2->Fill( combinedIsoRelLept2, eventWeight );
-
-    // these ones with no weight (for eff vs. PU):
-    h1_passedCombinedIsoRel015->Fill( rhoPF );
-    if( combinedIsoRelLept1<0.05 && combinedIsoRelLept2<0.05 ) 
-      h1_passedCombinedIsoRel005->Fill( rhoPF );
-
-    deltaRll = Lept1.DeltaR(Lept2);
-    h1_deltaRll->Fill( deltaRll, eventWeight );
+//  if( event==DEBUG_EVENTNUMBER ) {
+//    std::cout << std::endl << "-- FOUND JETS: " << std::endl;
+//    std::cout << "jet1: \tpt:" << jets[0].Pt() << " \teta: " << jets[0].Eta() << "\tbtag: " << bTaggerJet1 << std::endl;
+//    std::cout << "jet2: \tpt:" << jets[1].Pt() << " \teta: " << jets[1].Eta() << "\tbtag: " << bTaggerJet2 << std::endl;
+//    std::cout << "jet3: \tpt:" << jets[2].Pt() << " \teta: " << jets[2].Eta() << std::endl;
+//    std::cout << "jet4: \tpt:" << jets[3].Pt() << " \teta: " << jets[3].Eta() << std::endl;
+//  }
 
 
-    h1_nJets->Fill( jets.size(), eventWeight );
-    h1_pfMet->Fill( pfMet, eventWeight );
-    h1_metSignificance->Fill( metSignificance, eventWeight );
+//  h1_bTagJet1->Fill( bTaggerJet1, eventWeight );
+//  h1_bTagJet2->Fill( bTaggerJet2, eventWeight );
 
-    TLorentzVector v_met;
-    v_met.SetPtEtaPhiE( pfMet, 0., phiMet, pfMet );
-
-    float deltaPhiLept1_met = Lept1.DeltaPhi(v_met);
-    float deltaPhiLept2_met = Lept2.DeltaPhi(v_met);
-
-    float mT1 = sqrt( Lept1.Pt()*pfMet*(1.-cos(deltaPhiLept1_met)) );
-    float mT2 = sqrt( Lept2.Pt()*pfMet*(1.-cos(deltaPhiLept2_met)) );
-
-    h1_mT1->Fill( mT1, eventWeight );
-    h1_mT2->Fill( mT2, eventWeight );
-    h1_mTMax->Fill( TMath::Max(mT1, mT2), eventWeight );
-
-    h1_ptJet1->Fill( jets[0].Pt(), eventWeight );
-    h1_ptJet2->Fill( jets[1].Pt(), eventWeight );
-    h1_ptJet3->Fill( jets[2].Pt(), eventWeight );
-    h1_ptJet4->Fill( jets[3].Pt(), eventWeight );
-
-    h1_etaJet1->Fill( jets[0].Eta(), eventWeight );
-    h1_etaJet2->Fill( jets[1].Eta(), eventWeight );
-    h1_etaJet3->Fill( jets[2].Eta(), eventWeight );
-    h1_etaJet4->Fill( jets[3].Eta(), eventWeight );
-
-    h1_QGLikelihoodJet1->Fill( jets[0].QGLikelihood, eventWeight );
-    h1_QGLikelihoodJet2->Fill( jets[1].QGLikelihood, eventWeight );
-    h1_QGLikelihoodJet3->Fill( jets[2].QGLikelihood, eventWeight );
-    h1_QGLikelihoodJet4->Fill( jets[3].QGLikelihood, eventWeight );
-
-    h1_partFlavorJet1->Fill( jets[0].pdgIdPart, eventWeight );
-    h1_partFlavorJet2->Fill( jets[1].pdgIdPart, eventWeight );
-    h1_partFlavorJet3->Fill( jets[2].pdgIdPart, eventWeight );
-    h1_partFlavorJet4->Fill( jets[3].pdgIdPart, eventWeight );
+//  if( !(this->passedBTag( bTaggerJet1, bTaggerJet2, bTaggerType_ ) ) ) continue;
+//  //if( bTaggerJet1<btag_threshold && bTaggerJet2<btag_threshold ) continue;
 
 
-    TLorentzVector diJet_bb = jets[0] + jets[1];
-    TLorentzVector diJet_qq = jets[2] + jets[3];
+//  h1_leptType->Fill( leptType, eventWeight );
 
-    h1_mbb->Fill( diJet_bb.M(), eventWeight );
-    h1_mqq->Fill( diJet_qq.M(), eventWeight );
+//  h1_ptLept1->Fill( Lept1.Pt(), eventWeight );
+//  h1_ptLept2->Fill( Lept2.Pt(), eventWeight );
+//  h1_etaLept1->Fill( Lept1.Eta(), eventWeight );
+//  h1_etaLept2->Fill( Lept2.Eta(), eventWeight );
+//  if( leptTypeLept1==0 ) {
+//    h1_etaMu->Fill( Lept1.Eta(), eventWeight );
+//  } else {
+//    h1_etaEle->Fill( Lept1.Eta(), eventWeight );
+//  }
+//  if( leptTypeLept2==0 ) {
+//    h1_etaMu->Fill( Lept2.Eta(), eventWeight );
+//  } else {
+//    h1_etaEle->Fill( Lept2.Eta(), eventWeight );
+//  }
+//  h1_combinedIsoRelLept1->Fill( combinedIsoRelLept1, eventWeight );
+//  h1_combinedIsoRelLept2->Fill( combinedIsoRelLept2, eventWeight );
 
-    h1_ptbb->Fill( diJet_bb.Pt(), eventWeight );
-    h1_ptqq->Fill( diJet_qq.Pt(), eventWeight );
+//  // these ones with no weight (for eff vs. PU):
+//  h1_passedCombinedIsoRel015->Fill( rhoPF );
+//  if( combinedIsoRelLept1<0.05 && combinedIsoRelLept2<0.05 ) 
+//    h1_passedCombinedIsoRel005->Fill( rhoPF );
 
-    h1_deltaRbb->Fill( jets[0].DeltaR(jets[1]), eventWeight );
-    h1_deltaRqq->Fill( jets[2].DeltaR(jets[3]), eventWeight );
+//  deltaRll = Lept1.DeltaR(Lept2);
+//  h1_deltaRll->Fill( deltaRll, eventWeight );
 
 
-    float deltaR_b0_lept1 = jets[0].DeltaR(Lept1);
-    float deltaR_b0_lept2 = jets[0].DeltaR(Lept2);
-    float deltaR_b1_lept1 = jets[1].DeltaR(Lept1);
-    float deltaR_b1_lept2 = jets[1].DeltaR(Lept2);
+//  h1_nJets->Fill( jets.size(), eventWeight );
+//  h1_pfMet->Fill( pfMet, eventWeight );
+//  h1_metSignificance->Fill( metSignificance, eventWeight );
 
-    float deltaR_b0_lept_max, deltaR_b0_lept_min;
-    if( deltaR_b0_lept1>deltaR_b0_lept2 ) {
-      deltaR_b0_lept_max = deltaR_b0_lept1;
-      deltaR_b0_lept_min = deltaR_b0_lept2;
-    } else {
-      deltaR_b0_lept_min = deltaR_b0_lept1;
-      deltaR_b0_lept_max = deltaR_b0_lept2;
-    }
+//  TLorentzVector v_met;
+//  v_met.SetPtEtaPhiE( pfMet, 0., phiMet, pfMet );
 
-    float deltaR_b1_lept_max, deltaR_b1_lept_min;
-    if( deltaR_b1_lept1>deltaR_b1_lept2 ) {
-      deltaR_b1_lept_max = deltaR_b1_lept1;
-      deltaR_b1_lept_min = deltaR_b1_lept2;
-    } else {
-      deltaR_b1_lept_min = deltaR_b1_lept1;
-      deltaR_b1_lept_max = deltaR_b1_lept2;
-    }
+//  float deltaPhiLept1_met = Lept1.DeltaPhi(v_met);
+//  float deltaPhiLept2_met = Lept2.DeltaPhi(v_met);
 
-    float deltaR_b_lept_max = (deltaR_b1_lept_max>deltaR_b0_lept_max) ? deltaR_b1_lept_max : deltaR_b0_lept_max;
-    float deltaR_b_lept_min = (deltaR_b1_lept_min>deltaR_b0_lept_min) ? deltaR_b1_lept_min : deltaR_b0_lept_min;
+//  float mT1 = sqrt( Lept1.Pt()*pfMet*(1.-cos(deltaPhiLept1_met)) );
+//  float mT2 = sqrt( Lept2.Pt()*pfMet*(1.-cos(deltaPhiLept2_met)) );
 
-    h1_deltaR_b_lept_max->Fill(deltaR_b_lept_max, eventWeight);
-    h1_deltaR_b_lept_min->Fill(deltaR_b_lept_min, eventWeight);
+//  h1_mT1->Fill( mT1, eventWeight );
+//  h1_mT2->Fill( mT2, eventWeight );
+//  h1_mTMax->Fill( TMath::Max(mT1, mT2), eventWeight );
+
+//  h1_ptJet1->Fill( jets[0].Pt(), eventWeight );
+//  h1_ptJet2->Fill( jets[1].Pt(), eventWeight );
+//  h1_ptJet3->Fill( jets[2].Pt(), eventWeight );
+//  h1_ptJet4->Fill( jets[3].Pt(), eventWeight );
+
+//  h1_etaJet1->Fill( jets[0].Eta(), eventWeight );
+//  h1_etaJet2->Fill( jets[1].Eta(), eventWeight );
+//  h1_etaJet3->Fill( jets[2].Eta(), eventWeight );
+//  h1_etaJet4->Fill( jets[3].Eta(), eventWeight );
+
+//  h1_QGLikelihoodJet1->Fill( jets[0].QGLikelihood, eventWeight );
+//  h1_QGLikelihoodJet2->Fill( jets[1].QGLikelihood, eventWeight );
+//  h1_QGLikelihoodJet3->Fill( jets[2].QGLikelihood, eventWeight );
+//  h1_QGLikelihoodJet4->Fill( jets[3].QGLikelihood, eventWeight );
+
+//  h1_partFlavorJet1->Fill( jets[0].pdgIdPart, eventWeight );
+//  h1_partFlavorJet2->Fill( jets[1].pdgIdPart, eventWeight );
+//  h1_partFlavorJet3->Fill( jets[2].pdgIdPart, eventWeight );
+//  h1_partFlavorJet4->Fill( jets[3].pdgIdPart, eventWeight );
+
+
+//  TLorentzVector diJet_bb = jets[0] + jets[1];
+//  TLorentzVector diJet_qq = jets[2] + jets[3];
+
+//  h1_mbb->Fill( diJet_bb.M(), eventWeight );
+//  h1_mqq->Fill( diJet_qq.M(), eventWeight );
+
+//  h1_ptbb->Fill( diJet_bb.Pt(), eventWeight );
+//  h1_ptqq->Fill( diJet_qq.Pt(), eventWeight );
+
+//  h1_deltaRbb->Fill( jets[0].DeltaR(jets[1]), eventWeight );
+//  h1_deltaRqq->Fill( jets[2].DeltaR(jets[3]), eventWeight );
+
+
+//  float deltaR_b0_lept1 = jets[0].DeltaR(Lept1);
+//  float deltaR_b0_lept2 = jets[0].DeltaR(Lept2);
+//  float deltaR_b1_lept1 = jets[1].DeltaR(Lept1);
+//  float deltaR_b1_lept2 = jets[1].DeltaR(Lept2);
+
+//  float deltaR_b0_lept_max, deltaR_b0_lept_min;
+//  if( deltaR_b0_lept1>deltaR_b0_lept2 ) {
+//    deltaR_b0_lept_max = deltaR_b0_lept1;
+//    deltaR_b0_lept_min = deltaR_b0_lept2;
+//  } else {
+//    deltaR_b0_lept_min = deltaR_b0_lept1;
+//    deltaR_b0_lept_max = deltaR_b0_lept2;
+//  }
+
+//  float deltaR_b1_lept_max, deltaR_b1_lept_min;
+//  if( deltaR_b1_lept1>deltaR_b1_lept2 ) {
+//    deltaR_b1_lept_max = deltaR_b1_lept1;
+//    deltaR_b1_lept_min = deltaR_b1_lept2;
+//  } else {
+//    deltaR_b1_lept_min = deltaR_b1_lept1;
+//    deltaR_b1_lept_max = deltaR_b1_lept2;
+//  }
+
+//  float deltaR_b_lept_max = (deltaR_b1_lept_max>deltaR_b0_lept_max) ? deltaR_b1_lept_max : deltaR_b0_lept_max;
+//  float deltaR_b_lept_min = (deltaR_b1_lept_min>deltaR_b0_lept_min) ? deltaR_b1_lept_min : deltaR_b0_lept_min;
+
+//  h1_deltaR_b_lept_max->Fill(deltaR_b_lept_max, eventWeight);
+//  h1_deltaR_b_lept_min->Fill(deltaR_b_lept_min, eventWeight);
 
 
     ptLept1_t = Lept1.Pt();
@@ -1060,23 +1224,10 @@ ofstream ofs("run_event.txt");
     etaLept1_t = Lept1.Eta();
     etaLept2_t = Lept2.Eta();
 
-    ptJet1_t = jets[0].Pt();
-    ptJet2_t = jets[1].Pt();
-    ptJet3_t = jets[2].Pt();
-    ptJet4_t = jets[3].Pt();
-
-    bTagJet1_t = bTaggerJet1;
-    bTagJet2_t = bTaggerJet2;
-
-    etaJet1_t = jets[0].Eta();
-    etaJet2_t = jets[1].Eta();
-    etaJet3_t = jets[2].Eta();
-    etaJet4_t = jets[3].Eta();
-
-    QGLikelihoodJet1_t = jets[0].QGLikelihood;
-    QGLikelihoodJet2_t = jets[1].QGLikelihood;
-    QGLikelihoodJet3_t = jets[2].QGLikelihood;
-    QGLikelihoodJet4_t = jets[3].QGLikelihood;
+//  QGLikelihoodJet1_t = jets[0].QGLikelihood;
+//  QGLikelihoodJet2_t = jets[1].QGLikelihood;
+//  QGLikelihoodJet3_t = jets[2].QGLikelihood;
+//  QGLikelihoodJet4_t = jets[3].QGLikelihood;
 
 
 
@@ -1087,6 +1238,15 @@ ofstream ofs("run_event.txt");
 
   
   } //for entries
+
+
+
+  std::cout << std::endl << std::endl;
+  std::cout << "Jet choice: " << jetChoice_ << std::endl;
+  std::cout << "Found correct pair 0 in " << foundCorrectJetPair0 << "/" << nPairsTot0 << " = " << (float)100.*foundCorrectJetPair0/nPairsTot0 << "% of cases." << std::endl;
+  std::cout << "Found correct pair 1 in " << foundCorrectJetPair1 << "/" << nPairsTot1 << " = " << (float)100.*foundCorrectJetPair1/nPairsTot1 << "% of cases." << std::endl;
+  std::cout << "**MATCHED** Found correct pair 0 in " << foundCorrectJetPair0_matched << "/" << nPairsTot0_matched << " = " << (float)100.*foundCorrectJetPair0_matched/nPairsTot0_matched << "% of cases." << std::endl;
+  std::cout << "**MATCHED** Found correct pair 1 in " << foundCorrectJetPair1_matched << "/" << nPairsTot1_matched << " = " << (float)100.*foundCorrectJetPair1_matched/nPairsTot1_matched << "% of cases." << std::endl;
 
 
 
@@ -1122,79 +1282,90 @@ ofstream ofs("run_event.txt");
 
   h1_leptType->Write();
 
-  h1_pfMet->Write();
-
-  h1_mT1->Write();
-  h1_mT2->Write();
-  h1_mTMax->Write();
-
-  h1_metSignificance->Write();
-
-
-  h1_rhoPF_presel->Write();
-  h1_rhoPF->Write();
-
-  
-
-  h1_ptLept1->Write();
-  h1_ptLept2->Write();
-  h1_etaLept1->Write();
-  h1_etaLept2->Write();
-  h1_combinedIsoRelLept1->Write();
-  h1_combinedIsoRelLept2->Write();
-
-  h1_passedCombinedIsoRel015->Write();
-  h1_passedCombinedIsoRel005->Write();
-
-  h1_etaMu->Write();
-  h1_etaEle->Write();
-
-
-  h1_deltaRll->Write();
-
-
+  h1_nSignalJets->Write();
 
   h1_nJets->Write();
+  h1_nBJets->Write();
+
+  h1_mjj0->Write();
+  h1_mjj1->Write();
+
+  h1_mjjDiff->Write();
+  h1_mjjSum->Write();
+
+//h1_pfMet->Write();
+
+//h1_mT1->Write();
+//h1_mT2->Write();
+//h1_mTMax->Write();
+
+//h1_metSignificance->Write();
 
 
-  h1_bTagJet1->Write();
-  h1_bTagJet2->Write();
+//h1_rhoPF_presel->Write();
+//h1_rhoPF->Write();
 
-  h1_kinfit_chiSquare->Write();
-  h1_kinfit_chiSquareProb->Write();
+//
 
-  h1_ptJet1->Write();
-  h1_ptJet2->Write();
-  h1_ptJet3->Write();
-  h1_ptJet4->Write();
+//h1_ptLept1->Write();
+//h1_ptLept2->Write();
+//h1_etaLept1->Write();
+//h1_etaLept2->Write();
+//h1_combinedIsoRelLept1->Write();
+//h1_combinedIsoRelLept2->Write();
 
-  h1_etaJet1->Write();
-  h1_etaJet2->Write();
-  h1_etaJet3->Write();
-  h1_etaJet4->Write();
+//h1_passedCombinedIsoRel015->Write();
+//h1_passedCombinedIsoRel005->Write();
 
-  h1_QGLikelihoodJet1->Write();
-  h1_QGLikelihoodJet2->Write();
-  h1_QGLikelihoodJet3->Write();
-  h1_QGLikelihoodJet4->Write();
-
-  h1_partFlavorJet1->Write();
-  h1_partFlavorJet2->Write();
-  h1_partFlavorJet3->Write();
-  h1_partFlavorJet4->Write();
+//h1_etaMu->Write();
+//h1_etaEle->Write();
 
 
-  h1_deltaRbb->Write();
-  h1_deltaRqq->Write();
+//h1_deltaRll->Write();
 
-  h1_deltaR_b_lept_max->Write();
-  h1_deltaR_b_lept_min->Write();
 
-  h1_mbb->Write();
-  h1_mqq->Write();
-  
-  h1_ptbb->Write();
-  h1_ptqq->Write();
+
+//h1_nJets->Write();
+
+
+//h1_bTagJet1->Write();
+//h1_bTagJet2->Write();
+
+//h1_kinfit_chiSquare->Write();
+//h1_kinfit_chiSquareProb->Write();
+
+//h1_ptJet1->Write();
+//h1_ptJet2->Write();
+//h1_ptJet3->Write();
+//h1_ptJet4->Write();
+
+//h1_etaJet1->Write();
+//h1_etaJet2->Write();
+//h1_etaJet3->Write();
+//h1_etaJet4->Write();
+
+//h1_QGLikelihoodJet1->Write();
+//h1_QGLikelihoodJet2->Write();
+//h1_QGLikelihoodJet3->Write();
+//h1_QGLikelihoodJet4->Write();
+
+//h1_partFlavorJet1->Write();
+//h1_partFlavorJet2->Write();
+//h1_partFlavorJet3->Write();
+//h1_partFlavorJet4->Write();
+
+
+//h1_deltaRbb->Write();
+//h1_deltaRqq->Write();
+
+//h1_deltaR_b_lept_max->Write();
+//h1_deltaR_b_lept_min->Write();
+
+//h1_mbb->Write();
+//h1_mqq->Write();
+//
+//h1_ptbb->Write();
+//h1_ptqq->Write();
   
 
   outFile_->Close();
@@ -1208,173 +1379,37 @@ void Ntp1Finalizer_TTW::setSelectionType( const std::string& selectionType ) {
 
   selectionType_ = selectionType;
 
+
+  ptLept1_thresh_ = 20.;
+  ptLept2_thresh_ = 20.;
+  etaLept1_thresh_ = 3.;
+  etaLept2_thresh_ = 3.;
+
+  mll_thresh_ = 8.;
+
+  pfMet_thresh_ = 0.;
+  ht_thresh_ = 0.;
+
+  nbjets_thresh_ = 0;
+  nbjetsmed_thresh_ = 0;
+  njets_thresh_ = 0;
+
+  ptJet_thresh_ = 20.;
+  etaJet_thresh_ = 2.4;
+
+
   if( selectionType_=="presel" ) {
 
-    ptLept1_thresh_ = 20.;
-    ptLept2_thresh_ = 20.;
-    etaLept1_thresh_ = 3.;
-    etaLept2_thresh_ = 3.;
-    combRelIsoLept1_thresh_ = 1.;
-    combRelIsoLept2_thresh_ = 1.;
-
-    mll_thresh_ = 8.;
-
-    pfMet_thresh_ = 0.;
-    ht_thresh_ = 0.;
-
-    btagSelectionType_ = "looseloose";
-
-    ptJet_thresh_ = 20.;
-    etaJet_thresh_ = 2.4;
-
-    ptJet1_thresh_ = 20.;
-    ptJet2_thresh_ = 20.;
-    ptJet3_thresh_ = 20.;
-    ptJet4_thresh_ = 20.;
-    etaJet1_thresh_ = 2.4;
-    etaJet2_thresh_ = 2.4;
-    etaJet3_thresh_ = 2.4;
-    etaJet4_thresh_ = 2.4;
+    // nothing to change
 
   } else if( selectionType_=="sel1" ) {
 
-    ptLept1_thresh_ = 20.;
-    ptLept2_thresh_ = 20.;
-    etaLept1_thresh_ = 3.;
-    etaLept2_thresh_ = 3.;
-    combRelIsoLept1_thresh_ = 1.;
-    combRelIsoLept2_thresh_ = 1.;
+    ptLept1_thresh_ = 55.;
+    ptLept2_thresh_ = 30.;
 
-    mll_thresh_ = 8.;
-
-    pfMet_thresh_ = 40.;
-    ht_thresh_ = 0.;
-
-    btagSelectionType_ = "loosemed";
-
-    ptJet_thresh_ = 20.;
-    etaJet_thresh_ = 2.4;
-
-    ptJet1_thresh_ = 20.;
-    ptJet2_thresh_ = 20.;
-    ptJet3_thresh_ = 20.;
-    ptJet4_thresh_ = 20.;
-    etaJet1_thresh_ = 5.;
-    etaJet2_thresh_ = 5.;
-    etaJet3_thresh_ = 5.;
-    etaJet4_thresh_ = 5.;
-
-  } else if( selectionType_=="sel2" ) {
-
-    ptLept1_thresh_ = 40.;
-    ptLept2_thresh_ = 20.;
-    etaLept1_thresh_ = 3.;
-    etaLept2_thresh_ = 3.;
-    combRelIsoLept1_thresh_ = 1.;
-    combRelIsoLept2_thresh_ = 1.;
-
-    mll_thresh_ = 8.;
-
-    pfMet_thresh_ = 0.;
-    ht_thresh_ = 0.;
-
-    btagSelectionType_ = "loosemed";
-
-    ptJet_thresh_ = 20.;
-    etaJet_thresh_ = 2.4;
-
-    ptJet1_thresh_ = 20.;
-    ptJet2_thresh_ = 20.;
-    ptJet3_thresh_ = 20.;
-    ptJet4_thresh_ = 20.;
-    etaJet1_thresh_ = 5.;
-    etaJet2_thresh_ = 5.;
-    etaJet3_thresh_ = 5.;
-    etaJet4_thresh_ = 5.;
-
-  } else if( selectionType_=="sel3" ) {
-
-    ptLept1_thresh_ = 40.;
-    ptLept2_thresh_ = 40.;
-    etaLept1_thresh_ = 3.;
-    etaLept2_thresh_ = 3.;
-    combRelIsoLept1_thresh_ = 1.;
-    combRelIsoLept2_thresh_ = 1.;
-
-    mll_thresh_ = 8.;
-
-    pfMet_thresh_ = 0.;
-    ht_thresh_ = 0.;
-
-    btagSelectionType_ = "looseloose";
-
-    ptJet_thresh_ = 20.;
-    etaJet_thresh_ = 2.4;
-
-    ptJet1_thresh_ = 20.;
-    ptJet2_thresh_ = 20.;
-    ptJet3_thresh_ = 20.;
-    ptJet4_thresh_ = 20.;
-    etaJet1_thresh_ = 5.;
-    etaJet2_thresh_ = 5.;
-    etaJet3_thresh_ = 5.;
-    etaJet4_thresh_ = 5.;
-
-  } else if( selectionType_=="sel4" ) {
-
-    ptLept1_thresh_ = 75.;
-    ptLept2_thresh_ = 24.;
-    etaLept1_thresh_ = 3.;
-    etaLept2_thresh_ = 3.;
-    combRelIsoLept1_thresh_ = 0.05;
-    combRelIsoLept2_thresh_ = 0.05;
-
-    mll_thresh_ = 8.;
-
-    pfMet_thresh_ = 40.;
-    ht_thresh_ = 0.;
-
-    btagSelectionType_ = "loosenone";
-
-    ptJet_thresh_ = 20.;
-    etaJet_thresh_ = 2.4;
-
-    ptJet1_thresh_ = 20.;
-    ptJet2_thresh_ = 20.;
-    ptJet3_thresh_ = 20.;
-    ptJet4_thresh_ = 20.;
-    etaJet1_thresh_ = 5.;
-    etaJet2_thresh_ = 5.;
-    etaJet3_thresh_ = 5.;
-    etaJet4_thresh_ = 5.;
-
-  } else if( selectionType_=="sel5" ) {
-
-    ptLept1_thresh_ = 54.;
-    ptLept2_thresh_ = 23.;
-    etaLept1_thresh_ = 3.;
-    etaLept2_thresh_ = 3.;
-    combRelIsoLept1_thresh_ = 0.05;
-    combRelIsoLept2_thresh_ = 0.05;
-
-    mll_thresh_ = 8.;
-
-    pfMet_thresh_ = 30.;
-    ht_thresh_ = 56.;
-
-    btagSelectionType_ = "loosenone";
-
-    ptJet_thresh_ = 20.;
-    etaJet_thresh_ = 2.4;
-
-    ptJet1_thresh_ = 20.;
-    ptJet2_thresh_ = 20.;
-    ptJet3_thresh_ = 20.;
-    ptJet4_thresh_ = 20.;
-    etaJet1_thresh_ = 5.;
-    etaJet2_thresh_ = 5.;
-    etaJet3_thresh_ = 5.;
-    etaJet4_thresh_ = 5.;
+    njets_thresh_ = 3;
+    nbjetsmed_thresh_ = 1;
+    ht_thresh_ = 100.;
 
   } else {
 
@@ -1389,39 +1424,257 @@ void Ntp1Finalizer_TTW::setSelectionType( const std::string& selectionType ) {
 
 
 
-bool Ntp1Finalizer_TTW::passedBTag( float btag1, float btag2, const std::string& btagger ) {
+//bool Ntp1Finalizer_TTW::passedBTag( float btag1, float btag2, const std::string& btagger ) {
+//
+//  float loose_thresh = -99999.;
+//  float med_thresh = -99999.;
+//
+//  if( btagger=="TCHE" ) {
+//    loose_thresh = 1.7;
+//    med_thresh = 3.3;
+//  } else if( btagger=="JP" ) {
+//    loose_thresh = 
+//    med_thresh = 3.3;
+//  } else if( btagger=="SSVHE" ) {
+//    med_thresh = 2.0;
+//  }
+//
+//
+//  bool returnBool = false;
+//
+//  if( btagSelectionType_=="looseloose" ) {
+//
+//    returnBool = ( btag1>loose_thresh && btag2>loose_thresh );  
+//
+//  } else if( btagSelectionType_=="loosemed" ) {
+//
+//    returnBool = ( (btag1>med_thresh && btag2>loose_thresh) || (btag1>loose_thresh && btag2>med_thresh) );  
+//
+//  } else if( btagSelectionType_=="medmed" ) {
+//
+//    returnBool = ( btag1>med_thresh && btag2>med_thresh );  
+// 
+//  } else if( btagSelectionType_=="loosenone" ) {
+//
+//    returnBool = ( btag1>loose_thresh || btag2>loose_thresh );  
+// 
+//  }
+//
+//  return returnBool;
+//
+//}
 
-  float loose_thresh = -99999.;
-  float med_thresh = -99999.;
-
-  if( btagger=="TCHE" ) {
-    loose_thresh = 1.7;
-    med_thresh = 3.3;
-  } else if( btagger=="SSVHE" ) {
-    med_thresh = 2.0;
-  }
 
 
-  bool returnBool = false;
+bool isMatchedPair( AnalysisJet *jet1, AnalysisJet *jet2 ) {
 
-  if( btagSelectionType_=="looseloose" ) {
 
-    returnBool = ( btag1>loose_thresh && btag2>loose_thresh );  
+  // jet 1
+  if( !isMatchedToPart(*jet1) ) return false;
+//std::cout << "passed deltaR" << std::endl;
+//std::cout << "jet 1 part pdg id: " << jet1->pdgIdPart << std::endl;
+  if( abs(jet1->pdgIdPart) > 4 ) return false; // only udsc
+//std::cout << "passed jet1 part pdg id" << std::endl;
+//std::cout << "jet 1 part mom pdg id: " << jet1->pdgIdPartMom << std::endl;
+  if( abs(jet1->pdgIdPartMom) != 24 ) return false; // only W->jj
+//std::cout << "passed jet1 part mom pdg id" << std::endl;
 
-  } else if( btagSelectionType_=="loosemed" ) {
+  // jet 2
+  if( !isMatchedToPart(*jet2) ) return false;
+//std::cout << "jet 2 part pdg id: " << jet2->pdgIdPart << std::endl;
+  if( abs(jet2->pdgIdPart) > 4 ) return false; // only udsc
+//std::cout << "passed jet2 part pdg id" << std::endl;
+//std::cout << "jet 2 part mom pdg id: " << jet2->pdgIdPartMom << std::endl;
 
-    returnBool = ( (btag1>med_thresh && btag2>loose_thresh) || (btag1>loose_thresh && btag2>med_thresh) );  
+  // compare moms (for info on your mom, see http://i.imgur.com/SFfXU.gif)
+  //std::cout << "same mom? " << jet1->pdgIdPartMom << " " <<  jet2->pdgIdPartMom << std::endl;
+  if( jet1->pdgIdPartMom != jet2->pdgIdPartMom ) return false; // same W
+  //std::cout << "same mommom? " << jet1->pdgIdPartMomMom << " " <<  jet2->pdgIdPartMomMom << std::endl;
+  if( jet1->pdgIdPartMomMom != jet2->pdgIdPartMomMom ) return false; // same W
 
-  } else if( btagSelectionType_=="medmed" ) {
-
-    returnBool = ( btag1>med_thresh && btag2>med_thresh );  
- 
-  } else if( btagSelectionType_=="loosenone" ) {
-
-    returnBool = ( btag1>loose_thresh || btag2>loose_thresh );  
- 
-  }
-
-  return returnBool;
+  return true;
 
 }
+
+
+
+bool isMatchedToPart( AnalysisJet jet ) {
+
+  TLorentzVector part;
+  part.SetPtEtaPhiE( jet.ptPart, jet.etaPart, jet.phiPart, jet.ePart );
+
+  float deltaR = jet.DeltaR(part);
+
+  return (deltaR<0.5);
+
+}
+
+
+
+
+std::vector<int> getJets( const std::string& choice, std::vector< AnalysisJet > jets ) {
+
+
+  std::vector<int> firstPair  = getSingleJetPair( choice, jets );
+  std::vector<int> secondPair = getSingleJetPair( choice, jets, &firstPair );
+
+  std::vector<int> returnIndexes;
+  returnIndexes.push_back(firstPair[0]);
+  returnIndexes.push_back(firstPair[1]);
+  returnIndexes.push_back(secondPair[0]);
+  returnIndexes.push_back(secondPair[1]);
+
+  return returnIndexes;
+
+}
+
+
+
+std::vector<int> getSingleJetPair( const std::string& choice, std::vector<AnalysisJet> jets, std::vector<int> *vetoIndexes ) {
+
+  
+  std::vector<int> jetIndexes;
+  
+  if( choice == "leading" ) {
+
+    for( unsigned iJet=0; iJet<jets.size() && jetIndexes.size()<2; ++iJet ) {
+
+      if( matchedToVeto( iJet, vetoIndexes ) ) continue;
+
+      jetIndexes.push_back(iJet);
+
+    }
+  
+  } else if( choice == "closestToLead" ) {
+  
+
+    float deltaRmin = 999.;
+    int indexJet0 = -1;
+    int indexJet1 = -1;
+  
+    // start from hardest, take closest
+    for( unsigned iJet=0; iJet<jets.size(); ++iJet ) {
+
+      if( matchedToVeto( iJet, vetoIndexes ) ) continue;
+  
+      if( indexJet0==-1 ) {
+
+        indexJet0 = iJet; //hardest non-vetoed jet
+
+      } else { //find closest
+
+        float thisDeltaR = jets[iJet].DeltaR(jets[indexJet0]);
+    
+        if( thisDeltaR<deltaRmin ) {
+          deltaRmin = thisDeltaR;
+          indexJet1 = iJet;
+        }
+    
+      } //for jets i - looking for closest
+
+    }
+
+    jetIndexes.push_back(indexJet0);
+    jetIndexes.push_back(indexJet1);
+
+  
+  } else if( choice == "closest" ) {
+  
+    float deltaRmin = 999.;
+    int indexJet0 = -1;
+    int indexJet1 = -1;
+  
+    for( unsigned iJet=0; iJet<jets.size(); ++iJet ) {
+
+      if( matchedToVeto( iJet, vetoIndexes ) ) continue;
+
+      for( unsigned jJet=iJet+1; jJet<jets.size(); ++jJet ) {
+  
+        if( matchedToVeto( jJet, vetoIndexes ) ) continue;
+
+        float thisDeltaR = jets[iJet].DeltaR(jets[jJet]);
+  
+        if( thisDeltaR<deltaRmin ) {
+          deltaRmin = thisDeltaR;
+          indexJet0 = iJet;
+          indexJet1 = jJet;
+        }
+  
+      } //for jets j - looking for closest
+    } //for jets i - looking for closest
+
+    jetIndexes.push_back(indexJet0);
+    jetIndexes.push_back(indexJet1);
+
+  
+  } else if( choice == "bestWmass" ) {
+  
+    float closestMass = 10000.;
+    float wMass = 80.4;
+  
+    int indexJet0 = -1;
+    int indexJet1 = -1;
+  
+    for( unsigned iJet=0; iJet<jets.size(); ++iJet ) {
+
+      if( matchedToVeto( iJet, vetoIndexes ) ) continue;
+
+      for( unsigned jJet=iJet+1; jJet<jets.size(); ++jJet ) {
+  
+        if( matchedToVeto( iJet, vetoIndexes ) ) continue;
+
+        TLorentzVector thisDiJet = jets[iJet] + jets[jJet];
+        float thisMass = thisDiJet.M();
+  
+        if( fabs(thisMass-wMass)<fabs(closestMass-wMass) ) {
+          closestMass = thisMass;
+          indexJet0 = iJet;
+          indexJet1 = jJet;
+        }
+  
+      } //for jets j - looking for closest
+    } //for jets i - looking for closest
+  
+    jetIndexes.push_back(indexJet0);
+    jetIndexes.push_back(indexJet1);
+
+
+  } else {
+  
+    std::cout << "Unkown jet choice criterium: '" << choice << "'. Exiting." << std::endl;
+    exit(3939);
+  
+  } // jet choice
+   
+  
+  
+  return jetIndexes;
+
+}
+
+
+
+
+bool matchedToVeto( int iJet, std::vector<int> *vetoIndexes ) {
+
+  if( vetoIndexes==0 ) return false;
+
+  for( unsigned iVeto=0; iVeto<vetoIndexes->size(); ++iVeto ) 
+    if( iJet==vetoIndexes->at(iVeto) ) return true;
+
+  return false;
+
+}
+
+
+
+bool isSignalJet( AnalysisJet jet ) {
+
+  if( !isMatchedToPart(jet) ) return false;
+  if( abs(jet.pdgIdPart) > 4 ) return false; // only udsc
+  if( abs(jet.pdgIdPartMom) != 24 ) return false; // only W->jj
+
+  return true;
+
+}
+
