@@ -137,6 +137,7 @@ class DrawBase {
 
   float get_lumi() const { return lumi_; };
   LegendBox get_legendBox( int legendQuadrant=1, const std::vector<std::string>* legendNames=0 ) const;
+  TPaveText* get_labelTop() { return this->get_labelSqrt(); };
   TPaveText* get_labelCMS( int legendQuadrant=0 ) const;
   TPaveText* get_labelCMStop( bool wide=false ) const;
   TPaveText* get_labelSqrt( int legendQuadrant=0 ) const;
