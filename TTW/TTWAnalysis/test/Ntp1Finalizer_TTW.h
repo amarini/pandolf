@@ -9,7 +9,7 @@
 
 #include "Ntp1Finalizer.h"
 #include "AnalysisJet.h"
-#include "BTagSFUtil/BTagSFUtil.h"
+#include "BTagSFUtil/interface/BTagSFUtil.h"
 
 
 
@@ -17,7 +17,7 @@ class Ntp1Finalizer_TTW : public Ntp1Finalizer {
 
  public:
 
-  Ntp1Finalizer_TTW( const std::string& dataset, const std::string& selectionType, const std::string& bTaggerType="TCHE", const std::string& leptType="ALL");
+  Ntp1Finalizer_TTW( const std::string& dataset, const std::string& selectionType, const std::string& jetChoice, const std::string& bTaggerType="JP");
   virtual ~Ntp1Finalizer_TTW() {};
 
   virtual void finalize();
@@ -33,26 +33,24 @@ class Ntp1Finalizer_TTW : public Ntp1Finalizer {
    std::string bTaggerType_;
    std::string leptType_;
 
+   std::string jetChoice_;
+
+   float mll_thresh_;
+
+   float ht_thresh_;
    float pfMet_thresh_;
+
+   int njets_thresh_;
+   int nbjets_thresh_;
+   int nbjetsmed_thresh_;
 
    float ptLept1_thresh_;
    float ptLept2_thresh_;
    float etaLept1_thresh_;
    float etaLept2_thresh_;
 
-   std::string btagSelectionType_;
-
    float ptJet_thresh_;
    float etaJet_thresh_;
-
-   float ptJet1_thresh_;
-   float ptJet2_thresh_;
-   float ptJet3_thresh_;
-   float ptJet4_thresh_;
-   float etaJet1_thresh_;
-   float etaJet2_thresh_;
-   float etaJet3_thresh_;
-   float etaJet4_thresh_;
 
 };
 
