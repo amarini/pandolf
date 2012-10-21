@@ -1412,12 +1412,12 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
       } else { //normalize each histo to its area
         // first: MC
         if( !noMC ) {
-          //Float_t mcIntegral_sum = mcHisto_sum->Integral();
-          Float_t mcIntegral_sum = mcHisto_sum->Integral(0, mcHisto_sum->GetNbinsX()+1);
+          Float_t mcIntegral_sum = mcHisto_sum->Integral();
+          //Float_t mcIntegral_sum = mcHisto_sum->Integral(0, mcHisto_sum->GetNbinsX()+1);
           mcHisto_sum->Scale( 1./mcIntegral_sum );
           for( unsigned i=0; i<mcHistos.size(); ++i ) {
-            //Float_t mcIntegral = mcHistos[i]->Integral();
-            Float_t mcIntegral = mcHistos[i]->Integral(0, mcHistos[i]->GetNbinsX()+1);
+            Float_t mcIntegral = mcHistos[i]->Integral();
+            //Float_t mcIntegral = mcHistos[i]->Integral(0, mcHistos[i]->GetNbinsX()+1);
             if( mcIntegral!=0. ) {
               if( noStack_ )
                 mcHistos[i]->Scale( 1./mcIntegral );
