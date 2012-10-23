@@ -235,7 +235,7 @@ float RedNtpFinalizer::get_crossSection(const std::string& dataset) const {
   } else if( dataset_tstr.Contains("DiPhotonBox_Pt-250ToInf_8TeV-pythia6") ) {
     xSection = 0.029038 * kfactordiphot;  
   } else if( dataset_tstr.Contains("DiPhotonJets_8TeV-madgraph") ) {
-    xSection = 81. * kfactordiphot;  
+    xSection = 81. * kfactordiphotmadgraph;  
   } else if( dataset_tstr.Contains("GJet_Pt-20to40_doubleEMEnriched_TuneZ2star_8TeV-pythia6") ) {
     xSection = 0.001835 * 81930.0 * kfactorgamjet; 
   } else if( dataset_tstr.Contains("GJet_Pt40_doubleEMEnriched_TuneZ2star_8TeV-pythia6") ) {
