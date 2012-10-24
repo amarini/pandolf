@@ -1,7 +1,7 @@
-Combination of datacard_trilepton_4channels.txt, datacard_TTWZ_split.txt
+Combination of datacard_trilepton_4channels.txt, datacard_ssdl_3channels.txt
 imax 7 number of bins
 jmax 6 number of processes minus 1
-kmax 16 number of nuisance parameters
+kmax 17 number of nuisance parameters
 ----------------------------------------------------------------------------------------------------------------------------------
 bin          ch1_bin1     ch1_bin2     ch1_bin3     ch1_bin4     ch2_bin1     ch2_bin2     ch2_bin3   
 observation  1.0          2.0          2.0          4.0          6.0          8.0          2.0        
@@ -11,6 +11,7 @@ process                         ttZ          bg           ttZ          bg       
 process                         -1           1            -1           1            -1           1            -1           1            0            2            3            4            5            0            2            3            4            5            0            2            3            4            5          
 rate                            0.7087       1.1663       0.8282       1.0150       0.7872       0.4211       0.9213       0.3219       2.0490       0.0000       0.1730       0.3870       0.5690       3.7170       0.5610       0.3710       0.7310       0.8740       1.7760       1.7000       0.6150       0.4060       2.4020     
 ----------------------------------------------------------------------------------------------------------------------------------
+NLO                     lnN     1.13         -            1.13         -            1.13         -            1.13         -            1.13         -            -            -            -            1.13         -            -            -            -            1.13         -            -            -            -          
 bgUnc_eee               lnN     -            1.64788      -            -            -            -            -            -            -            -            -            -            -            -            -            -            -            -            -            -            -            -            -          
 bgUnc_eem               lnN     -            -            -            1.1512       -            -            -            -            -            -            -            -            -            -            -            -            -            -            -            -            -            -            -          
 bgUnc_mme               lnN     -            -            -            -            -            1.18638      -            -            -            -            -            -            -            -            -            -            -            -            -            -            -            -            -          
