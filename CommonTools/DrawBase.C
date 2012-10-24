@@ -1246,6 +1246,101 @@ void DrawBase::drawHisto_fromTree( const std::string& treeName, const std::strin
 
 
 
+
+void DrawBase::draw2DHisto_fromTree( const std::string& treeName, const std::string& varName1, const std::string& varName2, const std::string& selection, int nBins1, float xMin1, float xMax1, int nBins2, float xMin2, float xMax2, const std::string& name, const std::string& axisName1, const std::string& axisName2, const std::string& units1, const std::string& units2, int legendQuadrant, const std::string& flags, const std::string& labelText) { 
+
+  // need this = true here. love these root features.
+  TH1F::AddDirectory(kTRUE);
+
+
+  bool noDATA = false;
+  bool noMC = false;
+
+
+  std::string histoName = name;
+  if( flags!="" ) histoName = histoName + "_" + flags;
+
+  std::string projectVarName = varName2 + ":" + varName1;
+
+  std::vector<TH2D*> mcHistos;
+  TTree* treeMC = (TTree*)mcFiles_[0].file->Get(treeName.c_str());
+  if( treeMC==0 ) {
+    std::cout << "Didn't find tree '" << treeName << "' in MC file: " << mcFiles_[0].file->GetName() << std::endl;
+    std::cout << "Skipping." << std::endl;
+  } else {
+    char histoNameMC[500];
+    sprintf(histoNameMC, "%sMC_0", name.c_str());
+    TH2D* mcHisto0 = new TH2D(histoNameMC, "", nBins1, xMin1, xMax1, nBins2, xMin2, xMax2);
+    treeMC->Project(histoNameMC, projectVarName.c_str(), selection.c_str());
+    mcHistos.push_back( mcHisto0 );
+  }
+
+  if( noDATA && noMC ) {
+    std::cout << "Didn't find histo '" << histoName << "'. Skipping." << std::endl;
+    return;
+  }
+
+
+  if( mcFiles_.size()>1 ) {
+    for( unsigned int iMC=1; iMC<mcFiles_.size(); iMC++ ) {
+      TTree* tree = (TTree*)mcFiles_[iMC].file->Get(treeName.c_str());
+      if( tree==0 ) {
+        std::cout << "Didn't find tree '" << treeName << "' in MC file: " << mcFiles_[iMC].file->GetName() << std::endl;
+        std::cout << "Skipping." << std::endl;
+        continue;
+      }
+      char histoNameMC[500];
+      sprintf(histoNameMC, "%sMC_%d", name.c_str(), iMC);
+      TH2D* newHisto = new TH2D(histoNameMC, "",  nBins1, xMin1, xMax1, nBins2, xMin2, xMax2);
+      tree->Project(histoNameMC, projectVarName.c_str(), selection.c_str());
+      mcHistos.push_back( newHisto );
+    } //for mc files
+  } // if mcfiles > 1
+
+
+
+  TCanvas* c1 = new TCanvas("c1", "", 600, 600);
+  c1->cd();
+
+  
+  std::string realAxisName1 = axisName1;
+  std::string realAxisName2 = axisName2;
+
+  if( units1!="" ) realAxisName1 += " [" + units1 + "]";
+  if( units2!="" ) realAxisName2 += " [" + units2 + "]";
+
+
+  TH2D* h2_axes = new TH2D("axes", "", nBins1, xMin1, xMax1, nBins2, xMin2, xMax2);
+  h2_axes->SetXTitle( realAxisName1.c_str() );
+  h2_axes->SetYTitle( realAxisName2.c_str() );
+
+  h2_axes->Draw();
+
+  for( unsigned i=0; i<mcHistos.size(); ++i ) {
+
+    mcHistos[i]->SetLineColor(mcFiles_[i].fillColor);
+    mcHistos[i]->Draw("box same");
+    std::cout << mcHistos[i]->GetEntries() << std::endl;
+
+  }
+
+  TPaveText* label = this->get_labelTop();
+  label->Draw("same");
+
+  gPad->RedrawAxis();
+
+  c1->SaveAs("prova.eps");
+
+  TFile* file = TFile::Open("prova.root", "recreate");
+  file->cd();
+  for( unsigned i=0; i<mcHistos.size(); ++i ) mcHistos[i]->Write();
+
+  file->Close();
+
+
+}
+
+
 void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<TH1D*> mcHistos, std::vector<TH1D*> mcHistos_superimp, const std::string& name, const std::string& axisName, const std::string& units, const std::string& instanceName, bool log_aussi, int legendQuadrant, const std::string& flags, const std::string& labelText, bool add_jetAlgoText  ) {
 
 
