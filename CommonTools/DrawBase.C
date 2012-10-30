@@ -1596,6 +1596,7 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
 
     if( xAxisMin_ != 9999. ) xMin = xAxisMin_;
     if( xAxisMax_ != 9999. ) xMax = xAxisMax_;
+    if( yAxisMax_ != 9999. ) yMax = yAxisMax_;
 
 
     bool noBinLabels=true;
@@ -1607,7 +1608,6 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
       h2_axes->GetYaxis()->SetTitleOffset(1.55);
       h2_axes->GetYaxis()->SetLabelSize(0.04);
     }
-    if( yAxisMax_ != 9999. ) h2_axes->GetYaxis()->SetRangeUser(yMin, yAxisMax_);
     if( getBinLabels_ ) {
       for( unsigned iBinx=1; iBinx<nBinsx+1; ++iBinx ) {
         if( refHisto->GetXaxis()->GetBinLabel(iBinx) != "" )
