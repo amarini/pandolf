@@ -106,6 +106,7 @@ class AnalysisJet : public TLorentzVector {
   //btags:
   float trackCountingHighEffBJetTag;
   float trackCountingHighPurBJetTag;
+  float combinedSecondaryVertexBJetTag;
   float simpleSecondaryVertexHighEffBJetTag;
   float simpleSecondaryVertexHighPurBJetTag;
   float jetBProbabilityBJetTag;
