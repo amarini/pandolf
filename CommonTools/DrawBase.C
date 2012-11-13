@@ -352,6 +352,7 @@ void DrawBase::reset() {
   yAxisMaxScaleLog_ = 5.;
 
   flags_ = "";
+  legendTitle_ = "";
 
 }
 
