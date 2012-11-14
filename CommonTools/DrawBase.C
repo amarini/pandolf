@@ -210,6 +210,8 @@ DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType
 
   lastHistos_mcHistoSum_=0;
 
+  displayEmptyDatasets_ = true;
+
 }
 
 
@@ -1586,10 +1588,13 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
       else 
         legend->AddEntry(dataHistos[i], (dataFiles_[i].legendName).c_str(), "P");
     for( unsigned i=0; i<mcHistos.size(); ++i )  {
-      if( mcFiles_[i].markerStyle==-1 )
-        legend->AddEntry(mcHistos[i], (mcFiles_[i].legendName).c_str(), "F");
-      else
-        legend->AddEntry(mcHistos[i], (mcFiles_[i].legendName).c_str(), "P");
+      if( mcFiles_[i].markerStyle==-1 ) {
+        if( mcHistos[i]->Integral()>0. || displayEmptyDatasets_ )
+          legend->AddEntry(mcHistos[i], (mcFiles_[i].legendName).c_str(), "F");
+      } else {
+        if( mcHistos[i]->Integral()>0. || displayEmptyDatasets_ )
+          legend->AddEntry(mcHistos[i], (mcFiles_[i].legendName).c_str(), "P");
+      }
     }
     for( unsigned i=0; i<mcHistos_superimp.size(); ++i ) 
       legend->AddEntry(mcHistos_superimp[i], (mcFiles_superimp_[i].legendName).c_str(), "L");
