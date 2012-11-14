@@ -131,6 +131,7 @@ class DrawBase {
   void set_mcWeight( int iFile, float weight );
   void set_mcWeight( const std::string& datasetName, float weight );
   void set_is7TeV( bool is7TeV ) { is7TeV_ = is7TeV; };
+  void set_displayEmptyDatasets( bool displayThem ) { displayEmptyDatasets_ = displayThem; };
   void add_label( const std::string& text, float xmin=0.23, float ymin=0.87, float xmax=0.36, float ymax=0.9, float textSize=0.035 );
   void delete_label();
 
@@ -232,6 +233,8 @@ class DrawBase {
 
   bool isCMSArticle_;
   bool lumiOnRightSide_;
+
+  bool displayEmptyDatasets_;
 
 };
 
