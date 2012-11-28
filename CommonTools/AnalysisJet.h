@@ -35,7 +35,9 @@ class AnalysisJet : public TLorentzVector {
   int nCharged; //DON'T USE
   int nNeutral; //DON'T USE
   float QGLikelihood;
+  float QGLikelihood2012;
   float QGLikelihoodNoPU;
+
   
   //extra QGL variables
   float axis1;
@@ -50,10 +52,12 @@ class AnalysisJet : public TLorentzVector {
   float pull_QC;
   float tana_QC;
 
-  float nChg_ptCut;
-  float nChg_QC;
-  float nChg_ptCut_QC;
-  float nNeutral_ptCut;
+  int nChg_ptCut;
+  int nChg_QC;
+  int nChg_ptCut_QC;
+  int nNeutral_ptCut;
+  int nPFCand_QC_ptCut;
+
   float Rchg;
   float Rneutral;
   float R;
@@ -111,6 +115,7 @@ class AnalysisJet : public TLorentzVector {
   float simpleSecondaryVertexHighPurBJetTag;
   float jetBProbabilityBJetTag;
   float jetProbabilityBJetTag;
+  float combinedSecondaryVertexBJetTag;
 
   float beta;
   float betaStar;
