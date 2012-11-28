@@ -10,7 +10,7 @@ TreeFinalizer::TreeFinalizer( const std::string& analyzerType, const std::string
   DEBUG_ = false;
 
 
-  tree_ = new TChain("jetTree");
+  tree_ = new TChain("reducedTree");
 
   analyzerType_ = analyzerType;
   inputAnalyzerType_ = analyzerType;
@@ -83,7 +83,7 @@ void TreeFinalizer::addInput( const std::string& dataset ) {
       std::cout << "Exiting." << std::endl;
       exit(77);
     }
-    std::string treeName = infileName +"/jetTree";
+    std::string treeName = infileName +"/reducedTree";
     tree_->Add(treeName.c_str());
     std::cout << "-> Added " << treeName << ". Tree has " << tree_->GetEntries() << " entries." << std::endl;
     infile->Close();
