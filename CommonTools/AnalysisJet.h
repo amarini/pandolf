@@ -115,7 +115,6 @@ class AnalysisJet : public TLorentzVector {
   float simpleSecondaryVertexHighPurBJetTag;
   float jetBProbabilityBJetTag;
   float jetProbabilityBJetTag;
-  float combinedSecondaryVertexBJetTag;
 
   float beta;
   float betaStar;
