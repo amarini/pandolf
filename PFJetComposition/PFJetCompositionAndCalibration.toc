@@ -1,9 +1,0 @@
-\contentsline {section}{\numberline {1}Introduction}{2}
-\contentsline {section}{\numberline {2}Data Samples}{3}
-\contentsline {section}{\numberline {3}Definitions}{3}
-\contentsline {section}{\numberline {4}Jet Particle Composition}{4}
-\contentsline {subsection}{\numberline {4.1}Energy Fraction Variables}{5}
-\contentsline {subsection}{\numberline {4.2}Single Component Resolutions}{8}
-\contentsline {section}{\numberline {5}Response and Resolution Variation with Jet Charged Energy Fraction}{8}
-\contentsline {subsection}{\numberline {5.1}R$_{\mathrm {ch}}$-Based Calibration}{10}
-\contentsline {section}{\numberline {6}Conclusions}{11}
