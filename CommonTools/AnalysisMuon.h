@@ -26,7 +26,8 @@ class AnalysisMuon : public AnalysisLepton {
   bool passedMuonID_tight2012();
 
   bool isIsolated();
-  bool isIsolated2012();
+  bool isIsolated2012_MVA();
+  bool isIsolated2012_CutsDeltaBeta();
   virtual float combinedIsoRel();
 
   bool passedVBTF();
@@ -56,6 +57,10 @@ class AnalysisMuon : public AnalysisLepton {
   double emEt03;
   double hadEt03;
   double mvaisoMuon;
+  double pfIsolationSumPUPtR04;
+
+
+  bool matchedToGen;
 
 };
 
