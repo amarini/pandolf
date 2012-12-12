@@ -38,7 +38,19 @@ bool AnalysisMuon::isIsolated() {
 }
 
 
-bool AnalysisMuon::isIsolated2012() {
+bool AnalysisMuon::isIsolated2012_CutsDeltaBeta() {
+
+  bool isIsolated = (this->pfIsolationSumPUPtR04/this->Pt()) < 0.15;
+
+  return isIsolated;
+
+}
+
+
+
+
+
+bool AnalysisMuon::isIsolated2012_MVA() {
 
   float abseta = fabs(this->Eta());
   float pt = this->Pt();
@@ -77,7 +89,7 @@ bool AnalysisMuon::passedVBTF() {
 
 bool AnalysisMuon::isTightMuon2012() {
 
-  bool isIsolated = this->isIsolated2012();
+  bool isIsolated = this->isIsolated2012_CutsDeltaBeta();
   bool passedMuonID = this->passedMuonID_tight2012();
 
   return ( isIsolated && passedMuonID );
