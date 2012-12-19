@@ -89,6 +89,8 @@ void Ntp1Analyzer_TTZ::CreateOutputFile() {
   reducedTree_->Branch("ptHat",&ptHat_,"ptHat_/F");
 
   reducedTree_->Branch("leptType",  &leptType_,  "leptType_/I");
+
+  reducedTree_->Branch("htGen",  &htGen_,  "htGen_/F");
   
   reducedTree_->Branch("eZllMC",  &eZllMC_,  "eZllMC_/F");
   reducedTree_->Branch("ptZllMC",  &ptZllMC_,  "ptZllMC_/F");
@@ -360,49 +362,11 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
      int zIndexqq=-1;
      int zIndexll=-1;
 
-/*
+
      if( isMC_ ) {
 
 
-       // first look for Z->qq
-       std::vector<TLorentzVector> quarksMC;
-
-       for( unsigned iMc=0; iMc<nMc && quarksMC.size()<2; ++iMc ) {
-
-         // quarks have status 3
-         if( statusMc[iMc] != 3 ) continue;
-
-         TLorentzVector* thisParticle = new TLorentzVector();
-         thisParticle->SetPtEtaPhiE( pMc[iMc]*sin(thetaMc[iMc]), etaMc[iMc], phiMc[iMc], energyMc[iMc] );
-         if( thisParticle->Pt()<0.1 ) continue;
-
-         if( fabs(idMc[iMc])<7 && idMc[mothMc[iMc]]==23 ) {
-           zIndexqq = mothMc[iMc];
-           quarksMC.push_back( *thisParticle );
-         }
-
-       }
-
-       // (checked that always 2 quarks are found)
-       if( quarksMC.size()==2 && zIndexqq!=-1 ) {
-
-         TLorentzVector ZqqMC;
-         ZqqMC.SetPtEtaPhiE( pMc[zIndexqq]*sin(thetaMc[zIndexqq]), etaMc[zIndexqq], phiMc[zIndexqq], energyMc[zIndexqq] );
-
-         ptZqqMC_  = ZqqMC.Pt();
-         eZqqMC_   = ZqqMC.Energy();
-         etaZqqMC_ = ZqqMC.Eta();
-         phiZqqMC_ = ZqqMC.Phi();
-
-      // float ptZqq = pMc[zIndexqq]*sin(thetaMc[zIndexqq]);
-      // h1_ptHadronicZ->Fill( ptZqq );
-
-      // float deltaRqq = quarksMC[0].DeltaR(quarksMC[1]);
-      // h1_deltaRqq->Fill(deltaRqq);
-
-       }
-
-       // now look for Z->ll
+       // look for Z->ll
 
        std::vector<TLorentzVector> electronsMC;
        std::vector<TLorentzVector> muonsMC;
@@ -411,6 +375,7 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
 
          // partons only
          if( statusMc[iMc] != 3 ) continue;
+         if( fabs(idMc[iMc])!=11 && fabs(idMc[iMc])!=13 ) continue;
 
          TLorentzVector* thisParticle = new TLorentzVector();
          thisParticle->SetPtEtaPhiE( pMc[iMc]*sin(thetaMc[iMc]), etaMc[iMc], phiMc[iMc], energyMc[iMc] );
@@ -435,8 +400,6 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
            lept1MC = electronsMC[1];
            lept2MC = electronsMC[0];
          }
-         if( (fabs(lept1MC.Eta()) < 2.5) && ( fabs(lept1MC.Eta())<1.4442 || fabs(lept1MC.Eta())>1.566) ) h1_nEvents_vs_ptEle->Fill( lept1MC.Pt() );
-         if( (fabs(lept2MC.Eta()) < 2.5) && ( fabs(lept2MC.Eta())<1.4442 || fabs(lept2MC.Eta())>1.566) ) h1_nEvents_vs_ptEle->Fill( lept2MC.Pt() );
        } else if( muonsMC.size()==2 ) {
          if( muonsMC[0].Pt() > muonsMC[1].Pt() ) {
            lept1MC = muonsMC[0];
@@ -445,8 +408,6 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
            lept1MC = muonsMC[1];
            lept2MC = muonsMC[0];
          }
-         if( fabs(lept1MC.Eta()) < 2.4 ) h1_nEvents_vs_ptMuon->Fill( lept1MC.Pt() );
-         if( fabs(lept1MC.Eta()) < 2.1 || fabs(lept2MC.Eta()) < 2.1 ) h1_nEvents_vs_ptMuon->Fill( lept2MC.Pt() );
        } else {
          //taus
          noLeptons = true;
@@ -467,30 +428,33 @@ if( DEBUG_VERBOSE_ ) std::cout << "entry n." << jentry << std::endl;
          if( muonsMC.size() > 0 ) leptTypeMC_ = 0;
          else if( electronsMC.size() > 0 ) leptTypeMC_ = 1;
 
+         eLeptZ1Gen_ = lept1MC.Energy();
+         ptLeptZ1Gen_ = lept1MC.Pt();
+         etaLeptZ1Gen_ = lept1MC.Eta();
+         phiLeptZ1Gen_ = lept1MC.Phi();
+         
+         eLeptZ2Gen_ = lept2MC.Energy();
+         ptLeptZ2Gen_ = lept2MC.Pt();
+         etaLeptZ2Gen_ = lept2MC.Eta();
+         phiLeptZ2Gen_ = lept2MC.Phi();
+
+       } else {
+
+         eLeptZ1Gen_ = 0.;
+         ptLeptZ1Gen_ = 0.;
+         etaLeptZ1Gen_ = 10.;
+         phiLeptZ1Gen_ = 0.;
+         
+         eLeptZ2Gen_ = 0.;
+         ptLeptZ2Gen_ = 0.;
+         etaLeptZ2Gen_ = 10.;
+         phiLeptZ2Gen_ = 0.;
+
        }
 
 
-       // now look for the higgs:
-       if( zIndexll!=-1 && zIndexqq!=-1 ) {
-
-         int higgsIndex = mothMc[zIndexll];
-
-         if( idMc[higgsIndex] == 25 ) {
-
-           TLorentzVector HiggsMC;
-           HiggsMC.SetPtEtaPhiE( pMc[higgsIndex]*sin(thetaMc[higgsIndex]), etaMc[higgsIndex], phiMc[higgsIndex], energyMc[higgsIndex] );
-
-           eHiggsMC_   = HiggsMC.Energy(); 
-           ptHiggsMC_  = HiggsMC.Pt(); 
-           etaHiggsMC_ = HiggsMC.Eta(); 
-           phiHiggsMC_ = HiggsMC.Phi(); 
-
-         } // if higgs
-
-       } //if found two Z's
-
      } //if isMC
-*/
+
 
 
 
