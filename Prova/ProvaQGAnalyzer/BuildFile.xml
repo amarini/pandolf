@@ -1,0 +1,22 @@
+<Flags CXXFLAGS="-g"/>
+<use   name="root"/>
+<use   name="boost"/>
+<use   name="FWCore/Framework"/>
+<use   name="FWCore/MessageLogger"/>
+<use   name="FWCore/PluginManager"/>
+<use   name="FWCore/ParameterSet"/>
+<use   name="MagneticField/Engine"/>
+<use   name="DataFormats/GeometryVector"/>
+<use   name="DataFormats/JetReco"/>
+<use   name="Geometry/CaloTopology"/>
+<use   name="Geometry/CaloGeometry"/>
+<use   name="Geometry/TrackerGeometryBuilder"/>
+<use   name="JetMETCorrections/Objects"/>
+<use   name="RecoJets/JetAlgorithms"/>
+<use   name="RecoJets/JetProducers"/>
+<use   name="RecoJets/JetAssociationAlgorithms"/>
+<use   name="QuarkGluonAnalysis/QuarkGluonTagger2012"/>
+<flags   EDM_PLUGIN="1"/>
+<export>
+  <lib   name="1"/>
+</export>
