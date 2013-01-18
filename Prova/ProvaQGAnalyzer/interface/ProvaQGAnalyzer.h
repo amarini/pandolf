@@ -115,10 +115,15 @@ class ProvaQGAnalyzer : public edm::EDAnalyzer {
       Int_t   nChg_QCJet_pfakt5[100];
       Int_t   nChg_ptCut_QCJet_pfakt5[100];
       Int_t   nNeutral_ptCutJet_pfakt5[100];
+      Int_t   nPFCand_QC_ptCutJet_pfakt5[100];
       Float_t pTMaxJet_pfakt5[100];
       Float_t pTMaxChgJet_pfakt5[100];
       Float_t pTMaxNeutralJet_pfakt5[100];
       Float_t pTMaxChg_QCJet_pfakt5[100];
+
+      Float_t qglJet_pfakt5[100];
+
+      Int_t   pdgIdPartJet_pfakt5[100];
 
 
       Float_t beta_pfakt5[100][100];
