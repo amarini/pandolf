@@ -13,7 +13,7 @@
 //
 // Original Author:  Daniele del Re
 //         Created:  Thu Sep 13 16:00:15 CEST 2007
-// $Id: ProvaQGAnalyzer.cc,v 1.63 2011/11/20 21:45:37 meridian Exp $
+// $Id: ProvaQGAnalyzer.cc,v 1.1 2013/01/17 17:25:42 pandolf Exp $
 //
 //
 
@@ -58,6 +58,8 @@
 
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
+
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 
 #include "TLorentzVector.h"
 #include "TRegexp.h"
@@ -151,6 +153,8 @@ ProvaQGAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
    iEvent.getByLabel("offlinePrimaryVerticesWithBS", VertexHandle);
    //iEvent.getByLabel(Vertexsrc_, VertexHandle);
 
+   Handle<GenParticleCollection> genParticles;
+   if( isMC ) iEvent.getByLabel("genParticles", genParticles);
 
    Handle<ValueMap<float> > qglMap;
    iEvent.getByLabel("qglAK5PF",qglMap);
@@ -249,10 +253,16 @@ ProvaQGAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 	  pTMaxNeutralJet_pfakt5[nJet_pfakt5] = 0.;
         pTMaxChg_QCJet_pfakt5[nJet_pfakt5] = 0.;
 
+        qglJet_pfakt5[nJet_pfakt5] = -1.;
+
+        pdgIdPartJet_pfakt5[nJet_pfakt5] = 0;
+
         nChg_ptCutJet_pfakt5[nJet_pfakt5] = 0;
         nChg_QCJet_pfakt5[nJet_pfakt5] = 0;
         nChg_ptCut_QCJet_pfakt5[nJet_pfakt5] = 0;
         nNeutral_ptCutJet_pfakt5[nJet_pfakt5] = 0;
+
+        nPFCand_QC_ptCutJet_pfakt5[nJet_pfakt5] = 0;
 
         std::vector<bool> jetPart_forMult,jetPart_forAxis;
 
@@ -471,6 +481,8 @@ ProvaQGAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     pull_QCJet_pfakt5[nJet_pfakt5] = sqrt(ddetaR_ave_QC*ddetaR_ave_QC+ddphiR_ave_QC*ddphiR_ave_QC);
   }
 
+  nPFCand_QC_ptCutJet_pfakt5[nJet_pfakt5] = nChg_QCJet_pfakt5[nJet_pfakt5] + nNeutral_ptCutJet_pfakt5[nJet_pfakt5];
+
   rmsCandTrueJet_pfakt5[nJet_pfakt5] = sqrt( sum_ddR / SumW2);
   rmsCandTrue_QCJet_pfakt5[nJet_pfakt5] = sqrt( sum_ddR_QC / SumW2_QC);
 
@@ -481,8 +493,8 @@ ProvaQGAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
 
 	    //float qglNEW = qglikeli->computeQGLikelihood( ptCorrJet_pfakt5[nJet_pfakt5], etaJet_pfakt5[nJet_pfakt5], rho, nNeutral_ptCutJet_pfakt5[nJet_pfakt5]+nChg_QCJet_pfakt5[nJet_pfakt5], ptD_QCJet_pfakt5[nJet_pfakt5], axis2_QCJet_pfakt5[nJet_pfakt5] ); 
-          float qgl = (*qglMap)[jetRef];
-          std::cout << ptCorrJet_pfakt5[nJet_pfakt5] << " " << etaJet_pfakt5[nJet_pfakt5] << " " << rho << " " << nNeutral_ptCutJet_pfakt5[nJet_pfakt5]+nChg_QCJet_pfakt5[nJet_pfakt5] << " "<< ptD_QCJet_pfakt5[nJet_pfakt5] << " " << axis2_QCJet_pfakt5[nJet_pfakt5] << std::endl;
+          qglJet_pfakt5[nJet_pfakt5] = (*qglMap)[jetRef];
+          //std::cout << ptCorrJet_pfakt5[nJet_pfakt5] << " " << etaJet_pfakt5[nJet_pfakt5] << " " << rho << " " << nNeutral_ptCutJet_pfakt5[nJet_pfakt5]+nChg_QCJet_pfakt5[nJet_pfakt5] << " "<< ptD_QCJet_pfakt5[nJet_pfakt5] << " " << axis2_QCJet_pfakt5[nJet_pfakt5] << std::endl;
           //std::cout << qgl << " " << qglNEW << std::endl;
 
 
@@ -617,6 +629,41 @@ ProvaQGAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 	//  jetBProbabilityBJetTags_pfakt5[index] =  (*jetBProbabilityBJetTags)[index].second ;
 	//  jetProbabilityBJetTags_pfakt5[index] =  (*jetProbabilityBJetTags)[index].second ;
 	//}
+	
+
+     TLorentzVector thisJet;
+     thisJet.SetPtEtaPhiE( ptCorrJet_pfakt5[index], etaJet_pfakt5[index], phiJet_pfakt5[index], eJet_pfakt5[index] );
+
+     float bestDeltaR = 999.;
+     int pdgId_found = 0;
+
+     int nMC=0;
+
+     for (GenParticleCollection::const_iterator p = genParticles->begin(); p != genParticles->end(); ++p) {
+
+
+       if (p->status() != 3) continue;
+       if( !(abs(p->pdgId())<6 || p->pdgId()==21) ) continue;
+       if( p->pt()<1. ) continue;
+
+       nMC++;
+       if( nMC > 100 ) break;
+
+       TLorentzVector thisParton;
+       thisParton.SetPtEtaPhiE( p->pt(), p->eta(), p->phi(), p->energy() );
+
+       float thisDeltaR = thisJet.DeltaR(thisParton);
+
+       if( thisDeltaR < bestDeltaR ) {
+         bestDeltaR = thisDeltaR;
+         pdgId_found = p->pdgId();
+       }
+
+     } // for partons
+
+
+      pdgIdPartJet_pfakt5[index] = (bestDeltaR<0.3) ? pdgId_found : 0;
+
 	  ++nJet_pfakt5;
 	  
       } // pfakt5
@@ -650,13 +697,21 @@ ProvaQGAnalyzer::beginJob()
   m_tree->Branch("rhoPF",&rho,"rhoPF/F");
 
       m_tree->Branch("nJet_pfakt5",&nJet_pfakt5,"nJet_pfakt5/I");
-      m_tree->Branch("ptJet_pfakt5 ",&ptJet_pfakt5 ,"ptJet_pfakt5[nJet_pfakt5]/F");
-      m_tree->Branch("ptCorrJet_pfakt5 ",&ptCorrJet_pfakt5 ,"ptCorrJet_pfakt5[nJet_pfakt5]/F");
-      m_tree->Branch("eJet_pfakt5  ",&eJet_pfakt5  ,"eJet_pfakt5[nJet_pfakt5]/F");
-      m_tree->Branch("etaJet_pfakt5",&etaJet_pfakt5,"etaJet_pfakt5[nJet_pfakt5]/F");
-      m_tree->Branch("phiJet_pfakt5",&phiJet_pfakt5,"phiJet_pfakt5[nJet_pfakt5]/F");
-      m_tree->Branch("ptDJet_pfakt5",&ptDJet_pfakt5,"ptDJet_pfakt5[nJet_pfakt5]/F");
-      m_tree->Branch("rmsCandJet_pfakt5",&rmsCandJet_pfakt5,"rmsCandJet_pfakt5[nJet_pfakt5]/F");
+      m_tree->Branch("ptJet_pfakt5 ",ptJet_pfakt5 ,"ptJet_pfakt5[nJet_pfakt5]/F");
+      m_tree->Branch("ptCorrJet_pfakt5 ",ptCorrJet_pfakt5 ,"ptCorrJet_pfakt5[nJet_pfakt5]/F");
+      m_tree->Branch("eJet_pfakt5  ",eJet_pfakt5  ,"eJet_pfakt5[nJet_pfakt5]/F");
+      m_tree->Branch("etaJet_pfakt5",etaJet_pfakt5,"etaJet_pfakt5[nJet_pfakt5]/F");
+      m_tree->Branch("phiJet_pfakt5",phiJet_pfakt5,"phiJet_pfakt5[nJet_pfakt5]/F");
+      m_tree->Branch("ptDJet_pfakt5",ptDJet_pfakt5,"ptDJet_pfakt5[nJet_pfakt5]/F");
+      m_tree->Branch("rmsCandJet_pfakt5",rmsCandJet_pfakt5,"rmsCandJet_pfakt5[nJet_pfakt5]/F");
+
+      m_tree->Branch("axis2_QCJet_pfakt5",axis2_QCJet_pfakt5,"axis2_QCJet_pfakt5[nJet_pfakt5]/F");
+      m_tree->Branch("nPFCand_QC_ptCutJet_pfakt5",nPFCand_QC_ptCutJet_pfakt5,"nPFCand_QC_ptCutJet_pfakt5[nJet_pfakt5]/I");
+      m_tree->Branch("ptD_QCJet_pfakt5",ptD_QCJet_pfakt5,"ptD_QCJet_pfakt5[nJet_pfakt5]/F");
+
+      m_tree->Branch("qglJet_pfakt5",qglJet_pfakt5,"qglJet_pfakt5[nJet_pfakt5]/F");
+
+      m_tree->Branch("pdgIdPartJet_pfakt5",pdgIdPartJet_pfakt5,"pdgIdPartJet_pfakt5[nJet_pfakt5]/I");
 
       
 

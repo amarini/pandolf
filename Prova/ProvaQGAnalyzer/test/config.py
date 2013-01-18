@@ -1,4 +1,4 @@
-# $Id: common_dump_config.py,v 1.7 2011/11/20 21:45:20 meridian Exp $
+# $Id: config.py,v 1.1 2013/01/17 17:25:52 pandolf Exp $
 #
 #  common configuration to dump ntuples in MC and data
 #    all changes affecting the path and additional modules msut be done here
@@ -29,13 +29,13 @@ process.source = cms.Source("PoolSource",
     skipEvents = cms.untracked.uint32(0),
     fileNames = cms.untracked.vstring(
     #'file:/tmp/pandolf/events_GluGluToHToZZTo2L2Q_M-550_7TeV-powheg-pythia6_Summer11_PROVA.root'
-    'file:/afs/cern.ch/work/p/pandolf/public/DoubleElectron_RunA_53X_Jul13rereco.root'
+    'file:/afs/cern.ch/work/p/pandolf/public/events_QCD_Pt-15to3000_TuneZ2_Flat_8TeV_pythia6_Summer12_DR53X-PU_S10_START53_V7A-v1.root'
 )
 
 )
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(10)
+    input = cms.untracked.int32(-1)
 )
 
 process.options = cms.untracked.PSet(
