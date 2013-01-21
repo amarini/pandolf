@@ -18,26 +18,26 @@ int main() {
   float rhoPF;
   tree->SetBranchAddress("rhoPF", &rhoPF);
   int nJet;
-  tree->SetBranchAddress("nJet", &nJet);
+  tree->SetBranchAddress("nJet_pfakt5", &nJet);
   
   float ptJet[10];
-  tree->SetBranchAddress("ptJet", ptJet);
+  tree->SetBranchAddress("ptCorrJet_pfakt5 ", ptJet);
   float etaJet[10];
-  tree->SetBranchAddress("etaJet", etaJet);
+  tree->SetBranchAddress("etaJet_pfakt5", etaJet);
   float phiJet[10];
-  tree->SetBranchAddress("phiJet", phiJet);
+  tree->SetBranchAddress("phiJet_pfakt5", phiJet);
   float axis2_QCJet[10];
-  tree->SetBranchAddress("axis2_QCJet", axis2_QCJet);
+  tree->SetBranchAddress("axis2_QCJet_pfakt5", axis2_QCJet);
   float ptD_QCJet[10];
-  tree->SetBranchAddress("ptD_QCJet", ptD_QCJet);
+  tree->SetBranchAddress("ptD_QCJet_pfakt5", ptD_QCJet);
   int nPFCand_QC_ptCutJet[10];
-  tree->SetBranchAddress("nPFCand_QC_ptCutJet", nPFCand_QC_ptCutJet);
+  tree->SetBranchAddress("nPFCand_QC_ptCutJet_pfakt5", nPFCand_QC_ptCutJet);
 
   float qglJet[10];
-  tree->SetBranchAddress("qglJet", qglJet);
+  tree->SetBranchAddress("qglJet_pfakt5", qglJet);
 
   int pdgIdPartJet[10];
-  tree->SetBranchAddress("pdgIdPartJet", pdgIdPartJet);
+  tree->SetBranchAddress("pdgIdPartJet_pfakt5", pdgIdPartJet);
 
 
   QGLikelihoodCalculator* qglc = new QGLikelihoodCalculator("/afs/cern.ch/work/p/pandolf/public/QG_QCD_Pt-15to3000_TuneZ2_Flat_8TeV_pythia6_Summer12_DR53X-PU_S10_START53_V7A-v1.root");
