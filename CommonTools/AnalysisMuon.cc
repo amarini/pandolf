@@ -7,7 +7,7 @@ bool AnalysisMuon::passedMuonID() {
   bool passed = ( isGlobalMuonPromptTight && isAllTrackerMuon 
                 && pixelHits>0 && trackerHits>10 
                 && nMatchedStations>=2
-                && (dxy<0.02) && (dz<1.) );
+                && (fabs(dxy)<0.02) && (fabs(dz)<1.) );
 
   return passed;
 
@@ -21,7 +21,7 @@ bool AnalysisMuon::passedMuonID_tight2012() {
                 && pixelHits>0 && trackerHits>5 
                 && nValidMuonHits > 0
                 && nMatchedStations>=2
-                && (dxy<0.02) && (dz<0.5) ); 
+                && (fabs(dxy)<0.02) && (fabs(dz)<0.5) ); 
 
   return passed;
 
