@@ -391,7 +391,8 @@ float getWeight( const std::string& dataset, int nEvents ) {
     } else if( dataset_tstr.Contains("TTJets_TuneZ2star_8TeV-madgraph-tauola") ) {
       xSection = 225.1967;
     } else if( dataset_tstr.Contains("TBZToLL_TuneZ2star_8TeV-madgraph-tauola") ) {
-      xSection = 0.00715;
+      xSection = 0.0051;
+      //xSection = 0.00715;
     } else if( dataset_tstr.Contains("WJetsToLNu_TuneZ2Star_8TeV-madgraph") ) {
       xSection = 37509.;
     } else if( dataset_tstr.Contains("WWJetsTo2L2Nu_TuneZ2star_8TeV-madgraph-tauola") || dataset_tstr.Contains("WWTo2L2Nu_TuneZ2star_8TeV_pythia6_tauola") ) {
@@ -820,6 +821,10 @@ float getWeight( const std::string& dataset, int nEvents ) {
       xSection = 4819.6/3.;//##
     } else if( dataset_tstr.BeginsWith("GVJets") ) { //https://twiki.cern.ch/twiki/bin/viewauth/CMS/SameSignDilepton2011#MC_samples_for_the_2011_paper
       xSection = 56.64;
+    } else if( dataset_tstr.Contains("TBZToLL_") ) {
+      xSection = 0.01275;
+    } else if( dataset_tstr.Contains("TTH_Inclusive_M-125_7TeV") ) {
+      xSection = 0.0863;
     } else {
       std::cout << std::endl << std::endl;
       std::cout << "-> WARNING!! Dataset: '" << dataset << "' not present in database. Cross section unknown." << std::endl;
