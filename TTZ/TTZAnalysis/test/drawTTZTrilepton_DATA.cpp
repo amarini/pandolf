@@ -5,9 +5,11 @@
 #include "CommonTools/DrawBase.h"
 #include "CommonTools/fitTools.h"
 #include "TLatex.h"
+#include "TEfficiency.h"
 
 
 bool use_powhegDY=false;
+std::string SELECTION;
 
 
 struct ValueAndError {
@@ -35,6 +37,7 @@ int main(int argc, char* argv[]) {
   std::string leptType = "ALL";
 
   std::string selType(argv[1]);
+  SELECTION = selType;
 
   std::string PUType = "PUHR11_73pb";
 
@@ -487,6 +490,21 @@ std::cout << "dataset: " << db->get_mcFile(iMC).datasetName << std::endl;
     mmm_mc *= scaling;
     tot_mc *= scaling;
 
+    //if( db->get_mcFile(iMC).datasetName=="ZJets" && mme_mc==0. ) { // compute error on zero yield
+    //  TH1D* h_nCounter = (TH1D*)(db->get_mcFile(iMC).file->Get("nCounter"));
+    //  int nGen = h_nCounter->GetBinContent(1);
+    //  TEfficiency *eff = new TEfficiency();
+    //  float upper = eff->ClopperPearson(nGen, 0., 0.68, true);
+    //  float delta = upper;
+    //  delete eff;
+    //  //float error = delta * float(nGen);
+    //  float error = delta;
+    //  error *= 3048.;
+    //  mme_mc_err = error;
+    //  std::cout << "nGen: " << nGen << " upper: " << upper << " error: " << error << std::endl;
+    //}    
+
+
     eee_mc_err *= scaling;
     eem_mc_err *= scaling;
     mme_mc_err *= scaling;
@@ -594,16 +612,17 @@ std::cout << "dataset: " << db->get_mcFile(iMC).datasetName << std::endl;
   float yMax = TMath::Max(yMaxData, yMaxMC);
   yMax *= 1.5;
 
-  if( selection=="optsel3" ) yMax = 8.;
+  if( SELECTION=="optsel3" ) yMax = 8.;
 
-  float nBins = (selection=="optsel3") ? 4. : 5.;
+  float nBins = (SELECTION=="optsel3") ? 4. : 5.;
   TH2D* h2_axes = new TH2D("axes", "", (int)nBins, 0., nBins, 10, 0., yMax);
   h2_axes->GetXaxis()->SetLabelSize(0.085);
   h2_axes->GetXaxis()->SetBinLabel(1, "(ee)e");
   h2_axes->GetXaxis()->SetBinLabel(2, "(ee)#mu");
   h2_axes->GetXaxis()->SetBinLabel(3, "(#mu#mu)e");
   h2_axes->GetXaxis()->SetBinLabel(4, "(#mu#mu)#mu");
-  h2_axes->GetXaxis()->SetBinLabel(5, "Total" );
+  if(  SELECTION!="optsel3" )
+    h2_axes->GetXaxis()->SetBinLabel(5, "Total" );
   h2_axes->SetYTitle("Events");
   h2_axes->GetYaxis()->SetTitleOffset(1.25);
 
