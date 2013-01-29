@@ -12,5 +12,6 @@
 ./finalize_TTZTrilepton TTZ_TuneZ2_7TeV-madgraphCMSSW42xPUv3_spadhi $1 $2
 ./finalize_TTZTrilepton VV_Summer11 $1 $2
 ./finalize_TTZTrilepton GVJets_7TeV-madgraph_Fall11 $1 $2
+./finalize_TTZTrilepton TBZToLL_4F_TuneZ2_7TeV-madgraph-tauola_Fall11-PU_S6_START42_V14B-v1 $1 $2
 
 ./finalize_TTZTrilepton DATA_Run2011_FULL $1 $2

@@ -221,6 +221,8 @@ std::pair<float, float>  getSyst( const std::string& syst, const std::string& se
       hadd_command += " ";
       hadd_command += getFileName( "GVJets_7TeV-madgraph_Fall11", sel, suffix );
       hadd_command += " ";
+      hadd_command += getFileName( "TBZToLL_4F_TuneZ2_7TeV-madgraph-tauola_Fall11-PU_S6_START42_V14B-v1", sel, suffix );
+      hadd_command += " ";
 
       system( hadd_command.c_str() );
 
