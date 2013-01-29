@@ -334,7 +334,7 @@ int main(int argc, char* argv[]) {
 
   drawChannelYieldPlot( db, "noScaling", "", lumi_fb, noCorr, noCorr );
   drawChannelYieldPlot( db, "", "", lumi_fb, ttbarSF, DYWZSF );
-  drawChannelYieldPlot( db, "ptZll80", "eventWeight*(ptZll>80.)", lumi_fb, ttbarSF, DYWZSF );
+  //drawChannelYieldPlot( db, "ptZll80", "eventWeight*(ptZll>80.)", lumi_fb, ttbarSF, DYWZSF );
 
 
   delete db;
@@ -596,13 +596,14 @@ std::cout << "dataset: " << db->get_mcFile(iMC).datasetName << std::endl;
 
   if( selection=="optsel3" ) yMax = 8.;
 
-  TH2D* h2_axes = new TH2D("axes", "", 4, 0., 4., 10, 0., yMax);
+  float nBins = (selection=="optsel3") ? 4. : 5.;
+  TH2D* h2_axes = new TH2D("axes", "", (int)nBins, 0., nBins, 10, 0., yMax);
   h2_axes->GetXaxis()->SetLabelSize(0.085);
   h2_axes->GetXaxis()->SetBinLabel(1, "(ee)e");
   h2_axes->GetXaxis()->SetBinLabel(2, "(ee)#mu");
   h2_axes->GetXaxis()->SetBinLabel(3, "(#mu#mu)e");
   h2_axes->GetXaxis()->SetBinLabel(4, "(#mu#mu)#mu");
-//  h2_axes->GetXaxis()->SetBinLabel(5, "Total" );
+  h2_axes->GetXaxis()->SetBinLabel(5, "Total" );
   h2_axes->SetYTitle("Events");
   h2_axes->GetYaxis()->SetTitleOffset(1.25);
 
