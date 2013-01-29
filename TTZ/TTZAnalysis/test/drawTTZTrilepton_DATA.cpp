@@ -117,6 +117,16 @@ int main(int argc, char* argv[]) {
   TFile* mcZJetsFile = TFile::Open(mcZJetsFileName.c_str());
   db->add_mcFile( mcZJetsFile, "ZJets", "Z + jets", 46, 0);
 
+
+  std::string mctbZFileName = "TTZTrilepton_TBZToLL_4F_TuneZ2_7TeV-madgraph-tauola_Fall11-PU_S6_START42_V14B-v1";
+  mctbZFileName += "_" + selType;
+  mctbZFileName += "_" + bTaggerType;
+  //mctbZFileName += "_" + PUType;
+  mctbZFileName += "_" + leptType;
+  mctbZFileName += ".root";
+  TFile* mctbZFile = TFile::Open(mctbZFileName.c_str());
+  db->add_mcFile( mctbZFile, "tbZ", "tbZ", 49, 0);
+
   //std::string mcTTbarFileName = "TTZTrilepton_TTJets_TuneZ2_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1";
   std::string mcTTbarFileName = "TTZTrilepton_TTJ_Fall11_highstat";
   mcTTbarFileName += "_" + selType;
@@ -126,6 +136,8 @@ int main(int argc, char* argv[]) {
   mcTTbarFileName += ".root";
   TFile* mcTTbarFile = TFile::Open(mcTTbarFileName.c_str());
   db->add_mcFile( mcTTbarFile, "TTtW", "t#bar{t}", 39, 0);
+
+
 
   //std::string mcWZFileName = "TTZTrilepton_WZJetsTo3LNu_TuneZ2_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1";
   std::string mcVVFileName = "TTZTrilepton_VV_Summer11";
@@ -157,6 +169,8 @@ int main(int argc, char* argv[]) {
   system(hadd_command.c_str());
   TFile* mcVVVGFile = TFile::Open(mcVVVGFileName.c_str());
   db->add_mcFile( mcVVVGFile, "VVVG", "Diboson", 38, 0);
+
+
 
 //std::string mcZZFileName = "TTZTrilepton_ZZ_TuneZ2_7TeV_pythia6_tauola_Summer11-PU_S4_START42_V11-v1";
 //mcZZFileName += "_" + selType;
@@ -218,6 +232,7 @@ int main(int argc, char* argv[]) {
   //ttbarSF.val = 2.;
   db->set_mcWeight( "TTtW", ttbarSF.val );
   db->drawHisto("mZll_OF_prepresel", "Opposite Flavor Dilepton Mass", "GeV", "Events", false, 1, "scaled");
+  db->drawHisto("mZll_OF_presel", "Opposite Flavor Dilepton Mass", "GeV", "Events");
 
   //// opposite flavor leptons: control region for ttbar:
   //db->set_rebin(5);
@@ -304,7 +319,8 @@ int main(int argc, char* argv[]) {
   db->set_rebin(10);
   db->set_xAxisMax(150);
   db->drawHisto("ptLeptZ2", "Subleading Z Lepton p_{T}", "GeV", "Events");
-  db->drawHisto("ptLept3", "Subleading Z Lepton p_{T}", "GeV", "Events");
+  db->set_xAxisMax();
+  db->drawHisto("ptLept3", "Third Lepton p_{T}", "GeV", "Events");
   db->set_rebin(25);
   db->set_xAxisMax(400);
   db->drawHisto("ptZll", "p_{T} (Z)", "GeV", "Events");
@@ -461,6 +477,9 @@ std::cout << "dataset: " << db->get_mcFile(iMC).datasetName << std::endl;
       scaling *= DYWZSF.val;
       scaling_err = DYWZSF.err;
     }
+    if( db->get_mcFile(iMC).datasetName=="tbZ" ) {
+      scaling_err = 0.2; // this is not a scaling error, but the cross section uncertainty (it eludes the datadriven normalization)
+    }
 
     eee_mc *= scaling;
     eem_mc *= scaling;
@@ -575,13 +594,15 @@ std::cout << "dataset: " << db->get_mcFile(iMC).datasetName << std::endl;
   float yMax = TMath::Max(yMaxData, yMaxMC);
   yMax *= 1.5;
 
-  TH2D* h2_axes = new TH2D("axes", "", 5, 0., 5., 10, 0., yMax);
+  if( selection=="optsel3" ) yMax = 8.;
+
+  TH2D* h2_axes = new TH2D("axes", "", 4, 0., 4., 10, 0., yMax);
   h2_axes->GetXaxis()->SetLabelSize(0.085);
   h2_axes->GetXaxis()->SetBinLabel(1, "(ee)e");
   h2_axes->GetXaxis()->SetBinLabel(2, "(ee)#mu");
   h2_axes->GetXaxis()->SetBinLabel(3, "(#mu#mu)e");
   h2_axes->GetXaxis()->SetBinLabel(4, "(#mu#mu)#mu");
-  h2_axes->GetXaxis()->SetBinLabel(5, "Total" );
+//  h2_axes->GetXaxis()->SetBinLabel(5, "Total" );
   h2_axes->SetYTitle("Events");
   h2_axes->GetYaxis()->SetTitleOffset(1.25);
 
@@ -623,7 +644,7 @@ std::cout << "dataset: " << db->get_mcFile(iMC).datasetName << std::endl;
   fLatex->SetTextFont(42);
   fLatex->SetTextSize(0.045);
   fLatex->SetTextAlign(11);
-  fLatex->DrawLatex(0.51, 0.925, Form("L = %4.1f fb^{-1} at #sqrt{s} = 7 TeV", lumi_fb));
+  fLatex->DrawLatex(0.51, 0.925, Form("L = %4.1f fb^{-1} at  #sqrt{s} = 7 TeV", lumi_fb));
 
   gPad->RedrawAxis();
   
