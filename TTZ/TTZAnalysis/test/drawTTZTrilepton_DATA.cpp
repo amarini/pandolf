@@ -481,8 +481,9 @@ std::cout << "dataset: " << db->get_mcFile(iMC).datasetName << std::endl;
       scaling_err = DYWZSF.err;
     }
     if( db->get_mcFile(iMC).datasetName=="tbZ" ) {
-      scaling_err = 0.2; // this is not a scaling error, but the cross section uncertainty (it eludes the datadriven normalization)
+      scaling_err = 0.5; // this is not a scaling error, but the cross section uncertainty (it eludes the datadriven normalization)
     }
+std::cout << "scaling err: " << scaling_err << std::endl;
 
     eee_mc *= scaling;
     eem_mc *= scaling;
