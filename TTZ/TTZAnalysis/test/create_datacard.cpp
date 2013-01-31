@@ -103,6 +103,8 @@ int main(int argc, char* argv[]) {
   std::pair< float, float >  matchingSystSignal = getSyst( "matching", selection, "Signal" );
   datacard << "matching lnN\t" <<  matchingSystSignal.first << "/" << matchingSystSignal.second << "\t-" << std::endl;
 
+  datacard << "NLO      lnN\t1.13  \t\t-" << std::endl; //taken from SMP-12-008
+
   datacard.close();
 
   std::cout << "-> Created datacard: " << datacardName << std::endl;
