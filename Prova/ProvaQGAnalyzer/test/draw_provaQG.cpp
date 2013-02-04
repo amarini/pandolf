@@ -9,7 +9,7 @@ bool addCHS = true;
 
 void drawOne( DrawBase* db, const std::string& suffix, TFile* file, TFile* file_chs=0 );
 void drawRoC( DrawBase* db, TH1D* h1_old_gluon, TH1D* h1_old_quark, TH1D* h1_central_gluon, TH1D* h1_central_quark, TH1D* h1_new_gluon=0, TH1D* h1_new_quark=0, const std::string& labelText="" );
-void compareOneVariable( DrawBase* db, TTree* tree, TTree* tree_etaFix, const std::string& varName, const std::string& axisName, int nBins, float xMin, float xMax );
+void compareOneVariable( DrawBase* db, TTree* tree, TTree* tree_etaFix, std::string varName, const std::string& axisName, int nBins, float xMin, float xMax );
 void comparePDF( DrawBase* db, const std::string& name, const std::string& savename, TH1D* h1_nPFCand_quark_central, TH1D* h1_nPFCand_gluon_central, TH1D* h1_nPFCand_quark_transition_fix, TH1D* h1_nPFCand_gluon_transition_fix, const std::string& flags="" );
 void drawCompare_etaFix( DrawBase* db, TFile* file, TFile* file_etaFix );
 
@@ -149,8 +149,8 @@ void drawCompare_etaFix( DrawBase* db, TFile* file, TFile* file_etaFix ) {
   TTree* tree = (TTree*)file->Get("tree_out");
   TTree* tree_etaFix = (TTree*)file_etaFix->Get("tree_out");
 
-  compareOneVariable( db, tree, tree_etaFix, "nPFCand_QC_ptCut", "PF Candidate Multiplicity", 30, -0.5, 49.5 );
-  compareOneVariable( db, tree, tree_etaFix, "axis2_QC", "Jet Minor Axis", 30, 0., 5. );
+  compareOneVariable( db, tree, tree_etaFix, "nPFCand_QC_ptCut", "PF Candidate Multiplicity", 25, -0.5, 49.5 );
+  compareOneVariable( db, tree, tree_etaFix, "axis2_QC", "Jet Minor Axis", 30, 0., 10. );
   compareOneVariable( db, tree, tree_etaFix, "ptD_QC", "Jet p_{T}D", 30, 0., 1.0001 );
   compareOneVariable( db, tree, tree_etaFix, "pt", "Jet p_{T} [GeV]", 30, 20., 300.);
   compareOneVariable( db, tree, tree_etaFix, "qglNEW", "Quark-Gluon LD", 50, 0., 1.0001);
@@ -160,8 +160,11 @@ void drawCompare_etaFix( DrawBase* db, TFile* file, TFile* file_etaFix ) {
 
 
 
-void compareOneVariable( DrawBase* db, TTree* tree, TTree* tree_etaFix, const std::string& varName, const std::string& axisName, int nBins, float xMin, float xMax ) {
+void compareOneVariable( DrawBase* db, TTree* tree, TTree* tree_etaFix, std::string varName, const std::string& axisName, int nBins, float xMin, float xMax ) {
 
+  std::string treeName = varName;
+  if( varName=="axis2_QC" )
+    treeName = "-log(axis2_QC)";
 
   std::string histoName_quark_central = varName + "quark_central";
   TH1D* h1_quark_central = new TH1D(histoName_quark_central.c_str(), "", nBins, xMin, xMax);
@@ -179,17 +182,21 @@ void compareOneVariable( DrawBase* db, TTree* tree, TTree* tree_etaFix, const st
   TH1D* h1_gluon_transition_fix = new TH1D(histoName_gluon_transition_fix.c_str(), "", nBins, xMin, xMax);
 
 
-  tree->Project(histoName_quark_central.c_str(), varName.c_str(), "pdgid>0 && pdgid<4 && pt>20. && pt<300.&& abs(eta)<2.");
-  tree->Project(histoName_gluon_central.c_str(), varName.c_str(), "pdgid==21 && pt>20. && pt<300.&& abs(eta)<2.");
+  tree->Project(histoName_quark_central.c_str(), treeName.c_str(), "pdgid>0 && pdgid<4 && pt>20. && pt<300.&& abs(eta)<2.");
+  tree->Project(histoName_gluon_central.c_str(), treeName.c_str(), "pdgid==21 && pt>20. && pt<300.&& abs(eta)<2.");
 
-  tree->Project(histoName_quark_transition.c_str(), varName.c_str(), "pdgid>0 && pdgid<4 && pt>20. && pt<300.&& abs(eta)>2. && abs(eta)<2.4");
-  tree->Project(histoName_gluon_transition.c_str(), varName.c_str(), "pdgid==21 && pt>20. && pt<300.&& abs(eta)>2. && abs(eta)<2.4");
+  tree->Project(histoName_quark_transition.c_str(), treeName.c_str(), "pdgid>0 && pdgid<4 && pt>20. && pt<300.&& abs(eta)>2. && abs(eta)<2.4");
+  tree->Project(histoName_gluon_transition.c_str(), treeName.c_str(), "pdgid==21 && pt>20. && pt<300.&& abs(eta)>2. && abs(eta)<2.4");
 
-  tree_etaFix->Project(histoName_quark_transition_fix.c_str(), varName.c_str(), "pdgid>0 && pdgid<4 && pt>20. && pt<300.&& abs(eta)>2. && abs(eta)<2.4");
-  tree_etaFix->Project(histoName_gluon_transition_fix.c_str(), varName.c_str(), "pdgid==21 && pt>20. && pt<300.&& abs(eta)>2. && abs(eta)<2.4");
+  tree_etaFix->Project(histoName_quark_transition_fix.c_str(), treeName.c_str(), "pdgid>0 && pdgid<4 && pt>20. && pt<300.&& abs(eta)>2. && abs(eta)<2.4");
+  tree_etaFix->Project(histoName_gluon_transition_fix.c_str(), treeName.c_str(), "pdgid==21 && pt>20. && pt<300.&& abs(eta)>2. && abs(eta)<2.4");
 
   comparePDF( db, axisName, varName, h1_quark_central, h1_gluon_central, h1_quark_transition, h1_gluon_transition, "nofix" );
   comparePDF( db, axisName, varName, h1_quark_central, h1_gluon_central, h1_quark_transition_fix, h1_gluon_transition_fix, "etafix" );
+
+  if( varName=="qglNEW" ) 
+    drawRoC( db, h1_gluon_transition, h1_quark_transition, h1_gluon_central, h1_quark_central, h1_gluon_transition_fix, h1_quark_transition_fix );
+    
 
   delete h1_quark_central;
   delete h1_gluon_central;
@@ -356,12 +363,12 @@ void drawRoC( DrawBase* db, TH1D* h1_old_gluon, TH1D* h1_old_quark, TH1D* h1_cen
     legend->AddEntry( gr_RoC_central, "|#eta|<2", "P");
   if( h1_old_quark!=0 && h1_old_gluon!=0 ) {
     if( h1_new_quark==0 )
-      legend->AddEntry( gr_RoC_old, "2<|#eta|<2.5", "P");
+      legend->AddEntry( gr_RoC_old, "2<|#eta|<2.4", "P");
     else
-      legend->AddEntry( gr_RoC_old, "2<|#eta|<2.5 Before Correction", "P");
+      legend->AddEntry( gr_RoC_old, "2<|#eta|<2.4 Before Correction", "P");
   }
   if( h1_new_quark!=0 && h1_new_gluon!=0 )
-    legend->AddEntry( gr_RoC_new, "2<|#eta|<2.5 After Correction", "P");
+    legend->AddEntry( gr_RoC_new, "2<|#eta|<2.4 After Correction", "P");
   legend->Draw("same");
 
   TPaveText* labelTop = db->get_labelTop();
