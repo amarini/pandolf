@@ -1,6 +1,6 @@
 #=========================================================================================
 # Systematics table for ttW/Z analysis, same-sign channel
-# Generated on: Thu Jan 31 12:25:20 2013
+# Generated on: Thu Feb  7 19:48:29 2013
  
 # Copy between the dashed lines for datacard
 #-----------------------------------------------------------------------------------------
@@ -16,7 +16,7 @@ observation	16
 bin		1		1		1		1		1
 process		ttWZ		fake		cmid		wz		rare
 process		0		1		2		3		4
-rate		7.508		3.844		2.260		1.525		1.639
+rate		7.508		3.844		2.260		1.629		1.639
 # separate signal yields: 5.183 (ttW), 2.325 (ttZ)
 
 
@@ -33,5 +33,5 @@ jer      lnN	1.000		-		-		1.010		0.998
 pu       lnN	1.030		-		-		1.030		1.030
 matching lnN	1.015/0.998	-		-		1.015/0.998	1.015/0.998
 scale    lnN	1.023/0.966	-		-		1.023/0.966	1.023/0.966
-nlo      lnN	1.130		-		-		-		-
+NLO      lnN	1.130		-		-		-		-
 
