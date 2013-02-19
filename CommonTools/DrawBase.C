@@ -212,6 +212,11 @@ DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType
 
   displayEmptyDatasets_ = true;
 
+  legendBox_xMin_ = -1.;
+  legendBox_xMax_ = -1.;
+  legendBox_yMin_ = -1.;
+  legendBox_yMax_ = -1.;
+
 }
 
 
@@ -355,6 +360,11 @@ void DrawBase::reset() {
 
   flags_ = "";
   legendTitle_ = "";
+
+  legendBox_xMin_ = -1.;
+  legendBox_xMax_ = -1.;
+  legendBox_yMin_ = -1.;
+  legendBox_yMax_ = -1.;
 
 }
 
@@ -2892,6 +2902,7 @@ LegendBox DrawBase::get_legendBox( int legendQuadrant, const std::vector<std::st
 
     LegendBox lb;
 
+
     if( legendQuadrant==1 ) {
       lb.xMin = 0.63;
       lb.yMax = 0.91;
@@ -2924,6 +2935,7 @@ LegendBox DrawBase::get_legendBox( int legendQuadrant, const std::vector<std::st
       lb.yMax = lb.yMin + yScaleFactor*(float)nNames_total;
     }
 
+
     bool widen = false;
     int wide_thresh = 12;
     if( legendTitle_.size()>wide_thresh ) widen=true;
@@ -2943,6 +2955,19 @@ LegendBox DrawBase::get_legendBox( int legendQuadrant, const std::vector<std::st
       if( legendQuadrant==1 || legendQuadrant==4 ) lb.xMin *=0.85;
       if( legendQuadrant==2 || legendQuadrant==3 ) lb.xMax *=1.1;
     }
+
+    if( legendBox_xMin_>=0. )
+      lb.xMin = legendBox_xMin_;
+
+    if( legendBox_xMax_>=0. )
+      lb.xMax = legendBox_xMax_;
+
+    if( legendBox_yMin_>=0. )
+      lb.yMin = legendBox_yMin_;
+
+    if( legendBox_xMax_>=0. )
+      lb.yMax = legendBox_yMax_;
+
 
     return lb;
 
@@ -2978,14 +3003,10 @@ std::string DrawBase::get_lumiText() const {
   }
 
   char lumiText[200];
-  if( lumi_==4980. && !isCMSArticle_ ) { // CMS policy
-    sprintf( lumiText, "%.2f %s", lumi4Text, units.c_str());
-  } else {
-    if( onlyOneDecimal )
-      sprintf( lumiText, "%.0f %s", lumi4Text, units.c_str());
-    else
-      sprintf( lumiText, "%.1f %s", lumi4Text, units.c_str());
-  }
+  if( onlyOneDecimal )
+    sprintf( lumiText, "%.0f %s", lumi4Text, units.c_str());
+  else
+    sprintf( lumiText, "%.1f %s", lumi4Text, units.c_str());
 
   std::string lumiText_str(lumiText);
 
