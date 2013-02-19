@@ -132,6 +132,12 @@ class DrawBase {
   void set_mcWeight( const std::string& datasetName, float weight );
   void set_is7TeV( bool is7TeV ) { is7TeV_ = is7TeV; };
   void set_displayEmptyDatasets( bool displayThem ) { displayEmptyDatasets_ = displayThem; };
+  void set_legendBox_xMax( float legendBox_xMax ) { legendBox_xMax_ = legendBox_xMax; };
+  void set_legendBox_xMin( float legendBox_xMin ) { legendBox_xMin_ = legendBox_xMin; };
+  void set_legendBox_yMax( float legendBox_yMax ) { legendBox_yMax_ = legendBox_yMax; };
+  void set_legendBox_yMin( float legendBox_yMin ) { legendBox_yMin_ = legendBox_yMin; };
+
+
   void add_label( const std::string& text, float xmin=0.23, float ymin=0.87, float xmax=0.36, float ymax=0.9, float textSize=0.035 );
   void delete_label();
 
@@ -176,6 +182,8 @@ class DrawBase {
   float get_xAxisMin() const { return xAxisMin_; };
   float get_xAxisMax() const { return xAxisMax_; };
   float get_yAxisMaxScale() const { return yAxisMaxScale_; };
+
+
 
  private:
 
@@ -235,6 +243,12 @@ class DrawBase {
   bool lumiOnRightSide_;
 
   bool displayEmptyDatasets_;
+
+  float legendBox_xMin_;
+  float legendBox_xMax_;
+  float legendBox_yMin_;
+  float legendBox_yMax_;
+
 
 };
 
