@@ -421,6 +421,14 @@ float getWeight( const std::string& dataset, int nEvents ) {
       xSection = 0.232;
     } else if( dataset_tstr.Contains("TTZJets_8TeV-madgraph") ) {
       xSection = 0.208;
+    } else if( dataset_tstr.Contains("TTH_Inclusive_M-125_8TeV") ) {
+      xSection = 0.130;
+    } else if( dataset_tstr.BeginsWith("QCD_HT-100To250_TuneZ2star_8TeV-madgraph") ) {
+      xSection = 1.036E7;
+    } else if( dataset_tstr.BeginsWith("QCD_HT-250To500_TuneZ2star_8TeV-madgraph") ) {
+      xSection = 276000.0;
+    } else if( dataset_tstr.BeginsWith("QCD_HT-500To1000_TuneZ2star_8TeV-madgraph") ) {
+      xSection = 8426.0;
     } else {
       std::cout << std::endl << std::endl;
       std::cout << "-> WARNING!! Dataset: '" << dataset << "' not present in database. Cross section unknown." << std::endl;
