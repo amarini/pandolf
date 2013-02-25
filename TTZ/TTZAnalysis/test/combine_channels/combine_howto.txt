@@ -1,0 +1,14 @@
+*** significance (observed):
+combine -M ProfileLikelihood --signif datacard.txt
+
+
+*** significannce (expected);
+combine -M ProfileLikelihood --significance datacard.txt -t -1 --expectSignal=1 
+
+*** signal strength:
+combine -M MaxLikelihoodFit datacard.txt --justFit
+
+*** signal strength (stat only?):
+combine -M MaxLikelihoodFit datacard.txt --justFit --profilingMode=none
+
+
