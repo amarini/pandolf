@@ -68,8 +68,13 @@ int main(int argc, char* argv[]) {
 
 
   DrawBase* db = new DrawBase("TTZTrilepton");
+  db->set_isCMSArticle();
+  db->set_is7TeV(true);
 
-  //db->set_markerSize(4.);
+
+  db->set_markerSize(2.5);
+  db->set_graphLineWidth(4.);
+  db->set_noMarkerBarsX();
 
   //db->set_lumiOnRightSide(true);
 
@@ -193,6 +198,7 @@ int main(int argc, char* argv[]) {
 
 
   float lumi_fb = 4.98;
+  int rebin =1;
 
   db->set_lumiNormalization(lumi_fb*1000.);
   db->set_noStack(false);
@@ -212,7 +218,7 @@ int main(int argc, char* argv[]) {
   db->drawHisto("nBJets_medium_prepresel", "b-Jet Multiplicity (medium)", "", "Events", true);
   db->drawHisto("rhoPF_noPUW", "Particle Flow Energy Density", "GeV", "Events", true);
   db->drawHisto("rhoPF_prepresel", "Particle Flow Energy Density", "GeV", "Events", true);
-  db->set_rebin(2);
+  db->set_rebin(2*rebin);
   db->set_xAxisMin();
   db->set_xAxisMax(130.);
   db->set_yAxisMaxScale(1.1);
@@ -223,7 +229,7 @@ int main(int argc, char* argv[]) {
 
   float xMin_mZll = 70.;
   // opposite flavor leptons: control region for ttbar:
-  db->set_rebin(5);
+  db->set_rebin(5*rebin);
   db->set_yAxisMaxScale(1.3);
   db->set_xAxisMin(xMin_mZll);
   db->set_xAxisMax(150.);
@@ -251,12 +257,12 @@ int main(int argc, char* argv[]) {
 
 
   db->reset();
-  db->set_rebin(5.);
+  db->set_rebin(5.*rebin);
   db->set_yAxisMaxScale(1.1);
   db->set_xAxisMax(240.);
   db->drawHisto("ptJetMax_prepresel", "Leading Jet p_{T}", "GeV", "Events", true);
 
-  db->set_rebin(4);
+  db->set_rebin(4*rebin);
   db->set_xAxisMin(50);
   db->set_xAxisMax(130.);
   db->set_yAxisMaxScale(1.1);
@@ -279,18 +285,19 @@ int main(int argc, char* argv[]) {
   db->drawHisto("nJets_presel", "Jet Multiplicity", "", "Events", true, 1, "scaled");
 
 
-  db->set_rebin(2);
+  db->set_rebin(2*rebin);
   db->drawHisto("rhoPF_presel", "Particle Flow Energy Density", "GeV", "Events", true);
 
 
+  if( selType=="optsel3" ) rebin = 4;
 
-  db->set_rebin(5);
+  db->set_rebin(5*rebin);
   db->drawHisto("ptLept3_presel", "Third Lepton p_{T}", "GeV", "Events");
   db->drawHisto("etaLept3_presel", "Third Lepton #eta", "", "Events");
   db->drawHisto("leptTypeLept3_presel", "Third Lepton Flavor", "", "Events");
   db->drawHisto("combinedIsoRelLept3_presel", "Third Lepton Isolation", "", "Events");
 
-  db->set_rebin(4);
+  db->set_rebin(4*rebin);
   db->set_xAxisMin(50.);
   db->set_xAxisMax(130.);
   db->set_yAxisMaxScale(1.1);
@@ -309,27 +316,47 @@ int main(int argc, char* argv[]) {
   db->drawHisto("nBJets_medium", "b-Jet Multiplicity (medium)", "", "Events", true);
   db->drawHisto_fromTree("tree_passedEvents", "nBjets_loose", "eventWeight*(mZll>81. && mZll<101.)", 6, -0.5, 5.5, "nBjets_loose_tightZ", "b-Jet Multiplicity (loose)", "", "Events");
   db->drawHisto_fromTree("tree_passedEvents", "nBjets_medium", "eventWeight*(mZll>81. && mZll<101.)", 6, -0.5, 5.5, "nBjets_medium_tightZ", "b-Jet Multiplicity (medium)", "", "Events");
-  db->set_rebin(20);
+  db->set_rebin(20*rebin);
   db->set_xAxisMax(240);
   db->drawHisto("ptJetMax", "Leading Jet p_{T}", "GeV", "Events");
   db->drawHisto("pfMet", "Particle Flow ME_{T}", "GeV", "Events", true);
-  db->set_rebin(50);
   db->set_xAxisMax();
+  db->set_rebin(50*rebin);
+  db->set_xAxisMax();
+  if( selType=="optsel3" )
+    db->set_xAxisMin(100.);
   db->drawHisto("ht", "H_{T}", "GeV", "Events");
-  db->set_rebin(20);
+  db->set_xAxisMin();
+  if( selType=="optsel3" )
+    db->set_xAxisMin();
+  db->set_rebin(20*rebin);
   db->set_xAxisMax(300);
   db->drawHisto("ptLeptZ1", "Leading Z Lepton p_{T}", "GeV", "Events");
-  db->set_rebin(10);
+  db->set_xAxisMax();
+  db->set_rebin(10*rebin);
   db->set_xAxisMax(150);
   db->drawHisto("ptLeptZ2", "Subleading Z Lepton p_{T}", "GeV", "Events");
   db->set_xAxisMax();
   db->drawHisto("ptLept3", "Third Lepton p_{T}", "GeV", "Events");
-  db->set_rebin(25);
+  db->set_rebin(25*rebin);
   db->set_xAxisMax(400);
   db->drawHisto("ptZll", "p_{T} (Z)", "GeV", "Events");
-  db->set_rebin();
+
+  db->set_rebin(50*rebin);
+  db->set_xAxisMax();
+  db->set_yAxisMaxScale(1.55);
+  db->set_xAxisMax(800);
+  db->drawHisto("m3", "M3", "GeV", "Events");
 
 
+  db->reset();
+  db->set_yAxisMaxScale(1.55);
+  db->set_legendBox_xMin(0.65);
+  db->drawHisto_fromTree("tree_passedEvents", "pfMet", "eventWeight*(isMZllSignalRegion && nBjets_medium>0 && nBjets_loose>1)", 4, 0., 200., "pfMet_fullsel", "Particle Flow ME_{T}", "GeV", "Events");
+  db->drawHisto_fromTree("tree_passedEvents", "ptLeptZ1", "eventWeight*(isMZllSignalRegion && nBjets_medium>0 && nBjets_loose>1)", 4, 0., 400., "ptLeptZ1_fullsel", "Leading Z Lepton p_{T}", "GeV", "Events");
+  db->drawHisto_fromTree("tree_passedEvents", "ptZll", "eventWeight*(isMZllSignalRegion && nBjets_medium>0 && nBjets_loose>1)", 4, 50., 450., "ptZll_fullsel", "p_{T} (Z)", "GeV", "Events");
+  db->drawHisto_fromTree("tree_passedEvents", "ht", "eventWeight*(isMZllSignalRegion && nBjets_medium>0 && nBjets_loose>1)", 4, 100., 900., "ht_fullsel", "H_{T}", "GeV", "Events");
+  db->reset();
 
   ValueAndError noCorr;
   noCorr.val = 1.;
@@ -491,19 +518,19 @@ std::cout << "scaling err: " << scaling_err << std::endl;
     mmm_mc *= scaling;
     tot_mc *= scaling;
 
-    //if( db->get_mcFile(iMC).datasetName=="ZJets" && mme_mc==0. ) { // compute error on zero yield
-    //  TH1D* h_nCounter = (TH1D*)(db->get_mcFile(iMC).file->Get("nCounter"));
-    //  int nGen = h_nCounter->GetBinContent(1);
-    //  TEfficiency *eff = new TEfficiency();
-    //  float upper = eff->ClopperPearson(nGen, 0., 0.68, true);
-    //  float delta = upper;
-    //  delete eff;
-    //  //float error = delta * float(nGen);
-    //  float error = delta;
-    //  error *= 3048.;
-    //  mme_mc_err = error;
-    //  std::cout << "nGen: " << nGen << " upper: " << upper << " error: " << error << std::endl;
-    //}    
+   // if( db->get_mcFile(iMC).datasetName=="ZJets" && mme_mc==0. ) { // compute error on zero yield
+   //   TH1D* h_nCounter = (TH1D*)(db->get_mcFile(iMC).file->Get("nCounter"));
+   //   int nGen = h_nCounter->GetBinContent(1);
+   //   TEfficiency *eff = new TEfficiency();
+   //   float upper = eff->ClopperPearson(nGen, 0., 0.68, true);
+   //   float delta = upper;
+   //   delete eff;
+   //   //float error = delta * float(nGen);
+   //   float error = delta;
+   //   error *= 3048.;
+   //   mme_mc_err = error;
+   //   std::cout << "nGen: " << nGen << " upper: " << upper << " error: " << error << std::endl;
+   // }    
 
 
     eee_mc_err *= scaling;
