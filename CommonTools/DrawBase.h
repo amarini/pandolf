@@ -19,12 +19,12 @@
 #include "TH2D.h"
 #include "TF1.h"
 #include "TGraphErrors.h"
+#include "TGraphAsymmErrors.h"
 #include "TFile.h"
 #include "TTree.h"
 #include "TStyle.h"
 #include "TLegend.h"
 #include "TPaveText.h"
-//#include "TLatex.h"
 
 
 struct InputFile {
@@ -74,9 +74,9 @@ class DrawBase {
   //void drawHisto( const std::string& name, const std::string& etaRegion, const std::string& flags, const std::string& axisName="", const std::string& units="", int legendQuadrant=1, bool log_aussi=false);
   void drawHisto_vs_pt( int nBinsPt, float* ptBins, const std::string& name, const std::string& axisName, const std::string& units="", const std::string& instanceName="Entries", bool log_aussi=false, int legendQuadrant=1, std::string flags="", const std::string& labelText="" );
   void drawHisto_vs_pt( std::vector<float> ptBins, const std::string& name, const std::string& axisName, const std::string& units="", const std::string& instanceName="Entries", bool log_aussi=false, int legendQuadrant=1, std::string flags="", const std::string& labelText="" );
-  void drawHisto( const std::string& name, const std::string& axisName="", const std::string& units="", const std::string& instanceName="Events", bool log_aussi=false, int legendQuadrant=1, const std::string& flags="", const std::string& labelText="", bool add_jetAlgoText=false );
-  void drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<TH1D*> mcHistos, std::vector<TH1D*> mcHistos_superimp, const std::string& name, const std::string& axisName, const std::string& units="", const std::string& instanceName="Entries", bool log_aussi=false, int legendQuadrant=1, const std::string& flags="", const std::string& labelText="", bool add_jetAlgoText=false );
-  void drawHisto_fromTree( const std::string& treeName, const std::string& varName, const std::string& selection, int nBins, float xMin, float xMax, const std::string& name, const std::string& axisName, const std::string& units="", const std::string& instanceName="Entries", bool log_aussi=false, int legendQuadrant=1, const std::string& flags="", const std::string& labelText="", bool add_jetAlgoText=false );
+  TCanvas* drawHisto( const std::string& name, const std::string& axisName="", const std::string& units="", const std::string& instanceName="Events", bool log_aussi=false, int legendQuadrant=1, const std::string& flags="", const std::string& labelText="", bool add_jetAlgoText=false );
+  TCanvas* drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<TH1D*> mcHistos, std::vector<TH1D*> mcHistos_superimp, const std::string& name, const std::string& axisName, const std::string& units="", const std::string& instanceName="Entries", bool log_aussi=false, int legendQuadrant=1, const std::string& flags="", const std::string& labelText="", bool add_jetAlgoText=false );
+  TCanvas* drawHisto_fromTree( const std::string& treeName, const std::string& varName, const std::string& selection, int nBins, float xMin, float xMax, const std::string& name, const std::string& axisName, const std::string& units="", const std::string& instanceName="Entries", bool log_aussi=false, int legendQuadrant=1, const std::string& flags="", const std::string& labelText="", bool add_jetAlgoText=false );
   void draw2DHisto_fromTree( const std::string& treeName, const std::string& varName1, const std::string& varName2, const std::string& selection, int nBins1, float xMin1, float xMax1, int nBins2, float xMin2, float xMax2, const std::string& name, const std::string& axisName1, const std::string& axisName2, const std::string& units1="", const std::string& units2="", int legendQuadrant=1, const std::string& flags="", const std::string& labelText="" );
   void drawProfile( const std::string& yVar, const std::string& xVar, int legendQuadrant=1);
   void drawStack(const std::string& varY, const std::string& varX, const std::string& RECO_GEN, bool isData) const { this->drawStack( varY, varX, "", RECO_GEN, isData); };
@@ -136,6 +136,8 @@ class DrawBase {
   void set_legendBox_xMin( float legendBox_xMin ) { legendBox_xMin_ = legendBox_xMin; };
   void set_legendBox_yMax( float legendBox_yMax ) { legendBox_yMax_ = legendBox_yMax; };
   void set_legendBox_yMin( float legendBox_yMin ) { legendBox_yMin_ = legendBox_yMin; };
+  void set_noMarkerBarsX( bool noMarkerBarsX=true ) { noMarkerBarsX_ = noMarkerBarsX; };
+  void set_graphLineWidth( float graphLineWidth=1. ) { graphLineWidth_ = graphLineWidth; };
 
 
   void add_label( const std::string& text, float xmin=0.23, float ymin=0.87, float xmax=0.36, float ymax=0.9, float textSize=0.035 );
@@ -175,9 +177,13 @@ class DrawBase {
   std::string get_outputSuffix() const;
   std::string get_fullSuffix() const;
 
+  TH2D* get_lastHistos_axes() const { return lastHistos_axes_; };
   std::vector< TH1D* > get_lastHistos_data() const { return lastHistos_data_; };
+  TGraphAsymmErrors* get_lastHistos_dataGraph() const { return lastHistos_dataGraph_; };
   std::vector< TH1D* > get_lastHistos_mc() const { return lastHistos_mc_; };
   std::vector< TH1D* > get_lastHistos_mc_superimp() const { return lastHistos_mc_superimp_; };
+  THStack* get_lastHistos_mcStack() const { return lastHistos_mcStack_; };
+  //TList* get_lastHistos_primitives() const { return lastHistos_primitives_; };
 
   float get_xAxisMin() const { return xAxisMin_; };
   float get_xAxisMax() const { return xAxisMax_; };
@@ -204,8 +210,12 @@ class DrawBase {
   
   TH1D* lastHistos_mcHistoSum_;
   std::vector< TH1D* > lastHistos_data_;
+  TGraphAsymmErrors* lastHistos_dataGraph_;
   std::vector< TH1D* > lastHistos_mc_;
   std::vector< TH1D* > lastHistos_mc_superimp_;
+  TH2D* lastHistos_axes_;
+  THStack* lastHistos_mcStack_;
+  //TList* lastHistos_primitives_;
   
   Float_t scaleFactor_;
 
@@ -216,6 +226,8 @@ class DrawBase {
   Float_t yAxisMaxScaleLog_;
 
   Float_t markerSize_;
+  Float_t graphLineWidth_;
+
   Float_t lumi_;
   bool is7TeV_;
 
@@ -229,6 +241,8 @@ class DrawBase {
   bool root_aussi_;
   bool logx_;
   bool getBinLabels_;
+  bool noMarkerBarsX_;
+
   std::string legendTitle_;
   float legendTextSize_;
 
