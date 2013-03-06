@@ -198,17 +198,22 @@ DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType
 
   poissonAsymmErrors_ = true;
   drawZeros_ = true;
+  noMarkerBarsX_ = false;
+  graphLineWidth_ = 1.;
 
   pdf_aussi_ = false;
   root_aussi_ = false;
   noStack_ = false;
 
   isCMSArticle_ = false;
-  lumiOnRightSide_ = true;
+  lumiOnRightSide_ = false;
 
   additionalLabel_ = 0;
 
   lastHistos_mcHistoSum_=0;
+  lastHistos_mcStack_=0;
+  lastHistos_axes_=0;
+  lastHistos_dataGraph_=0;
 
   displayEmptyDatasets_ = true;
 
@@ -1102,7 +1107,7 @@ void DrawBase::drawHisto_vs_pt( std::vector<float> ptBins, const std::string& na
 
 
 
-void DrawBase::drawHisto( const std::string& name, const std::string& axisName, const std::string& units, const std::string& instanceName, bool log_aussi, int legendQuadrant, const std::string& flags, const std::string& labelText, bool add_jetAlgoText  ) {
+TCanvas* DrawBase::drawHisto( const std::string& name, const std::string& axisName, const std::string& units, const std::string& instanceName, bool log_aussi, int legendQuadrant, const std::string& flags, const std::string& labelText, bool add_jetAlgoText  ) {
 
   bool noDATA = false;
   bool noMC = false;
@@ -1125,7 +1130,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
 
   if( noDATA && noMC ) {
     std::cout << "Didn't find histo '" << histoName << "'. Skipping." << std::endl;
-    return;
+    return 0;
   }
 
 
@@ -1135,7 +1140,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
       mcHistos.push_back((TH1D*)(mcFiles_[i].file->Get(histoName.c_str())->Clone()));
       if( mcHistos[i]==0 ) {
         std::cout << "Didn't find MC histo '" << histoName << "'. Continuing." << std::endl;
-        return;
+        return 0;
       }
     } //for mc files
   } // if mcfiles > 1
@@ -1149,7 +1154,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
     mcHistos_superimp.push_back(mcHisto0_superimp);
 
 
-  drawHisto_fromHistos( dataHistos, mcHistos, mcHistos_superimp, name, axisName, units, instanceName, log_aussi, legendQuadrant, flags, labelText, add_jetAlgoText );
+  return drawHisto_fromHistos( dataHistos, mcHistos, mcHistos_superimp, name, axisName, units, instanceName, log_aussi, legendQuadrant, flags, labelText, add_jetAlgoText );
 
 
 } //drawhisto
@@ -1159,7 +1164,7 @@ void DrawBase::drawHisto( const std::string& name, const std::string& axisName, 
 
 
 
-void DrawBase::drawHisto_fromTree( const std::string& treeName, const std::string& varName, const std::string& selection, int nBins, float xMin, float xMax, const std::string& name, const std::string& axisName, const std::string& units, const std::string& instanceName, bool log_aussi, int legendQuadrant, const std::string& flags, const std::string& labelText, bool add_jetAlgoText  ) {
+TCanvas* DrawBase::drawHisto_fromTree( const std::string& treeName, const std::string& varName, const std::string& selection, int nBins, float xMin, float xMax, const std::string& name, const std::string& axisName, const std::string& units, const std::string& instanceName, bool log_aussi, int legendQuadrant, const std::string& flags, const std::string& labelText, bool add_jetAlgoText  ) {
 
 
   // need this = true here. love these root features.
@@ -1209,7 +1214,7 @@ void DrawBase::drawHisto_fromTree( const std::string& treeName, const std::strin
 
   if( noDATA && noMC ) {
     std::cout << "Didn't find histo '" << histoName << "'. Skipping." << std::endl;
-    return;
+    return 0;
   }
 
 
@@ -1252,7 +1257,7 @@ void DrawBase::drawHisto_fromTree( const std::string& treeName, const std::strin
   }
 
 
-  drawHisto_fromHistos( dataHistos, mcHistos, mcHistos_superimp, name, axisName, units, instanceName, log_aussi, legendQuadrant, flags, labelText, add_jetAlgoText );
+  return drawHisto_fromHistos( dataHistos, mcHistos, mcHistos_superimp, name, axisName, units, instanceName, log_aussi, legendQuadrant, flags, labelText, add_jetAlgoText );
 
 } //drawhisto_fromTree
 
@@ -1354,7 +1359,7 @@ void DrawBase::draw2DHisto_fromTree( const std::string& treeName, const std::str
 }
 
 
-void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<TH1D*> mcHistos, std::vector<TH1D*> mcHistos_superimp, const std::string& name, const std::string& axisName, const std::string& units, const std::string& instanceName, bool log_aussi, int legendQuadrant, const std::string& flags, const std::string& labelText, bool add_jetAlgoText  ) {
+TCanvas* DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<TH1D*> mcHistos, std::vector<TH1D*> mcHistos_superimp, const std::string& name, const std::string& axisName, const std::string& units, const std::string& instanceName, bool log_aussi, int legendQuadrant, const std::string& flags, const std::string& labelText, bool add_jetAlgoText  ) {
 
 
   // need this in order to avoid the same-histogram problem
@@ -1636,8 +1641,8 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
     // create data graph (poisson asymm errors):
     TGraphAsymmErrors* graph_data_poisson = new TGraphAsymmErrors(0);
     if( dataHistos.size()==1 && poissonAsymmErrors_ ) {
-      if( noBinLabels )
-        graph_data_poisson = fitTools::getGraphPoissonErrors(dataHistos[0], drawZeros_);
+      if( noMarkerBarsX_ )
+        graph_data_poisson = fitTools::getGraphPoissonErrors(dataHistos[0], drawZeros_, "0");
       else 
         graph_data_poisson = fitTools::getGraphPoissonErrors(dataHistos[0], drawZeros_, "binWidth");
       if( dataFiles_[0].markerStyle!=-1 )
@@ -1645,6 +1650,7 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
       else 
         graph_data_poisson->SetMarkerStyle(20);
       graph_data_poisson->SetMarkerSize(markerSize_);
+      graph_data_poisson->SetLineWidth(graphLineWidth_);
     }
 
 
@@ -1910,7 +1916,10 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
 
 
 
-    if( lastHistos_mcHistoSum_!=0 ) delete lastHistos_mcHistoSum_;
+    if( lastHistos_mcHistoSum_!=0 ) {
+      delete lastHistos_mcHistoSum_;
+      lastHistos_mcHistoSum_=0;
+    }
 
     if( mcHisto_sum!=0 ) lastHistos_mcHistoSum_ = new TH1D(*mcHisto_sum);
 
@@ -1924,6 +1933,7 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
       lastHistos_data_.push_back(newHisto);
     }
 
+
     for( unsigned iHisto=0; iHisto<mcHistos.size(); ++iHisto ) {
       TH1D* newHisto = new TH1D(*(mcHistos[iHisto]));
       lastHistos_mc_.push_back(newHisto);
@@ -1935,18 +1945,44 @@ void DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<
     }
 
       
+    if( lastHistos_axes_!=0 ) {
+      delete lastHistos_axes_;
+      lastHistos_axes_ = 0;
+    }
+    lastHistos_axes_ = new TH2D(*h2_axes);
 
-    delete c1;
-    delete legend;
-    delete h2_axes;
-    if( mcHisto_stack!=0 ) delete mcHisto_stack;
-    if( mcHisto_sum!=0 ) delete mcHisto_sum;
+
+    if( lastHistos_mcStack_!=0 ) {
+      delete lastHistos_mcStack_;
+      lastHistos_mcStack_ = 0;
+    }
+    lastHistos_mcStack_ = new THStack(*mcHisto_stack);
+
+
+    if( lastHistos_dataGraph_!=0 ) {
+      delete lastHistos_dataGraph_;
+      lastHistos_dataGraph_ = 0;
+    }
+    lastHistos_dataGraph_ = new TGraphAsymmErrors(*graph_data_poisson);
+
+
+   
+
+    //delete legend;
+    //delete h2_axes;
+    //if( mcHisto_stack!=0 ) delete mcHisto_stack;
+    //if( mcHisto_sum!=0 ) delete mcHisto_sum;
 
 
   // FIX: NOT SURE IF IT'S OK TO KEEP IT LIKE THIS
   // had to comment the following line in order to be able
   // to draw the same histogram twice in the same program
   //TH1F::AddDirectory(kTRUE);
+
+    //TList* prims = c1->GetListOfPrimitives();
+    //delete c1;
+
+    return c1;
 
 
 } //drawHisto
