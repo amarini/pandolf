@@ -166,7 +166,8 @@ float RedNtpFinalizer::get_crossSection(const std::string& dataset) const {
   double kfactordiphotmadgraph = 1.15;       // for madgraph di-jets
   double kfactorgamjet = 1.3;
   double kfactorqcd = 1;
-  double kfactordy = 1.15;
+  double kfactordy = 1.;
+  //double kfactordy = 1.15;
   double kfactorwg = 1;       
   double kfactorzg = 1;       
   double kfactorwmgg = 1;     
@@ -244,8 +245,6 @@ float RedNtpFinalizer::get_crossSection(const std::string& dataset) const {
     xSection = 0.000235 * 5.195e+07 * kfactorqcd;
   } else if( dataset_tstr.Contains("QCD_Pt-30to40_doubleEMEnriched_TuneZ2star_8TeV-pythia6") ) {
     xSection = 0.002175 * 2.365e+07 * kfactorqcd;
-  } else if( dataset_tstr.Contains("QCD_Pt-30to40_doubleEMEnriched_TuneZ2star_8TeV-pythia6") ) {
-    xSection = 0.002175 * 2.365e+07 * kfactorqcd;
   } else if( dataset_tstr.Contains("WH_ZH_HToGG_M-125_8TeV-pythia6") ) {
     xSection = (0.6966 + 0.3943)*2.28E-03;
   } else if( dataset_tstr.Contains("TTH_HToGG_M-125_8TeV-pythia6") ) {
@@ -262,6 +261,8 @@ float RedNtpFinalizer::get_crossSection(const std::string& dataset) const {
     xSection = 0.0504 * kfactorwmgg;      // W-gg  - da AN FP
   } else if( dataset_tstr.BeginsWith("WpGG") ) {
     xSection = 0.0667 * kfactorwpgg;      // W+gg  - da AN FP
+  } else if( dataset_tstr.BeginsWith("tHqLeptonic") ) {
+    xSection = 0.0152 * 0.108 * 3. * 2.28E-03;      // W+gg  - da AN FP
   } else {
     std::cout << std::endl << std::endl;
     std::cout << "-> WARNING!! Dataset: '" << dataset << "' not present in database. Cross section unknown." << std::endl;
