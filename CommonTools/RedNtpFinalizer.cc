@@ -193,7 +193,7 @@ float RedNtpFinalizer::get_crossSection(const std::string& dataset) const {
     xSection = 11.1773;
   } else if( dataset_tstr.Contains("Tbar_tW-channel-DR_TuneZ2star_8TeV-powheg-tauola") ) {
     xSection = 11.1773;
-  } else if( dataset_tstr.Contains("TTJets_TuneZ2star_8TeV-madgraph-tauola") ) {
+  } else if( dataset_tstr.Contains("TTJets_TuneZ2star_8TeV-madgraph-tauola") || dataset_tstr.BeginsWith("TT_CT10") ) {
     xSection = 225.1967;
   } else if( dataset_tstr.Contains("WJetsToLNu_TuneZ2Star_8TeV-madgraph") ) {
     xSection = 37509.;
