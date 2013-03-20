@@ -263,6 +263,7 @@ float RedNtpFinalizer::get_crossSection(const std::string& dataset) const {
     xSection = 0.0667 * kfactorwpgg;      // W+gg  - da AN FP
   } else if( dataset_tstr.BeginsWith("tHqLeptonic") ) {
     xSection = 0.0152 * 0.108 * 3. * 2.28E-03;      // W+gg  - da AN FP
+    xSection *= 1.4; // NLO scale factor taken from http://arxiv.org/pdf/1302.3856v2.pdf
   } else {
     std::cout << std::endl << std::endl;
     std::cout << "-> WARNING!! Dataset: '" << dataset << "' not present in database. Cross section unknown." << std::endl;
