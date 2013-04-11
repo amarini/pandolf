@@ -195,6 +195,7 @@ DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType
   getBinLabels_ = false;
   legendTitle_ = "";
   legendTextSize_ = 0.038;
+  widenLegend_ = true;
 
   poissonAsymmErrors_ = true;
   drawZeros_ = true;
@@ -1588,9 +1589,9 @@ TCanvas* DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vec
     int totalNfiles = mcFiles_.size() + dataFiles_.size();
 //    if( dataFile_.file!=0 ) totalNfiles++;
 
-    if( totalNfiles > 5 ) {
-      yMax *= 1.2;
-    }
+    //if( totalNfiles > 5 ) {
+    //  yMax *= 1.2;
+    //}
 
 
     TLegend* legend = new TLegend(lb.xMin, lb.yMin, lb.xMax, lb.yMax, legendTitle_.c_str());
@@ -2973,23 +2974,25 @@ LegendBox DrawBase::get_legendBox( int legendQuadrant, const std::vector<std::st
 
 
     bool widen = false;
-    int wide_thresh = 12;
-    if( legendTitle_.size()>wide_thresh ) widen=true;
-    if( legendNames!=0 ) {
-      for( unsigned i=0;i<legendNames->size(); ++i )
-        if( legendNames->at(i).length() > wide_thresh ) widen=true;
-    } else {
-      for( unsigned i=0;i<dataFiles_.size(); ++i )
-        if( dataFiles_[i].legendName.length() > wide_thresh ) widen=true;
-      for( unsigned i=0;i<mcFiles_.size(); ++i )
-        if( mcFiles_[i].legendName.length() > wide_thresh ) widen=true;
-      for( unsigned i=0;i<mcFiles_superimp_.size(); ++i )
-        if( mcFiles_superimp_[i].legendName.length() > wide_thresh ) widen=true;
+    if( widenLegend_ ) {
+      int wide_thresh = 12;
+      if( legendTitle_.size()>wide_thresh ) widen=true;
+      if( legendNames!=0 ) {
+        for( unsigned i=0;i<legendNames->size(); ++i )
+          if( legendNames->at(i).length() > wide_thresh ) widen=true;
+      } else {
+        for( unsigned i=0;i<dataFiles_.size(); ++i )
+          if( dataFiles_[i].legendName.length() > wide_thresh ) widen=true;
+        for( unsigned i=0;i<mcFiles_.size(); ++i )
+          if( mcFiles_[i].legendName.length() > wide_thresh ) widen=true;
+        for( unsigned i=0;i<mcFiles_superimp_.size(); ++i )
+          if( mcFiles_superimp_[i].legendName.length() > wide_thresh ) widen=true;
+      }
     }
 
     if( widen ) {
       if( legendQuadrant==1 || legendQuadrant==4 ) lb.xMin *=0.85;
-      if( legendQuadrant==2 || legendQuadrant==3 ) lb.xMax *=1.1;
+      if( legendQuadrant==2 || legendQuadrant==3 ) lb.xMax *=1.15;
     }
 
     if( legendBox_xMin_>=0. )
@@ -3503,3 +3506,28 @@ void DrawBase::set_mcWeight( const std::string& datasetName, float weight ) {
 
 }
 
+
+
+InputFile DrawBase::get_mcFile( const std::string& datasetName ) const {
+
+  InputFile infile;
+
+  for( unsigned iFile=0; iFile<mcFiles_.size(); ++iFile ) {
+
+    if( mcFiles_[iFile].datasetName==datasetName ) {
+
+      infile = mcFiles_[iFile];
+      break;
+
+    }
+
+  }
+
+  if( infile.datasetName != datasetName ) {
+    std::cout << "ERROR!!! Didn't find MC file with dataset name: " << datasetName << std::endl;
+    std::cout << "Exiting" << std::endl;
+  }
+
+  return infile;
+
+}
