@@ -6,6 +6,8 @@
 #include "RooPlot.h"
 
 #include "TRegexp.h"
+#include "TROOT.h"
+
 #include <iostream>
 #include <algorithm>
 
@@ -1361,6 +1363,10 @@ void DrawBase::draw2DHisto_fromTree( const std::string& treeName, const std::str
 
 
 TCanvas* DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vector<TH1D*> mcHistos, std::vector<TH1D*> mcHistos_superimp, const std::string& name, const std::string& axisName, const std::string& units, const std::string& instanceName, bool log_aussi, int legendQuadrant, const std::string& flags, const std::string& labelText, bool add_jetAlgoText  ) {
+
+
+  TCanvas *old_c1 = (TCanvas*)gROOT->GetListOfCanvases()->FindObject("c1");
+  if( old_c1 != 0 ) delete old_c1;
 
 
   // need this in order to avoid the same-histogram problem
