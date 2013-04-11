@@ -132,14 +132,13 @@ class DrawBase {
   void set_mcWeight( const std::string& datasetName, float weight );
   void set_is7TeV( bool is7TeV ) { is7TeV_ = is7TeV; };
   void set_displayEmptyDatasets( bool displayThem ) { displayEmptyDatasets_ = displayThem; };
+  void set_widenLegend( bool widenLegend ) { widenLegend_ = widenLegend; };
   void set_legendBox_xMax( float legendBox_xMax ) { legendBox_xMax_ = legendBox_xMax; };
   void set_legendBox_xMin( float legendBox_xMin ) { legendBox_xMin_ = legendBox_xMin; };
   void set_legendBox_yMax( float legendBox_yMax ) { legendBox_yMax_ = legendBox_yMax; };
   void set_legendBox_yMin( float legendBox_yMin ) { legendBox_yMin_ = legendBox_yMin; };
   void set_noMarkerBarsX( bool noMarkerBarsX=true ) { noMarkerBarsX_ = noMarkerBarsX; };
   void set_graphLineWidth( float graphLineWidth=1. ) { graphLineWidth_ = graphLineWidth; };
-
-
   void add_label( const std::string& text, float xmin=0.23, float ymin=0.87, float xmax=0.36, float ymax=0.9, float textSize=0.035 );
   void delete_label();
 
@@ -159,6 +158,7 @@ class DrawBase {
   std::string get_legendTitle() const { return legendTitle_; };
   InputFile get_dataFile( int i ) const { return dataFiles_[i]; };
   InputFile get_mcFile( int i ) const { return mcFiles_[i]; };
+  InputFile get_mcFile( const std::string& datasetName ) const;
   std::vector< InputFile >  get_dataFiles() const { return dataFiles_; };
   std::vector< InputFile >  get_mcFiles() const { return mcFiles_; };
   std::string get_outputdir() const { return outputdir_; };
@@ -245,6 +245,7 @@ class DrawBase {
 
   std::string legendTitle_;
   float legendTextSize_;
+  bool widenLegend_;
 
   bool poissonAsymmErrors_;
   bool drawZeros_;
