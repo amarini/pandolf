@@ -186,7 +186,7 @@ float RedNtpFinalizer::get_crossSection(const std::string& dataset) const {
 
 
   if( dataset_tstr.Contains("DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph") ) {
-    xSection = 3532.81; 
+    xSection = 3532.81;       
   } else if( dataset_tstr.Contains("DYJetsToLL_M-10To50filter_8TeV-madgraph") ) {
     xSection = 860.5013;
   } else if( dataset_tstr.Contains("T_tW-channel-DR_TuneZ2star_8TeV-powheg-tauola") ) {
@@ -218,7 +218,7 @@ float RedNtpFinalizer::get_crossSection(const std::string& dataset) const {
   } else if( dataset_tstr.Contains("TTTo2L2Nu2B_8TeV-powheg-pythia6") ) {
     xSection = 23.6402;
   } else if( dataset_tstr.Contains("WGToLNuG_TuneZ2star_8TeV-madgraph-tauola") ) {
-    xSection = 553.92;
+    xSection = 553.92;    
   } else if( dataset_tstr.Contains("ZGToLLG_8TeV-madgraph") ) {
     xSection = 181.338*0.06;
   } else if( dataset_tstr.Contains("ZG_Inclusive_8TeV-madgraph") ) {
@@ -266,7 +266,18 @@ float RedNtpFinalizer::get_crossSection(const std::string& dataset) const {
     //xSection *= 1.4; // NLO scale factor taken from http://arxiv.org/pdf/1302.3856v2.pdf
   } else if( dataset_tstr.BeginsWith("tHqHadronic") ) {
     xSection = 0.0152 * (1. - 0.108 * 3.) * 2.28E-03;      // from http://arxiv.org/abs/1211.0499
+  } else if( dataset_tstr.BeginsWith("Radion_M-300_madgraph") ) {   // from https://twiki.cern.ch/twiki/bin/view/CMS/HHtoGammaGammabb#MC_signal_simulation
+    xSection = 0.000271;     
+  } else if( dataset_tstr.BeginsWith("Radion_M-500_madgraph") ) {
+    xSection = 0.0000471;    
+  } else if( dataset_tstr.BeginsWith("Radion_M-700_madgraph") ) {
+    xSection = 0.0000158;    
+  } else if( dataset_tstr.BeginsWith("Radion_M-1000_madgraph") ) {
+    xSection = 0.00000263;   
   } else {
+
+
+
     std::cout << std::endl << std::endl;
     std::cout << "-> WARNING!! Dataset: '" << dataset << "' not present in database. Cross section unknown." << std::endl;
     std::cout << "-> Will set unitary weights." << std::endl;
