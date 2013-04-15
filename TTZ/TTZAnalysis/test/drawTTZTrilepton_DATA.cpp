@@ -25,6 +25,7 @@ ValueAndError get_DYWZSF( const DrawBase& db, float xMin=0, float xMax=10000. );
 float computeChiSquare( TH1D* h1_DATA, TH1D* h1_MC, float xMin=0, float xMax=10000. );
 
 void drawChannelYieldPlot( DrawBase* db, const std::string& selName, char selection[], float lumi_fb, ValueAndError ttbarSF, ValueAndError DYWZSF );
+void addErrorBands( DrawBase* db, TCanvas* canvas, ValueAndError ttbarSF, ValueAndError DYWZSF, const std::string& name );
 
 
 int main(int argc, char* argv[]) {
@@ -67,13 +68,21 @@ int main(int argc, char* argv[]) {
 
 
 
+  Color_t gCol_ttz  = 18; 
+  Color_t gCol_ttw  = 33;
+  Color_t gCol_dy   = 46;
+  Color_t gCol_tbz  = 42;
+  Color_t gCol_tt   = 38;
+  Color_t gCol_dib  = 39;
+
+
   DrawBase* db = new DrawBase("TTZTrilepton");
   db->set_isCMSArticle();
   db->set_is7TeV(true);
 
 
-  db->set_markerSize(2.5);
-  db->set_graphLineWidth(4.);
+  db->set_markerSize(3);
+  db->set_graphLineWidth(2.);
   db->set_noMarkerBarsX();
 
   //db->set_lumiOnRightSide(true);
@@ -92,7 +101,6 @@ int main(int argc, char* argv[]) {
   db->add_dataFile( dataFile, data_dataset );
 
 
-  int signalFillColor = 42;
 
   std::string TTZFileName = "TTZTrilepton_TTZ_TuneZ2_7TeV-madgraphCMSSW42xPUv3_spadhi";
   TTZFileName += "_" + selType;
@@ -101,7 +109,7 @@ int main(int argc, char* argv[]) {
   TTZFileName += "_" + leptType;
   TTZFileName += ".root";
   TFile* TTZFile = TFile::Open(TTZFileName.c_str());
-  db->add_mcFile( TTZFile, "ttZ", "t#bar{t} + Z", signalFillColor, 0);
+  db->add_mcFile( TTZFile, "ttZ", "t#bar{t} + Z", gCol_ttz, 0);
 
 
   std::string mcTTWFileName = "TTZTrilepton_TTW_TuneZ2_7TeV-madgraphCMSSW42xPUv2_spadhi";
@@ -111,7 +119,7 @@ int main(int argc, char* argv[]) {
   mcTTWFileName += "_" + leptType;
   mcTTWFileName += ".root";
   TFile* mcTTWFile = TFile::Open(mcTTWFileName.c_str());
-  db->add_mcFile( mcTTWFile, "ttW", "t#bar{t} + W", 44, 0);
+  db->add_mcFile( mcTTWFile, "ttW", "t#bar{t} + W", gCol_ttw, 0);
 
 
   //std::string mcZJetsFileName = "TTZTrilepton_DYJetsToLL_TuneZ2_7TeV-madgraph-tauola_Fall11";
@@ -123,7 +131,7 @@ int main(int argc, char* argv[]) {
   mcZJetsFileName += "_" + leptType;
   mcZJetsFileName += ".root";
   TFile* mcZJetsFile = TFile::Open(mcZJetsFileName.c_str());
-  db->add_mcFile( mcZJetsFile, "ZJets", "Z + jets", 46, 0);
+  db->add_mcFile( mcZJetsFile, "ZJets", "Z + jets", gCol_dy, 0);
 
 
   std::string mctbZFileName = "TTZTrilepton_TBZToLL_4F_TuneZ2_7TeV-madgraph-tauola_Fall11-PU_S6_START42_V14B-v1";
@@ -133,7 +141,7 @@ int main(int argc, char* argv[]) {
   mctbZFileName += "_" + leptType;
   mctbZFileName += ".root";
   TFile* mctbZFile = TFile::Open(mctbZFileName.c_str());
-  db->add_mcFile( mctbZFile, "tbZ", "tbZ", 49, 0);
+  db->add_mcFile( mctbZFile, "tbZ", "tbZ", gCol_tbz, 0);
 
   //std::string mcTTbarFileName = "TTZTrilepton_TTJets_TuneZ2_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1";
   std::string mcTTbarFileName = "TTZTrilepton_TTJ_Fall11_highstat";
@@ -143,7 +151,7 @@ int main(int argc, char* argv[]) {
   mcTTbarFileName += "_" + leptType;
   mcTTbarFileName += ".root";
   TFile* mcTTbarFile = TFile::Open(mcTTbarFileName.c_str());
-  db->add_mcFile( mcTTbarFile, "TTtW", "t#bar{t}", 39, 0);
+  db->add_mcFile( mcTTbarFile, "TTtW", "t#bar{t}", gCol_tt, 0);
 
 
 
@@ -176,7 +184,7 @@ int main(int argc, char* argv[]) {
   std::cout << hadd_command << std::endl;
   system(hadd_command.c_str());
   TFile* mcVVVGFile = TFile::Open(mcVVVGFileName.c_str());
-  db->add_mcFile( mcVVVGFile, "VVVG", "Diboson", 38, 0);
+  db->add_mcFile( mcVVVGFile, "VVVG", "Diboson", gCol_dib, 0);
 
 
 
@@ -186,7 +194,7 @@ int main(int argc, char* argv[]) {
 //mcZZFileName += "_" + leptType;
 //mcZZFileName += ".root";
 //TFile* mcZZFile = TFile::Open(mcZZFileName.c_str());
-//db->add_mcFile( mcZZFile, "ZZtoAnything_TuneZ2", "ZZ + jets", kRed, 3004);
+//db->add_mcFile( mcZZFile, "ZZtoAnything_TuneZ2", "ZZ + jets", kRed, 3005);
 
 
 
@@ -319,7 +327,7 @@ int main(int argc, char* argv[]) {
   db->set_rebin(20*rebin);
   db->set_xAxisMax(240);
   db->drawHisto("ptJetMax", "Leading Jet p_{T}", "GeV", "Events");
-  db->drawHisto("pfMet", "Particle Flow ME_{T}", "GeV", "Events", true);
+  db->drawHisto("pfMet", "Particle Flow #slash{E}_{T}", "GeV", "Events", true);
   db->set_xAxisMax();
   db->set_rebin(50*rebin);
   db->set_xAxisMax();
@@ -352,10 +360,15 @@ int main(int argc, char* argv[]) {
   db->reset();
   db->set_yAxisMaxScale(1.55);
   db->set_legendBox_xMin(0.65);
-  db->drawHisto_fromTree("tree_passedEvents", "pfMet", "eventWeight*(isMZllSignalRegion && nBjets_medium>0 && nBjets_loose>1)", 4, 0., 200., "pfMet_fullsel", "Particle Flow ME_{T}", "GeV", "Events");
-  db->drawHisto_fromTree("tree_passedEvents", "ptLeptZ1", "eventWeight*(isMZllSignalRegion && nBjets_medium>0 && nBjets_loose>1)", 4, 0., 400., "ptLeptZ1_fullsel", "Leading Z Lepton p_{T}", "GeV", "Events");
-  db->drawHisto_fromTree("tree_passedEvents", "ptZll", "eventWeight*(isMZllSignalRegion && nBjets_medium>0 && nBjets_loose>1)", 4, 50., 450., "ptZll_fullsel", "p_{T} (Z)", "GeV", "Events");
-  db->drawHisto_fromTree("tree_passedEvents", "ht", "eventWeight*(isMZllSignalRegion && nBjets_medium>0 && nBjets_loose>1)", 4, 100., 900., "ht_fullsel", "H_{T}", "GeV", "Events");
+  TCanvas* canvas;
+  canvas = db->drawHisto_fromTree("tree_passedEvents", "pfMet", "eventWeight*(isMZllSignalRegion && nBjets_medium>0 && nBjets_loose>1)", 4, 0., 200., "pfMet_fullsel", "Particle Flow #slash{E}_{T}", "GeV", "Events");
+  addErrorBands( db, canvas, ttbarSF, DYWZSF, "pfMet_fullsel" );
+  canvas = db->drawHisto_fromTree("tree_passedEvents", "ptLeptZ1", "eventWeight*(isMZllSignalRegion && nBjets_medium>0 && nBjets_loose>1)", 4, 0., 400., "ptLeptZ1_fullsel", "Leading Z Lepton p_{T}", "GeV", "Events");
+  addErrorBands( db, canvas, ttbarSF, DYWZSF, "ptLeptZ1_fullsel" );
+  canvas = db->drawHisto_fromTree("tree_passedEvents", "ptZll", "eventWeight*(isMZllSignalRegion && nBjets_medium>0 && nBjets_loose>1)", 4, 50., 450., "ptZll_fullsel", "p_{T} (Z)", "GeV", "Events");
+  addErrorBands( db, canvas, ttbarSF, DYWZSF, "ptZll_fullsel" );
+  canvas = db->drawHisto_fromTree("tree_passedEvents", "ht", "eventWeight*(isMZllSignalRegion && nBjets_medium>0 && nBjets_loose>1)", 4, 100., 900., "ht_fullsel", "H_{T}", "GeV", "Events");
+  addErrorBands( db, canvas, ttbarSF, DYWZSF, "ht_fullsel" );
   db->reset();
 
   ValueAndError noCorr;
@@ -373,6 +386,95 @@ int main(int argc, char* argv[]) {
   return 0;
 
 }  
+
+
+
+void addErrorBands( DrawBase* db, TCanvas* canvas, ValueAndError ttbarSF, ValueAndError DYWZSF, const std::string& name ) {
+
+  //TH1F::AddDirectory(kTRUE);
+
+  TGraphAsymmErrors* gr_data = db->get_lastHistos_dataGraph();
+
+  THStack* stackMC = db->get_lastHistos_mcStack();
+  std::vector<TH1D*> vh1_mc = db->get_lastHistos_mc();
+
+  int  nBins = vh1_mc[0]->GetNbinsX();
+  float xMin = vh1_mc[0]->GetXaxis()->GetXmin();
+  float xMax = vh1_mc[0]->GetXaxis()->GetXmax();
+
+
+  TH1D* h1_mc_totBG = new TH1D("mc_totBG", "", nBins, xMin, xMax);
+  h1_mc_totBG->Sumw2();
+
+
+
+
+  for( unsigned iBin=1; iBin<nBins+1; ++iBin ) {
+
+
+    float totalBinContent = 0.;
+    float totalBinError = 0.;
+
+
+
+    // have to recompute MC BG stack error for black line and band:
+    for( unsigned i=0; i<db->get_mcFiles().size(); ++i) {
+ 
+      // reverse order:
+      int iMC = db->get_mcFiles().size()-i-1;
+
+
+      std::string datasetName = db->get_mcFile(iMC).datasetName;
+      if( datasetName=="ttZ" || datasetName=="ttW" ) continue; // BG only
+
+
+      float thisBinContent = vh1_mc[iMC]->GetBinContent(iBin);
+      float thisBinError = vh1_mc[iMC]->GetBinError(iBin);
+
+      float scaling_err = 0.;
+
+      if( db->get_mcFile(iMC).datasetName=="TTtW" ) {
+        scaling_err = ttbarSF.err;
+      }
+      if( db->get_mcFile(iMC).datasetName=="ZJets" || db->get_mcFile(iMC).datasetName=="VVVG" ) {
+        scaling_err = DYWZSF.err;
+      }
+      if( db->get_mcFile(iMC).datasetName=="tbZ" ) {
+        scaling_err = 0.5; // this is not a scaling error, but the cross section uncertainty (it eludes the datadriven normalization)
+      }
+
+
+      totalBinContent += thisBinContent;
+      totalBinError += sqrt( thisBinError*thisBinError*thisBinContent*thisBinContent + scaling_err*scaling_err*thisBinContent*thisBinContent );
+
+    }
+
+
+    h1_mc_totBG->SetBinContent( iBin, totalBinContent );
+    h1_mc_totBG->SetBinError  ( iBin, totalBinError );
+ 
+  }
+
+
+  h1_mc_totBG->SetFillStyle( 3005 );
+  h1_mc_totBG->SetFillColor( 12 );
+  h1_mc_totBG->SetLineWidth( 3 );
+
+  h1_mc_totBG->DrawCopy("0 E2 same");
+  h1_mc_totBG->SetFillStyle(0);
+  h1_mc_totBG->DrawCopy("hist same");
+
+  gr_data->Draw("P same");
+ 
+  char canvasName[500];
+  sprintf( canvasName, "%s/%s_plusBgError.eps", db->get_outputdir().c_str(), name.c_str() );
+  canvas->SaveAs(canvasName);
+
+  sprintf( canvasName, "%s/%s_plusBgError.pdf", db->get_outputdir().c_str(), name.c_str() );
+  canvas->SaveAs(canvasName);
+
+}
+
 
 
 
@@ -630,7 +732,7 @@ std::cout << "scaling err: " << scaling_err << std::endl;
 
   
 
-  h1_yields_mc_totBG->SetFillStyle( 3004 );
+  h1_yields_mc_totBG->SetFillStyle( 3005 );
   h1_yields_mc_totBG->SetFillColor( 12 );
   h1_yields_mc_totBG->SetLineWidth( 3 );
 
