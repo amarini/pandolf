@@ -1448,6 +1448,14 @@ TCanvas* DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vec
         mcHistos[0]->SetMarkerSize( markerSize_ );
         mcHistos[0]->SetLineWidth(0);
       }
+
+      if( mcFiles_[0].lineColor!=-1 ) {
+        mcHistos[0]->SetLineWidth( mcFiles_[0].lineWidth );
+      }
+      if( mcFiles_[0].lineColor!=-1 || mcFiles_[0].lineWidth!=-1 ) {
+        mcHistos[0]->SetLineColor( mcFiles_[0].lineColor );
+      }
+
       mcHistos[0]->Rebin(rebin_);
       mcHistos[0]->Scale(mcFiles_[0].weight );
 
@@ -1844,7 +1852,11 @@ TCanvas* DrawBase::drawHisto_fromHistos( std::vector<TH1D*> dataHistos, std::vec
       TH2D* h2_axes_log = new TH2D("axes_log", "", nBinsx, xMin, xMax, 10, 0.1*yMin_log, yAxisMaxScaleLog_*yMax);
       //TH2D* h2_axes_log = new TH2D("axes_log", "", nBinsx, xMin, xMax, 10, 0.1*yMin_log, 100.*yMax);
       if( yAxisMax_ != 9999. ) h2_axes_log->GetYaxis()->SetRangeUser(0.1*yMin_log, yAxisMaxScaleLog_*yAxisMax_);
-      h2_axes_log->SetXTitle(xAxis.c_str());
+      if( !noBinLabels )
+        h2_axes_log->GetXaxis()->SetLabelSize(0.07);
+      else
+        h2_axes_log->SetXTitle(xAxis.c_str());
+
       h2_axes_log->SetYTitle(yAxis.c_str());
     //h2_axes_log->GetXaxis()->SetTitleOffset(1.1);
     //h2_axes_log->GetYaxis()->SetTitleOffset(1.5);
@@ -3039,9 +3051,6 @@ std::string DrawBase::get_lumiText() const {
     units = "fb ^{-1}";
   }
   
-  if(  lumi4Text > 10. ) {
-    onlyOneDecimal=true;
-  }
 
   if( dataFiles_.size()==0 ) {
     if( ((int)(lumi4Text*10.) % 10) == 0 ) onlyOneDecimal=true;
