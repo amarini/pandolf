@@ -274,8 +274,17 @@ float RedNtpFinalizer::get_crossSection(const std::string& dataset) const {
     xSection = 0.0000158;    
   } else if( dataset_tstr.BeginsWith("Radion_M-1000_madgraph") ) {
     xSection = 0.00000263;   
+  } else if( dataset_tstr.BeginsWith("Tbar_s-channel") ) {
+    xSection = 1.76;
+  } else if( dataset_tstr.BeginsWith("T_t-channel") ) {
+    xSection = 56.4;
+  } else if( dataset_tstr.BeginsWith("T_tW-channel") || dataset_tstr.BeginsWith("Tbar_tW-channel")) {
+    xSection = 11.1;
+  } else if( dataset_tstr.BeginsWith("T_s-channel") ) {
+    xSection = 3.79;
+  } else if( dataset_tstr.BeginsWith("Tbar_t-channel") ) {
+    xSection = 30.7;
   } else {
-
 
 
     std::cout << std::endl << std::endl;
