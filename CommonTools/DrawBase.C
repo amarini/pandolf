@@ -209,7 +209,7 @@ DrawBase::DrawBase( const std::string& analysisType, const std::string& recoType
   noStack_ = false;
 
   isCMSArticle_ = false;
-  lumiOnRightSide_ = false;
+  lumiOnRightSide_ = true;
 
   additionalLabel_ = 0;
 
@@ -3322,7 +3322,7 @@ TPaveText* DrawBase::get_labelSqrt( int legendQuadrant ) const {
         else
           cmsText = "CMS Preliminary";
       }
-      if( scaleFactor_>=0. ) {
+      if( scaleFactor_>=0. && (dataFiles_.size() + mcFiles_.size())>0 ) {
         label_sqrt->AddText(Form("%s, L = %s at  #sqrt{s} = %d TeV", cmsText.c_str(), lumiText.c_str(), sqrts));
       } else {
         label_sqrt->AddText(Form("%s,  #sqrt{s} = %d TeV", cmsText.c_str(), sqrts) );
