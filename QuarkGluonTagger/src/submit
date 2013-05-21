@@ -1,0 +1,57 @@
+#!/bin/bash
+
+SUBMIT=1
+CHECK=0
+RESUBMIT=0
+
+NJOBS=200
+
+if [ "$1" == "check" ]; then export CHECK=1; export SUBMIT=0; fi;
+if [ "$1" == "resubmit" ]; then export RESUBMIT=1;export CHECK=1; export SUBMIT=0; fi;
+
+echo -e "************"
+[ $SUBMIT -eq 1 ] && echo -e "*  \033[31;01mSubmit\033[00m  *"
+[ $CHECK -eq 1 ]  && echo -e "*  \033[31;01mCheck \033[00m  *"
+[ $CHECK -eq 1 ] && [ $RESUBMIT -eq 1 ]  && echo -e "* \033[31;01mResubmit\033[00m *"
+echo -e "************"
+read -p "Going To SUBMIT? $SUBMIT; Going To Check? $CHECK; Going to resubmit? $RESUBMIT"
+
+if [ $SUBMIT -eq 1 ]; then
+for i in `seq 0 $((NJOBS-1))` ; do
+
+[ -f Plot/log_$i.txt ] && rm Plot/log_$i.txt
+bsub -q 1nh -o Plot/log_$i.txt <<EOF
+cd ~/work/CMSSW_5_3_6
+export "SCRAM_ARCH=slc5_amd64_gcc462"
+eval \`scramv1 runtime -sh\`
+
+cd ~/work/GluonTag/QuarkGluonTagger2012/src
+root -q -l -b DrawComparisonFromNtp1.C+"($i,${NJOBS})"
+
+EOF
+
+done
+fi
+
+if [ $CHECK -eq 1 ]; then
+for i in `seq 0 $((NJOBS-1))` ; do
+[ -f Plot/done_${i}_${NJOBS}.txt ] || { echo "Job $i/$NJOBS not done" ;
+if [ $RESUBMIT -eq 1 ] ; then
+
+[ -f Plot/log_$i.txt ] && rm Plot/log_$i.txt
+bsub -q 1nh -o Plot/log_$i.txt <<EOF
+cd ~/work/CMSSW_5_3_6
+export "SCRAM_ARCH=slc5_amd64_gcc462"
+eval \`scramv1 runtime -sh\`
+
+cd ~/work/GluonTag/QuarkGluonTagger2012/src
+root -q -l -b DrawComparisonFromNtp1.C+"($i,${NJOBS})"
+EOF
+
+fi;
+
+}
+
+
+done
+fi
